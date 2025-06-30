@@ -1,0 +1,71 @@
+page-result {
+  .scroll-content {
+    background: #F5F5F5;
+  }
+
+  .user_sets_row {
+
+    div p {
+      margin: 10px 0px !important;
+      font-size: 16px;
+    }
+
+    ion-input {
+      width: 50px;
+      border-radius: 5px;
+      margin: auto;
+      border: 1px solid grey;
+      margin: 0px 5px;
+      text-align: center;
+
+      .text-input {
+        text-align: center !important;
+      }
+
+      font-size: 20px;
+      font-weight: 600;
+
+      .text-input-ios {
+        text-align: center;
+        margin: 11px 2px 11px 2px !important;
+      }
+
+    }
+
+    ion-icon {
+      color: #2B92BB;
+    }
+  }
+
+  .scoreStyle {
+    width: 80%;
+    height: 42px;
+    border-radius: 5px;
+    text-align: center;
+  }
+
+  .columnStyle {
+    color: #737373
+  }
+
+
+  //   ion-col:nth-child(odd) .participant_div{
+  //     border: 1px solid green; 
+  //     border-radius: 5px; 
+  //   }
+  //   ion-col:nth-child(even) .participant_div{
+  //     border: 1px solid red;
+  //     border-radius: 5px; 
+  //   }
+
+  .img {
+    width: 41px;
+    height: 25px;
+    // top: 90px;
+    // left: 16px;
+  }
+
+  .timekare-primary-btn {
+    background-color: #2B92BB !important;
+  }
+}

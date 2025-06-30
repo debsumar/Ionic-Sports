@@ -1,0 +1,49 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title text-center>Score Input</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="dismiss()" style="color:#fff">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-card class="maincard" *ngFor="let i of getNumberArray(score); let idx = index">
+    <ion-card-header class="cardHeader">
+      <ion-card-title style="font-weight: 600; font-size: 20px; color: #154766; text-align: center;">
+        Goal {{idx + 1}}
+      </ion-card-title>
+    </ion-card-header>
+    <ion-card-content style="padding-right: 2px; padding-left: 5px; padding-top: 5px;">
+      <ion-list>
+        <ion-item>
+          <ion-label>Player</ion-label>
+          <ion-select [(ngModel)]="selectedPlayer[idx]" (ionChange)="onPlayerSelect(idx)">
+            <ion-option *ngFor="let l of leagueMatchParticipantRes" [value]="l.user.Id">
+              {{l?.user?.FirstName}} {{l?.user?.LastName}}
+            </ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label fixed style="flex: 1;">Time(minutes)</ion-label>
+          <ion-input style="flex: 1;" type="number" [(ngModel)]="goalTime[idx]" min="0" max="150"
+            (ionChange)="onGoalTimeChange(idx)"></ion-input>
+          <!-- <ion-datetime displayFormat="mm" pickerFormat="HH:mm" [(ngModel)]="goalTime[idx]" max="02:30">
+          </ion-datetime> -->
+        </ion-item>
+      </ion-list>
+    </ion-card-content>
+  </ion-card>
+</ion-content>
+
+<ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12>
+        <button class="foobtn" ion-button block (click)="saveGoal()">Add Goal</button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>

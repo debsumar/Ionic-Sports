@@ -1,0 +1,58 @@
+page-potm {
+  .scroll-content {
+    overflow: hidden;
+    background-image: none !important; // background: white !important;
+    background: #f7f7f7 !important;
+  }
+
+  ion-title {
+    background-color: #2b92bb !important;
+
+    div {
+      color: #fff !important;
+    }
+  }
+
+  .toolbar-background-md {
+    background-color: #2b92bb;
+  }
+
+
+  ion-item-divider {
+    margin-top: 20px;
+    margin-bottom: 10px;
+    background-color: lightgray;
+  }
+
+  h3 {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    margin-top: 15px;
+    margin-bottom: 10px;
+    color: #154766;
+    font-weight: 600;
+  }
+
+  .item.item-md .checkbox-md {
+    position: static;
+    display: block;
+    margin: 5px;
+  }
+
+  .green-checkbox .checkbox-icon {
+    // background-color: green;
+    border-color: green;
+  }
+
+  .red-checkbox .checkbox-icon {
+    // background-color: red;
+    border-color: red;
+  }
+
+  .foobtn {
+    background-color: #5be283;
+    height: 3.6rem;
+    font-size: 1.4rem;
+  }
+}

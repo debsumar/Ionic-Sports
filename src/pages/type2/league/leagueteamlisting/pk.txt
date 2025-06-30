@@ -1,0 +1,123 @@
+<div style="width: 100%; height: 100%">
+  <ion-card class="headercard">
+    <ion-card-content>
+      <ion-row>
+        <ion-col col-12>
+          <div style="display: flex; justify-content: space-around">
+            <div class="matchesplayed">
+              <span>today</span>
+              <p>Today</p>
+            </div>
+
+            <div class="matchesplayed">
+              <span>TeamnLength</span>
+              <p>Total</p>
+            </div>
+          </div>
+
+          <div>
+            <!-- <ion-searchbar
+              class="search"
+              placeholder="Search by Host, Title, Activity etc"
+              autocorrect="off"
+              (ionInput)="getFilterItems($event)"
+              showCanelButton="focus"
+              animated
+            >   
+            </ion-searchbar> -->
+            <ion-row class="sub-container rows-allign2">
+              <ion-col
+                col-1
+                style="text-align: center; margin-top: 12px; padding: 0px"
+              >
+                <!-- <button>
+                  <ion-icon name="ios-search"></ion-icon>
+              </button> -->
+                <ion-icon name="ios-search"></ion-icon>
+              </ion-col>
+              <ion-col col-11 class="search-bar">
+                <ion-searchbar
+                  placeholder="Search by Host, Title, Activity"
+                  id="customsearchbar"
+                 
+                  autocorrect="off"
+                ></ion-searchbar>
+              </ion-col>
+            </ion-row>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-card-content>
+  </ion-card>
+ 
+
+  <ion-row >
+    <ion-col
+      col-12
+      style="padding-left: 10px"
+      *ngFor="let team of teamsForParentClub"
+      >
+      <div class="all border-left-style"></div>
+
+      <ion-card>
+        <ion-card-header class="Location-head">
+          <ion-row>
+            <p class="name">teamname:{{team.teamName}}</p>
+          </ion-row>
+        </ion-card-header>
+        <ion-card-content style="color: #c5b495">
+          <ion-row>
+            <ion-col col-6>
+              <p class="card-text">
+                <span>agegroup:{{team.ageGroup}}</span>
+              </p>
+
+              <p class="card-text" >
+                <span>description:{{team.teamDescription}}</span>
+              </p>
+            </ion-col>
+            <ion-col col-6>
+              <p class="card-text">
+                <span
+                  >activity:
+                  <span 
+                    >{{team.activity.ActivityName}}</span
+                  ></span
+                >
+              </p>
+
+              <p class="card-text">
+                <span>VenueName</span>
+              </p>
+              <div class="flex-style">
+                <div>
+                  <ion-icon
+                    style="font-size: 18px; color: #2b92bb"
+                    
+                  ></ion-icon>
+                  <span> Public </span>
+                </div>
+
+                <span style="margin-top: 4px"
+                  >Win</span
+                >
+              </div>
+            </ion-col>
+          </ion-row>
+        </ion-card-content>
+      </ion-card>
+    </ion-col>
+  </ion-row>
+
+  <!-- <ion-fab right bottom>
+    <button
+      ion-fab
+      mini
+      (click)="gotoCreateMatch()"
+      style="background-color: #2b92bb !important; color: white !important"
+      class="fab_btn1"
+    >
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab> -->
+</div>

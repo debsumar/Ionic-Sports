@@ -1,0 +1,38 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title text-center>Ask Me</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div class="chat-area">
+    <div *ngFor="let msg of messages" class="message-row" [ngClass]="{'user-msg': msg.isUser, 'bot-msg': !msg.isUser}">
+      <!-- 👤 Profile Image -->
+
+      <div style="width: 50%;">
+        <img [src]="msg.isUser ? 'assets/images/dummyCoach.jpg' : 'assets/images/logo.png'" class="profile-img"
+          alt="Avatar">
+      </div>
+      <!-- 💬 Message Bubble -->
+      <div class="message-bubble">
+        <p>{{msg.text}}</p>
+        <span class="msg-timestamp">{{msg.timestamp}}</span>
+      </div>
+    </div>
+    <!-- ✨ Quick Links (only after initial bot message) -->
+    <div class="quick-links" *ngIf="messages.length === 1">
+      <button ion-button outline small *ngFor="let link of quickLinks" (click)="sendQuickLink(link)">
+        {{link}}
+      </button>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <div class="input-bar">
+    <ion-input placeholder="Ask me something.." [(ngModel)]="userInput" (keyup.enter)="sendMessage()"></ion-input>
+    <button ion-button clear icon-only (click)="sendMessage()">
+      <ion-icon name="send"></ion-icon>
+    </button>
+  </div>
+</ion-footer>

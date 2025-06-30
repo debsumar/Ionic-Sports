@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Manage League Teams</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <div style="padding-bottom: 10px !important">
+    <ion-card style="width: 100%; margin: 0px !important;">
+      <ion-card-content style="padding: 0px !important;">
+        <ion-row>
+          <ion-col col-6>
+            <button ion-button class="select-type" (click)="changeType(0)" [class.selected]="activeIndex == 0">
+              Team A
+            </button>
+          </ion-col>
+          <ion-col col-6>
+            <button ion-button class="select-type" (click)="changeType(1)" [class.selected]="activeIndex == 1">
+              Team B
+            </button>
+          </ion-col>
+        </ion-row>
+      </ion-card-content>
+    </ion-card>
+  </div>
+
+  <div *ngIf="activeIndex == 0">
+    <div class="drop-zone" *ngFor="let section of sections; let sectionIndex = index" class="section">
+      <h2 class="section-title">{{ section.title }}</h2>
+      <div class="itemlist" (dragenter)="onEnterSection(sectionIndex)" (dragleave)="onDragLeaveSection(sectionIndex)"
+        (dragover)="$event.preventDefault()" (drop)="onDrop($event, sectionIndex)">
+        <ion-card *ngFor="let item of section.items" class="item" draggable="true"
+          (dragstart)="onDragStart($event, item, sectionIndex)" (dragend)="onDragEnd($event)">
+          <ion-card-content class="item-card-content">
+            <ion-grid>
+              <ion-row>
+                <ion-col col-5 class="margin_auto">
+                  <p class="margin_0 para_overflow" style="font-size:1.6rem">{{item.name}} {{last_name}}</p>
+                  <p>{{item.position}}</p>
+                </ion-col>
+                <ion-col col-1 class="margin_auto">
+                  <img src="assets/images/protection.svg" style="margin-left:5px">
+                </ion-col>
+                <ion-col col-2 class="margin_auto" style="padding: 7px 0px 0px 0px;line-height: 1;" text-center>
+                  {{item.age}}yrs
+                </ion-col>
+                <ion-col col-1 class="margin_auto">
+                  <img src="assets/images/no_camere2.jpeg" class="margin_auto">
+                </ion-col>
+                <ion-col col-3 class="paidBlock margin_auto">
+                  <div style="float: right;margin-top: 0px;">
+                    <p class="pending">
+                      <span>Currency 10.00</span>
+                    </p>
+                    <p class="pending" style="margin-top:-10px">Pending</p>
+                  </div>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+  </div>
+</ion-content>

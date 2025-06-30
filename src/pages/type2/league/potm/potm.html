@@ -1,0 +1,52 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Player of the match</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="dismiss()" style="color:#fff">
+        <ion-icon name="close"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-row>
+    <ion-col col-6 style="margin: 0; padding: 0;">
+      <h3>{{winnerTeamName}}</h3>
+      <!-- Winner Team -->
+      <ion-list>
+        <ion-item no-padding *ngFor="let w of leagueMatchParticipantResForWinner">
+          <ion-label style="color: green">{{w?.user?.FirstName}} {{w?.user?.LastName}}</ion-label>
+          <ion-checkbox [checked]="w.user.selected" [disabled]="!w.user.selected && selectedPlayers.length >= 2"
+            (ionChange)="togglePlayerSelection(w, true)" class=" green-checkbox">
+          </ion-checkbox>
+        </ion-item>
+      </ion-list>
+
+
+    </ion-col>
+    <ion-col col-6 style="margin: 0; padding: 0;">
+      <h3>{{loserTeamName}}</h3>
+      <!-- Loser Team -->
+      <ion-list>
+        <ion-item no-padding *ngFor="let l of leagueMatchParticipantResForLoser">
+          <ion-label style="color: red">{{l?.user?.FirstName}} {{l?.user?.LastName}}</ion-label>
+          <ion-checkbox [checked]="l.user.selected" [disabled]="!l.user.selected && selectedPlayers.length >= 2"
+            (ionChange)="togglePlayerSelection(l, false)" class="red-checkbox">
+          </ion-checkbox>
+        </ion-item>
+      </ion-list>
+    </ion-col>
+  </ion-row>
+
+</ion-content>
+
+<ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12>
+        <button class="foobtn" ion-button block (click)="save()">Save</button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer>
