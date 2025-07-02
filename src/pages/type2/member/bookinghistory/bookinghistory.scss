@@ -17,30 +17,18 @@ page-bookinghistory {
         }
     }
 
-    // 🔄 Pending Payments Button Styling
     .select-filter {
+        float: right;
+        padding-right: 10px;
+        padding-bottom: 10px;
         transition: all 0.3s ease;
-
-        &.active {
-            background-color: #f53d3d !important;
-            color: #ffffff !important;
-            border-color: #f53d3d !important;
-
-            // 🔥 Add a subtle glow effect for active state
-            box-shadow: 0 0 10px rgba(245, 61, 61, 0.3);
-
-
-        }
-
-        &:not(.active) {
-            background-color: transparent;
-            color: #488aff;
-            border-color: #488aff;
-
-            &:hover {
-                background-color: rgba(72, 138, 255, 0.1);
-            }
-        }
+        cursor: pointer; // 🖱️ Indicate it's clickable
+        display: inline-block; // Ensure text-decoration works correctly
+        text-decoration: underline; // ✏️ Apply underline to the text
+        background-color: transparent;
+        font-weight: 700;
+        color: #2b92bb; // Example default text color
+        border-color: #2b92bb; // 
     }
 
     // .select-filter {

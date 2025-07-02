@@ -21,6 +21,7 @@ import { MatchModel } from "./models/match.model";
 import * as moment from "moment";
 import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../services/graphql.service";
+import { MatchType } from "../../../shared/utility/enums";
 /**
  * Generated class for the MatchPage page.
  *
@@ -83,7 +84,7 @@ export class MatchPage {
       }
     });
 
-    this.fetchMatchesInput.user_postgre_metadata.UserParentClubId=this.sharedservice.getPostgreParentClubId();
+    this.fetchMatchesInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
   }
 
   ionViewWillEnter() {
@@ -109,11 +110,13 @@ export class MatchPage {
     this.navCtrl.push("Dashboard");
   }
   gotoMatchdetailsPage(match) {
-    this.navCtrl.push("MatchdetailsPage", {
-      match: match,
-      // selectedmatchId: match.Id,
-      // selectedmemberkey: this.FetchMatchesInput.MemberKey,
-    });
+    MatchType.Team ?
+      this.navCtrl.push("MatchTeamDetailsPage", { match: match }) :
+      this.navCtrl.push("MatchdetailsPage", {
+        match: match,
+        // selectedmatchId: match.Id,
+        // selectedmemberkey: this.FetchMatchesInput.MemberKey,
+      });
   }
 
   //getting matches
@@ -333,8 +336,8 @@ export class MatchPage {
 
 export class FetchMatchesInput {
   FetchType: number;
-  user_postgre_metadata:{
-    UserParentClubId:string
+  user_postgre_metadata: {
+    UserParentClubId: string
   }
 }
 

@@ -33,8 +33,8 @@ export const environment = {
   //emailUrl: "http://localhost:32683/";
   node_url: "https://activitypro-node.appspot.com",
   // new_http_url: "https://api-dev.activitypro.co.uk:1026/api",
-  // new_http_url: "http://localhost:9000/api",
-  new_http_url: "https://d475-2409-40e2-10f6-56f5-b4d3-7ea9-93a2-5a2d.ngrok-free.app/api",
+  new_http_url: "http://localhost:9000/api",
+  // new_http_url: "https://d475-2409-40e2-10f6-56f5-b4d3-7ea9-93a2-5a2d.ngrok-free.app/api",
   nest_url: "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV",
   group_sessionsUrl: "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV",
   group_session_apikey: "",
@@ -43,8 +43,8 @@ export const environment = {
   SuperAdminKey: "-KoGLONcroK1vB02b9Gg",
   graphql_url: "https://api-dev.activitypro.co.uk/graphql",
   // new_graphql_url: "https://api-dev.activitypro.co.uk:1026/graphql",
-  // new_graphql_url: "http://localhost:9000/graphql",
-  new_graphql_url: "https://d475-2409-40e2-10f6-56f5-b4d3-7ea9-93a2-5a2d.ngrok-free.app/graphql",
+  new_graphql_url: "http://localhost:9000/graphql",
+  // new_graphql_url: "https://d475-2409-40e2-10f6-56f5-b4d3-7ea9-93a2-5a2d.ngrok-free.app/graphql",
   android_onesignal_id: "",
   ios_onesignal_id: "",
   firebaseConfig: {

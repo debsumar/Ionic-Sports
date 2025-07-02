@@ -29,3 +29,14 @@ export enum LeagueVenueType {
     Location = 2,
     School = 3,
 }
+
+export enum LeagueMatchActionType {
+    LEAGUE = 0,
+    Match = 1,
+}
+
+export enum MatchType {
+    SINGLES = 0,
+    DOUBLES = 1,
+    Team = 2,
+}

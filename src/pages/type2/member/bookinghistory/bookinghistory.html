@@ -16,7 +16,7 @@
 <ion-content>
     <p class="font-18 mar-5" style="color: rgba(0,0,0,0.85);margin: 10px 8px; font-size: 18px;">{{historyObj.Name}}</p>
     <ion-row class="due-row">
-        <ion-col *ngIf="isPendingPaymentsMode" col-6 class="discount-col">
+        <ion-col *ngIf="isPendingPaymentsMode" col-12 class="discount-col">
             <p class="font-25">{{currencyDetails.CurrencySymbol}}{{getCurrentTotalAmount()}}</p>
             <p class="font-17">Due</p>
         </ion-col>
@@ -41,12 +41,15 @@
     </ion-grid>
 
 
-    <ion-buttons end style="margin-right: 16px;">
+    <!-- <ion-buttons end style="margin-right: 16px;">
         <button ion-button class="select-filter" [class.active]="isPendingPaymentsMode"
             (click)="togglePendingPayments()">
             {{getPendingPaymentsButtonText()}}
         </button>
-    </ion-buttons>
+    </ion-buttons> -->
+    <span class="select-filter" [class.active]="isPendingPaymentsMode" (click)="togglePendingPayments()">
+        {{getPendingPaymentsButtonText()}}
+    </span>
 
     <!-- 📋 REGULAR SESSIONS DISPLAY (when isPendingPaymentsMode = false) -->
     <div *ngIf="isPendingPaymentsMode">
@@ -599,7 +602,7 @@
         </div>
     </div>
 
-    <div *ngIf="isNoBookings && no_bookings_text!=''">
+    <!-- <div *ngIf="isNoBookings && no_bookings_text!=''">
         <ion-card>
             <ion-card-content>
                 <ion-row>
@@ -609,7 +612,7 @@
                 </ion-row>
             </ion-card-content>
         </ion-card>
-    </div>
+    </div> -->
 
     <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="search_term==''">
         <ion-infinite-scroll-content loadingSpinner="crescent"
