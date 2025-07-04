@@ -32,11 +32,11 @@ export enum LeagueVenueType {
 
 export enum LeagueMatchActionType {
     LEAGUE = 0,
-    Match = 1,
+    MATCH = 1,
 }
 
 export enum MatchType {
     SINGLES = 0,
     DOUBLES = 1,
-    Team = 2,
+    TEAM = 2,
 }

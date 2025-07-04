@@ -146,9 +146,6 @@ export class LeagueMatchInfoPage {
       items: []
     }
   ];
-
-  invitedType: boolean = true;
-  match: any;
   parentClubKey: string;
 
   constructor(
@@ -451,11 +448,11 @@ export class LeagueMatchInfoPage {
           this.roles = data["getTeamRoles"]["teamRoles"];
           console.log("Getting Player Roles", this.roles);
           // this.commonService.hideLoader();
-      },
-      (err) => {
+        },
+        (err) => {
           console.log(JSON.stringify(err));
-          this.commonService.toastMessage("failed to fetch role",2500,ToastMessageType.Error,ToastPlacement.Bottom);
-      })
+          this.commonService.toastMessage("failed to fetch role", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+        })
   }
 
   updatePlayerRole(member: LeagueMatchParticipantModel) {
@@ -567,7 +564,7 @@ export class LeagueMatchInfoPage {
         // this.commonService.hideLoader();
         console.log("error in fetching",)
       }
-    },error => {
+    }, error => {
       this.commonService.hideLoader();
       this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
     });
@@ -589,7 +586,7 @@ export class LeagueMatchInfoPage {
     },
       (err) => {
         this.commonService.hideLoader();
-        if( err.error && err.error.message) {
+        if (err.error && err.error.message) {
           this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error,);
         } else {
           this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error,);
@@ -620,10 +617,10 @@ export class LeagueMatchInfoPage {
         console.log("Get_League_Match_Participant RESPONSE", JSON.stringify(res.data));
         this.sections.forEach(section => section.items = []);// Clear the sections array
         this.populateSections(); // Call populateSections after data is fetched
-      } 
-    },error => {
+      }
+    }, error => {
       this.commonService.hideLoader();
-      if( error.error && error.error.message) {
+      if (error.error && error.error.message) {
         this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
       } else {
         this.commonService.toastMessage("Failed to fetch participants details", 3000, ToastMessageType.Error,);

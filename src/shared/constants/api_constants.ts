@@ -98,4 +98,6 @@ export const API = {
     EnrolmentDetails: `holidaycamp/enrolment-details`,
     PAUSE_MONTHLY_SUBSCRIPTION: `pause_monthly_subscription`,
     GET_SUBSCRIPTION_PAUSE_MONTHS: `monthly_session/getSubscriptionPauseMonths`,
+    GET_ACTIVIY_SPECIFIC_TEAM: `league/getActivitySpecificTeam`,
+
 }

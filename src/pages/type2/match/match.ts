@@ -110,7 +110,7 @@ export class MatchPage {
     this.navCtrl.push("Dashboard");
   }
   gotoMatchdetailsPage(match) {
-    MatchType.Team ?
+    match.MatchType == MatchType.TEAM ?
       this.navCtrl.push("MatchTeamDetailsPage", { match: match }) :
       this.navCtrl.push("MatchdetailsPage", {
         match: match,
