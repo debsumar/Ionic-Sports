@@ -21,9 +21,19 @@ import moment from 'moment';
   providers: [HttpService]
 })
 export class ResultInputPage {
+  updateResultEntityInput: UpdateResultEntityInput = {
+    resultId: '',
+    ResultDetails: '',
+    resultDescription: '',
+    ResultStatus: 0,
+    PublishedByApp: '',
+    winner_league_participation_id: '',
+    loser_league_participation_id: ''
+  }
   homeTeamObj: LeagueParticipationForMatchModel;
   awayTeamObj: LeagueParticipationForMatchModel;
   matchObj: LeagueMatch;
+  resultId: string;
   leagueId: string;
   activityId: string;
   selectedPlayer: string[] = [];
@@ -57,9 +67,47 @@ export class ResultInputPage {
     this.activityId = this.navParams.get("activityId");
     this.homeTeamObj = this.navParams.get("homeTeamObj");
     this.awayTeamObj = this.navParams.get("awayTeamObj");
+    this.resultId = this.navParams.get("resultId");
     this.TEAMS = [this.homeTeamObj, this.awayTeamObj];
-
     this.score = this.navParams.get("score");
+    this.updateResultEntityInput.resultId = this.resultId;
+    this.updateResultEntityInput.resultDescription = '';//will add later
+    this.updateResultEntityInput.PublishedByApp = AppType.ADMIN_NEW.toString();
+  }
+
+  onWinnerTeamChange() {
+
+    // const selectedTeam = this.TEAMS.find(team => team.parentclubteam.id === this.selectedWinnerTeamId);
+    // console.log("Selected Team:", selectedTeam);
+    try {
+      this.updateResultEntity();
+    } catch (err) {
+      console.error('⚠️ Error updating result entity on winner team change:', err);
+    }
+  }
+
+  updateResultEntity() {
+    this.commonService.showLoader("Updating...");
+    this.updateResultEntityInput.winner_league_participation_id = this.TEAMS.find(team => team.parentclubteam.id === this.selectedWinnerTeamId).id;
+    this.updateResultEntityInput.loser_league_participation_id = this.TEAMS.find(team => team.id !== this.selectedWinnerTeamId).id;
+    this.httpService.post(`${API.UPDATE_RESULT_ENTITY}`, this.updateResultEntityInput).subscribe((res: any) => {
+      if (res) {
+        this.commonService.hideLoader();
+        console.log("Update_League_Fixture RESPONSE", JSON.stringify(res));
+        this.commonService.toastMessage(res.message, 3000, ToastMessageType.Success);
+      } else {
+        console.log("error in Update_League_Fixture",)
+      }
+    },
+      (err) => {
+        this.commonService.hideLoader();
+        if (err.error && err.error.message) {
+          this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error,);
+        } else {
+          this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error,);
+        }
+      }
+    );
   }
 
 
@@ -137,6 +185,13 @@ export class ResultInputPage {
       loserTeamGoals: 0,
     });
   }
-
-
+}
+export class UpdateResultEntityInput {
+  resultId: string;
+  ResultDetails: string;
+  resultDescription: string;
+  ResultStatus: number;
+  PublishedByApp: string;
+  winner_league_participation_id: string;
+  loser_league_participation_id: string;
 }

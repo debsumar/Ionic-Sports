@@ -1,4 +1,8 @@
+
+// ===== EXISTING MODELS (unchanged) =====
+
 import { ActivityModel } from "../../match/models/match.model";
+
 export class LeaguesForParentClubModel {
   id: string;
   message: string;
@@ -21,53 +25,52 @@ export class LeaguesForParentClubModel {
   league_visibility: number;
   club: ClubModel;
   coach: Coach;
-  location: Location
-  location_id: string
-  location_type: number
-  last_enrollment_date: string
-  last_withdrawal_date: string
-  early_arrival_time: string
-  start_time: string
-  end_time: string
-  capacity: number
-  capacity_left: number
-  referee_type: number
-  referee_name: string
-  season: string
-  grade: string
-  rating_group: string
-  contact_email: string
-  contact_phone: string
-  secondary_contact_email: string
-  secondary_contact_phone: string
-  is_paid: boolean
-  member_price: string
-  non_member_price: string
-  is_pay_later: boolean
-  allow_bacs: boolean
-  allow_cash: boolean
-  show_participants: boolean
-
-
+  location: Location;
+  location_id: string;
+  location_type: number;
+  last_enrollment_date: string;
+  last_withdrawal_date: string;
+  early_arrival_time: string;
+  start_time: string;
+  end_time: string;
+  capacity: number;
+  capacity_left: number;
+  referee_type: number;
+  referee_name: string;
+  season: string;
+  grade: string;
+  rating_group: string;
+  contact_email: string;
+  contact_phone: string;
+  secondary_contact_email: string;
+  secondary_contact_phone: string;
+  is_paid: boolean;
+  member_price: string;
+  non_member_price: string;
+  is_pay_later: boolean;
+  allow_bacs: boolean;
+  allow_cash: boolean;
+  show_participants: boolean;
 }
 
 export class Location {
-  id: string
-  name: string
+  id: string;
+  name: string;
 }
 
 export class Coach {
-  Id: string
-  first_name: string
-  last_name: string
-  email_id: string
+  Id: string;
+  first_name: string;
+  last_name: string;
+  email_id: string;
 }
 
 export class Venue {
-  VenueId: string
-  PostCode: string
-  VenueName: string
+  VenueId: string;
+  PostCode: string;
+  VenueName: string;
 }
+
 export class CreateLeagueModel {
   id: string;
   message: string;
@@ -87,14 +90,13 @@ export class CreateLeagueModel {
   venueKey: string;
 }
 
-
 export class LeagueStandingModel {
   id: string;
   parentclubteam: {
-    teamName: string
-    id: string
-    ageGroup: string
-    teamVisibility: string
+    teamName: string;
+    id: string;
+    ageGroup: string;
+    teamVisibility: string;
     teamDescription: string;
   };
   wins: string;
@@ -105,46 +107,44 @@ export class LeagueStandingModel {
 }
 
 export class LeagueParticipantModel {
-
-
-  id: string
-  participant_name: string
-  participant_id: string
-  matches: number
-  wins: number
-  loss: number
-  draw: number
-  rank: number
-  points: number
-  amount_pay_status: number
-  amount_pay_status_text: string
-  paidby: number
-  paidby_text: string
-  paid_amount: string
-  amount_due: string
-  paid_on: string
-  participant_status_text: string
-  participant_details: UserAndDetail
-  isSelected?: boolean
+  id: string;
+  participant_name: string;
+  participant_id: string;
+  matches: number;
+  wins: number;
+  loss: number;
+  draw: number;
+  rank: number;
+  points: number;
+  amount_pay_status: number;
+  amount_pay_status_text: string;
+  paidby: number;
+  paidby_text: string;
+  paid_amount: string;
+  amount_due: string;
+  paid_on: string;
+  participant_status_text: string;
+  participant_details: UserAndDetail;
+  isSelected?: boolean;
 }
 
 export class ClubModel {
-  Id: string
-  ClubName: string
-  FirebaseId: string
+  Id: string;
+  ClubName: string;
+  FirebaseId: string;
 }
 
 export class UserAndDetail {
-  user_id: string
-  first_name: string
-  last_name: string
-  email: string
-  parent_phone_number: string
-  parent_id: string
-  is_child: boolean
-  is_enable: boolean
-  parent_email: string
-  contact_email: string
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  parent_phone_number: string;
+  parent_id: string;
+  is_child: boolean;
+  is_enable: boolean;
+  parent_email: string;
+  contact_email: string;
 }
 
 export class LeagueParticipationForMatchModel {
@@ -152,6 +152,7 @@ export class LeagueParticipationForMatchModel {
   participation_type: number;
   parentclubteam: ParentClubTeam;
 }
+
 export class ParentClubTeam {
   id: string;
   teamName: string;
@@ -237,12 +238,10 @@ export class TeamRole {
 export class SelectedPlayerScorersModel {
   playerId?: string;
   time?: string;
-  playerObj: LeagueMatchParticipantModel
+  playerObj: LeagueMatchParticipantModel;
 }
 
-
 export class LeagueMatchParticipantModel {
-
   disabled?: boolean;
   id: string;
   created_at: string;
@@ -273,4 +272,3 @@ export class LeagueMatchParticipantModel {
   teamrole: TeamRole;
   amount_pay_status_text: string;
 }
-

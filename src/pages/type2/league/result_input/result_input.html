@@ -19,7 +19,8 @@
     </ion-item>
     <ion-item *ngIf="resultType === 'winner'">
       <ion-label>Winner</ion-label>
-      <ion-select [(ngModel)]="selectedWinnerTeamId" placeholder="Select Winner Team">
+      <ion-select [(ngModel)]="selectedWinnerTeamId" (ionChange)="onWinnerTeamChange()"
+        placeholder="Select Winner Team">
         <ion-option *ngFor="let team of TEAMS" [value]="team?.parentclubteam?.id">{{team?.parentclubteam?.teamName}}
         </ion-option>
       </ion-select>

@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, Renderer2, ViewChild } from "@angular/core";
 import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, FabContainer } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { SharedServices } from "../../../services/sharedservice";
@@ -10,7 +10,7 @@ import gql from "graphql-tag";
 import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { error } from "console";
-import { MatchModelV2 } from "../../../../shared/model/match.model";
+import { AllMatchData, GetIndividualMatchParticipantModel, MatchModelV2, } from "../../../../shared/model/match.model";
 import { LeagueMatchActionType, MatchType } from "../../../../shared/utility/enums";
 import { API } from "../../../../shared/constants/api_constants";
 import { HttpService } from "../../../../services/http.service";
@@ -37,10 +37,27 @@ export class MatchTeamDetailsPage {
   selectedHomeTeamText: string;
   selectedAwayTeamText: string;
 
-  match: MatchModelV2;
+  getIndividualMatchParticipantRes: GetIndividualMatchParticipantModel[] = [];
+  match: AllMatchData;
+  // homeTeamPlayers: TeamMemberData[] = [];
+  // awayTeamPlayers: TeamMemberData[] = [];
   parentClubKey: string;
   activitySpecificTeamsRes: TeamsForParentClubModel[] = [];
   selectedTeam: TeamsForParentClubModel;
+  getIndividualMatchParticipantInput: GetIndividualMatchParticipantInput = {
+    parentclubId: "",
+    clubId: "",
+    activityId: "",
+    memberId: "",
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: "",
+    updated_by: "",
+    MatchId: "",
+    TeamId: "",
+    leagueTeamPlayerStatusType: 0
+  }
   getActivitySpecificTeamInput: GetActivitySpecificTeamInput = {
     parentclubId: "",
     clubId: "",
@@ -66,9 +83,24 @@ export class MatchTeamDetailsPage {
     MatchId: "",
     HomeParticipantId: "",
     AwayParticipantId: "",
-    HomeParentclubTeamIdId: "",
-    AwayParentclubTeamIdId: ""
+    HomeParentclubTeamId: "",
+    AwayParentclubTeamId: ""
   }
+  // sections: { title: string; items: any[] }[] = [
+  sections: { title: string; items: GetIndividualMatchParticipantModel[] }[] = [
+    {
+      title: 'Playing Squad',
+      items: []
+    },
+    {
+      title: 'Bench',
+      items: []
+    },
+    {
+      title: 'Remaining Players',
+      items: []
+    }
+  ];
 
 
   constructor(
@@ -83,12 +115,14 @@ export class MatchTeamDetailsPage {
     public actionSheetCtrl: ActionSheetController,
     private graphqlService: GraphqlService,
     private httpService: HttpService,
+    private renderer: Renderer2,// Inject Renderer2
+
 
   ) {
-    this.match = this.navParams.get("match");
-    console.log('MATCH OBJ' + this.match);
-    //  this.selectedHomeTeamText = this.matchObj.homeusername != null ? this.matchObj.homeusername : 'Home Team';
-    // this.selectedAwayTeamText = this.matchObj.awayusername != null ? this.matchObj.awayusername : 'Away Team';
+    this.match = JSON.parse(this.navParams.get("match"));
+    console.log('MATCH OBJ', this.match);
+    this.selectedHomeTeamText = this.match.homeUserName != null ? this.match.homeUserName : 'Home Team';
+    this.selectedAwayTeamText = this.match.awayUserName != null ? this.match.awayUserName : 'Away Team';
     this.storage.get('Currency').then((val) => {
       this.currencyDetails = JSON.parse(val);
     });
@@ -101,7 +135,18 @@ export class MatchTeamDetailsPage {
         this.getActivitySpecificTeamInput.action_type = LeagueMatchActionType.MATCH;
         this.getActivitySpecificTeamInput.app_type = AppType.ADMIN_NEW;
         this.getActivitySpecificTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
-        this.getActivitySpecificTeamInput.activityId = this.match.Activity.Id;
+        this.getActivitySpecificTeamInput.activityId = this.match.activityId;
+
+        this.getIndividualMatchParticipantInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+        this.getIndividualMatchParticipantInput.memberId = this.sharedservice.getLoggedInId();
+        this.getIndividualMatchParticipantInput.action_type = LeagueMatchActionType.MATCH;
+        this.getIndividualMatchParticipantInput.app_type = AppType.ADMIN_NEW;
+        this.getIndividualMatchParticipantInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+        this.getIndividualMatchParticipantInput.activityId = this.match.activityId;
+        this.getIndividualMatchParticipantInput.MatchId = this.match.MatchId;
+        this.getIndividualMatchParticipantInput.TeamId = this.match.homeUserId; // Default to Home Team
+        this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType = 0; // Default to All
+
 
         this.updateTeamInput.parentclubId = this.sharedservice.getPostgreParentClubId();
         this.updateTeamInput.memberId = this.sharedservice.getLoggedInId();
@@ -109,10 +154,26 @@ export class MatchTeamDetailsPage {
         this.updateTeamInput.app_type = AppType.ADMIN_NEW;
         this.updateTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateTeamInput.LeagueId = ''
-        this.updateTeamInput.MatchId = this.match.Id;
+        this.updateTeamInput.MatchId = this.match.MatchId;
         this.getActivitySpecificTeam();
+        this.getIndividualMatchParticipant();
       }
     });
+  }
+  publish() {
+    this.closeFab();
+    const homeTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedHomeTeamText);
+    const awayTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedAwayTeamText);
+    console.log("Selected Home Team:", homeTeam);
+    console.log(this.selectedHomeTeamText);
+    console.log(this.selectedAwayTeamText);
+    this.selectedHomeTeamText != 'Home Team' ||
+      this.selectedAwayTeamText != 'Away Team' ?
+      this.navCtrl.push("PublishFootballPage", {
+        "match": this.match, "homeTeam": homeTeam,
+        "awayTeam": awayTeam,
+      }) :
+      this.commonService.toastMessage('Select Home and Away Teams', 3000, ToastMessageType.Info,);
   }
 
   closeFab() {
@@ -125,6 +186,77 @@ export class MatchTeamDetailsPage {
   }
   formatMatchStartDate(date) {
     return moment(date, "YYYY-MM-DD HH:mm").local().format("DD-MMM-YYYY hh:mm A");
+  }
+
+  onEnterSection(sectionIndex: number) {
+    const dropZone = document.querySelectorAll('.drop-zone')[sectionIndex];
+    if (dropZone) {
+      this.renderer.addClass(dropZone, 'drag-over'); // Use Renderer2 to add class
+    }
+  }
+
+  onDragLeaveSection(sectionIndex: number) {
+    const dropZone = document.querySelectorAll('.drop-zone')[sectionIndex];
+    if (dropZone) {
+      this.renderer.removeClass(dropZone, 'drag-over'); // Use Renderer2 to remove class
+    }
+  }
+
+  onDragStart(event: any, item: any, sectionIndex: number) {
+    // if (this.leagueMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
+    event.dataTransfer.setData('text/plain', JSON.stringify({ item, sectionIndex }));
+    event.dataTransfer.effectAllowed = 'move'; // Ensure the effect is allowed
+    // } else {
+    //   this.commonService.toastMessage('Please select "All" filter to drag and drop', 3000, ToastMessageType.Info);
+    //   event.preventDefault(); // Prevent the drag from starting
+    // }
+  }
+
+  onDragEnd(event: any) {
+    const dropZones = document.querySelectorAll('.drop-zone');
+    dropZones.forEach(dropZone => this.renderer.removeClass(dropZone, 'drag-over')); // Use Renderer2 to remove class
+  }
+
+  onDrop(event: any, sectionIndex: number) {
+    event.preventDefault();
+    const data = JSON.parse(event.dataTransfer.getData('text/plain')); // Ensure correct data type
+    const item = data.item;
+    const fromSectionIndex = data.sectionIndex;
+
+    if (fromSectionIndex !== sectionIndex) {
+      this.sections[fromSectionIndex].items = this.sections[fromSectionIndex].items.filter(i => i.id !== item.id);
+      this.sections[sectionIndex].items.push(item);
+
+      // let newParticipantStatus: LeagueParticipationStatus;
+
+      // if (sectionIndex === 0) {
+      //   newParticipantStatus = LeagueParticipationStatus.PARTICIPANT;
+      // } else if (sectionIndex === 1) {
+      //   newParticipantStatus = LeagueParticipationStatus.NON_PARTICIPANT;
+      // } else {
+      //   newParticipantStatus = LeagueParticipationStatus.PENDING;
+      // }
+
+      // this.updateLeagueMatchParticipationStatus(item.participant_status, newParticipantStatus, { participationId: item.id });
+
+    }
+    this.onDragLeaveSection(sectionIndex);
+  }
+
+  getFilteredSections(): { title: string; items: any[] }[] {
+    // getFilteredSections(): { title: string; items: LeagueMatchParticipantModel[] }[] {
+    // if (this.leagueMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
+    //   // Show all sections
+    //   return this.sections;
+    // } else if (this.leagueMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.PLAYING) {
+    //   // Only show the "Playing Squad" section
+    //   return this.sections.filter(section => section.title === 'Playing Squad');
+    // } else if (this.leagueMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.BENCH) {
+    //   // Only show the "Bench" section
+    //   return this.sections.filter(section => section.title === 'Bench');
+    // }
+    // Default: show all
+    return this.sections;
   }
 
   showAvailableTeams(isHomeTeam: boolean): void {
@@ -158,16 +290,16 @@ export class MatchTeamDetailsPage {
               this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
             } else {
               this.selectedHomeTeamText = this.selectedTeam.teamName;
-              this.updateTeamInput.HomeParentclubTeamIdId = selectedVal;
-              this.updateTeamInput.AwayParentclubTeamIdId = ""; //setting the deafult val to ""
+              this.updateTeamInput.HomeParentclubTeamId = selectedVal;
+              this.updateTeamInput.AwayParentclubTeamId = ""; //setting the deafult val to ""
             }
           } else {
             if (selectedVal === this.selectedHomeTeamText) {
               this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
             } else {
               this.selectedAwayTeamText = this.selectedTeam.teamName;
-              this.updateTeamInput.AwayParentclubTeamIdId = selectedVal;
-              this.updateTeamInput.HomeParentclubTeamIdId = ""; //setting the deafult val to ""
+              this.updateTeamInput.AwayParentclubTeamId = selectedVal;
+              this.updateTeamInput.HomeParentclubTeamId = ""; //setting the deafult val to ""
             }
           }
           this.updateTeam();
@@ -186,6 +318,7 @@ export class MatchTeamDetailsPage {
     // this.sections.forEach(section => section.items = []); // Clear the sections array
     this.activeType = val !== undefined ? val : !this.activeType;
     this.getActivitySpecificTeam();
+    this.getIndividualMatchParticipant();
 
     // if (this.activeType && this.matchObj.home_team_id !== null) {
     //   this.getLeagueMatchParticipant(1);
@@ -194,6 +327,40 @@ export class MatchTeamDetailsPage {
     // }
     // this.getFilteredSections();
     // console.log('leagueTeamPlayerStatusType:', this.leagueMatchParticipantInput.leagueTeamPlayerStatusType);
+  }
+
+  //to fetch list of avilable players of both home & away teams
+  getIndividualMatchParticipant() {
+    this.httpService.post(`${API.GetIndividualMatchParticipant}`, this.getIndividualMatchParticipantInput).subscribe((res: any) => {
+      if (res) {
+        this.getIndividualMatchParticipantRes = res.data;
+        // this.homeTeamPlayers = this.getTeamsByMatchRes.HomeTeam;
+        // this.awayTeamPlayers = this.getTeamsByMatchRes.AwayTeam;
+        console.log("GetTeamsByMatch RESPONSE", JSON.stringify(res.data));
+        this.populateSections();
+      } else {
+        console.log("error in fetching",)
+      }
+    }, error => {
+      this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
+    });
+  }
+
+  populateSections() {
+    this.getIndividualMatchParticipantRes.forEach(participant => {
+      // switch (participant.participant_status) {
+      //   case LeagueParticipationStatus.PARTICIPANT: // Playing Squad 1
+      //     this.sections[0].items.push(participant);
+      //     break;
+      //   case LeagueParticipationStatus.NON_PARTICIPANT: // Bench 2
+      //     this.sections[1].items.push(participant);
+      //     break;
+      //   case LeagueParticipationStatus.PENDING: // Remaining Players 0
+      // default:
+      this.sections[2].items.push(participant);
+      // break;
+      // }
+    });
   }
 
   //to fetch list of avilable teams
@@ -275,7 +442,7 @@ export class MatchTeamDetailsPage {
         deleteMatch(deleteMatchInput: $deleteMatchInput)
       }`
         ;
-      const deleteVariable = { deleteMatchInput: { ParentClubKey: this.parentClubKey, MatchId: this.match.Id } }
+      const deleteVariable = { deleteMatchInput: { ParentClubKey: this.parentClubKey, MatchId: this.match.MatchId } }
 
       this.graphqlService.mutate(delete_Match, deleteVariable, 1).subscribe((response) => {
         this.commonService.hideLoader();
@@ -296,8 +463,23 @@ export class MatchTeamDetailsPage {
 
     }
   }
-
 }
+
+export class GetIndividualMatchParticipantInput {
+  parentclubId: string; // 🏢 Parent club ID
+  clubId: string; // 🏟️ Club ID
+  activityId: string; // ⚽ Activity ID
+  memberId: string; // 👤 Member ID
+  action_type: number; // ⚙️ Action type (e.g., LeagueMatchActionType)
+  device_type: number; // 📱 Device type (e.g., 1 for Android, 2 for iOS)
+  app_type: number; // 📱 App type (e.g., AppType.ADMIN_NEW)
+  device_id: string; // 🆔 Device ID
+  updated_by: string; // ✍️ User who updated
+  MatchId: string; // 🏟️ Match ID
+  TeamId: string; // 🏈 Team ID
+  leagueTeamPlayerStatusType: number; // 📊 Player status type (e.g., LeagueTeamPlayerStatusType)
+}
+
 
 export class GetActivitySpecificTeamInput {
   parentclubId: string;
@@ -325,6 +507,8 @@ export class UpdateTeamInput {
   MatchId: string;
   HomeParticipantId: string;
   AwayParticipantId: string;
-  HomeParentclubTeamIdId: string;
-  AwayParentclubTeamIdId: string;
+  HomeParentclubTeamId: string;
+  AwayParentclubTeamId: string;
 }
+
+

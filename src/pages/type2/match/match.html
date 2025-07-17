@@ -4,17 +4,6 @@
   See http://ionicframework.com/docs/components/#navigation for more info on
   Ionic pages and navigation.
 -->
-<!-- <ion-header>
-  <ion-navbar>
-    <ion-title>Match Dashboard</ion-title>
-    <ion-buttons end>
-      <button ion-button icon-only>
-        <ion-icon (click)="gotoDashboard()" name="home"></ion-icon>
-        <ion-icon name="more"></ion-icon>
-      </button>
-    </ion-buttons>
-  </ion-navbar>
-</ion-header> -->
 
 <div style="width: 100%; height: 100%">
   <ion-card class="headercard">
@@ -28,31 +17,20 @@
             </div>
 
             <div class="matchesplayed">
-              <span>{{matches?.length}}</span>
+              <span>{{matchlist?.length}}</span>
               <p>Total</p>
             </div>
           </div>
 
           <div>
-            <!-- <ion-searchbar
-              class="search"
-              placeholder="Search by Host, Title, Activity etc"
-              autocorrect="off"
-              (ionInput)="getFilterItems($event)"
-              showCanelButton="focus"
-              animated
-            >   
-            </ion-searchbar> -->
+
             <ion-row class="sub-container rows-allign2">
               <ion-col col-1 style="text-align: center; margin-top: 12px; padding: 0px">
-                <!-- <button>
-                  <ion-icon name="ios-search"></ion-icon>
-              </button> -->
                 <ion-icon name="ios-search"></ion-icon>
               </ion-col>
               <ion-col col-11 class="search-bar">
                 <ion-searchbar placeholder="Search by Host, Title, Activity" id="customsearchbar"
-                  [(ngModel)]="searchInput" (ionInput)="getFilterItems($event)" autocorrect="off"></ion-searchbar>
+                  [(ngModel)]="searchInput" (ionInput)="getFilterEvents($event)" autocorrect="off"></ion-searchbar>
               </ion-col>
             </ion-row>
           </div>
@@ -60,132 +38,9 @@
       </ion-row>
     </ion-card-content>
   </ion-card>
-  <!-- <div *ngIf="filteredMatches.length > 0">
-    <ion-card
-      (click)="gotoMatchdetailsPage(match)"
-      class="matchcard"
-      *ngFor="let match of filteredMatches"
-      style="margin-top: 5px !important"
-    >
-      <ion-card-content style="margin-top: 0px !important">
-        <ion-row>
-          <ion-col col-7>
-            <div class="cardrow">
-              <p class="date" style="overflow: unset !important;">{{formatMatchStartDate(match.MatchStartDate)}}</p>
-            </div>
-            <div class="cardrow">
-              <p
-                *ngIf="match.Activity && match.Activity.ActivityName"
-                class="largetext"
-              >
-                {{match.Activity.ActivityName}}
-              </p>
-              <p class="largetext">
-                {{match.MatchType==0?"Singles":"Doubles"}}
-              </p>
-            </div>
-            <div class="cardrow">
-              <ion-icon name="locate" style="color: #2b92bb"></ion-icon>
-              <p class="largetext" *ngIf="match.VenueName!=null">
-                {{match.VenueName}}
-              </p>
-            </div>
-           
-            <div class="cardrow">
-              <p class="smalltext">{{match.MatchTitle}}</p>
-            </div>
-          </ion-col>
-          <ion-col col-5 style="margin: auto">
-            <div class="cardrow">
-              <ion-icon
-                name="locate"
-                style="color: #2b92bb; padding-left: 20px"
-              ></ion-icon>
-              <p class="smalltext">Host:</p>
-            </div>
 
-            <div class="cardrow">
-              <p
-                style="padding-left: 20px"
-                *ngIf="match.Hosts && match.Hosts.length>0"
-              >
-                <span class="host" *ngFor="let host of match.Hosts"
-                  >{{host.Name}}</span
-                >
-              </p>
-            </div>
-
-            <div class="cardrow">
-              <ion-icon
-                style="padding-left: 20px; font-size: 18px; color: #2b92bb"
-                [name]="match.MatchVisibility==0?'ios-globe':'ios-lock-outline'"
-              ></ion-icon>
-              <p class="smalltext">
-                {{match.MatchVisibility==0?"Public":"Private"}}
-              </p>
-            </div>
-            <div class="cardrow">
-              <p class="pending" style="margin-left: 17px;">
-                {{match.ResultStatus==0?"Pending":"Published"}}
-              </p>
-            </div>
-          </ion-col>
-        </ion-row>
-      </ion-card-content>
-    </ion-card>
-  </div>  -->
-
-  <ion-row *ngIf="filteredMatches.length > 0">
-    <ion-col col-12 style="padding-left: 10px" *ngFor="let match of filteredMatches">
-      <!-- <div class="all border-left-style"></div> -->
-
-      <!-- <ion-card (click)="gotoMatchdetailsPage(match)">
-        <ion-card-header class="Location-head">
-          <ion-row>
-            <p class="name">{{formatMatchStartDate(match.MatchStartDate)}}</p>
-          </ion-row>
-        </ion-card-header>
-        <ion-card-content style="color: #c5b495">
-          <ion-row>
-            <ion-col col-6>
-              <p class="card-text">
-                <span>{{match.MatchTitle}}</span>
-              </p>
-
-              <p class="card-text" *ngFor="let host of match.Hosts">
-                <span>{{host.Name}}</span>
-              </p>
-            </ion-col>
-            <ion-col col-6>
-              <p class="card-text">
-                <span
-                  >{{match.MatchType==0?"Singles":"Doubles"}} -
-                  <span *ngIf="match.Activity && match.Activity.ActivityName"
-                    >{{match.Activity.ActivityName}}</span
-                  ></span
-                >
-              </p>
-
-              <p class="card-text" *ngIf="match.VenueName!=null">
-                <span>{{match.VenueName}}</span>
-              </p>
-              <div class="flex-style">
-                <div>
-                  <ion-icon
-                    style="font-size: 18px; color: #2b92bb"
-                    [name]="match.MatchVisibility==0?'ios-globe':'ios-lock-outline'"
-                  ></ion-icon>
-                  <span> {{match.MatchVisibility==0?"Public":"Private"}} </span>
-                </div>
-
-                <span style="margin-top: 4px"
-                  >{{match.ResultStatus==0?"Pending":"Published"}}</span
-                >
-              </div>
-            </ion-col>
-          </ion-row>
-        </ion-card-content>
-      </ion-card> -->
+  <ion-row *ngIf="filteredMatchlist.length > 0">
+    <ion-col col-12 style="padding-left: 10px" *ngFor="let match of filteredMatchlist">
 
       <ion-card class="maincard" (click)="gotoMatchdetailsPage(match)">
         <ion-card-header class="Location-head " style="padding: 2px 0px 5px 0px;">
@@ -203,14 +58,14 @@
           <ion-row style="margin-top: -5px;">
             <ion-col>
               <p class="leftStyle">
-                <span *ngIf="match.Activity && match.Activity.ActivityName">{{match.Activity.ActivityName}}</span> -
-                <span>{{match.MatchType==0?"Singles":"Doubles"}}
+                <span>{{match.ActivityName}}</span> -
+                <span>{{getMatchTypeName(match.MatchType)}}
                 </span>
 
               </p>
             </ion-col>
             <ion-col class="align-right" *ngFor="let host of match.Hosts">
-              <p class="roundStyle"> <span>{{host.Name}}</span></p>
+              <!-- <p class="roundStyle"> <span>{{host.Name}}</span></p> -->
             </ion-col>
           </ion-row>
           <ion-row *ngIf="isPublish" style="margin-top: -5px;">
@@ -218,7 +73,7 @@
 
               <ion-row>
                 <div>
-                  <p class="username">TBD</p>
+                  <p class="username">{{match.homeUserName}}</p>
                 </div>
               </ion-row>
 
@@ -228,7 +83,7 @@
 
               <ion-row>
                 <div>
-                  <p class="username">TBD
+                  <p class="username">{{match.awayUserName}}
                     <!-- <span style="padding-right: 2px;"> <ion-icon name="trophy"
                     class="golden-trophy"></ion-icon></span> -->
                   </p>
@@ -275,7 +130,7 @@
           <ion-row class="username-row" *ngIf="!isPublish">
             <ion-col class="username-col">
               <div class="username-container">
-                <p class="username">TBD</p>
+                <p class="username">{{match.homeUserName}}</p>
               </div>
             </ion-col>
             <ion-col class="vs-col">
@@ -286,7 +141,7 @@
             <ion-col class="username-col">
               <div class="username-container">
                 <p class="username">
-                  TBD
+                  {{match.awayUserName}}
                 </p>
               </div>
             </ion-col>
@@ -295,9 +150,9 @@
             <ion-col style="text-align: left;">
               <p class="public-text">{{match.VenueName}}</p>
             </ion-col>
-            <ion-col style="text-align: right;">
-              <p class="public-text">{{match.MatchVisibility==0?"Public":"Private"}} </p>
-            </ion-col>
+            <!-- <ion-col style="text-align: right;">
+              <p class="public-text"> {{getMatchTypeName(match.MatchType)}}</p>
+            </ion-col> -->
           </ion-row>
 
           <!-- <ion-row style="margin-top: -10px;margin-bottom: -8px;">

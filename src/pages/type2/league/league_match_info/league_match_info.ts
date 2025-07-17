@@ -90,7 +90,9 @@ export class LeagueMatchInfoPage {
     LeagueId: "",
     MatchId: "",
     HomeParticipantId: "",
-    AwayParticipantId: ""
+    AwayParticipantId: "",
+    HomeParentclubTeamId: '',
+    AwayParentclubTeamId: '',
   }
   updateLeagueMatchParticipantipationRoleInput: UpdateLeagueMatchParticipantipationRoleInput = {
     parentclubId: "",
@@ -270,6 +272,7 @@ export class LeagueMatchInfoPage {
     this.closeFab();
     const homeTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedHomeTeamText);
     const awayTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedAwayTeamText);
+    console.log("Selected Home Team:", homeTeam);
     console.log(this.selectedHomeTeamText);
     console.log(this.selectedAwayTeamText);
     this.selectedHomeTeamText != 'Home Team' ||
@@ -774,6 +777,8 @@ export class UpdateLeagueFixtureInput {
   MatchId: string;
   HomeParticipantId: string;
   AwayParticipantId: string;
+  HomeParentclubTeamId: string;
+  AwayParentclubTeamId: string;
 }
 
 export class UpdateLeagueMatchParticipantipationRoleInput {

@@ -22,6 +22,10 @@ import * as moment from "moment";
 import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../services/graphql.service";
 import { MatchType } from "../../../shared/utility/enums";
+import { HttpService } from "../../../services/http.service";
+import { API } from "../../../shared/constants/api_constants";
+import { AllMatchData, MatchModelV3 } from "../../../shared/model/match.model";
+import { AppType } from "../../../shared/constants/module.constants";
 /**
  * Generated class for the MatchPage page.
  *
@@ -33,8 +37,27 @@ import { MatchType } from "../../../shared/utility/enums";
 @Component({
   selector: "page-match",
   templateUrl: "match.html",
+  providers: [HttpService]
+
 })
 export class MatchPage {
+
+  fetchAllMatchesInput: FetchAllMatchesInput = {
+    parentclubId: "",
+    clubId: "",
+    activityId: "",
+    memberId: "",
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: "",
+    updated_by: "",
+    created_by: "",
+    FetchType: 0
+  };
+  fetchAllMatchesRes: MatchModelV3;
+  matchlist: AllMatchData[] = [];
+  filteredMatchlist: AllMatchData[] = [];
   fetchMatchesInput: FetchMatchesInput = {
     FetchType: 4,
     user_postgre_metadata: {
@@ -62,14 +85,13 @@ export class MatchPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private apollo: Apollo,
-    private httpLink: HttpLink,
     public commonService: CommonService,
     public loadingCtrl: LoadingController,
     public storage: Storage,
-    public fb: FirebaseService,
     public sharedservice: SharedServices,
     private graphqlService: GraphqlService,
+    private httpService: HttpService,
+
   ) {
     this.commonService.category.pipe(first()).subscribe((data) => {
       if (data == "matchlist") {
@@ -78,32 +100,38 @@ export class MatchPage {
           if (val.$key != "") {
             // this.FetchUserInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
           }
-          this.getMatches();
-          // this.getUserDetails();
+          // this.getMatches();
+          this.fetchAllMatches();
         });
       }
     });
 
     this.fetchMatchesInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
+
+    this.fetchAllMatchesInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+    this.fetchAllMatchesInput.memberId = this.sharedservice.getLoggedInId();
+    this.fetchAllMatchesInput.action_type = 0;
+    this.fetchAllMatchesInput.app_type = AppType.ADMIN_NEW;
+    this.fetchAllMatchesInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+    this.fetchAllMatchesInput.FetchType = 1;
   }
 
   ionViewWillEnter() {
     console.log("MatchPage");
-    // this.navCtrl.push("CreatematchPage");
+  }
 
-    // this.FetchMatchesInput.ParentClubKey = this.navParams.get(
-    //   "selectedParentCubKey"
-    // );
-
-    // this.storage.get("userObj").then((val) => {
-    //   val = JSON.parse(val);
-    //   if (val.$key != "") {
-    //     this.FetchMatchesInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
-    //     this.FetchUserInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
-    //   }
-    //   this.getMatches();
-    //   this.getUserDetails();
-    // });
+  // 🔄 Method to get the string representation of MatchType from the enum
+  getMatchTypeName(type: number): string {
+    switch (type) {
+      case MatchType.SINGLES:
+        return 'Singles';
+      case MatchType.DOUBLES:
+        return 'Doubles';
+      case MatchType.TEAM:
+        return 'Team';
+      default:
+        return 'Unknown'; // 🤷 Handle unexpected values
+    }
   }
 
   gotoDashboard() {
@@ -111,12 +139,40 @@ export class MatchPage {
   }
   gotoMatchdetailsPage(match) {
     match.MatchType == MatchType.TEAM ?
-      this.navCtrl.push("MatchTeamDetailsPage", { match: match }) :
+      this.navCtrl.push("MatchTeamDetailsPage", { match: JSON.stringify(match) }) :
       this.navCtrl.push("MatchdetailsPage", {
         match: match,
         // selectedmatchId: match.Id,
         // selectedmemberkey: this.FetchMatchesInput.MemberKey,
       });
+  }
+
+
+  fetchAllMatches() {
+    this.commonService.showLoader("Fetching matches...");
+    this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe((res: any) => {
+      if (res) {
+        this.commonService.hideLoader();
+        this.fetchAllMatchesRes = res.data;
+        this.matchlist = this.fetchAllMatchesRes.AllMatches;
+        console.log("FetchAllMatches RESPONSE", JSON.stringify(res.data));
+        this.filteredMatchlist = JSON.parse(JSON.stringify(this.matchlist));
+        let today = moment().format("YYYY-MM-DD");
+        this.Today = this.matchlist.filter((match) => {
+          let match_createdAt = moment(
+            match.MatchStartDate,
+            "YYYY-MM-DD"
+          ).format("YYYY-MM-DD");
+
+          return moment(today).isSame(match_createdAt);
+        }).length;
+      } else {
+        console.log("error in fetching",)
+      }
+    }, error => {
+      this.commonService.hideLoader();
+      this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
+    });
   }
 
   //getting matches
@@ -181,15 +237,15 @@ export class MatchPage {
       });
       this.filteredMatches = JSON.parse(JSON.stringify(this.matches));
 
-      let today = moment().format("YYYY-MM-DD");
-      this.Today = this.matches.filter((match) => {
-        let match_createdAt = moment(
-          match.MatchStartDate,
-          "YYYY-MM-DD"
-        ).format("YYYY-MM-DD");
+      // let today = moment().format("YYYY-MM-DD");
+      // this.Today = this.matches.filter((match) => {
+      //   let match_createdAt = moment(
+      //     match.MatchStartDate,
+      //     "YYYY-MM-DD"
+      //   ).format("YYYY-MM-DD");
 
-        return moment(today).isSame(match_createdAt);
-      }).length;
+      //   return moment(today).isSame(match_createdAt);
+      // }).length;
     },
       (error) => {
         //this.commonService.hideLoader();
@@ -206,50 +262,6 @@ export class MatchPage {
           console.error("Network Error:", error.networkError);
         }
       })
-
-
-    // this.apollo
-    //   .query({
-    //     query: matchesQuery,
-
-    //     fetchPolicy: "network-only",
-    //     variables: {
-    //       fetchMatchesInput: this.FetchMatchesInput,
-    //     },
-    //   })
-    //   .subscribe(
-    //     ({ data }) => {
-    //       console.log("matches data" + JSON.stringify(data["fetchMatches"]));
-    //       this.commonService.hideLoader();
-    //       this.matches = data["fetchMatches"];
-    //       this.matches = this.matches.sort(function (a, b) {
-    //         return moment(b.MatchStartDate, "YYYY-MM-DD hh:mm").diff(
-    //           moment(a.MatchStartDate, "YYYY-MM-DD hh:mm")
-    //         );
-    //       });
-    //       this.filteredMatches = JSON.parse(JSON.stringify(this.matches));
-
-    //       let today = moment().format("YYYY-MM-DD");
-    //       this.Today = this.matches.filter((match) => {
-    //         let match_createdAt = moment(
-    //           match.MatchStartDate,
-    //           "YYYY-MM-DD"
-    //         ).format("YYYY-MM-DD");
-
-    //         return moment(today).isSame(match_createdAt);
-    //       }).length;
-    //     },
-    //     (err) => {
-    //       this.commonService.hideLoader();
-    //       console.log(JSON.stringify(err));
-    //       this.commonService.toastMessage(
-    //         "Failed to fetch matches",
-    //         2500,
-    //         ToastMessageType.Error,
-    //         ToastPlacement.Bottom
-    //       );
-    //     }
-    //   );
   };
 
   formatMatchStartDate(date) {
@@ -259,6 +271,32 @@ export class MatchPage {
 
   gotoCreateMatch() {
     this.navCtrl.push("CreatematchPage");
+  }
+
+  /**
+   * 🔍 Filters matchlist based on search input (for AllMatches API response)
+   * Usage: Call this method with the search event from the searchbar for AllMatches data
+   */
+  getFilterEvents(ev: any) {
+    let val = ev.target.value;
+    if (val && val.trim() !== "") {
+      this.filteredMatchlist = this.matchlist.filter((item) => {
+        if (item.MatchTitle && item.MatchTitle.toLowerCase().indexOf(val.toLowerCase()) > -1) return true;
+        if (item.ActivityName && item.ActivityName.toLowerCase().indexOf(val.toLowerCase()) > -1) return true;
+        if (item.homeUserName && item.homeUserName.toLowerCase().indexOf(val.toLowerCase()) > -1) return true;
+        if (item.awayUserName && item.awayUserName.toLowerCase().indexOf(val.toLowerCase()) > -1) return true;
+        return false;
+      });
+    } else {
+      this.initializeEvents();
+    }
+  }
+
+  /**
+   * 🗒️ Resets filteredMatchlist to all matches (for AllMatches API response)
+   */
+  initializeEvents() {
+    this.filteredMatchlist = this.matchlist;
   }
 
   getFilterItems(ev: any) {
@@ -295,43 +333,6 @@ export class MatchPage {
   initializeItems() {
     this.filteredMatches = this.matches;
   }
-
-  //   getUserDetails = () => {
-  //     const userQuery = gql`
-  //       query getUserStats($ladderInput: FetchUserInput!) {
-  //         getUserStats(ladderInput: $ladderInput) {
-  //           TotalMatches
-  //           Wins
-  //           rank
-  //         }
-  //       }
-  //     `;
-  //     this.apollo
-  //       .query({
-  //         query: userQuery,
-  //         fetchPolicy: "network-only",
-  //         variables: {
-  //           ladderInput: this.FetchUserInput,
-  //         },
-  //       })
-  //       .subscribe(
-  //         ({ data }) => {
-  //           console.log("user data" + JSON.stringify(data["getUserStats"]));
-  //           this.commonService.hideLoader();
-  //           this.users = data["getUserStats"];
-  //         },
-  //         (err) => {
-  //           this.commonService.hideLoader();
-  //           console.log(JSON.stringify(err));
-  //           this.commonService.toastMessage(
-  //             "Failed to fetch User Details",
-  //             2500,
-  //             ToastMessageType.Error,
-  //             ToastPlacement.Bottom
-  //           );
-  //         }
-  //       );
-  //   };
 }
 
 export class FetchMatchesInput {
@@ -341,8 +342,17 @@ export class FetchMatchesInput {
   }
 }
 
-export class FetchUserInput {
-  ParentClubKey: String;
-  MemberKey: String;
-  ParticipationStatus: number;
+export interface FetchAllMatchesInput {
+  parentclubId: string; // 🏢 Parent club ID
+  clubId: string; // 🏢 Club ID
+  activityId: string; // ⚽ Activity ID
+  memberId: string; // 🧑‍ User/Member ID
+  action_type: number; // ⚙️ Type of action
+  device_type: number; // 📱 Type of device
+  app_type: number; // 📱 Type of application
+  device_id: string; // 🆔 Device identifier
+  updated_by: string; // 🧑‍ Identifier of the updater
+  created_by: string | null; // 🧑‍ Identifier of the creator (can be null)
+  FetchType: number; // 🔍 Type of fetch operation
 }
+

@@ -99,5 +99,9 @@ export const API = {
     PAUSE_MONTHLY_SUBSCRIPTION: `pause_monthly_subscription`,
     GET_SUBSCRIPTION_PAUSE_MONTHS: `monthly_session/getSubscriptionPauseMonths`,
     GET_ACTIVIY_SPECIFIC_TEAM: `league/getActivitySpecificTeam`,
-
+    CREATE_CLUB: `club/create_club`,
+    GetTeamsByMatch: `match/get_teams_by_match`,
+    GetIndividualMatchParticipant: `match/GetIndividualMatchParticipant`,
+    FetchAllMatches: `match/FetchAllMatches`,
+    UPDATE_RESULT_ENTITY: `LeagueResult/updateResultEntity`,
 }

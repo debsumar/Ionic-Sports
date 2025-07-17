@@ -1,15 +1,13 @@
 import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { IonicPage, ModalController, NavController, NavParams } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
-import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
+import { CommonService, ToastMessageType, ToastPlacement } from '../../../../../services/common.service';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
-import { LeagueMatch } from '../models/location.model';
-import { LeagueMatchParticipantModel, LeagueParticipationForMatchModel, SelectedPlayerScorersModel } from '../models/league.model';
-import { HttpService } from '../../../../services/http.service';
-import { API } from '../../../../shared/constants/api_constants';
-import { LeagueTeamPlayerStatusType } from '../../../../shared/utility/enums';
-import { SharedServices } from '../../../services/sharedservice';
-import { AppType } from '../../../../shared/constants/module.constants';
+import { HttpService } from '../../../../../services/http.service';
+import { API } from '../../../../../shared/constants/api_constants';
+import { LeagueTeamPlayerStatusType } from '../../../../../shared/utility/enums';
+import { SharedServices } from '../../../../services/sharedservice';
+import { AppType } from '../../../../../shared/constants/module.constants';
 import { first } from 'rxjs/operators';
 import {
   CricketSectionModel,
@@ -22,22 +20,24 @@ import {
   PublishLeagueResultForActivitiesInput,
   LeagueMatchParticipantInput,
   POTMDetailModel
-} from '../../../../shared/model/league_result.model';
+} from '../../../../../shared/model/league_result.model';
+import { LeagueMatchParticipantModel, LeagueParticipationForMatchModel, SelectedPlayerScorersModel } from '../../../league/models/league.model';
+import { AllMatchData } from '../../../../../shared/model/match.model';
 
 @IonicPage()
 @Component({
-  selector: 'page-summary_football',
-  templateUrl: 'summary_football.html',
+  selector: 'page-publish_football',
+  templateUrl: 'publish_football.html',
   providers: [HttpService]
 })
-export class SummaryFootballPage implements AfterViewInit {
+export class PublishFootballPage implements AfterViewInit {
   @ViewChild('doughnutCanvas', { read: ElementRef }) doughnutCanvas: ElementRef;
 
   // Component properties
   homeScore: string = '0';
   awayScore: string = '0';
   potmList: any;
-  matchObj: LeagueMatch;
+  matchObj: AllMatchData;
   leagueId: string;
   activityId: string;
   activityCode: number;
@@ -160,12 +160,16 @@ export class SummaryFootballPage implements AfterViewInit {
     try {
       // Get navigation parameters
       this.matchObj = this.navParams.get("match");
-      this.leagueId = this.navParams.get("leagueId");
-      this.activityId = this.navParams.get("activityId");
-      this.activityCode = this.navParams.get("activityCode");
-      this.homeTeamObj = this.navParams.get("homeTeam");
-      this.awayTeamObj = this.navParams.get("awayTeam");
-      console.log("ACTIVITY CODE:", this.activityCode);
+      this.leagueId = '';
+      if (this.matchObj) {
+        this.activityId = this.matchObj.activityId;
+        // this.activityCode = +this.matchObj.ActivityCode;
+        this.activityCode = parseInt(this.matchObj.ActivityCode);
+        this.homeTeamObj = this.navParams.get("homeTeam");
+        console.log("HOME TEAM:", this.homeTeamObj);
+        this.awayTeamObj = this.navParams.get("awayTeam");
+        console.log("ACTIVITY CODE:", this.activityCode);
+      }
 
       // Initialize API inputs
       this.initializeApiInputs();
@@ -187,7 +191,7 @@ export class SummaryFootballPage implements AfterViewInit {
     this.leagueMatchParticipantInput = {
       ...baseInput,
       LeagueId: this.leagueId,
-      MatchId: this.matchObj.match_id,
+      MatchId: this.matchObj.MatchId,
       TeamId: this.homeTeamObj.parentclubteam.id || '',
       TeamId2: this.awayTeamObj.parentclubteam.id || '',
       leagueTeamPlayerStatusType: LeagueTeamPlayerStatusType.PLAYINGPLUSBENCH
@@ -196,14 +200,14 @@ export class SummaryFootballPage implements AfterViewInit {
     // Initialize league match result input
     this.leagueMatchResultInput = {
       ...baseInput,
-      MatchId: this.matchObj.match_id
+      MatchId: this.matchObj.MatchId
     };
 
     // Initialize publish league result input
     this.publishLeagueResultForActivitiesInput = {
       ...baseInput,
       activityCode: this.activityCode.toString() || '',
-      leaguefixtureId: this.matchObj.fixture_id || '',
+      leaguefixtureId: this.matchObj.LeagueFixtureId || '',
       homeLeagueParticipationId: this.homeTeamObj.id || '',
       awayLeagueParticipationId: this.awayTeamObj.id || '',
       isDrawn: false,
@@ -256,9 +260,8 @@ export class SummaryFootballPage implements AfterViewInit {
     };
   }
 
-  // Add a new getter for display purposes (returns string)
   get potmDisplayString(): string {
-    if (!this.result_json) {
+    if (!this.result_json || !this.getLeagueMatchResultRes) {
       return '';
     }
 
@@ -268,10 +271,13 @@ export class SummaryFootballPage implements AfterViewInit {
       names = this.selectedPlayersPotm
         .map(s => `${s.user.FirstName || ''} ${s.user.LastName || ''}`.trim())
         .filter(name => name.length > 0);
-      return names.join(', ');
-    } else {
-      return this.result_json.POTM_PLAYERS || '';
+    } else if (this.result_json.POTM && Array.isArray(this.result_json.POTM)) {
+      names = this.result_json.POTM
+        .map(p => p.PLAYER || '')
+        .filter(name => name.trim().length > 0);
     }
+
+    return names.join(', ');
   }
 
   get potmDisplayNames(): POTMDetailModel[] {
@@ -289,12 +295,10 @@ export class SummaryFootballPage implements AfterViewInit {
           TEAM_ID: s.Team.id
         }))
         .filter(p => p.PLAYER.length > 0);
-
-      this.result_json.POTM_PLAYERS = potm.map(p => p.PLAYER).join(', ');
-      return potm; // ✅ Return the new data
     }
 
-    // Return existing data if no new selections
+    //assign the value of PLAYER as comma separated join in the variable this.result_json.POTM_PLAYERS
+    this.result_json.POTM_PLAYERS = potm.map(p => p.PLAYER).join(', ');
     return this.result_json.POTM.map(p => ({
       PLAYER: p.PLAYER || '',
       PLAYER_ID: p.PLAYER_ID || '',
@@ -435,6 +439,7 @@ export class SummaryFootballPage implements AfterViewInit {
     try {
       // Update Football section with current data
       if (this.publishLeagueResultForActivitiesInput.Football) {
+        this.publishLeagueResultForActivitiesInput.Football.POTM = this.potmDisplayNames;
         this.publishLeagueResultForActivitiesInput.Football.Team1!.SCORE = this.scorerObjectsHome;
         this.publishLeagueResultForActivitiesInput.Football.Team2!.SCORE = this.scorerObjectsAway;
         this.publishLeagueResultForActivitiesInput.Football.Team1!.BALL_POSSESSION = this.homePoss;
@@ -728,7 +733,7 @@ export class SummaryFootballPage implements AfterViewInit {
       created_by: this.sharedservice.getLoggedInId() || '',
       activityId: this.activityId || '',
       activityCode: this.activityCode.toString() || '',
-      leaguefixtureId: this.matchObj.fixture_id || '',
+      leaguefixtureId: this.matchObj.LeagueFixtureId || '',
     };
   }
 
@@ -812,10 +817,11 @@ export class SummaryFootballPage implements AfterViewInit {
         const result_input: Partial<PublishLeagueResultForActivitiesInput> = {
           ...this.createBaseResultInput(),
           Football: {
-            POTM: this.potmDisplayNames,
-            POTM_PLAYERS: this.potmDisplayString
+            POTM: this.potmDisplayNames
           }
         };
+
+        //modify the resultt_input according to getter potmDisplayNames()
 
         this.PublishLeagueResult(result_input);
       } else {
