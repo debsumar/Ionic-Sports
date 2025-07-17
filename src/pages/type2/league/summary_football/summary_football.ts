@@ -51,7 +51,35 @@ export class SummaryFootballPage implements AfterViewInit {
   leagueMatchParticipantRes: LeagueMatchParticipantModel[] = [];
   getLeagueMatchResultRes: LeagueResultModel | null = null;
   publishLeagueResultForActivitiesRes: any;
-  result_json: FootballResultModel = {};
+  // result_json: FootballResultModel = {};
+  result_json: FootballResultModel = {
+    POTM: [],
+    POTM_PLAYERS: '',
+    Team1: {
+      GOAL: '0',
+      SHOTS: '0',
+      SHOTS_ON_GOAL: '0',
+      CORNERS: '0',
+      FOULS_COMMITTED: '0',
+      OFFSIDES: '0',
+      BALL_POSSESSION: '0.00',
+      YELLOW_CARD: '0',
+      RED_CARD: '0',
+      SCORE: []
+    },
+    Team2: {
+      GOAL: '0',
+      SHOTS: '0',
+      SHOTS_ON_GOAL: '0',
+      CORNERS: '0',
+      FOULS_COMMITTED: '0',
+      OFFSIDES: '0',
+      BALL_POSSESSION: '0.00',
+      YELLOW_CARD: '0',
+      RED_CARD: '0',
+      SCORE: []
+    }
+  };
   ishome: boolean = true;
   selectedTab: string = 'Stats';
   homePoss: string = '0.00';
@@ -390,6 +418,12 @@ export class SummaryFootballPage implements AfterViewInit {
       console.warn('result_json is neither string nor object:', rawResultJson);
       this.result_json = {};
     }
+    // Validate that the result_json has the required structure
+    if (!this.result_json.Team1 || !this.result_json.Team2) {
+      console.warn('result_json missing Team1 or Team2, initializing defaults');
+      this.initializeDefaultValues();
+      return;
+    }
 
     // Update component properties from result_json
     this.updateComponentFromResultJson();
@@ -489,126 +523,35 @@ export class SummaryFootballPage implements AfterViewInit {
     );
   }
 
-  // Modal and UI Methods
-  async editMatchStats(): Promise<void> {
-    const alert = await this.alertCtrl.create({
-      title: 'Edit Match Stats',
-      inputs: [
-        {
-          label: 'Home Possession (%)',
-          name: 'homePoss',
-          placeholder: 'Home Possession',
-          type: 'number',
-          value: this.homePoss || '0'
+  async updateMatchStats() {
+    const result_input: Partial<PublishLeagueResultForActivitiesInput> = {
+      ...this.createBaseResultInput(),
+      Football: {
+        Team1: {
+          GOAL: (this.result_json.Team1.GOAL || 0).toString(),
+          SHOTS_ON_GOAL: (this.result_json.Team1.SHOTS_ON_GOAL || 0).toString(),
+          CORNERS: (this.result_json.Team1.CORNERS || 0).toString(),
+          FOULS_COMMITTED: (this.result_json.Team1.FOULS_COMMITTED || 0).toString(),
+          OFFSIDES: (this.result_json.Team1.OFFSIDES || 0).toString(),
+          BALL_POSSESSION: this.homePoss || '0.00',
+          YELLOW_CARD: (this.result_json.Team1.YELLOW_CARD || 0).toString(),
+          RED_CARD: (this.result_json.Team1.RED_CARD || 0).toString(),
+          SHOTS: (this.result_json.Team1.SHOTS.toString() || 0).toString(),
         },
-        {
-          label: 'Away Possession (%)',
-          name: 'awayPoss',
-          placeholder: 'Away Possession',
-          type: 'number',
-          value: this.awayPoss || '0'
-        },
-        {
-          label: `${this.homeTeamObj.parentclubteam.teamName || 'Home'} Shots on Goal`,
-          name: 'shotsOnGoalHome',
-          placeholder: 'Home Shots on Goal',
-          type: 'number',
-          value: this.result_json.Team1.SHOTS_ON_GOAL || '0'
-        },
-        {
-          label: `${this.awayTeamObj.parentclubteam.teamName || 'Away'} Shots on Goal`,
-          name: 'shotsOnGoalAway',
-          placeholder: 'Away Shots on Goal',
-          type: 'number',
-          value: this.result_json.Team2.SHOTS_ON_GOAL || '0'
-        },
-        {
-          label: 'Home Shot Attempts',
-          name: 'shotAttemptsHome',
-          placeholder: 'Home Shot Attempts',
-          type: 'number',
-          value: this.result_json.Team1.SHOTS || '0'
-        },
-        {
-          label: 'Away Shot Attempts',
-          name: 'shotAttemptsAway',
-          placeholder: 'Away Shot Attempts',
-          type: 'number',
-          value: this.result_json.Team2.SHOTS || '0'
-        },
-        {
-          label: 'Fouls By Home Team',
-          name: 'foulsHome',
-          placeholder: 'Fouls By Home Team',
-          type: 'number',
-          value: this.result_json.Team1.FOULS_COMMITTED || '0'
-        },
-        {
-          label: 'Fouls By Away Team',
-          name: 'foulsAway',
-          placeholder: 'Fouls By Away Team',
-          type: 'number',
-          value: this.result_json.Team2.FOULS_COMMITTED || '0'
-        },
-        {
-          label: 'Offside By Home Team',
-          name: 'offsideHome',
-          placeholder: 'Home Offside',
-          type: 'number',
-          value: this.result_json.Team1.OFFSIDES || '0'
-        },
-        {
-          label: 'Offside By Away Team',
-          name: 'offsideAway',
-          placeholder: 'Away Offside',
-          type: 'number',
-          value: this.result_json.Team2.OFFSIDES || '0'
-        },
-        {
-          label: 'Home Team Yellow Cards',
-          name: 'yellowCardHome',
-          placeholder: 'Home Yellow Cards',
-          type: 'number',
-          value: this.result_json.Team1.YELLOW_CARD || '0'
-        },
-        {
-          label: 'Away Team Yellow Cards',
-          name: 'yellowCardAway',
-          placeholder: 'Away Yellow Cards',
-          type: 'number',
-          value: this.result_json.Team2.YELLOW_CARD || '0'
-        },
-        {
-          label: 'Home Team Red Cards',
-          name: 'redCardHome',
-          placeholder: 'Home Red Cards',
-          type: 'number',
-          value: this.result_json.Team1.RED_CARD || '0'
-        },
-        {
-          label: 'Away Team Red Cards',
-          name: 'redCardAway',
-          placeholder: 'Away Red Cards',
-          type: 'number',
-          value: this.result_json.Team2.RED_CARD || '0'
+        Team2: {
+          GOAL: (this.result_json.Team2.GOAL || 0).toString(),
+          SHOTS_ON_GOAL: (this.result_json.Team2.SHOTS_ON_GOAL || 0).toString(),
+          CORNERS: (this.result_json.Team2.CORNERS || 0).toString(),
+          FOULS_COMMITTED: (this.result_json.Team2.FOULS_COMMITTED || 0).toString(),
+          OFFSIDES: (this.result_json.Team2.OFFSIDES || 0).toString(),
+          BALL_POSSESSION: this.awayPoss || '0.00',
+          YELLOW_CARD: (this.result_json.Team2.YELLOW_CARD || 0).toString(),
+          RED_CARD: (this.result_json.Team2.RED_CARD || 0).toString(),
+          SHOTS: (this.result_json.Team2.SHOTS.toString() || 0).toString()
         }
-      ],
-      buttons: [
-        {
-          text: 'Cancel',
-          role: 'cancel',
-          handler: () => console.log('Edit stats cancelled')
-        },
-        {
-          text: 'Save',
-          handler: (data) => {
-            this.saveMatchStats(data);
-          }
-        }
-      ]
-    });
-
-    await alert.present();
+      }
+    };
+    this.PublishLeagueResult(result_input);
   }
 
   private saveMatchStats(data: any): void {
@@ -826,114 +769,109 @@ export class SummaryFootballPage implements AfterViewInit {
     modal.present();
   }
 
-  // Chart and UI Methods
-  ngAfterViewInit(): void {
+  ngAfterViewInit() {
     this.drawDoughnutChart();
   }
 
-  drawDoughnutChart(): void {
-    try {
-      if (!this.doughnutCanvas.nativeElement) {
-        console.warn("Canvas element not available");
-        return;
-      }
+  drawDoughnutChart() {
+    const canvas = this.doughnutCanvas.nativeElement;
+    const ctx = canvas.getContext('2d');
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    const radius = Math.min(canvas.width, canvas.height) / 2;
 
-      const canvas = this.doughnutCanvas.nativeElement;
-      const ctx = canvas.getContext('2d');
+    const data = [this.homePoss, this.awayPoss].map(poss => parseFloat(poss)); // 🟢 Convert string to number
+    const labels = ['Atlético Madrid', 'Real Madrid'];
+    const colors = ['red', 'green'];
 
-      if (!ctx) {
-        console.warn("Canvas context not available");
-        return;
-      }
+    let startAngle = -Math.PI / 2;
 
-      const centerX = canvas.width / 2;
-      const centerY = canvas.height / 2;
-      const radius = Math.min(canvas.width, canvas.height) / 2;
+    for (let i = 0; i < data.length; i++) {
+      const sliceAngle = 2 * Math.PI * data[i] / 100;
 
-      const homePossNum = parseFloat(this.homePoss) || 0;
-      const awayPossNum = parseFloat(this.awayPoss) || 0;
-      const data = [homePossNum, awayPossNum];
-      const colors = ['#ff6b6b', '#4ecdc4'];
-
-      // Clear canvas
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      let startAngle = -Math.PI / 2;
-
-      for (let i = 0; i < data.length; i++) {
-        const sliceAngle = 2 * Math.PI * data[i] / 100;
-
-        ctx.beginPath();
-        ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
-        ctx.lineTo(centerX, centerY);
-        ctx.fillStyle = colors[i];
-        ctx.fill();
-        ctx.closePath();
-
-        startAngle += sliceAngle;
-      }
-
-      // Add white circle in the middle to make it a doughnut chart
       ctx.beginPath();
-      ctx.arc(centerX, centerY, radius * 0.6, 0, 2 * Math.PI);
-      ctx.fillStyle = 'white';
+      ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
+      ctx.lineTo(centerX, centerY);
+      ctx.fillStyle = colors[i];
       ctx.fill();
       ctx.closePath();
 
-      this.drawTeamLogos(ctx, centerX, centerY, radius);
-    } catch (error) {
-      console.error("Error drawing doughnut chart:", error);
+      startAngle += sliceAngle;
     }
-  }
 
-  private drawTeamLogos(ctx: CanvasRenderingContext2D, centerX: number, centerY: number, radius: number): void {
-    // This is a simplified version - you can enhance it with actual team logos
-    const logoSize = radius * 0.3;
+    // Add white circle in the middle to make it a doughnut chart
+    ctx.beginPath();
+    ctx.arc(centerX, centerY, radius * 0.8, 0, 2 * Math.PI);
+    ctx.fillStyle = 'white';
+    ctx.fill();
+    ctx.closePath();
 
-    // Draw home team text
-    ctx.fillStyle = '#333';
-    ctx.font = '12px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(
-      this.homeTeamObj.parentclubteam.teamName.substring(0, 10) || 'Home',
-      centerX - radius * 0.3,
-      centerY - 10
-    );
-    ctx.fillText(
-      `${this.homePoss}%`,
-      centerX - radius * 0.3,
-      centerY + 10
-    );
+    // Load and draw the Real Madrid logo
+    const rmaLogo = new Image();
+    rmaLogo.src = 'https://logos-world.net/wp-content/uploads/2020/06/Real-Madrid-Logo.png';
+    const awayLogo = new Image();
+    awayLogo.src = 'https://logos-world.net/wp-content/uploads/2020/06/atletico-madrid-Logo.png';
 
-    // Draw away team text
-    ctx.fillText(
-      this.awayTeamObj.parentclubteam.teamName.substring(0, 10) || 'Away',
-      centerX + radius * 0.3,
-      centerY - 10
-    );
-    ctx.fillText(
-      `${this.awayPoss}%`,
-      centerX + radius * 0.3,
-      centerY + 10
-    );
+    let imagesLoaded = 0;
+    const totalImages = 2;
+
+    const checkImagesLoaded = () => {
+      imagesLoaded++;
+      if (imagesLoaded === totalImages) {
+        let logoWidth = radius * 0.8; // Increased logo width
+        let logoHeight = radius * 0.6;
+        const rmaLogoX = centerX - radius * 0.9;
+        const rmaLogoY = centerY - logoHeight / 2;
+        const awayLogoX = centerX + radius * 0.1;
+        const awayLogoY = centerY - logoHeight / 2;
+
+        ctx.drawImage(rmaLogo, rmaLogoX, rmaLogoY, logoWidth, logoHeight);
+        ctx.drawImage(awayLogo, awayLogoX, awayLogoY, logoWidth, logoHeight);
+
+        // Draw vertical line
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY - logoHeight);
+        ctx.lineTo(centerX, centerY + logoHeight);
+        ctx.strokeStyle = 'grey'; // Line color
+        ctx.lineWidth = 1; // Line width
+        ctx.stroke();
+        ctx.closePath();
+      }
+    };
+
+    rmaLogo.onload = () => {
+      checkImagesLoaded();
+    };
+
+    awayLogo.onload = () => {
+      checkImagesLoaded();
+    };
+
+    // Add labels
+    // ctx.fillStyle = '#000';
+    // ctx.font = '12px Arial';
+    // ctx.textAlign = 'center';
+    // ctx.fillText(`${this.rmaShotsOnGoal}%`, centerX - radius * 0.2, centerY);
+    // ctx.fillText(`${this.awayShotsOnGoal}%`, centerX + radius * 0.2, centerY);
   }
 
   // Utility Methods
-  getPercentage(value1: string | number, value2: string | number, team: 'team1' | 'team2'): string {
-    const val1 = typeof value1 === 'string' ? parseFloat(value1) : value1 || 0;
-    const val2 = typeof value2 === 'string' ? parseFloat(value2) : value2 || 0;
+  getPercentage(value1: string, value2: string, team: 'team1' | 'team2'): string {
+    const val1 = parseInt(value1) || 0;
+    const val2 = parseInt(value2) || 0;
     const total = val1 + val2;
 
-    if (total === 0) return '0.00';
+    if (total === 0) return '0';
 
-    if (team === 'team1') {
-      return ((val1 / total) * 100).toFixed(2);
-    } else {
-      return ((val2 / total) * 100).toFixed(2);
-    }
+    const percentage = team === 'team1'
+      ? (val1 / total) * 100
+      : (val2 / total) * 100;
+
+    return percentage.toFixed(2);
   }
 
-  // adjustPercentages(percent1: number, percent2: number): { team1: number; team2: number } {
+  // Helper method to adjust percentages
+  // adjustPercentages(percent1: number, percent2: number) {
   //   const total = percent1 + percent2;
 
   //   if (total === 100) {
@@ -956,4 +894,38 @@ export class SummaryFootballPage implements AfterViewInit {
   //     }
   //   }
   // }
+  //  get safeResultJson(): FootballResultModel {
+  //   if (!this.result_json || !this.result_json.Team1 || !this.result_json.Team2) {
+  //     return {
+  //       POTM: [],
+  //       POTM_PLAYERS: '',
+  //       Team1: {
+  //         GOAL: '0',
+  //         SHOTS: '0',
+  //         SHOTS_ON_GOAL: '0',
+  //         CORNERS: '0',
+  //         FOULS_COMMITTED: '0',
+  //         OFFSIDES: '0',
+  //         BALL_POSSESSION: '0.00',
+  //         YELLOW_CARD: '0',
+  //         RED_CARD: '0',
+  //         SCORE: []
+  //       },
+  //       Team2: {
+  //         GOAL: '0',
+  //         SHOTS: '0',
+  //         SHOTS_ON_GOAL: '0',
+  //         CORNERS: '0',
+  //         FOULS_COMMITTED: '0',
+  //         OFFSIDES: '0',
+  //         BALL_POSSESSION: '0.00',
+  //         YELLOW_CARD: '0',
+  //         RED_CARD: '0',
+  //         SCORE: []
+  //       }
+  //     };
+  //   }
+  //   return this.result_json;
+  // }
+
 }

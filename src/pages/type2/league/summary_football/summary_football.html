@@ -77,28 +77,27 @@
     <hr style="border: 0; border-top: 0.5px solid rgba(0, 0, 0, 0.15); margin: 10px 0;">
   </div>
 
-  <div class="stats-section" (click)="editMatchStats()">
+  <div class="stats-section" (click)="isResultPopupVisible = true">
     <div style="text-align: center;margin: 5px;">
       <h3 style="color: #f6ae4d;">Match Stats</h3>
     </div>
-    <p style="text-align: center;color: #f6ae4d;margin: 5px;">Possession</p>
+    <p style="text-align: center;color: #f6ae4d;margin: 0px;">Possession</p>
 
     <div class="chartDiv">
       <ion-col style="margin: 0; padding: 0">
-        <span style="padding-right: 0px; color: green;">{{homePoss}}%</span>
+        <span style="color: green;">{{homePoss}}%</span>
         <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px; padding-right:20px;"></ion-icon>
       </ion-col>
 
       <canvas #doughnutCanvas width="200" height="200"></canvas>
 
       <ion-col style="margin: 0; padding: 0">
-        <span style="padding-left: 20px; color: red;">{{awayPoss}}%</span>
-        <ion-icon name="create"
-          style="color: rgba(0,0,0,0.50); font-size: 16px;padding-left: 20px; padding-right: 5px;"></ion-icon>
+        <span style="color: red;">{{awayPoss}}%</span>
+        <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px;"></ion-icon>
       </ion-col>
     </div>
 
-    <div class="stat-row" *ngIf="result_json && result_json.Team1 && result_json.Team2">
+    <div class="stat-row" *ngIf="result_json">
       <!-- Shots On Goal Section -->
       <div class="stat-section">
         <p class="stat-title">Shots On Goal</p>
@@ -109,12 +108,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill rma"
-                    [style.width.%]="getPercentage(result_json.Team1?.SHOTS_ON_GOAL || '0', result_json.Team2?.SHOTS_ON_GOAL || '0', 'team1')">
+                    [style.width.%]="getPercentage(result_json.Team1.SHOTS_ON_GOAL, result_json.Team2.SHOTS_ON_GOAL, 'team1')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: green;">{{result_json.Team1?.SHOTS_ON_GOAL || '0'}}</span>
+                <span style="color: green;">{{result_json.Team1.SHOTS_ON_GOAL}}</span>
               </ion-col>
             </ion-row>
             <!-- Team 2 Bar -->
@@ -122,20 +121,21 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill atm"
-                    [style.width.%]="getPercentage(result_json.Team1?.SHOTS_ON_GOAL || '0', result_json.Team2?.SHOTS_ON_GOAL || '0', 'team2')">
+                    [style.width.%]="getPercentage(result_json.Team1.SHOTS_ON_GOAL, result_json.Team2.SHOTS_ON_GOAL, 'team2')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: red;">{{result_json.Team2?.SHOTS_ON_GOAL || '0'}}</span>
+                <span style="color: red;">{{result_json.Team2.SHOTS_ON_GOAL}}</span>
               </ion-col>
             </ion-row>
           </ion-col>
         </ion-row>
       </div>
 
+
       <!-- Total Shots Section -->
-      <div class="stat-section">
+      <div class="stat-section" *ngIf="result_json">
         <p class="stat-title">Total Shots</p>
         <ion-row>
           <ion-col>
@@ -144,12 +144,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill rma"
-                    [style.width.%]="getPercentage(result_json.Team1?.SHOTS || '0', result_json.Team2?.SHOTS || '0', 'team1')">
+                    [style.width.%]="getPercentage(result_json.Team1.SHOTS, result_json.Team2.SHOTS, 'team1')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: green;">{{result_json.Team1?.SHOTS || '0'}}</span>
+                <span style="color: green;">{{result_json.Team1.SHOTS}}</span>
               </ion-col>
             </ion-row>
             <!-- Team 2 Bar -->
@@ -157,12 +157,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill atm"
-                    [style.width.%]="getPercentage(result_json.Team1?.SHOTS || '0', result_json.Team2?.SHOTS || '0', 'team2')">
+                    [style.width.%]="getPercentage(result_json.Team1.SHOTS, result_json.Team2.SHOTS, 'team2')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: red;">{{result_json.Team2?.SHOTS || '0'}}</span>
+                <span style="color: red;">{{result_json.Team2.SHOTS}}</span>
               </ion-col>
             </ion-row>
           </ion-col>
@@ -170,7 +170,7 @@
       </div>
 
       <!-- Corners Section -->
-      <div class="stat-section">
+      <div class="stat-section" *ngIf="result_json">
         <p class="stat-title">Corners</p>
         <ion-row>
           <ion-col>
@@ -179,12 +179,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill rma"
-                    [style.width.%]="getPercentage(result_json.Team1?.CORNERS || '0', result_json.Team2?.CORNERS || '0', 'team1')">
+                    [style.width.%]="getPercentage(result_json.Team1.CORNERS, result_json.Team2.CORNERS, 'team1')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: green;">{{result_json.Team1?.CORNERS || '0'}}</span>
+                <span style="color: green;">{{result_json.Team1.CORNERS}}</span>
               </ion-col>
             </ion-row>
             <!-- Team 2 Bar -->
@@ -192,12 +192,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill atm"
-                    [style.width.%]="getPercentage(result_json.Team1?.CORNERS || '0', result_json.Team2?.CORNERS || '0', 'team2')">
+                    [style.width.%]="getPercentage(result_json.Team1.CORNERS, result_json.Team2.CORNERS, 'team2')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: red;">{{result_json.Team2?.CORNERS || '0'}}</span>
+                <span style="color: red;">{{result_json.Team2.CORNERS}}</span>
               </ion-col>
             </ion-row>
           </ion-col>
@@ -205,7 +205,7 @@
       </div>
 
       <!-- Fouls Section -->
-      <div class="stat-section">
+      <div class="stat-section" *ngIf="result_json">
         <p class="stat-title">Fouls Committed</p>
         <ion-row>
           <ion-col>
@@ -214,12 +214,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill rma"
-                    [style.width.%]="getPercentage(result_json.Team1?.FOULS_COMMITTED || '0', result_json.Team2?.FOULS_COMMITTED || '0', 'team1')">
+                    [style.width.%]="getPercentage(result_json.Team1.FOULS_COMMITTED, result_json.Team2.FOULS_COMMITTED, 'team1')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: green;">{{result_json.Team1?.FOULS_COMMITTED || '0'}}</span>
+                <span style="color: green;">{{result_json.Team1.FOULS_COMMITTED}}</span>
               </ion-col>
             </ion-row>
             <!-- Team 2 Bar -->
@@ -227,12 +227,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill atm"
-                    [style.width.%]="getPercentage(result_json.Team1?.FOULS_COMMITTED || '0', result_json.Team2?.FOULS_COMMITTED || '0', 'team2')">
+                    [style.width.%]="getPercentage(result_json.Team1.FOULS_COMMITTED, result_json.Team2.FOULS_COMMITTED, 'team2')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: red;">{{result_json.Team2?.FOULS_COMMITTED || '0'}}</span>
+                <span style="color: red;">{{result_json.Team2.FOULS_COMMITTED}}</span>
               </ion-col>
             </ion-row>
           </ion-col>
@@ -240,7 +240,7 @@
       </div>
 
       <!-- Yellow Cards Section -->
-      <div class="stat-section">
+      <div class="stat-section" *ngIf="result_json">
         <p class="stat-title">Yellow Cards</p>
         <ion-row>
           <ion-col>
@@ -249,12 +249,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill rma"
-                    [style.width.%]="getPercentage(result_json.Team1?.YELLOW_CARD || '0', result_json.Team2?.YELLOW_CARD || '0', 'team1')">
+                    [style.width.%]="getPercentage(result_json.Team1.YELLOW_CARD, result_json.Team2.YELLOW_CARD, 'team1')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: green;">{{result_json.Team1?.YELLOW_CARD || '0'}}</span>
+                <span style="color: green;">{{result_json.Team1.YELLOW_CARD}}</span>
               </ion-col>
             </ion-row>
             <!-- Team 2 Bar -->
@@ -262,12 +262,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill atm"
-                    [style.width.%]="getPercentage(result_json.Team1?.YELLOW_CARD || '0', result_json.Team2?.YELLOW_CARD || '0', 'team2')">
+                    [style.width.%]="getPercentage(result_json.Team1.YELLOW_CARD, result_json.Team2.YELLOW_CARD, 'team2')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: red;">{{result_json.Team2?.YELLOW_CARD || '0'}}</span>
+                <span style="color: red;">{{result_json.Team2.YELLOW_CARD}}</span>
               </ion-col>
             </ion-row>
           </ion-col>
@@ -275,7 +275,7 @@
       </div>
 
       <!-- Red Cards Section -->
-      <div class="stat-section">
+      <div class="stat-section" *ngIf="result_json">
         <p class="stat-title">Red Cards</p>
         <ion-row>
           <ion-col>
@@ -284,12 +284,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill rma"
-                    [style.width.%]="getPercentage(result_json.Team1?.RED_CARD || '0', result_json.Team2?.RED_CARD || '0', 'team1')">
+                    [style.width.%]="getPercentage(result_json.Team1.RED_CARD, result_json.Team2.RED_CARD, 'team1')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: green;">{{result_json.Team1?.RED_CARD || '0'}}</span>
+                <span style="color: green;">{{result_json.Team1.RED_CARD}}</span>
               </ion-col>
             </ion-row>
             <!-- Team 2 Bar -->
@@ -297,12 +297,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill atm"
-                    [style.width.%]="getPercentage(result_json.Team1?.RED_CARD || '0', result_json.Team2?.RED_CARD || '0', 'team2')">
+                    [style.width.%]="getPercentage(result_json.Team1.RED_CARD, result_json.Team2.RED_CARD, 'team2')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: red;">{{result_json.Team2?.RED_CARD || '0'}}</span>
+                <span style="color: red;">{{result_json.Team2.RED_CARD}}</span>
               </ion-col>
             </ion-row>
           </ion-col>
@@ -310,7 +310,7 @@
       </div>
 
       <!-- Offsides Section -->
-      <div class="stat-section">
+      <div class="stat-section" *ngIf="result_json">
         <p class="stat-title">Offsides</p>
         <ion-row>
           <ion-col>
@@ -319,12 +319,12 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill rma"
-                    [style.width.%]="getPercentage(result_json.Team1?.OFFSIDES || '0', result_json.Team2?.OFFSIDES || '0', 'team1')">
+                    [style.width.%]="getPercentage(result_json.Team1.OFFSIDES, result_json.Team2.OFFSIDES, 'team1')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: green;">{{result_json.Team1?.OFFSIDES || '0'}}</span>
+                <span style="color: green;">{{result_json.Team1.OFFSIDES}}</span>
               </ion-col>
             </ion-row>
             <!-- Team 2 Bar -->
@@ -332,17 +332,119 @@
               <ion-col col-10 style="padding: 0; margin: 0;">
                 <div class="barDiv">
                   <div class="bar-fill atm"
-                    [style.width.%]="getPercentage(result_json.Team1?.OFFSIDES || '0', result_json.Team2?.OFFSIDES || '0', 'team2')">
+                    [style.width.%]="getPercentage(result_json.Team1.OFFSIDES, result_json.Team2.OFFSIDES, 'team2')">
                   </div>
                 </div>
               </ion-col>
               <ion-col col-2 style="padding: 0; margin: 0;" text-center>
-                <span style="color: red;">{{result_json.Team2?.OFFSIDES || '0'}}</span>
+                <span style="color: red;">{{result_json.Team2.OFFSIDES}}</span>
               </ion-col>
             </ion-row>
           </ion-col>
         </ion-row>
       </div>
     </div>
+
+
   </div>
 </ion-content>
+
+
+
+
+<!-- Custom popup for result update popup -->
+<div class="custom-popup" *ngIf="isResultPopupVisible && result_json">
+  <div class="popup-container">
+    <div class="popup-header">
+      <h3>Update Result</h3>
+      <button class="close-button" (click)="isResultPopupVisible=false">×</button>
+    </div>
+
+    <div class="popup-content">
+      <ion-item class="input_item">
+        <ion-label>Home Possession</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="homePoss"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Away Possession</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="awayPoss"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>{{this.homeTeamObj.parentclubteam.teamName}} Shots on Goal</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="this.result_json.Team1.SHOTS_ON_GOAL"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>{{awayTeamObj.parentclubteam.teamName}} Shots on Goal</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team2.SHOTS_ON_GOAL"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Home Shot Attempts</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team1.SHOTS"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Away Shot Attempts</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team2.SHOTS"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Fouls By Home Team</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team1.FOULS_COMMITTED"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Fouls By Away Team</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team2.FOULS_COMMITTED"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Offside By Home Team</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team1.OFFSIDES"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Offside By Away Team</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team2.OFFSIDES"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Home Team Yellow Cards</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team1.YELLOW_CARD"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Away Team Yellow Cards</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team2.YELLOW_CARD"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Home Team Red Cards</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team1.RED_CARD"></ion-input>
+      </ion-item>
+
+      <ion-item class="input_item">
+        <ion-label>Away Team Red Cards</ion-label>
+        <ion-input type="number" class="textright" [(ngModel)]="result_json.Team2.RED_CARD"></ion-input>
+      </ion-item>
+    </div>
+
+    <div class="popup-buttons">
+      <button ion-button class="timekare-primary-btn" (click)="isResultPopupVisible=false">Cancel</button>
+      <button ion-button class="timekare-primary-btn" (click)="updateMatchStats()">Update</button>
+    </div>
+  </div>
+</div>
+
+<!-- <ion-footer>
+  <ion-grid>
+    <ion-row>
+      <ion-col col-12>
+        <button class="foobtn" ion-button block (click)="publishResult()">Publish Result</button>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-footer> -->
