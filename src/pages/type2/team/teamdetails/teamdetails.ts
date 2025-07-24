@@ -164,6 +164,7 @@ export class TeamdetailsPage {
       query getTeamsById($teamId: String!) {
         getTeamsById(teamId: $teamId) {
           id
+          short_name
           created_at
           created_by
           updated_at

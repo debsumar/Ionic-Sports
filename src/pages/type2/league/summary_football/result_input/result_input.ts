@@ -3,16 +3,15 @@ import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angul
 import { Storage } from '@ionic/storage';
 import { Apollo } from "apollo-angular";
 import gql from "graphql-tag";
-import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
-import { LeagueMatch } from '../models/location.model';
-import { LeagueMatchParticipantModel, LeagueParticipationForMatchModel } from '../models/league.model';
-import { LeagueTeamPlayerStatusType } from '../../../../shared/utility/enums';
-import { API } from '../../../../shared/constants/api_constants';
-import { HttpService } from '../../../../services/http.service';
-import { SharedServices } from '../../../services/sharedservice';
-import { AppType } from '../../../../shared/constants/module.constants';
+import { AppType } from '../../../../../shared/constants/module.constants';
 import moment from 'moment';
+import { HttpService } from '../../../../../services/http.service';
+import { CommonService, ToastMessageType } from '../../../../../services/common.service';
+import { API } from '../../../../../shared/constants/api_constants';
+import { SharedServices } from '../../../../services/sharedservice';
+import { LeagueParticipationForMatchModel, LeagueMatchParticipantModel } from '../../models/league.model';
+import { LeagueMatch } from '../../models/location.model';
 
 @IonicPage()
 @Component({
@@ -23,8 +22,8 @@ import moment from 'moment';
 export class ResultInputPage {
   updateResultEntityInput: UpdateResultEntityInput = {
     resultId: '',
-    ResultDetails: '',
-    resultDescription: '',
+    // ResultDetails: '',
+    // resultDescription: '',
     ResultStatus: 0,
     PublishedByApp: '',
     winner_league_participation_id: '',
@@ -71,7 +70,7 @@ export class ResultInputPage {
     this.TEAMS = [this.homeTeamObj, this.awayTeamObj];
     this.score = this.navParams.get("score");
     this.updateResultEntityInput.resultId = this.resultId;
-    this.updateResultEntityInput.resultDescription = '';//will add later
+    // this.updateResultEntityInput.resultDescription = '';//will add later
     this.updateResultEntityInput.PublishedByApp = AppType.ADMIN_NEW.toString();
   }
 
@@ -80,16 +79,36 @@ export class ResultInputPage {
     // const selectedTeam = this.TEAMS.find(team => team.parentclubteam.id === this.selectedWinnerTeamId);
     // console.log("Selected Team:", selectedTeam);
     try {
-      this.updateResultEntity();
+      this.updateResultEntity(false);
     } catch (err) {
       console.error('⚠️ Error updating result entity on winner team change:', err);
     }
   }
 
-  updateResultEntity() {
+  onResultTypeChange() {
+    if (this.resultType === 'drawn') {
+      try {
+        this.updateResultEntity(true);
+      } catch (err) {
+        console.error('⚠️ Error updating result entity for drawn match:', err);
+      }
+    }
+  }
+
+  updateResultEntity(isDrawn: boolean) {
     this.commonService.showLoader("Updating...");
-    this.updateResultEntityInput.winner_league_participation_id = this.TEAMS.find(team => team.parentclubteam.id === this.selectedWinnerTeamId).id;
-    this.updateResultEntityInput.loser_league_participation_id = this.TEAMS.find(team => team.id !== this.selectedWinnerTeamId).id;
+    if (isDrawn) {
+      this.updateResultEntityInput.winner_league_participation_id = this.homeTeamObj.id;
+      this.updateResultEntityInput.loser_league_participation_id = this.awayTeamObj.id;
+    } else {
+      // Find the winner team first
+      const winnerTeam = this.TEAMS.find(team => team.parentclubteam.id === this.selectedWinnerTeamId);
+      // Find the loser team by comparing team IDs, not parentclubteam IDs
+      const loserTeam = this.TEAMS.find(team => team.id !== winnerTeam.id);
+
+      this.updateResultEntityInput.winner_league_participation_id = winnerTeam.id;
+      this.updateResultEntityInput.loser_league_participation_id = loserTeam.id;
+    }
     this.httpService.post(`${API.UPDATE_RESULT_ENTITY}`, this.updateResultEntityInput).subscribe((res: any) => {
       if (res) {
         this.commonService.hideLoader();
@@ -154,6 +173,12 @@ export class ResultInputPage {
         loserTeamGoals = this.homeTeamGoals;
       }
 
+      // Validate that winner team has more goals than loser team
+      if (winnerTeamGoals <= loserTeamGoals) {
+        this.commonService.toastMessage('Winner team goals must be greater than losing team goals.', 3000, ToastMessageType.Info);
+        return;
+      }
+
       // 🟢 Dismiss modal with winner result data
       this.viewCtrl.dismiss({
         winnerTeam: winnerTeam,
@@ -165,10 +190,16 @@ export class ResultInputPage {
         loserTeamGoals: loserTeamGoals.toString(),
       });
     } else if (this.resultType === 'drawn') {
-      // 🤝 For drawn matches, no winner/loser teams
+      // For drawn type, check if both teams have the same number of goals
+      if (this.homeTeamGoals !== this.awayTeamGoals) {
+        this.commonService.toastMessage('For drawn matches, both teams must have the same number of goals.', 3000, ToastMessageType.Info);
+        return;
+      }
+
+      // 🤝 For drawn matches, dismiss modal with drawn match data
       this.viewCtrl.dismiss({
-        winnerTeam: null,
-        loserTeam: null,
+        winnerTeam: this.homeTeamObj,
+        loserTeam: this.awayTeamObj,
         isDrawn: true,
         homeTeamGoals: this.homeTeamGoals.toString(),
         awayTeamGoals: this.awayTeamGoals.toString(),
@@ -188,10 +219,10 @@ export class ResultInputPage {
 }
 export class UpdateResultEntityInput {
   resultId: string;
-  ResultDetails: string;
-  resultDescription: string;
-  ResultStatus: number;
+  ResultDetails?: string;
+  resultDescription?: string;
+  ResultStatus?: number;
   PublishedByApp: string;
-  winner_league_participation_id: string;
-  loser_league_participation_id: string;
+  winner_league_participation_id?: string;
+  loser_league_participation_id?: string;
 }

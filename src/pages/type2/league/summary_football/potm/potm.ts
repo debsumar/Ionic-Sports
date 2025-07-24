@@ -1,15 +1,16 @@
 import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
-import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
-import { LeagueMatchParticipantModel, LeagueParticipationForMatchModel } from '../models/league.model';
-import { LeagueMatch } from '../models/location.model';
-import { LeagueTeamPlayerStatusType } from '../../../../shared/utility/enums';
-import { HttpService } from '../../../../services/http.service';
-import { API } from '../../../../shared/constants/api_constants';
-import { AppType } from '../../../../shared/constants/module.constants';
-import { SharedServices } from '../../../services/sharedservice';
+import { CommonService, ToastMessageType } from '../../../../../services/common.service';
+import { HttpService } from '../../../../../services/http.service';
+import { API } from '../../../../../shared/constants/api_constants';
+import { AppType } from '../../../../../shared/constants/module.constants';
+import { LeagueTeamPlayerStatusType } from '../../../../../shared/utility/enums';
+import { SharedServices } from '../../../../services/sharedservice';
+import { LeagueMatchParticipantModel, LeagueParticipationForMatchModel } from '../../models/league.model';
+import { LeagueMatch } from '../../models/location.model';
+
 
 @IonicPage()
 @Component({

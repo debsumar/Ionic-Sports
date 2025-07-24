@@ -13,7 +13,7 @@
   <ion-list>
     <ion-item>
       <ion-label>Status</ion-label>
-      <ion-select [(ngModel)]="resultType" placeholder="Select Status">
+      <ion-select [(ngModel)]="resultType" (ionChange)="onResultTypeChange()" placeholder="Select Status">
         <ion-option *ngFor="let opt of RESULT_TYPE_OPTIONS" [value]="opt.value">{{ opt.label }}</ion-option>
       </ion-select>
     </ion-item>

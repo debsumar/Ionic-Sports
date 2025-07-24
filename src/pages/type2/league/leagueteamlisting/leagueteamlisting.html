@@ -173,8 +173,15 @@
                 <img [src]="team.logo_url" alt="{{team.teamName}} Logo" class="team-logo"> <!-- ✅ Team logo image -->
               </ion-col> <!-- ✅ Remaining space for name -->
               <ion-col>
-                <p class="name">{{team.teamName | titlecase}}</p>
-
+                <ion-row>
+                  <ion-col col-11>
+                    <p class="name">{{team.teamName | titlecase}}</p>
+                  </ion-col>
+                  <ion-col col-1 style="text-align: right; padding-top: 8px;">
+                    <ion-icon *ngIf="team.teamVisibility == 1" style="font-size: 18px; color: #2b92bb"
+                      name="lock"></ion-icon>
+                  </ion-col>
+                </ion-row>
               </ion-col>
             </ion-row>
           </ion-card-header>
@@ -182,26 +189,25 @@
             <ion-row>
               <ion-col col-6>
                 <p class="card-text">
-                  <span>Age Group:{{team.ageGroup}}</span>
+                  <span>{{team.ageGroup}}</span>
                 </p>
-
+                <p class="card-text">
+                  <span>{{team.club.ClubName}} </span>
+                </p>
                 <p class="card-text">
                   <span>{{team.teamDescription}}</span>
                 </p>
               </ion-col>
               <ion-col col-6>
                 <p class="card-text">
-                  <span>Activity:
-                    <span>{{team.activity.ActivityName}}</span></span>
+                  <span>{{team.activity.ActivityName}}</span>
                 </p>
 
-                <p class="card-text">
-                  <span>{{team.club.ClubName}} </span>
-                </p>
+
                 <div class="flex-style">
                   <div>
-                    <ion-icon style="font-size: 18px; color: #2b92bb"></ion-icon>
-                    <span> {{team.teamVisibility==0?"Public":"Private"}} </span>
+                    <!-- <ion-icon style="font-size: 18px; color: #2b92bb"
+                      [name]="team.teamVisibility==0?'ios-globe':'lock'"></ion-icon> -->
                   </div>
 
                   <span style="margin-top: 4px"> </span>

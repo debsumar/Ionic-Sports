@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, PopoverController, ToastController } from 'ionic-angular';
+import { ActionSheetController, IonicPage, NavController, NavParams, PopoverController, ToastController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import moment from "moment";
 import gql from 'graphql-tag';
@@ -12,6 +12,8 @@ import { HttpLink } from 'apollo-angular-link-http';
 import { EditTeamsForParentClubModel, TeamsForParentClubModel } from '../models/team.model';
 import { Activity } from '../models/activity.model';
 import { GraphqlService } from '../../../../services/graphql.service';
+import { TeamImageUploadService } from '../../team/team_image_upload/team_image_upload.service';
+import { Camera, CameraOptions, PictureSourceType } from '@ionic-native/camera';
 
 /**
  * Generated class for the EditteamPage page.
@@ -24,13 +26,16 @@ import { GraphqlService } from '../../../../services/graphql.service';
 @Component({
   selector: 'page-editteam',
   templateUrl: 'editteam.html',
+  providers: [TeamImageUploadService]
 })
 export class EditteamPage {
-
+  img_url: string = "";
 
   publicType: boolean = true;
   clubVenues: ClubVenue[] = [];
   privateType: boolean = true;
+  postgre_parentclubId: string;
+
   parentClubTeamEdit: ParentClubTeamEdit = {
     ParentClubKey: "",
     MemberKey: "",
@@ -43,11 +48,12 @@ export class EditteamPage {
       venueType: 0,
       ageGroup: "",
       teamName: "",
-      shortName: "",
       teamStatus: 0,
       teamVisibility: 0,
-      teamDescription: ""
-    }
+      teamDescription: "",
+      logoUrl: ''
+    },
+    shortName: ""
   }
 
   venueDetailsInput: VenueDetailsInput = {
@@ -78,6 +84,11 @@ export class EditteamPage {
     private toastCtrl: ToastController,
     private apollo: Apollo,
     private graphqlService: GraphqlService,
+    public actionSheetCtrl: ActionSheetController,
+
+    private imageUploadService: TeamImageUploadService,
+    private camera: Camera,
+    public sharedService: SharedServices,
 
   ) {
     this.team = this.navParams.get("team");
@@ -87,12 +98,15 @@ export class EditteamPage {
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
       if (val.$key != "") {
+        this.postgre_parentclubId = this.sharedService.getPostgreParentClubId();
+
         this.parentClubTeamEdit.teamId = this.team.id;
         this.parentClubTeamEdit.ParentClubKey =
           val.UserInfo[0].ParentClubKey;
         this.parentClubTeamEdit.MemberKey = val.$key;
         this.venueDetailsInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
         this.venueDetailsInput.MemberKey = val.$key;
+        this.parentClubTeamEdit.teamDetailsInput.logoUrl = this.team.logo_url
         this.getClubVenues();
       }
     });
@@ -115,6 +129,85 @@ export class EditteamPage {
 
     this.publicType = val == 'public' ? true : false;
     this.parentClubTeamEdit.teamDetailsInput.teamVisibility = val == 'private' ? 1 : 0;
+  }
+
+  async selectTeamLogo() {
+    // this.sponsorIndex = index;
+    const actionSheet = await this.actionSheetCtrl.create({
+      //header: 'Choose File',
+      buttons: [{
+        text: 'Camera',
+        role: 'destructive',
+        icon: 'ios-camera',
+        handler: () => {
+          console.log('clicked');
+          this.CaptureImage(this.camera.PictureSourceType.CAMERA);
+        }
+      }, {
+        text: 'Gallery',
+        icon: 'ios-image',
+        handler: () => {
+          //console.log('Share clicked');
+          this.CaptureImage(this.camera.PictureSourceType.PHOTOLIBRARY);
+        }
+      }, {
+        text: 'Cancel',
+        icon: 'close',
+        role: 'cancel',
+        handler: () => {
+          //console.log('Cancel clicked');
+        }
+      }
+      ]
+    });
+    await actionSheet.present();
+  }
+
+  async CaptureImage(sourceType: PictureSourceType) {
+    const options: CameraOptions = {
+      quality: 70,
+      sourceType,
+      destinationType: this.camera.DestinationType.DATA_URL,
+      encodingType: this.camera.EncodingType.JPEG,
+      //mediaType: this.camera.MediaType.PICTURE
+    };
+
+    try {
+      const imageData = await this.camera.getPicture(options);
+      //const mimeType = sourceType === this.camera.EncodingType.JPEG ? 'image/jpeg' : 'image/png';
+      this.img_url = imageData.startsWith('data:image/jpeg;base64,') ? imageData : `data:image/jpeg;base64,${imageData}`;
+      this.prepareAndUpload();
+    } catch (error) {
+      console.log(`err:${JSON.stringify(error)}`);
+      this.commonService.toastMessage("Error capturing image", 2500, ToastMessageType.Error);
+    }
+  }
+  async prepareAndUpload() {
+    try {
+      this.commonService.showLoader("Uploading image...");
+
+      const uniqueFileName = `${this.postgre_parentclubId}/${Date.now()}-${Math.random().toString(36).substring(2, 15)}.jpeg`;
+      // Step 1: Get presigned URL from server
+      const presignedUrl = await this.imageUploadService.getPresignedUrl(uniqueFileName, 'team', 'ap-dev-league');
+
+      // Step 2: Upload the image to S3 using presigned URL
+      this.imageUploadService.uploadImage(presignedUrl[0].url, this.img_url).then(() => {
+        this.commonService.hideLoader();
+        const imageUrl = `${this.sharedService.getCloudfrontURL()}/team/${uniqueFileName}`;
+        console.log(`uploadedurl:${this.sharedService.getCloudfrontURL()}/team/${uniqueFileName}`);
+        this.parentClubTeamEdit.teamDetailsInput.logoUrl = imageUrl;
+        this.commonService.toastMessage("Image(s) uploaded successfully", 2500, ToastMessageType.Success);
+      }).catch((err) => {
+        console.log(`err:${JSON.stringify(err)}`);
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Error uploading image", 2500, ToastMessageType.Error);
+      })
+
+    } catch (error) {
+      this.commonService.hideLoader();
+      console.log(`err1:${JSON.stringify(error)}`);
+      this.commonService.toastMessage("Error uploading image", 2500, ToastMessageType.Error);
+    }
   }
 
   selectClubName() {
@@ -152,11 +245,21 @@ export class EditteamPage {
       console.log("alll venues:", this.clubVenues)
 
       if (this.clubVenues.length > 0) {
-
+        // Set the venueKey from the team data to pre-select the correct venue
         this.venueKey = this.team.venueKey;
         console.log("venue :", this.venueKey)
-        this.parentClubTeamEdit.teamDetailsInput.venueKey = this.clubVenues[0].ClubKey;
-        this.parentClubTeamEdit.teamDetailsInput.venueType = this.clubVenues[0].LocationType;
+
+        // Find the selected venue in the clubVenues array
+        const selectedVenue = this.clubVenues.find(venue => venue.ClubKey === this.venueKey);
+        if (selectedVenue) {
+          this.parentClubTeamEdit.teamDetailsInput.venueKey = selectedVenue.ClubKey;
+          this.parentClubTeamEdit.teamDetailsInput.venueType = selectedVenue.LocationType;
+        } else {
+          // Fallback to first venue if team's venue is not found
+          this.parentClubTeamEdit.teamDetailsInput.venueKey = this.clubVenues[0].ClubKey;
+          this.parentClubTeamEdit.teamDetailsInput.venueType = this.clubVenues[0].LocationType;
+          this.venueKey = this.clubVenues[0].ClubKey;
+        }
         this.getActivity();
       }
       console.log("activity", this.clubVenues);
@@ -176,7 +279,6 @@ export class EditteamPage {
   getActivity() {
     //this.commonService.showLoader("Please wait...");
     this.venueDetailsInput.VenueKey = this.venueKey;
-    // this.venueDetailsInput.VenueKey=this.parentClubTeamEdit.teamDetailsInput.venueKey
 
     console.log("venueKey for activity", this.venueDetailsInput.VenueKey);
     const activityQuery = gql`
@@ -228,16 +330,27 @@ export class EditteamPage {
     this.parentClubTeamEdit.teamDetailsInput.teamVisibility = this.parentClubTeamEdit.teamDetailsInput.teamVisibility;
     this.parentClubTeamEdit.teamDetailsInput.teamDescription = this.team.teamDescription;
     this.parentClubTeamEdit.teamDetailsInput.teamName = this.team.teamName;
-    this.parentClubTeamEdit.teamDetailsInput.shortName = this.team.shortName;
     this.parentClubTeamEdit.teamDetailsInput.ageGroup = this.team.ageGroup;
     this.parentClubTeamEdit.teamDetailsInput.activityCode = String(this.team.activity.ActivityCode);
     this.parentClubTeamEdit.teamId = this.team.id;
 
+    // Debug the short_Name value
+    console.log("Team short_Name value:", this.team.short_name);
+
+    // Set shortName only at the root level
+    // If short_Name is undefined or null, use a default value to ensure it's included in the payload
+    this.parentClubTeamEdit.shortName = this.team.short_name || "DefaultShortName";
+
+    // Log the final object to verify shortName is set in both places
+    console.log("Final parentClubTeamEdit object:", JSON.stringify(this.parentClubTeamEdit));
     const updateMut = gql`
          mutation modifyParentClubTeam($teamEditInput: ParentClubTeamEdit!){
         modifyParentClubTeam(teamEditInput:$teamEditInput)
       }
     `;
+
+    // Log the exact variables being sent to the mutation
+    // console.log("GraphQL mutation variables:", JSON.stringify(variables));
 
     const variables = { teamEditInput: this.parentClubTeamEdit };
 
@@ -297,21 +410,22 @@ export class EditteamPage {
 } // ✅ Corrected closing bracket for the class
 
 export class ParentClubTeamEdit {
-  ParentClubKey: String
-  MemberKey: String
+  ParentClubKey: string
+  MemberKey: string
   AppType: number
   ActionType: number;
-  teamId: String;
+  teamId: string;
+  shortName: string
   teamDetailsInput: {
-    activityCode: String
-    venueKey: String
+    activityCode: string
+    venueKey: string
     venueType: number
-    ageGroup: String
-    teamName: String
-    shortName: String
+    ageGroup: string
+    teamName: string
     teamStatus: number
     teamVisibility: number
-    teamDescription: String;
+    teamDescription: string;
+    logoUrl: string;
   }
 }
 

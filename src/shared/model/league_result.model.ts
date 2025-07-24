@@ -100,15 +100,19 @@ export interface LeagueMatchParticipantInput {
 // ===== FOOTBALL MODELS =====
 
 export interface FootballSectionModel {
+  LEAGUE_FIXTURE_ID?: string;
   result_description?: string;
   result_dets?: string;
   POTM?: POTMDetailModel[];
-  POTM_PLAYERS?: string;
-  Team1?: FootballTeamStatsModel;
-  Team2?: FootballTeamStatsModel;
+  // POTM_PLAYERS?: string;
+  HOME_TEAM?: FootballTeamStatsModel;
+  AWAY_TEAM?: FootballTeamStatsModel;
 }
 
 export interface FootballTeamStatsModel {
+  IS_WINNER?: boolean;
+  NAME?: string;
+  TEAM_ID?: string;
   GOAL?: string;
   SHOTS?: string;
   SHOTS_ON_GOAL?: string;
@@ -139,38 +143,51 @@ export interface FootballResultModel {
   result_description?: string;
   result_dets?: string;
   POTM?: POTMDetailModel[];
-  POTM_PLAYERS?: string;
-  Team1?: FootballTeamStatsModel;
-  Team2?: FootballTeamStatsModel;
+  // POTM_PLAYERS?: string;
+  LEAGUE_FIXTURE_ID?: string;
+  HOME_TEAM?: FootballTeamStatsModel;
+  AWAY_TEAM?: FootballTeamStatsModel;
 }
 
 // ===== TENNIS MODELS =====
 
 export interface TennisSectionModel {
+  LEAGUE_FIXTURE_ID?: string;
   result_description?: string;
   result_dets?: string;
-  POTM?: string[];
-  Team1?: TennisTeamStatsModel;
-  Team2?: TennisTeamStatsModel;
+  POTM?: POTMDetailModel[];
+  HOME_TEAM?: TennisTeamStatsModel;
+  AWAY_TEAM?: TennisTeamStatsModel;
+  SET_SCORES?: TennisSetScoreModel[];
 }
 
 export interface TennisTeamStatsModel {
-  GOAL?: string;
-  SHOTS?: string;
-  SHOTS_ON_GOAL?: string;
-  CORNERS?: string;
-  FOULS_COMMITTED?: string;
-  OFFSIDES?: string;
-  BALL_POSSESSION?: string;
-  YELLOW_CARD?: string;
-  RED_CARD?: string;
-  SCORE?: TennisScoreDetailModel[];
+  IS_WINNER?: boolean;
+  NAME?: string;
+  TEAM_ID?: string;
+  SETS_WON?: number;
+  GAMES_WON?: number;
+  ACES?: number;
+  DOUBLE_FAULTS?: number;
+  FIRST_SERVE_PERCENTAGE?: string;
+  WINNERS?: number;
+  UNFORCED_ERRORS?: number;
+  BREAK_POINTS_WON?: number;
 }
 
-export interface TennisScoreDetailModel {
-  PLAYER?: string;
-  PLAYER_ID?: string;
-  TIME?: string;
+export interface TennisSetScoreModel {
+  SET_NUMBER?: number;
+  SCORE?: string;
+  WINNER?: string;
+}
+
+// Tennis Result Model (for API response)
+export interface TennisResultModel {
+  LEAGUE_FIXTURE_ID?: string;
+  POTM?: POTMDetailModel[];
+  HOME_TEAM?: TennisTeamStatsModel;
+  AWAY_TEAM?: TennisTeamStatsModel;
+  SET_SCORES?: TennisSetScoreModel[];
 }
 
 // ===== CRICKET MODELS =====

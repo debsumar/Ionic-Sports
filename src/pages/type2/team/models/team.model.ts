@@ -2,6 +2,7 @@ import { ActivityModel } from "../../match/models/match.model";
 
 export class TeamsForParentClubModel {
   id: string;
+  short_name?: string;
   created_at: string;
   created_by: string;
   updated_at: string;

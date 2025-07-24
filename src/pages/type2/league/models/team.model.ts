@@ -14,7 +14,7 @@ export class TeamsForParentClubModel {
   venueType: string;
   ageGroup: string;
   teamName: string;
-  shortName: string;
+  short_name: string;
   teamStatus: string;
   teamVisiility: string;
   teamDescription: string;

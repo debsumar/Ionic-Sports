@@ -155,6 +155,7 @@ export class LeagueParticipationForMatchModel {
 
 export class ParentClubTeam {
   id: string;
+  logo_url?: string;
   teamName: string;
   teamDescription: string;
 }
@@ -182,6 +183,7 @@ export class User {
 
 export class Team {
   id: string;
+  logo_url?: string;
   created_at: string;
   created_by: string;
   updated_at: string;

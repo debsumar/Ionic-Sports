@@ -21,7 +21,21 @@
 
       <ion-item>
         <ion-label floating>Short Name</ion-label>
-        <ion-input type="text" [(ngModel)]="team.shortName"></ion-input>
+        <ion-input type="text" [(ngModel)]="team.short_name"></ion-input>
+      </ion-item>
+      <ion-item class="event_title_img">
+        <ion-row>
+          <ion-col col-10 style="margin:auto">
+            <p class="para">Team Logo</p>
+            <img *ngIf="parentClubTeamEdit.teamDetailsInput.logoUrl"
+              [src]="parentClubTeamEdit.teamDetailsInput.logoUrl">
+          </ion-col>
+          <ion-col col-2 style="margin:auto">
+            <button ion-button icon-only clear (click)="selectTeamLogo()">
+              <img src="assets/images/upload.svg" class="add_icon">
+            </button>
+          </ion-col>
+        </ion-row>
       </ion-item>
 
       <ion-item>

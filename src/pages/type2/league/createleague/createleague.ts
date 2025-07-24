@@ -99,8 +99,8 @@ export class CreateleaguePage {
       league_visibility: 0,
       coachId: '',
       venue_id: '',
-      member_price: 0.00,
-      non_member_price: 0.00,
+      member_price: '0.00',
+      non_member_price: '0.00',
       location_type: 1,
       allow_bacs: false,
       allow_cash: false,
@@ -478,12 +478,12 @@ export class CreateleaguePage {
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
 
-    } else if ((!this.isTeamType && this.leagueCreationInput.league.is_paid) && (this.leagueCreationInput.league.member_price == 0 || this.leagueCreationInput.league.member_price == undefined)) {
+    } else if ((!this.isTeamType && this.leagueCreationInput.league.is_paid) && (parseFloat(this.leagueCreationInput.league.member_price) <= 0 || this.leagueCreationInput.league.member_price == undefined || this.leagueCreationInput.league.member_price == '')) {
       let message = "Enter member fee";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
     }
-    else if ((!this.isTeamType && this.leagueCreationInput.league.is_paid) && (this.leagueCreationInput.league.non_member_price == 0 || this.leagueCreationInput.league.non_member_price == undefined)) {
+    else if ((!this.isTeamType && this.leagueCreationInput.league.is_paid) && (parseFloat(this.leagueCreationInput.league.non_member_price) <= 0 || this.leagueCreationInput.league.non_member_price == undefined || this.leagueCreationInput.league.non_member_price == '')) {
       let message = "Enter non-member fee";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
@@ -571,14 +571,15 @@ export class CreateleaguePage {
       this.leagueCreationInput.AppType = this.leagueCreationInput.AppType;
       this.leagueCreationInput.ActionType = this.leagueCreationInput.ActionType;
       this.leagueCreationInput.league.capacity = Number(this.leagueCreationInput.league.capacity);
-      // this.leagueCreationInput.league.capacity = this.isTeamType ? 0 : Number(this.leagueCreationInput.league.capacity);
-      // if (this.leagueCreationInput.league.is_paid) {
-      //   this.leagueCreationInput.league.member_price = this.member_price.toString() || "0.00";
-      //   this.leagueCreationInput.league.non_member_price = this.non_member_price.toString() || "0.00";
-      // } else {
-      //   this.leagueCreationInput.league.member_price = "0.00"
-      //   this.leagueCreationInput.league.non_member_price = "0.00";
-      // }
+
+      // Ensure price values are properly formatted as strings
+      if (this.leagueCreationInput.league.is_paid) {
+        this.leagueCreationInput.league.member_price = parseFloat(this.leagueCreationInput.league.member_price || '0').toFixed(2);
+        this.leagueCreationInput.league.non_member_price = parseFloat(this.leagueCreationInput.league.non_member_price || '0').toFixed(2);
+      } else {
+        this.leagueCreationInput.league.member_price = "0.00";
+        this.leagueCreationInput.league.non_member_price = "0.00";
+      }
       if (this.isTeamType) {
         this.leagueCreationInput.league.last_enrollment_date = this.leagueCreationInput.league.start_date;
         this.leagueCreationInput.league.last_withdrawal_date = this.leagueCreationInput.league.start_date;
@@ -743,8 +744,8 @@ export class LeagueCreationInput {
     secondary_contact_email: string
     secondary_contact_phone: string
     is_paid: boolean
-    member_price: number
-    non_member_price: number
+    member_price: string
+    non_member_price: string
     is_pay_later: boolean
     league_visibility: number
     coachId: string
