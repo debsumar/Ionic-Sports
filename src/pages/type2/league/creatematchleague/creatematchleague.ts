@@ -56,6 +56,7 @@ export class CreatematchleaguePage {
   clubVenues: ClubVenue[] = [];
   LocationName = "";
   startTime: any;
+  endTime: any;
   startDate: any;
   leagueStartDate: any;
   leagueEndDate: any;
@@ -173,6 +174,7 @@ export class CreatematchleaguePage {
 
     // this.max = "2049-12-31";
     this.startTime = "09:00";
+    this.endTime = "23:59"
 
     this.parentClubId = this.sharedService.getPostgreParentClubId();
     this.leagueGroupInput.ParentClubId = this.parentClubId;
@@ -521,7 +523,7 @@ export class CreatematchleaguePage {
         this.inputObj.StartDate = this.startDate + " " + this.startTime;
         // this.inputObj.StartDate = new Date(this.startDate + " " + this.startTime).toISOString(); //iso date string if needed uncomment this line
 
-        this.inputObj.EndDate = moment(new Date(this.startDate)).format("YYYY-MM-DD");
+        this.inputObj.EndDate = this.startDate + " " + this.endTime;
 
         console.log('input date is:', this.inputObj.EndDate);
         console.log(new Date(this.startDate + " " + this.startTime).getTime());

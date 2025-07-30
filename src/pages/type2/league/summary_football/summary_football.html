@@ -57,26 +57,27 @@
         <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 12px;"></ion-icon>
       </ion-col>
     </div>
-    <ion-card (click)="gotoPotmPage()" style="width: 100%;margin-left: 0px;">
-      <ion-row>
+    <ion-card (click)="gotoPotmPage()"
+      style="width: 100%; margin-left: 0px; padding: 12px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+      <ion-row style="align-items: center;">
         <ion-col col-3>
-          <p>POTM</p>
+          <p style="margin: 0; font-weight: 600; color: #333; font-size: 14px;">POTM</p>
         </ion-col>
         <ion-col col-9 *ngIf="potmDisplayNames && potmDisplayNames.length > 0">
-          <ion-row style="margin: 0;padding: 0;">
-            <p style="padding-right: 8px;color: #2b92bb" *ngFor="let potm of potmDisplayNames; let last = last">
+          <ion-row style="margin: 0; padding: 0; align-items: center;">
+            <p style="padding-right: 8px; color: #2b92bb; margin: 0; font-weight: 500;"
+              *ngFor="let potm of potmDisplayNames; let last = last">
               {{potm.PLAYER}}<span *ngIf="!last">, </span>
             </p>
           </ion-row>
         </ion-col>
         <ion-col col-9 *ngIf="!potmDisplayNames || potmDisplayNames.length === 0">
-          <ion-row style="margin: 0;padding: 0;">
-            <p style="padding-right: 8px;color: #999;">Select POTM</p>
+          <ion-row style="margin: 0; padding: 0; align-items: center;">
+            <p style="padding-right: 8px; color: #999; margin: 0; font-style: italic;">Select POTM</p>
           </ion-row>
         </ion-col>
       </ion-row>
     </ion-card>
-    <!-- <hr style="border: 0; border-top: 0.5px solid rgba(0, 0, 0, 0.15); margin: 10px 0;"> -->
   </div>
 
   <div class="stats-section">
@@ -86,16 +87,14 @@
     <p style="text-align: center;color: #f6ae4d;margin: 0px;">Possession</p>
 
     <div class="chartDiv">
-      <ion-col style="margin: 0; padding: 0" (click)="isHomeStatsPopupVisible = true">
-        <span style="color: green; font-size: 20px;">{{homePoss}}%</span>
-        <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px; padding-right:20px;"></ion-icon>
-      </ion-col>
-
-      <canvas #doughnutCanvas width="200" height="200"></canvas>
-
       <ion-col style="margin: 0; padding: 0" (click)="isAwayStatsPopupVisible = true">
         <span style="color: red; font-size: 20px;">{{awayPoss}}%</span>
         <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px;"></ion-icon>
+      </ion-col>
+      <canvas #doughnutCanvas width="200" height="200"></canvas>
+      <ion-col style="margin: 0; padding: 0" (click)="isHomeStatsPopupVisible = true">
+        <span style="color: green; font-size: 20px;">{{homePoss}}%</span>
+        <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px; padding-right:20px;"></ion-icon>
       </ion-col>
     </div>
 

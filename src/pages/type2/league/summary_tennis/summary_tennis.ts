@@ -147,7 +147,8 @@ export class SummaryTennisPage implements AfterViewInit {
         device_id: '',
         updated_by: '',
         created_by: '',
-        MatchId: ''
+        MatchId: '',
+        ActivityCode: 0
     };
 
     publishLeagueResultForActivitiesInput: PublishLeagueResultForActivitiesInput = {
@@ -163,9 +164,6 @@ export class SummaryTennisPage implements AfterViewInit {
         created_by: '',
         activityCode: '',
         leaguefixtureId: '',
-        isDrawn: false,
-        isHomeTeamWinner: false,
-        isAwayTeamWinner: false,
         homeLeagueParticipationId: '',
         awayLeagueParticipationId: '',
         Tennis: {
@@ -256,7 +254,8 @@ export class SummaryTennisPage implements AfterViewInit {
         // Initialize league match result input
         this.leagueMatchResultInput = {
             ...baseInput,
-            MatchId: this.matchObj.match_id
+            MatchId: this.matchObj.match_id,
+            ActivityCode: this.activityCode || 0
         };
 
         // Initialize publish league result input
@@ -632,9 +631,6 @@ export class SummaryTennisPage implements AfterViewInit {
 
             const result_input: Partial<PublishLeagueResultForActivitiesInput> = {
                 ...this.createBaseResultInput(),
-                isHomeTeamWinner: isDrawn ? false : homeSets > awaySets,
-                isAwayTeamWinner: isDrawn ? false : awaySets > homeSets,
-                isDrawn: isDrawn,
                 Tennis: {
                     LEAGUE_FIXTURE_ID: this.matchObj.fixture_id || '',
                     HOME_TEAM: {

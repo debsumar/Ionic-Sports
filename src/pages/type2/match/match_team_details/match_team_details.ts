@@ -121,6 +121,7 @@ export class MatchTeamDetailsPage {
   ) {
     this.match = JSON.parse(this.navParams.get("match"));
     console.log('MATCH OBJ', this.match);
+    console.log('MATCH OBJ', this.match.activityId);
     this.selectedHomeTeamText = this.match.homeUserName != null ? this.match.homeUserName : 'Home Team';
     this.selectedAwayTeamText = this.match.awayUserName != null ? this.match.awayUserName : 'Away Team';
     this.storage.get('Currency').then((val) => {
@@ -135,6 +136,14 @@ export class MatchTeamDetailsPage {
         this.getActivitySpecificTeamInput.action_type = LeagueMatchActionType.MATCH;
         this.getActivitySpecificTeamInput.app_type = AppType.ADMIN_NEW;
         this.getActivitySpecificTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+        // Defensive check for required match properties
+        if (!this.match.activityId) {
+          console.error('Match activityId is missing:', this.match);
+          this.commonService.toastMessage('Match activity data is missing', 3000, ToastMessageType.Error);
+          this.navCtrl.pop();
+          return;
+        }
+
         this.getActivitySpecificTeamInput.activityId = this.match.activityId;
 
         this.getIndividualMatchParticipantInput.parentclubId = this.sharedservice.getPostgreParentClubId();
@@ -285,8 +294,11 @@ export class MatchTeamDetailsPage {
             return false; // prevent alert from dismissing          
           }
           this.selectedTeam = this.activitySpecificTeamsRes.find(team => team.id === selectedVal);
+
+
+
           if (isHomeTeam) {
-            if (selectedVal === this.selectedAwayTeamText) {
+            if (this.selectedTeam.teamName === this.selectedAwayTeamText) {
               this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
             } else {
               this.selectedHomeTeamText = this.selectedTeam.teamName;
@@ -294,7 +306,7 @@ export class MatchTeamDetailsPage {
               this.updateTeamInput.AwayParentclubTeamId = ""; //setting the deafult val to ""
             }
           } else {
-            if (selectedVal === this.selectedHomeTeamText) {
+            if (this.selectedTeam.teamName === this.selectedHomeTeamText) {
               this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
             } else {
               this.selectedAwayTeamText = this.selectedTeam.teamName;

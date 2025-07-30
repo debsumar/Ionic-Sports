@@ -19,13 +19,13 @@
 
         <p class="largetext">
           <span>{{match.MatchTitle}}</span>
-          <span>{{match.Activity?.ActivityName}}</span>,
+          <span>{{match.ActivityName}}</span>,
           <span>{{match.MatchType==0?"Singles":"Doubles"}}</span>
         </p>
 
-        <p class="largetext" *ngIf="match.Hosts && match.Hosts.length > 0">
+        <p class="largetext" *ngIf="match.homeUserName || match.awayUserName">
           <span>Hosted by:</span>
-          <span *ngFor="let host of match.Hosts" class="largetext">{{host.Name}}</span>
+          <span class="largetext">{{match.homeUserName}} {{match.awayUserName}}</span>
         </p>
         <!-- <p class="largetext">{{host.Name}}</p> -->
         <p style="margin: 5px 0px;display: flex;align-items: center">
@@ -38,13 +38,11 @@
           <span class="smalltext">{{match.VenueName}}</span>
         </p>
         <p style="position: absolute;top:0px;right:3px;display:flex;align-items: center;">
-          <!-- <span>{{match.MatchVisibility==0?"Public":"Private"}}</span> -->
-          <span><ion-icon style="padding:0px 10px 0px 10px;"
-              [name]="match.MatchVisibility==0?'ios-globe':'lock'"></ion-icon></span>
+          <!-- Note: AllMatchData doesn't have MatchVisibility, using a default icon -->
+          <span><ion-icon style="padding:0px 10px 0px 10px;" name="ios-globe"></ion-icon></span>
         </p>
 
-        <button class="deletebtn" ion-button (click)="deleteConfirm()" clear
-          *ngIf="(match) && (!match.Result || !match.Result.CreatedAt)">
+        <button class="deletebtn" ion-button (click)="deleteConfirm()" clear *ngIf="match">
           <ion-icon name="trash"></ion-icon>
         </button>
 
@@ -77,7 +75,7 @@
           <ion-row>
             <ion-col col-6>
               <button ion-button class="select-type" (click)="changeType(true)" [class.selected]="activeType">
-                {{match.Result && match.Result.ResultStatus==1 ? 'Published' : 'Active' }}
+                Active
               </button>
             </ion-col>
             <ion-col col-6>
@@ -92,17 +90,14 @@
     <!-- lower half screen -->
     <div class="" *ngIf="activeType" class="teams_dev">
       <!-- the below is to show when result not yet published -->
-      <ion-row
-        *ngIf="(teams && teams.length > 0) && ((match) && (match.Result == null || match.Result.ResultStatus!=1))"
-        class="teams_row">
+      <ion-row *ngIf="(teams && teams.length > 0)" class="teams_row">
         <ion-col *ngFor="let team of teams;let i=index;" col-12>
           <div class="participant_div" *ngIf="team.Participants.length > 0">
             <ion-item *ngFor="let participant of team.Participants;let j=index;">
               <p *ngIf="participant.User.isUserAvailable" item-left [style.color]="getColor(i)">
                 {{participant.User.FirstName}} {{participant.User.LastName}}</p>
               <p *ngIf="!participant.User.isUserAvailable" item-left [style.color]="getColor(i)">Add participant</p>
-              <button ion-button block [disabled]="match.Result!=null && !this.isCanEditTeams"
-                (click)="manipulateUser(participant.User,i,j)"
+              <button ion-button block [disabled]="!this.isCanEditTeams" (click)="manipulateUser(participant.User,i,j)"
                 [ngStyle]="{'background-color':participant.User.isUserAvailable ? 'red' : 'green' }" item-right>
                 <ion-icon name='add' size="large" *ngIf="!participant.User.isUserAvailable"></ion-icon>
                 <ion-icon name='remove' size="large" *ngIf="participant.User.isUserAvailable"></ion-icon>
@@ -112,8 +107,8 @@
         </ion-col>
       </ion-row>
 
-      <!-- the below is to show when result published already -->
-      <ion-row class="teams_row"
+      <!-- the below is to show when result published already - commented out since AllMatchData doesn't have Result -->
+      <!-- <ion-row class="teams_row"
         *ngIf="(teams && teams.length > 0) && ((match) && (match.Result && match.Result.ResultStatus==1))">
         <ion-col *ngFor="let team of teams;let i=index;" col-12>
           <div class="participant_div" *ngIf="team.Participants.length > 0">
@@ -149,9 +144,9 @@
           <hr style="background-color: rgba(0, 0, 0, 0.30);">
           <ion-item>
             <!-- <ion-label floating style="padding-left: 10px">Match Description</ion-label> -->
-            <p>{{winner_team.comments}}</p>
-          </ion-item>
-        </ion-col>
+      <p>{{winner_team.comments}}</p>
+      </ion-item>
+      </ion-col>
       </ion-row>
       <ion-row *ngIf="teams && teams.length == 0">
         <ion-col col-12 text-center>

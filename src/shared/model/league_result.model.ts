@@ -45,6 +45,7 @@ export interface LeagueMatchResultInput {
   parentclubId: string;
   clubId: string;
   activityId: string;
+  ActivityCode: number;
   memberId: string;
   action_type: number;
   device_type: number;
@@ -69,9 +70,6 @@ export interface PublishLeagueResultForActivitiesInput {
   created_by: string;
   activityCode: string;
   leaguefixtureId: string;
-  isDrawn: boolean;
-  isHomeTeamWinner: boolean;
-  isAwayTeamWinner: boolean;
   homeLeagueParticipationId: string;
   awayLeagueParticipationId: string;
   Football?: FootballSectionModel;
@@ -102,16 +100,14 @@ export interface LeagueMatchParticipantInput {
 export interface FootballSectionModel {
   LEAGUE_FIXTURE_ID?: string;
   result_description?: string;
-  result_dets?: string;
   POTM?: POTMDetailModel[];
-  // POTM_PLAYERS?: string;
   HOME_TEAM?: FootballTeamStatsModel;
   AWAY_TEAM?: FootballTeamStatsModel;
+  RESULT?: FootballResultStatsModel;
 }
 
 export interface FootballTeamStatsModel {
-  IS_WINNER?: boolean;
-  NAME?: string;
+  TEAM_NAME?: string;
   TEAM_ID?: string;
   GOAL?: string;
   SHOTS?: string;
@@ -138,15 +134,20 @@ export interface POTMDetailModel {
   TEAM_ID?: string;
 }
 
+export interface FootballResultStatsModel {
+  DESCRIPTION: string;
+  WINNER_ID: string;
+  RESULT_STATUS: string;
+}
+
 // Football Result Model (for API response)
 export interface FootballResultModel {
   result_description?: string;
-  result_dets?: string;
   POTM?: POTMDetailModel[];
-  // POTM_PLAYERS?: string;
   LEAGUE_FIXTURE_ID?: string;
   HOME_TEAM?: FootballTeamStatsModel;
   AWAY_TEAM?: FootballTeamStatsModel;
+  RESULT?: FootballResultStatsModel;
 }
 
 // ===== TENNIS MODELS =====

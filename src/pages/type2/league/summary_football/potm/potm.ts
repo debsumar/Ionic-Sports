@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
@@ -12,144 +12,258 @@ import { LeagueMatchParticipantModel, LeagueParticipationForMatchModel } from '.
 import { LeagueMatch } from '../../models/location.model';
 
 
+
 @IonicPage()
 @Component({
   selector: 'page-potm',
   templateUrl: 'potm.html',
   providers: [HttpService]
 })
-export class PotmPage {
-  winnerTeamName: string = ''; // Replace with actual data
-  loserTeamName: string = '';   // Replace with actual data
-  selectedPlayers: LeagueMatchParticipantModel[] = [];
-  winnerTeamObj: LeagueParticipationForMatchModel;
-  loserTeamObj: LeagueParticipationForMatchModel;
+export class PotmPage implements OnInit, OnDestroy {
+  // Core data
+  homeTeamName: string = '';
+  awayTeamName: string = '';
+  homeTeamObj: LeagueParticipationForMatchModel;
+  awayTeamObj: LeagueParticipationForMatchModel;
   matchObj: LeagueMatch;
   leagueId: string;
   activityId: string;
-  callback: any;
+  resultObject: any;
 
-  leagueMatchParticipantResForWinner: LeagueMatchParticipantModel[] = [];
-  leagueMatchParticipantResForLoser: LeagueMatchParticipantModel[] = [];
-  leagueMatchParticipantInput: LeagueMatchParticipantInput = {
-    parentclubId: "",
-    clubId: "",
-    activityId: "",
-    memberId: "",
-    action_type: 0,
-    device_type: 0,
-    app_type: 0,
-    device_id: "",
-    updated_by: "",
-    LeagueId: "",
-    MatchId: "",
-    TeamId: "",
-    TeamId2: "",
-    leagueTeamPlayerStatusType: 0
+  // Player data
+  homeTeamPlayers: LeagueMatchParticipantModel[] = [];
+  awayTeamPlayers: LeagueMatchParticipantModel[] = [];
+  selectedPlayerIds: Set<string> = new Set();
+  maxSelections: number = 2;
+
+  // Loading states
+  isDataReady: boolean = false;
+
+  // API input
+  private baseApiInput: any;
+
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    public storage: Storage,
+    public viewCtrl: ViewController,
+    public commonService: CommonService,
+    public alertCtrl: AlertController,
+    private httpService: HttpService,
+    public sharedservice: SharedServices
+  ) {
+    this.initializeNavParams();
+    this.setupBaseApiInput();
   }
 
-  constructor(public navCtrl: NavController, public navParams: NavParams,
-    public storage: Storage, public viewCtrl: ViewController,
-    public commonService: CommonService, public alertCtrl: AlertController, private httpService: HttpService, public sharedservice: SharedServices,) {
+  ngOnInit() {
+    this.loadTeamParticipants();
+  }
 
-    this.callback = this.navParams.get('callback');
+  ngOnDestroy() {
+    // Cleanup if needed
+  }
+
+  private initializeNavParams(): void {
     this.matchObj = this.navParams.get("matchObj");
     this.leagueId = this.navParams.get("leagueId");
     this.activityId = this.navParams.get("activityId");
-    this.winnerTeamObj = this.navParams.get("homeTeamObj");
-    this.loserTeamObj = this.navParams.get("awayTeamObj");
+    this.homeTeamObj = this.navParams.get("homeTeamObj");
+    this.awayTeamObj = this.navParams.get("awayTeamObj");
+    this.resultObject = this.navParams.get("resultObject");
 
-    this.winnerTeamName = this.winnerTeamObj && this.winnerTeamObj.parentclubteam ? this.winnerTeamObj.parentclubteam.teamName : 'Winner Team';
-    this.loserTeamName = this.loserTeamObj && this.loserTeamObj.parentclubteam ? this.loserTeamObj.parentclubteam.teamName : 'Loser Team';
-    console.log("Winner TEAM OBJ:", this.winnerTeamObj);
-    this.leagueMatchParticipantInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-    this.leagueMatchParticipantInput.memberId = this.sharedservice.getLoggedInId();
-    this.leagueMatchParticipantInput.action_type = 0;
-    this.leagueMatchParticipantInput.app_type = AppType.ADMIN_NEW;
-    this.leagueMatchParticipantInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
-    this.leagueMatchParticipantInput.LeagueId = this.leagueId;
-    if (this.matchObj) {
-      this.leagueMatchParticipantInput.MatchId = this.matchObj.match_id;
-      this.getLeagueMatchParticipant(true);
-    }
+    this.homeTeamName = (this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.teamName) || 'Home Team';
+    this.awayTeamName = (this.awayTeamObj && this.awayTeamObj.parentclubteam && this.awayTeamObj.parentclubteam.teamName) || 'Away Team';
 
-
+    console.log("POTM Page initialized with:", {
+      homeTeam: this.homeTeamName,
+      awayTeam: this.awayTeamName,
+      hasResultObject: !!this.resultObject
+    });
   }
 
+  private setupBaseApiInput(): void {
+    this.baseApiInput = {
+      parentclubId: this.sharedservice.getPostgreParentClubId() || '',
+      clubId: '',
+      activityId: this.activityId || '',
+      memberId: this.sharedservice.getLoggedInId() || '',
+      action_type: 0,
+      device_type: this.sharedservice.getPlatform() === "android" ? 1 : 2,
+      app_type: AppType.ADMIN_NEW,
+      device_id: this.sharedservice.getDeviceId() || '',
+      updated_by: '',
+      LeagueId: this.leagueId,
+      MatchId: (this.matchObj && this.matchObj.match_id) || '',
+      leagueTeamPlayerStatusType: LeagueTeamPlayerStatusType.PLAYINGPLUSBENCH
+    };
+  }
 
-  togglePlayerSelection(player: LeagueMatchParticipantModel, isWinner: boolean) {
-    const alreadySelected = this.selectedPlayers.some(p => p.user.Id === player.user.Id);
+  private async loadTeamParticipants(): Promise<void> {
+    this.commonService.showLoader("Fetching participants...");
 
-    if (alreadySelected) {
-      // Unselect the player
+    try {
+      await Promise.all([
+        this.loadHomeTeamParticipants(),
+        this.loadAwayTeamParticipants()
+      ]);
+
+      this.commonService.hideLoader();
+      this.isDataReady = true;
+      this.initializeExistingSelections();
+    } catch (error) {
+      this.commonService.hideLoader();
+      console.error("Error loading team participants:", error);
+      this.commonService.toastMessage("Error loading team data", 3000, ToastMessageType.Error);
+    }
+  }
+
+  private loadHomeTeamParticipants(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const input = {
+        ...this.baseApiInput,
+        TeamId: this.homeTeamObj.parentclubteam.id
+      };
+
+      this.httpService.post(`${API.Get_League_Match_Participant}`, input).subscribe(
+        (res: any) => {
+          if (res && res.data) {
+            this.homeTeamPlayers = res.data.map((player: any) => ({
+              ...player,
+              user: { ...player.user, selected: false }
+            }));
+            console.log("Home team participants loaded:", this.homeTeamPlayers.length);
+            resolve();
+          } else {
+            reject(new Error("No home team data received"));
+          }
+        },
+        (error) => {
+          console.error("Error loading home team participants:", error);
+          reject(error);
+        }
+      );
+    });
+  }
+
+  private loadAwayTeamParticipants(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      const input = {
+        ...this.baseApiInput,
+        TeamId: this.awayTeamObj.parentclubteam.id
+      };
+
+      this.httpService.post(`${API.Get_League_Match_Participant}`, input).subscribe(
+        (res: any) => {
+          if (res && res.data) {
+            this.awayTeamPlayers = res.data.map((player: any) => ({
+              ...player,
+              user: { ...player.user, selected: false }
+            }));
+            console.log("Away team participants loaded:", this.awayTeamPlayers.length);
+            resolve();
+          } else {
+            reject(new Error("No away team data received"));
+          }
+        },
+        (error) => {
+          console.error("Error loading away team participants:", error);
+          reject(error);
+        }
+      );
+    });
+  }
+
+  private initializeExistingSelections(): void {
+    if (!this.resultObject || !this.resultObject.POTM || !this.resultObject.POTM.length) {
+      console.log("No existing POTM data to initialize");
+      return;
+    }
+
+    console.log("Initializing existing POTM selections:", this.resultObject.POTM);
+
+    const allPlayers = [...this.homeTeamPlayers, ...this.awayTeamPlayers];
+
+    this.resultObject.POTM.forEach((potm: any) => {
+      const player = allPlayers.find(p => p.user.Id === potm.PLAYER_ID);
+      if (player) {
+        player.user.selected = true;
+        this.selectedPlayerIds.add(potm.PLAYER_ID);
+        console.log(`Pre-selected POTM: ${player.user.FirstName} ${player.user.LastName}`);
+      }
+    });
+
+    console.log(`Initialized ${this.selectedPlayerIds.size} existing POTM selections`);
+  }
+
+  togglePlayerSelection(player: LeagueMatchParticipantModel): void {
+    const playerId = player.user.Id;
+    const isCurrentlySelected = this.selectedPlayerIds.has(playerId);
+
+    if (isCurrentlySelected) {
+      // Deselect player
+      this.selectedPlayerIds.delete(playerId);
       player.user.selected = false;
-      this.selectedPlayers = this.selectedPlayers.filter(p => p.user.Id !== player.user.Id);
+      console.log(`Deselected: ${player.user.FirstName} ${player.user.LastName}`);
     } else {
-      if (this.selectedPlayers.length >= 2) {
-        this.commonService.toastMessage('You can select a maximum of 2 players', 3000, ToastMessageType.Info);
+      // Check if we can select more players
+      if (this.selectedPlayerIds.size >= this.maxSelections) {
+        this.commonService.toastMessage(
+          `You can select a maximum of ${this.maxSelections} players`,
+          3000,
+          ToastMessageType.Info
+        );
         return;
       }
 
-      // Select the player
+      // Select player
+      this.selectedPlayerIds.add(playerId);
       player.user.selected = true;
-      this.selectedPlayers.push(player);
+      console.log(`Selected: ${player.user.FirstName} ${player.user.LastName}`);
     }
 
-    console.log('Selected Players:', this.selectedPlayers.map(p => p.user.FirstName));
+    console.log(`Total selected: ${this.selectedPlayerIds.size}/${this.maxSelections}`);
   }
 
-  getLeagueMatchParticipant(isWinner) {
-    this.commonService.showLoader("Fetching info ...");
-    isWinner ? this.leagueMatchParticipantInput.TeamId = this.winnerTeamObj.parentclubteam.id : this.leagueMatchParticipantInput.TeamId = this.loserTeamObj.parentclubteam.id;
-    // this.leagueMatchParticipantInput.TeamId2 = this.loserTeamObj.parentclubteam.id
-    this.leagueMatchParticipantInput.leagueTeamPlayerStatusType = LeagueTeamPlayerStatusType.PLAYINGPLUSBENCH;
-    this.httpService.post(`${API.Get_League_Match_Participant}`, this.leagueMatchParticipantInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        if (isWinner) {
-          this.leagueMatchParticipantResForWinner = res.data || [];
-          console.log("Get_League_Match_Participant WINNER", JSON.stringify(res.data));
-          this.getLeagueMatchParticipant(false);
-        }
-        else
-          this.leagueMatchParticipantResForLoser = res.data || [];
-        console.log("Get_League_Match_Participant LOSER", JSON.stringify(res.data));
-      } else {
-        this.commonService.hideLoader();
-        console.log("error in fetching",)
-      }
-    })
+  isPlayerDisabled(player: LeagueMatchParticipantModel): boolean {
+    return !player.user.selected && this.selectedPlayerIds.size >= this.maxSelections;
   }
 
-  dismiss() {
+  get selectedPlayers(): LeagueMatchParticipantModel[] {
+    const allPlayers = [...this.homeTeamPlayers, ...this.awayTeamPlayers];
+    return allPlayers.filter(player => this.selectedPlayerIds.has(player.user.Id));
+  }
+
+  get isLoading(): boolean {
+    return !this.isDataReady;
+  }
+
+  get canSave(): boolean {
+    return this.isDataReady && this.selectedPlayerIds.size > 0;
+  }
+
+  save(): void {
+    if (!this.canSave) {
+      this.commonService.toastMessage("Please select at least one player", 3000, ToastMessageType.Info);
+      return;
+    }
+
+    const selectedPlayers = this.selectedPlayers;
+    console.log("Saving POTM selections:", selectedPlayers.map(p => `${p.user.FirstName} ${p.user.LastName}`));
+
+    this.viewCtrl.dismiss(selectedPlayers);
+  }
+
+  dismiss(): void {
     this.viewCtrl.dismiss([]);
   }
 
-  save() {
-    this.viewCtrl.dismiss(this.selectedPlayers);
+  trackByPlayerId(_index: number, player: LeagueMatchParticipantModel): string {
+    return player.user.Id;
   }
-
-  // save() {
-  //   this.callback(this.selectedPlayers).then(() => { this.viewCtrl.dismiss(); });
-
-  // }
-
-
-
-
-  // this.commonService.updateCategory("potmList");
-  // this.selectedPlayers;
-  // this.navCtrl.pop();
-  // for catchinfg the data  inside constructor
-
-  // this.commonService.category.pipe(first()).subscribe(async(data) => {
-
-  //   if (data == "update_session_list") {
-  //   }
-  // })
 }
 
-export class LeagueMatchParticipantInput {
+export interface LeagueMatchParticipantInput {
   parentclubId: string;
   clubId: string;
   activityId: string;

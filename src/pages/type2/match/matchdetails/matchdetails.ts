@@ -7,9 +7,8 @@ import { CommonService, ToastMessageType, ToastPlacement } from "../../../../ser
 import { Apollo } from "apollo-angular";
 import moment from "moment";
 import gql from "graphql-tag";
-import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../../services/graphql.service";
-import { error } from "console";
+import { AllMatchData } from "../../../../shared/model/match.model";
 /**
  * Generated class for the MatchdetailsPage page.
  *
@@ -37,7 +36,7 @@ export class MatchdetailsPage {
     comments_date: ""
   }
 
-  match: any;
+  match: AllMatchData;
   history: any;
 
   InvitationResponseInput = {
@@ -77,11 +76,12 @@ export class MatchdetailsPage {
     if (!this.isHistory) {
       this.isHistory = false
     }
-    this.winner_team.comments = this.match.Result && this.match.Result.resultDescription ? this.match.Result.resultDescription : "";
-    this.winner_team.comments_date = this.match.Result && this.match.Result.CreatedAt ? this.match.Result.CreatedAt : "";
+    // Note: AllMatchData doesn't have Result property, so commenting out these lines
+    // this.winner_team.comments = this.match.Result && this.match.Result.resultDescription ? this.match.Result.resultDescription : "";
+    // this.winner_team.comments_date = this.match.Result && this.match.Result.CreatedAt ? this.match.Result.CreatedAt : "";
     console.log(this.match);
-    this.UserInvitationStatus.MatchId = this.match.Id;
-    this.InvitationResponseInput.MatchId = this.match.Id;
+    this.UserInvitationStatus.MatchId = this.match.MatchId;
+    this.InvitationResponseInput.MatchId = this.match.MatchId;
     // this.UserInvitationStatus.MemberKey = this.navParams.get("selectedmemberkey");
     console.log(this.UserInvitationStatus);
     this.getActiveTeams();
@@ -289,12 +289,13 @@ export class MatchdetailsPage {
     }
 
 
-    const isUserHostOfMatch = this.match.Hosts.some(host => host.User
-      && host.User.Id === this.UserInvitationStatus.MemberId);
-    if (isUserHostOfMatch) {
-      this.isCanEditTeams = true;
-      return;
-    } 3
+    // Note: AllMatchData doesn't have Hosts property, so commenting out host check
+    // const isUserHostOfMatch = this.match.Hosts.some(host => host.User
+    //   && host.User.Id === this.UserInvitationStatus.MemberId);
+    // if (isUserHostOfMatch) {
+    //   this.isCanEditTeams = true;
+    //   return;
+    // }
 
     this.isCanEditTeams = false;
   }
@@ -346,11 +347,11 @@ export class MatchdetailsPage {
         for (let i = 0; i < this.teams.length; i++) {
           this.teams[i]["IsWinner"] = false;
           this.teams[i]['Sets_Points'] = [];
-          if (this.match.Result && this.match.Result.ResultStatus == 1) {
-            this.teams[i]["IsWinner"] = this.match.Result.Winner.Id === this.teams[i].Id ? true : false;
-            this.teams[i]["Sets_Points"] = this.match.Result && this.match.Result.ResultDetails ? JSON.parse(this.match.Result.ResultDetails.split(":")[i]) : [];
-
-          }
+          // Note: AllMatchData doesn't have Result property, so commenting out result-related logic
+          // if (this.match.Result && this.match.Result.ResultStatus == 1) {
+          //   this.teams[i]["IsWinner"] = this.match.Result.Winner.Id === this.teams[i].Id ? true : false;
+          //   this.teams[i]["Sets_Points"] = this.match.Result && this.match.Result.ResultDetails ? JSON.parse(this.match.Result.ResultDetails.split(":")[i]) : [];
+          // }
 
           for (let j = 0; j < participants_length; j++) {
             console.log(`${j}:${this.teams[i].Participants[j]}`);
@@ -507,7 +508,7 @@ export class MatchdetailsPage {
   teamsUpdateConfirmation(teamIndex: number, userIndex: number) {
     let team_updateInput = {
       TeamId: this.teams[teamIndex].Id,
-      MatchId: this.match.Id,
+      MatchId: this.match.MatchId,
       Players: []
     }
 
@@ -584,7 +585,7 @@ export class MatchdetailsPage {
     //   return false;
     // }
     const teams = JSON.parse(JSON.stringify(this.teams));
-    this.navCtrl.push("PublishresultPage", { matchId: this.match.Id, teams: teams });
+    this.navCtrl.push("PublishresultPage", { matchId: this.match.MatchId, teams: teams });
   }
 
 
@@ -626,7 +627,7 @@ export class MatchdetailsPage {
         deleteMatch(deleteMatchInput: $deleteMatchInput)
       }`
         ;
-      const deleteVariable = { deleteMatchInput: { ParentClubKey: this.parentClubKey, MatchId: this.match.Id } }
+      const deleteVariable = { deleteMatchInput: { ParentClubKey: this.parentClubKey, MatchId: this.match.MatchId } }
 
       this.graphqlService.mutate(delete_Match, deleteVariable, 1).subscribe((response) => {
         this.commonService.hideLoader();

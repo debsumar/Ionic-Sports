@@ -104,4 +104,5 @@ export const API = {
     GetIndividualMatchParticipant: `match/GetIndividualMatchParticipant`,
     FetchAllMatches: `match/FetchAllMatches`,
     UPDATE_RESULT_ENTITY: `LeagueResult/updateResultEntity`,
+    GET_RESULT_STATUS_BY_ACTIVITY: `LeagueResult/getResultStatusByActivity`,
 }

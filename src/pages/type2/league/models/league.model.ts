@@ -274,3 +274,8 @@ export class LeagueMatchParticipantModel {
   teamrole: TeamRole;
   amount_pay_status_text: string;
 }
+
+export interface ResultStatusModel {
+  id: number;
+  status: string;
+}

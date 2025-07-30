@@ -22,7 +22,8 @@ import {
   PublishLeagueResultForActivitiesInput,
   LeagueMatchParticipantInput,
   POTMDetailModel,
-  FootballTeamStatsModel
+  FootballTeamStatsModel,
+  FootballResultStatsModel
 } from '../../../../shared/model/league_result.model';
 
 @IonicPage()
@@ -57,8 +58,7 @@ export class SummaryFootballPage implements AfterViewInit {
     POTM: [],
     // POTM_PLAYERS: '',
     HOME_TEAM: {
-      IS_WINNER: false,
-      NAME: '',
+      TEAM_NAME: '',
       TEAM_ID: '',
       GOAL: '0',
       SHOTS: '0',
@@ -72,8 +72,7 @@ export class SummaryFootballPage implements AfterViewInit {
       SCORE: []
     },
     AWAY_TEAM: {
-      IS_WINNER: false,
-      NAME: '',
+      TEAM_NAME: '',
       TEAM_ID: '',
       GOAL: '0',
       SHOTS: '0',
@@ -127,7 +126,8 @@ export class SummaryFootballPage implements AfterViewInit {
     device_id: '',
     updated_by: '',
     created_by: '',
-    MatchId: ''
+    MatchId: '',
+    ActivityCode: 0
   };
 
   publishLeagueResultForActivitiesInput: PublishLeagueResultForActivitiesInput = {
@@ -143,19 +143,14 @@ export class SummaryFootballPage implements AfterViewInit {
     created_by: '',
     activityCode: '',
     leaguefixtureId: '',
-    isDrawn: false,
-    isHomeTeamWinner: false,
-    isAwayTeamWinner: false,
     homeLeagueParticipationId: '',
     awayLeagueParticipationId: '',
     Football: {
       LEAGUE_FIXTURE_ID: '',
       result_description: '',
-      result_dets: '',
       POTM: [],
       HOME_TEAM: {
-        IS_WINNER: false,
-        NAME: '',
+        TEAM_NAME: '',
         TEAM_ID: '',
         GOAL: '0',
         SHOTS: '0',
@@ -170,8 +165,7 @@ export class SummaryFootballPage implements AfterViewInit {
 
       },
       AWAY_TEAM: {
-        IS_WINNER: false,
-        NAME: '',
+        TEAM_NAME: '',
         TEAM_ID: '',
         GOAL: '0',
         SHOTS: '0',
@@ -240,7 +234,8 @@ export class SummaryFootballPage implements AfterViewInit {
     // Initialize league match result input
     this.leagueMatchResultInput = {
       ...baseInput,
-      MatchId: this.matchObj.match_id
+      MatchId: this.matchObj.match_id,
+      ActivityCode: this.activityCode || 0
     };
 
     // Initialize publish league result input
@@ -331,7 +326,6 @@ export class SummaryFootballPage implements AfterViewInit {
       TEAM_ID: p.TEAM_ID || ''
     })) || [];
   }
-
 
   get scorerObjectsHome(): FootballScoreDetailModel[] {
     if (!this.result_json || !this.getLeagueMatchResultRes) {
@@ -542,8 +536,7 @@ export class SummaryFootballPage implements AfterViewInit {
       Football: {
         LEAGUE_FIXTURE_ID: this.matchObj.fixture_id || '',
         HOME_TEAM: {
-          IS_WINNER: false,
-          NAME: this.homeTeamObj.parentclubteam.teamName || '',
+          TEAM_NAME: this.homeTeamObj.parentclubteam.teamName || '',
           TEAM_ID: this.homeTeamObj.parentclubteam.id || '',
           GOAL: (this.result_json.HOME_TEAM.GOAL || 0).toString(),
           SHOTS_ON_GOAL: (this.result_json.HOME_TEAM.SHOTS_ON_GOAL || 0).toString(),
@@ -566,8 +559,7 @@ export class SummaryFootballPage implements AfterViewInit {
       Football: {
         LEAGUE_FIXTURE_ID: this.matchObj.fixture_id || '',
         AWAY_TEAM: {
-          IS_WINNER: false,
-          NAME: this.awayTeamObj.parentclubteam.teamName || '',
+          TEAM_NAME: this.awayTeamObj.parentclubteam.teamName || '',
           TEAM_ID: this.awayTeamObj.parentclubteam.id || '',
           GOAL: (this.result_json.AWAY_TEAM.GOAL || 0).toString(),
           SHOTS_ON_GOAL: (this.result_json.AWAY_TEAM.SHOTS_ON_GOAL || 0).toString(),
@@ -600,6 +592,7 @@ export class SummaryFootballPage implements AfterViewInit {
       "teamObj": teamObj,
       "score": parseInt(score),
       "ishome": ishome,
+      "resultObject": this.result_json
     });
 
     modal.onDidDismiss(data => {
@@ -614,11 +607,11 @@ export class SummaryFootballPage implements AfterViewInit {
     modal.present();
   }
 
-  private handleScoreInputResult(goalDetails: any[], ishome: boolean): void {
+  private handleScoreInputResult(goalDetails: FootballScoreDetailModel[], ishome: boolean): void {
     try {
       const scoreData = goalDetails.map((goal: any) => ({
         PLAYER: `${goal.playerObj.user.FirstName || ''} ${goal.playerObj.user.LastName || ''}`.trim(),
-        PLAYER_ID: goal.playerObj.user.Id || goal.playerObj.memberId || '',
+        PLAYER_ID: goal.playerObj.user.Id || goal.playerObj.memberId || goal.PLAYER_ID || '',
         TIME: goal.time || ''
       })).filter(goal => goal.PLAYER.length > 0);
 
@@ -628,15 +621,13 @@ export class SummaryFootballPage implements AfterViewInit {
           LEAGUE_FIXTURE_ID: this.matchObj.fixture_id || '',
           ...(ishome ? {
             HOME_TEAM: {
-              IS_WINNER: false,
-              NAME: this.homeTeamObj.parentclubteam.teamName || '',
+              TEAM_NAME: this.homeTeamObj.parentclubteam.teamName || '',
               TEAM_ID: this.homeTeamObj.parentclubteam.id || '',
               SCORE: scoreData
             }
           } : {
             AWAY_TEAM: {
-              IS_WINNER: false,
-              NAME: this.awayTeamObj.parentclubteam.teamName || '',
+              TEAM_NAME: this.awayTeamObj.parentclubteam.teamName || '',
               TEAM_ID: this.awayTeamObj.parentclubteam.id || '',
               SCORE: scoreData
             }
@@ -645,7 +636,7 @@ export class SummaryFootballPage implements AfterViewInit {
       };
 
       this.PublishLeagueResult(result_input);
-      console.log("Received Scorers:", scoreData);
+      console.log("Received Scorers with PLAYER_ID:", scoreData);
     } catch (error) {
       console.error("Error handling score input result:", error);
       this.commonService.toastMessage("Error processing goal details", 3000, ToastMessageType.Error);
@@ -679,6 +670,8 @@ export class SummaryFootballPage implements AfterViewInit {
       "homeTeamObj": this.homeTeamObj,
       "awayTeamObj": this.awayTeamObj,
       "resultId": this.getLeagueMatchResultRes.Id,
+      "activityCode": this.activityCode,
+      "resultObject": this.result_json
     });
 
     modal.onDidDismiss(data => {
@@ -711,26 +704,27 @@ export class SummaryFootballPage implements AfterViewInit {
       this.homeScore = homeGoals.toString();
       this.awayScore = awayGoals.toString();
 
-      const isDrawn = homeGoals === awayGoals;
+      // Extract footballResultStats with null checks
+      const footballResultStats: FootballResultStatsModel = data.footballResultStats || {};
 
       const result_input: Partial<PublishLeagueResultForActivitiesInput> = {
         ...this.createBaseResultInput(),
-        isHomeTeamWinner: isDrawn ? false : homeGoals > awayGoals,
-        isAwayTeamWinner: isDrawn ? false : awayGoals > homeGoals,
-        isDrawn: isDrawn,
         Football: {
           LEAGUE_FIXTURE_ID: this.matchObj.fixture_id || '',
           HOME_TEAM: {
-            IS_WINNER: isDrawn ? false : homeGoals > awayGoals,
-            NAME: this.homeTeamObj.parentclubteam.teamName || '',
+            TEAM_NAME: this.homeTeamObj.parentclubteam.teamName || '',
             TEAM_ID: this.homeTeamObj.parentclubteam.id || '',
             GOAL: homeGoals.toString()
           },
           AWAY_TEAM: {
-            IS_WINNER: isDrawn ? false : awayGoals > homeGoals,
-            NAME: this.awayTeamObj.parentclubteam.teamName || '',
+            TEAM_NAME: this.awayTeamObj.parentclubteam.teamName || '',
             TEAM_ID: this.awayTeamObj.parentclubteam.id || '',
             GOAL: awayGoals.toString()
+          },
+          RESULT: {
+            DESCRIPTION: footballResultStats.DESCRIPTION || '',
+            WINNER_ID: footballResultStats.WINNER_ID || '',
+            RESULT_STATUS: data.resultStatus || '0'
           }
         }
       };
@@ -751,6 +745,7 @@ export class SummaryFootballPage implements AfterViewInit {
       "activityId": this.activityId,
       "homeTeamObj": this.homeTeamObj,
       "awayTeamObj": this.awayTeamObj,
+      "resultObject": this.result_json
     });
 
     modal.onDidDismiss(data => {
@@ -783,7 +778,7 @@ export class SummaryFootballPage implements AfterViewInit {
 
   drawDoughnutChart() {
     const canvas = this.doughnutCanvas.nativeElement;
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
     const centerX = canvas.width / 2;
     const centerY = canvas.height / 2;
     const radius = Math.min(canvas.width, canvas.height) / 2;
@@ -792,15 +787,20 @@ export class SummaryFootballPage implements AfterViewInit {
     let homeValue = parseFloat(this.homePoss) || 0;
     let awayValue = parseFloat(this.awayPoss) || 0;
 
-    console.log('Original values - Home:', this.homePoss, 'Away:', this.awayPoss);
-    console.log('Parsed values - Home:', homeValue, 'Away:', awayValue);
+    console.log(
+      "Original values - Home:",
+      this.homePoss,
+      "Away:",
+      this.awayPoss
+    );
+    console.log("Parsed values - Home:", homeValue, "Away:", awayValue);
 
     // Ensure values are between 0 and 100
     homeValue = Math.max(0, Math.min(100, homeValue));
     awayValue = Math.max(0, Math.min(100, awayValue));
 
     const total = homeValue + awayValue;
-    console.log('Total:', total);
+    console.log("Total:", total);
 
     // If both are 0, show equal split
     if (total === 0) {
@@ -809,7 +809,7 @@ export class SummaryFootballPage implements AfterViewInit {
     }
     // Only normalize if total is significantly different from 100 (allow for small rounding errors)
     else if (Math.abs(total - 100) > 0.1) {
-      console.log('Normalizing values because total is', total);
+      console.log("Normalizing values because total is", total);
       homeValue = (homeValue / total) * 100;
       awayValue = (awayValue / total) * 100;
     }
@@ -819,14 +819,27 @@ export class SummaryFootballPage implements AfterViewInit {
     awayValue = parseFloat(awayValue.toFixed(2));
 
     const data = [homeValue, awayValue];
-    console.log('Final chart data:', data);
+    console.log("Final chart data:", data);
 
     // ADDITIONAL DEBUG - Show what percentage each slice should be
-    console.log(`Home slice should be: ${homeValue}% = ${(homeValue / 100 * 360).toFixed(1)}°`);
-    console.log(`Away slice should be: ${awayValue}% = ${(awayValue / 100 * 360).toFixed(1)}°`);
+    console.log(
+      `Home slice should be: ${homeValue}% = ${(
+        (homeValue / 100) *
+        360
+      ).toFixed(1)}°`
+    );
+    console.log(
+      `Away slice should be: ${awayValue}% = ${(
+        (awayValue / 100) *
+        360
+      ).toFixed(1)}°`
+    );
 
-    const labels = [this.homeTeamObj.parentclubteam.teamName || 'Home Team', this.awayTeamObj.parentclubteam.teamName || 'Away Team'];
-    const colors = ['#FF6B6B', '#4ECDC4'];
+    const labels = [
+      this.homeTeamObj.parentclubteam.teamName || "Home Team",
+      this.awayTeamObj.parentclubteam.teamName || "Away Team",
+    ];
+    const colors = ["green", "red"]; // Home team = green, Away team = red (matching HTML)
 
     let startAngle = -Math.PI / 2; // Start from top
 
@@ -836,7 +849,11 @@ export class SummaryFootballPage implements AfterViewInit {
     for (let i = 0; i < data.length; i++) {
       if (data[i] > 0) {
         const sliceAngle = (2 * Math.PI * data[i]) / 100;
-        console.log(`Drawing slice ${i}: value=${data[i]}%, angle=${sliceAngle.toFixed(4)} radians, degrees=${(sliceAngle * 180 / Math.PI).toFixed(1)}°`);
+        console.log(
+          `Drawing slice ${i}: value=${data[i]}%, angle=${sliceAngle.toFixed(
+            4
+          )} radians, degrees=${((sliceAngle * 180) / Math.PI).toFixed(1)}°`
+        );
 
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
@@ -852,16 +869,23 @@ export class SummaryFootballPage implements AfterViewInit {
     // Add white circle in the middle to make it a doughnut chart
     ctx.beginPath();
     ctx.arc(centerX, centerY, radius * 0.8, 0, 2 * Math.PI);
-    ctx.fillStyle = 'white';
+    ctx.fillStyle = "white";
     ctx.fill();
     ctx.closePath();
 
     // Rest of your original logo drawing code...
     const homeLogo = new Image();
-    homeLogo.src = this.homeTeamObj.parentclubteam.logo_url || 'assets/imgs/default-team-logo.png';
-    console.log('Home team logo URL:', this.homeTeamObj.parentclubteam.logo_url);
+    homeLogo.src =
+      this.homeTeamObj.parentclubteam.logo_url ||
+      "assets/imgs/default-team-logo.png";
+    console.log(
+      "Home team logo URL:",
+      this.homeTeamObj.parentclubteam.logo_url
+    );
     const awayLogo = new Image();
-    awayLogo.src = this.awayTeamObj.parentclubteam.logo_url || 'assets/imgs/default-team-logo.png';
+    awayLogo.src =
+      this.awayTeamObj.parentclubteam.logo_url ||
+      "assets/imgs/default-team-logo.png";
 
     let imagesLoaded = 0;
     const totalImages = 2;
@@ -883,7 +907,7 @@ export class SummaryFootballPage implements AfterViewInit {
         ctx.beginPath();
         ctx.moveTo(centerX, centerY - logoHeight);
         ctx.lineTo(centerX, centerY + logoHeight);
-        ctx.strokeStyle = 'grey';
+        ctx.strokeStyle = "grey";
         ctx.lineWidth = 1;
         ctx.stroke();
         ctx.closePath();
@@ -910,16 +934,24 @@ export class SummaryFootballPage implements AfterViewInit {
     return this.result_json.AWAY_TEAM;
   }
 
-  getPercentage(value1: string, value2: string, team: 'HOME_TEAM' | 'AWAY_TEAM'): string {
+  getPercentage(
+    value1: string,
+    value2: string,
+    team: "HOME_TEAM" | "AWAY_TEAM"
+  ): string {
     const val1 = parseInt(value1) || 0;
     const val2 = parseInt(value2) || 0;
-    const total = val1 + val2;
 
-    if (total === 0) return '0';
+    // If both values are 0, return 0
+    if (val1 === 0 && val2 === 0) return "0";
 
-    const percentage = team === 'HOME_TEAM'
-      ? (val1 / total) * 100
-      : (val2 / total) * 100;
+    // Find the maximum value between the two teams
+    const maxValue = Math.max(val1, val2);
+
+    // The team with higher value gets 100% bar fill
+    // The other team gets percentage relative to the higher value
+    const percentage =
+      team === "HOME_TEAM" ? (val1 / maxValue) * 100 : (val2 / maxValue) * 100;
 
     return percentage.toFixed(2);
   }
