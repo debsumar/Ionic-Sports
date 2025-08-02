@@ -414,7 +414,12 @@
 <div class="custom-popup" *ngIf="isAwayStatsPopupVisible && result_json">
   <div class="popup-container">
     <div class="popup-header">
-      <h3>Update {{awayTeamObj.parentclubteam.teamName}} Stats</h3>
+      <p>
+        <span>Update</span>
+        <span style="font-weight: bold; font-size: 20px;">
+          {{awayTeamObj.parentclubteam.teamName}}
+        </span>
+      </p>
       <button class="close-button" (click)="isAwayStatsPopupVisible=false">×</button>
     </div>
 

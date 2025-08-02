@@ -436,20 +436,25 @@ export class SummaryFootballPage implements AfterViewInit {
       const awayTeam = this.result_json.AWAY_TEAM;
 
       if (homeTeam && awayTeam) {
-        this.homeScore = homeTeam.GOAL.toString() || '0';
-        this.awayScore = awayTeam.GOAL.toString() || '0';
-        this.homePoss = homeTeam.BALL_POSSESSION || '0.00';
-        this.awayPoss = awayTeam.BALL_POSSESSION || '0.00';
+        this.homeScore = homeTeam.GOAL.toString() || "0";
+        this.awayScore = awayTeam.GOAL.toString() || "0";
+        this.homePoss = homeTeam.BALL_POSSESSION || "0.00";
+        this.awayPoss = awayTeam.BALL_POSSESSION || "0.00";
+
+        // Redraw chart when data updates
+        setTimeout(() => {
+          this.drawDoughnutChart();
+        }, 100);
       }
     }
   }
 
   private initializeDefaultValues(): void {
     this.result_json = {};
-    this.homeScore = '0';
-    this.awayScore = '0';
-    this.homePoss = '0.00';
-    this.awayPoss = '0.00';
+    this.homeScore = "0";
+    this.awayScore = "0";
+    this.homePoss = "0.00";
+    this.awayPoss = "0.00";
   }
 
   PublishLeagueResult(result_input: Partial<PublishLeagueResultForActivitiesInput>): void {

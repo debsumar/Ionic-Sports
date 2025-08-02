@@ -285,6 +285,14 @@ page-summary_football {
     ion-item {
       padding: 5px !important;
     }
+
+    .textright {
+      text-align: right !important;
+    }
+
+    ion-input.textright input {
+      text-align: right !important;
+    }
   }
 
   .popup-buttons {
