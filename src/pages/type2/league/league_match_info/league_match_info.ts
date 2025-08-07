@@ -664,7 +664,7 @@ export class LeagueMatchInfoPage {
     this.updateLeagueMatchParticipationStatusInput.ParticipationId = participationId;
     this.updateLeagueMatchParticipationStatusInput.ParticipationStatus = newParticipantStatus;
     // this.httpService.post(`${API.Update_League_Match_Participantipation_Role}`, this.updateLeagueMatchParticipantipationRoleInput).subscribe((res: any) => {
-    this.httpService.post(`${API.Update_League_Match_Participantipation_Status}`, this.updateLeagueMatchParticipationStatusInput).subscribe((res: any) => {
+    this.httpService.post(`${API.Update_League_Match_Participation_Status}`, this.updateLeagueMatchParticipationStatusInput).subscribe((res: any) => {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;

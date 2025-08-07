@@ -34,7 +34,7 @@ export const environment = {
   node_url: "https://activitypro-node.appspot.com",
   // new_http_url: "https://api-dev.activitypro.co.uk:1026/api",
   new_http_url: "http://localhost:9000/api",
-  // new_http_url: "https://f0e7a94c2765.ngrok-free.app/api",
+  // new_http_url: "https://5d3cc5e73a74.ngrok-free.app/api",
   nest_url: "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV",
   group_sessionsUrl: "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV",
   group_session_apikey: "",
@@ -44,7 +44,7 @@ export const environment = {
   graphql_url: "https://api-dev.activitypro.co.uk/graphql",
   // new_graphql_url: "https://api-dev.activitypro.co.uk:1026/graphql",
   new_graphql_url: "http://localhost:9000/graphql",
-  // new_graphql_url: "https://f0e7a94c2765.ngrok-free.app/graphql",
+  // new_graphql_url: "https://5d3cc5e73a74.ngrok-free.app/graphql",
   android_onesignal_id: "",
   ios_onesignal_id: "",
   firebaseConfig: {

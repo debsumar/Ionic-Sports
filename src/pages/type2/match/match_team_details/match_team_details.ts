@@ -16,6 +16,7 @@ import { API } from "../../../../shared/constants/api_constants";
 import { HttpService } from "../../../../services/http.service";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { TeamsForParentClubModel } from "../../league/models/team.model";
+import { Role } from "../../team/team.model";
 /**
  * Generated class for the MatchTeamDetailsPage page.
  *
@@ -44,6 +45,7 @@ export class MatchTeamDetailsPage {
   parentClubKey: string;
   activitySpecificTeamsRes: TeamsForParentClubModel[] = [];
   selectedTeam: TeamsForParentClubModel;
+  roles: Role[];
   getIndividualMatchParticipantInput: GetIndividualMatchParticipantInput = {
     parentclubId: "",
     clubId: "",
@@ -85,6 +87,29 @@ export class MatchTeamDetailsPage {
     AwayParticipantId: "",
     HomeParentclubTeamId: "",
     AwayParentclubTeamId: ""
+  }
+
+  updateMatchParticipantRoleInput: UpdateMatchParticipantRoleInput = {
+    parentclubId: "",
+    clubId: "",
+    activityId: "",
+    memberId: "",
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: "",
+    updated_by: "",
+    match_participation_id: "",
+    role_id: "",
+    role_type: 0
+  }
+
+  teamRolesInput: TeamRolesInput = {
+    ParentClubKey: '',
+    MemberKey: '',
+    AppType: 0,
+    ActionType: 0,
+    activityCode: 0,
   }
   // sections: { title: string; items: any[] }[] = [
   sections: { title: string; items: GetIndividualMatchParticipantModel[] }[] = [
@@ -130,7 +155,14 @@ export class MatchTeamDetailsPage {
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
       if (val.$key != "") {
-        this.parentClubKey = val.UserInfo[0].ParentClubKey
+        this.parentClubKey = val.UserInfo[0].ParentClubKey;
+
+        // Initialize teamRolesInput
+        this.teamRolesInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
+        this.teamRolesInput.MemberKey = val.$key;
+        this.teamRolesInput.AppType = AppType.ADMIN_NEW;
+        this.teamRolesInput.ActionType = 0;
+
         this.getActivitySpecificTeamInput.parentclubId = this.sharedservice.getPostgreParentClubId();
         this.getActivitySpecificTeamInput.memberId = this.sharedservice.getLoggedInId();
         this.getActivitySpecificTeamInput.action_type = LeagueMatchActionType.MATCH;
@@ -145,6 +177,10 @@ export class MatchTeamDetailsPage {
         }
 
         this.getActivitySpecificTeamInput.activityId = this.match.activityId;
+
+        // Set activityCode for teamRolesInput - extract from activityId if needed
+        // Assuming activityId contains the activity code or can be parsed
+        this.teamRolesInput.activityCode = parseInt(this.match.ActivityCode) || 0;
 
         this.getIndividualMatchParticipantInput.parentclubId = this.sharedservice.getPostgreParentClubId();
         this.getIndividualMatchParticipantInput.memberId = this.sharedservice.getLoggedInId();
@@ -164,8 +200,18 @@ export class MatchTeamDetailsPage {
         this.updateTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateTeamInput.LeagueId = ''
         this.updateTeamInput.MatchId = this.match.MatchId;
+
+        // Initialize updateMatchParticipantRoleInput
+        this.updateMatchParticipantRoleInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+        this.updateMatchParticipantRoleInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateMatchParticipantRoleInput.action_type = LeagueMatchActionType.MATCH;
+        this.updateMatchParticipantRoleInput.app_type = AppType.ADMIN_NEW;
+        this.updateMatchParticipantRoleInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+        this.updateMatchParticipantRoleInput.activityId = this.match.activityId;
+
         this.getActivitySpecificTeam();
         this.getIndividualMatchParticipant();
+        this.getRoleForPlayers();
       }
     });
   }
@@ -250,6 +296,120 @@ export class MatchTeamDetailsPage {
 
     }
     this.onDragLeaveSection(sectionIndex);
+  }
+
+  //ActionSheet Controller
+  presentActionSheet(member: GetIndividualMatchParticipantModel) {
+    let actionSheet = this.actionSheetCtrl.create({
+      title: `${member.user.FirstName} ${member.user.LastName}`,
+      buttons: [
+        {
+          text: 'Update Role',
+          icon: 'female',
+          handler: () => {
+            //for updating roles
+            this.showRoles(member);
+          }
+        },
+      ]
+    });
+    actionSheet.present();
+  }
+
+  showRoles(member: GetIndividualMatchParticipantModel): void {
+    this.closeFab();
+    if (this.roles && this.roles.length > 0) {
+      let alert = this.alertCtrl.create();
+      alert.setTitle(`Select Role`);
+
+      for (let userIndex = 0; userIndex < this.roles.length; userIndex++) {
+        alert.addInput({
+          type: 'radio',
+          label: this.roles[userIndex].role_name,
+          value: this.roles[userIndex].id,
+          checked: member.teamrole && member.teamrole.id === this.roles[userIndex].id
+        });
+      }
+
+      alert.addButton('Cancel');
+      alert.addButton({
+        text: 'OK',
+        handler: (selectedVal) => {
+          if (!selectedVal) {
+            this.commonService.toastMessage("Please select a role", 3000, ToastMessageType.Info);
+            return false; // prevent alert from dismissing          
+          }
+          else {
+            // Update the member's role before calling updatePlayerRole
+            const selectedRole = this.roles.find(r => r.id === selectedVal);
+            this.updateMatchParticipantRoleInput.role_id = selectedRole.id;
+            this.updateMatchParticipantRoleInput.role_type = parseInt(selectedRole.role_type);
+            this.updatePlayerRole(member);
+          }
+        }
+      });
+
+      alert.present();
+
+    } else {
+      this.commonService.toastMessage("No roles available", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
+    }
+  }
+
+  getRoleForPlayers() {
+    const playernstaffrole = gql`
+        query getTeamRoles($activityDetails:TeamRolesInput!) { 
+         getTeamRoles(activityDetails:$activityDetails){
+          teamRoles {
+            id
+            role_type
+            role_name
+          }
+  
+           }
+         }
+       `;
+    this.graphqlService.query(playernstaffrole, { activityDetails: this.teamRolesInput }, 0).subscribe((data: any) => {
+      this.roles = data.data.getTeamRoles.teamRoles;
+      console.log("Roles getting for player:", JSON.stringify(this.roles));
+    },
+      (error) => {
+        console.error("Error in fetching roles:", error);
+        if (error.graphQLErrors) {
+          console.error("GraphQL Errors:", error.graphQLErrors);
+          for (const gqlError of error.graphQLErrors) {
+            console.error("Error Message:", gqlError.message);
+            console.error("Error Extensions:", gqlError.extensions);
+          }
+        }
+        if (error.networkError) {
+          console.error("Network Error:", error.networkError);
+        }
+      }
+    );
+  }
+
+  updatePlayerRole(member: GetIndividualMatchParticipantModel) {
+    this.commonService.showLoader("Updating Role...");
+    this.updateMatchParticipantRoleInput.match_participation_id = member.id;
+
+    this.httpService.post(`${API.Update_League_Match_Participantipation_Role}`, this.updateMatchParticipantRoleInput).subscribe((res: any) => {
+      if (res) {
+        this.commonService.hideLoader();
+        var response = res.message;
+        console.log("Update_Match_Participant_Role RESPONSE", JSON.stringify(response));
+        this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
+        // Refresh the participant data
+        this.getIndividualMatchParticipant();
+      } else {
+        this.commonService.hideLoader();
+        console.log("error in Update_Match_Participant_Role");
+      }
+    },
+      (err) => {
+        this.commonService.hideLoader();
+        this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error);
+      });
   }
 
   getFilteredSections(): { title: string; items: any[] }[] {
@@ -521,6 +681,29 @@ export class UpdateTeamInput {
   AwayParticipantId: string;
   HomeParentclubTeamId: string;
   AwayParentclubTeamId: string;
+}
+
+export class UpdateMatchParticipantRoleInput {
+  parentclubId: string; // 🏢 Parent club ID
+  clubId: string; // 🏟️ Club ID
+  activityId: string; // ⚽ Activity ID
+  memberId: string; // 👤 Member ID
+  action_type: number; // ⚙️ Action type
+  device_type: number; // 📱 Device type (1=Android, 2=iOS)
+  app_type: number; // 📱 App type
+  device_id: string; // 🆔 Device ID
+  updated_by: string; // ✍️ User who updated
+  match_participation_id: string; // 🏟️ Match participation ID
+  role_id: string; // 👥 Role ID
+  role_type: number; // 📊 Role type (1=player, 2=coach)
+}
+
+export class TeamRolesInput {
+  ParentClubKey: string; // 🏢 Parent club key
+  MemberKey: string; // 👤 Member key
+  AppType: number; // 📱 App type
+  ActionType: number; // ⚙️ Action type
+  activityCode: number; // ⚽ Activity code
 }
 
 

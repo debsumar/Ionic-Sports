@@ -7,7 +7,7 @@ export interface CreateLeagueMatchInput {
     GroupId: string
     EndDate: string
     Stage: number
-    Round:number
+    Round: number
     MatchVisibility: number
     MatchDetails: string
     StartDate: string
@@ -20,11 +20,12 @@ export interface CreateLeagueMatchInput {
     user_device_metadata: UserDeviceMetadataField
 }
 
-export class UserPostgreMetadataField {
+export interface UserPostgreMetadataField {
     UserParentClubId: string
+    UserActivityId: string
 }
 
-export class UserDeviceMetadataField {
+export interface UserDeviceMetadataField {
     UserAppType: number
     UserActionType: number
     UserDeviceType: number
@@ -52,17 +53,17 @@ export interface LeagueGroupInput {
     ActionType: number
     DeviceType: number
     leagueId: string
-    }
-
-export interface CoachList{
-    Id:string
-    first_name:string
-    last_name:string
-    phone_no:string
-    email_id:string
 }
 
-export interface SchoolList{
-    id:string
-    school_name:string
+export interface CoachList {
+    Id: string
+    first_name: string
+    last_name: string
+    phone_no: string
+    email_id: string
+}
+
+export interface SchoolList {
+    id: string
+    school_name: string
 }

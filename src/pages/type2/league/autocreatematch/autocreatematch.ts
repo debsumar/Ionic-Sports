@@ -52,8 +52,15 @@ export class AutocreatematchPage {
     StartDate: '',
     primary_participant_id: '',
     secondary_participant_id: '',
-    user_postgre_metadata: new UserPostgreMetadataField(),
-    user_device_metadata: new UserDeviceMetadataField(),
+    user_postgre_metadata: {
+      UserParentClubId: '',
+      UserActivityId: ''
+    },
+    user_device_metadata: {
+      UserAppType: 0,
+      UserActionType: 0,
+      UserDeviceType: 0
+    },
     location_id: '',
     location_type: 0,
     EndDate: '',

@@ -86,7 +86,7 @@ export const API = {
     Get_League_Participant_For_Match: `league/GetLeagueParticipantForMatch`,
     Update_League_Fixture: `league/UpdateLeagueFixture`,
     Get_League_Match_Participant: `league/GetLeagueMatchParticipant`,
-    Update_League_Match_Participantipation_Status: `league/UpdateLeagueMatchParticipantipationStatus`,
+    Update_League_Match_Participation_Status: `league/UpdateLeagueMatchParticipationStatus`,
     Update_League_Match_Participantipation_Role: `league/update_league_match_participant_role`,
     Get_Round_Types: `league/getRoundTypes`,
     Get_League_Match_Result: `LeagueResult/getLeagueMatchResult`,

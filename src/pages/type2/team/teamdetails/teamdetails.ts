@@ -165,6 +165,7 @@ export class TeamdetailsPage {
         getTeamsById(teamId: $teamId) {
           id
           short_name
+          logo_url
           created_at
           created_by
           updated_at

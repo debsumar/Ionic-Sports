@@ -111,8 +111,15 @@ export class CreatematchleaguePage {
     StartDate: '',
     primary_participant_id: '',
     secondary_participant_id: '',
-    user_postgre_metadata: new UserPostgreMetadataField,
-    user_device_metadata: new UserDeviceMetadataField,
+    user_postgre_metadata: {
+      UserParentClubId: '',
+      UserActivityId: ''
+    },
+    user_device_metadata: {
+      UserAppType: 0,
+      UserActionType: 0,
+      UserDeviceType: 0
+    },
     location_id: '',
     location_type: 0,
     EndDate: '',
@@ -131,6 +138,7 @@ export class CreatematchleaguePage {
   primary_participant_id2: string;
 
   secondary_participant_id2: string
+  activityId: string;
 
   constructor(
     public alertCtrl: AlertController,
@@ -165,11 +173,14 @@ export class CreatematchleaguePage {
     this.leagueId = this.navParams.get("leagueId");
     this.location_id = this.navParams.get('location_id');
     this.location_type = this.navParams.get('location_type');
+    console.log("location_id from navParams:", this.location_id);
     this.inputObj.location_id = this.location_id;
     this.inputObj.location_type = this.location_type;
     this.leagueStartDate = this.navParams.get("leagueStartDate");
     this.leagueEndDate = this.navParams.get("leagueEndDate");
     console.log("league start date is:", this.leagueStartDate);
+    this.activityId = this.navParams.get("activityId");
+    console.log("activityId from navParams:", this.activityId);
 
 
     // this.max = "2049-12-31";
@@ -180,8 +191,10 @@ export class CreatematchleaguePage {
     this.leagueGroupInput.ParentClubId = this.parentClubId;
     this.leagueGroupInput.leagueId = this.leagueId;
     this.inputObj.user_postgre_metadata.UserParentClubId = this.parentClubId;
+    this.inputObj.user_postgre_metadata.UserActivityId = this.activityId;
+    // console.log("inputObj after setting UserActivityId:", JSON.stringify(this.inputObj.user_postgre_metadata));
     this.inputObj.user_device_metadata.UserActionType = 0;
-    this.inputObj.user_device_metadata.UserAppType = 0;
+    this.inputObj.user_device_metadata.UserAppType = AppType.ADMIN_NEW;
     this.inputObj.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2;
 
     this.inputObj.CreatedBy = this.sharedservice.getLoggedInId();
@@ -471,6 +484,13 @@ export class CreatematchleaguePage {
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
     }
+
+    if (!this.activityId || this.activityId === "") {
+      let message = "Activity ID is missing. Please try again.";
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
+      return false;
+    }
+
     // else if (this.inputObj.MatchName == "" || this.inputObj.MatchName == undefined) {
     //   let message = "Please enter match name";
     //   this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
@@ -525,6 +545,7 @@ export class CreatematchleaguePage {
 
         this.inputObj.EndDate = this.startDate + " " + this.endTime;
 
+        console.log('Final inputObj before API call:', JSON.stringify(this.inputObj));
         console.log('input date is:', this.inputObj.EndDate);
         console.log(new Date(this.startDate + " " + this.startTime).getTime());
         this.commonService.showLoader("Creating...");

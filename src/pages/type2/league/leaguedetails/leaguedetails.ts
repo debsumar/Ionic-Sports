@@ -109,7 +109,7 @@ export class LeaguedetailsPage {
     public modalCtrl: ModalController,
     private graphqlService: GraphqlService,
     private httpService: HttpService,
-    
+
   ) {
     // this.league = this.navParams.get("league");
     // console.log(this.league);
@@ -378,7 +378,7 @@ export class LeaguedetailsPage {
   updateResult(match: LeagueMatch) {
     this.navCtrl.push("LeaguematchresultPage", { leagueMatch: match });
   }
-  
+
   creatematchleaguePage() {
     this.navCtrl.push("CreatematchleaguePage", {
       leagueStartDate: this.individualLeague.start_date,
@@ -386,7 +386,8 @@ export class LeaguedetailsPage {
       leagueId: this.individualLeague.id, leagueName: this.individualLeague.league_name,
       location_id: this.individualLeague.location_id,
       location_type: this.individualLeague.location_type,
-      league_type_text: this.individualLeague.league_type_text
+      league_type_text: this.individualLeague.league_type_text,
+      activityId: this.individualLeague.activity.Id
     });
   }
   autoCreateMatch() {
