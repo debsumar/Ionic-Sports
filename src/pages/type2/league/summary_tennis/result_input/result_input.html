@@ -14,12 +14,14 @@
         <div class="team-section">
             <h4>{{homeTeamObj?.parentclubteam?.teamName}} (Home)</h4>
             <ion-item>
-                <ion-label>Sets Won</ion-label>
-                <ion-input type="number" [(ngModel)]="homeSetsWon" placeholder="0"></ion-input>
+                <ion-label fixed style="flex: 1;">Sets Won</ion-label>
+                <ion-input class="input-40px" style="font-size: 40px !important;" type="number"
+                    [(ngModel)]="homeSetsWon" min="0" max="150" placeholder="0"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-label>Total Games Won</ion-label>
-                <ion-input type="number" [(ngModel)]="homeGamesWon" placeholder="0"></ion-input>
+                <ion-label fixed style="flex: 1;">Total Games Won</ion-label>
+                <ion-input class="input-40px" style="font-size: 40px !important;" type="number"
+                    [(ngModel)]="homeGamesWon" min="0" max="150" placeholder="0"></ion-input>
             </ion-item>
         </div>
 
@@ -30,12 +32,14 @@
         <div class="team-section">
             <h4>{{awayTeamObj?.parentclubteam?.teamName}} (Away)</h4>
             <ion-item>
-                <ion-label>Sets Won</ion-label>
-                <ion-input type="number" [(ngModel)]="awaySetsWon" placeholder="0"></ion-input>
+                <ion-label fixed style="flex: 1;">Sets Won</ion-label>
+                <ion-input class="input-40px" style="font-size: 40px !important;" type="number"
+                    [(ngModel)]="awaySetsWon" min="0" max="150" placeholder="0"></ion-input>
             </ion-item>
             <ion-item>
-                <ion-label>Total Games Won</ion-label>
-                <ion-input type="number" [(ngModel)]="awayGamesWon" placeholder="0"></ion-input>
+                <ion-label fixed style="flex: 1;">Total Games Won</ion-label>
+                <ion-input class="input-40px" style="font-size: 40px !important;" type="number"
+                    [(ngModel)]="awayGamesWon" min="0" max="150" placeholder="0"></ion-input>
             </ion-item>
         </div>
     </div>

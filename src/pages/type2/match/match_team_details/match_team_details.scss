@@ -280,4 +280,23 @@ page-match_team_details {
     position: absolute;
     left: 6px;
   }
+
+  // Status display colors for invite status
+  .status-playing {
+    color: #32db64 !important; // Green for playing status
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .status-not-playing {
+    color: #f53d3d !important; // Red for not playing status
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .status-other {
+    color: #f76e04 !important; // Orange for other statuses
+    font-weight: 600;
+    font-size: 12px;
+  }
 }

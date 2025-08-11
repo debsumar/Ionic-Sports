@@ -1,4 +1,25 @@
 page-tennis-result-input {
+    .text-input {
+        font-size: 30px !important;
+    }
+
+    // Target the ion-input with the class directly for 40px font size
+    ion-input.input-40px {
+        font-size: 20px !important;
+
+        // Target the actual input element inside 
+        ion-input .text-input {
+            font-size: 20px !important;
+            text-align: right !important;
+        }
+
+        // Target native input element
+        input {
+            font-size: 20px !important;
+            text-align: right !important;
+        }
+    }
+
     .result-input-container {
         padding: 20px;
 
@@ -25,6 +46,17 @@ page-tennis-result-input {
                 background: white;
                 margin-bottom: 10px;
                 border-radius: 4px;
+                display: flex !important;
+                align-items: center !important;
+
+                ion-label {
+                    flex: 1 !important;
+                    margin-right: 10px !important;
+                }
+
+                ion-input {
+                    flex: 0 1 auto !important;
+                }
             }
         }
 

@@ -188,4 +188,20 @@ page-league_match_info {
     position: absolute;
     left: 6px;
   }
+
+  // 🎯 Invite status color styles
+  .status-playing {
+    color: #32db64 !important; // Success green
+    font-weight: 600;
+  }
+
+  .status-not-playing {
+    color: #f53d3d !important; // Error red
+    font-weight: 600;
+  }
+
+  .status-other {
+    color: #f76e04 !important; // Warning orange
+    font-weight: 600;
+  }
 }

@@ -507,6 +507,74 @@ export class SummaryFootballPage implements AfterViewInit {
     }
   }
 
+  // Possession validation methods
+  private validatePossessionValues(updatingTeam: 'home' | 'away'): boolean {
+    const homeValue = parseFloat(this.homePoss) || 0;
+    const awayValue = parseFloat(this.awayPoss) || 0;
+
+    // Check if both values were initially populated from API (both > 0)
+    const bothInitiallyPopulated = this.areBothPossessionValuesPopulated();
+
+    if (bothInitiallyPopulated) {
+      // If both values were initially populated, ensure sum doesn't exceed 100
+      const total = homeValue + awayValue;
+      if (total > 100) {
+        this.commonService.toastMessage(
+          `Possession values cannot exceed 100%. Current total: ${total.toFixed(2)}%`,
+          3000,
+          ToastMessageType.Error
+        );
+        return false;
+      }
+    } else {
+      // If either value was initially 0, validate only when both have values
+      if (homeValue > 0 && awayValue > 0) {
+        const total = homeValue + awayValue;
+        if (total > 100) {
+          this.commonService.toastMessage(
+            `Possession values cannot exceed 100%. Current total: ${total.toFixed(2)}%`,
+            3000,
+            ToastMessageType.Error
+          );
+          return false;
+        }
+      }
+    }
+
+    // Validate individual values are within range
+    if (homeValue < 0 || homeValue > 100) {
+      this.commonService.toastMessage(
+        'Home possession must be between 0% and 100%',
+        3000,
+        ToastMessageType.Error
+      );
+      return false;
+    }
+
+    if (awayValue < 0 || awayValue > 100) {
+      this.commonService.toastMessage(
+        'Away possession must be between 0% and 100%',
+        3000,
+        ToastMessageType.Error
+      );
+      return false;
+    }
+
+    return true;
+  }
+
+  private areBothPossessionValuesPopulated(): boolean {
+    // Check if both possession values were populated from the API response
+    if (!this.result_json || !this.result_json.HOME_TEAM || !this.result_json.AWAY_TEAM) {
+      return false;
+    }
+
+    const apiHomeValue = parseFloat(this.result_json.HOME_TEAM.BALL_POSSESSION || '0');
+    const apiAwayValue = parseFloat(this.result_json.AWAY_TEAM.BALL_POSSESSION || '0');
+
+    return apiHomeValue > 0 && apiAwayValue > 0;
+  }
+
   getLeagueMatchParticipant(): void {
     if (!this.leagueMatchParticipantInput.TeamId || !this.leagueMatchParticipantInput.TeamId2) {
       console.error("TeamId and TeamId2 are required for getLeagueMatchParticipant");
@@ -536,6 +604,11 @@ export class SummaryFootballPage implements AfterViewInit {
   }
 
   async updateHomeTeamStats() {
+    // Validate possession before updating
+    if (!this.validatePossessionValues('home')) {
+      return;
+    }
+
     const result_input: Partial<PublishLeagueResultForActivitiesInput> = {
       ...this.createBaseResultInput(),
       Football: {
@@ -559,6 +632,11 @@ export class SummaryFootballPage implements AfterViewInit {
   }
 
   async updateAwayTeamStats() {
+    // Validate possession before updating
+    if (!this.validatePossessionValues('away')) {
+      return;
+    }
+
     const result_input: Partial<PublishLeagueResultForActivitiesInput> = {
       ...this.createBaseResultInput(),
       Football: {
@@ -792,20 +870,11 @@ export class SummaryFootballPage implements AfterViewInit {
     let homeValue = parseFloat(this.homePoss) || 0;
     let awayValue = parseFloat(this.awayPoss) || 0;
 
-    console.log(
-      "Original values - Home:",
-      this.homePoss,
-      "Away:",
-      this.awayPoss
-    );
-    console.log("Parsed values - Home:", homeValue, "Away:", awayValue);
-
     // Ensure values are between 0 and 100
     homeValue = Math.max(0, Math.min(100, homeValue));
     awayValue = Math.max(0, Math.min(100, awayValue));
 
     const total = homeValue + awayValue;
-    console.log("Total:", total);
 
     // If both are 0, show equal split
     if (total === 0) {
@@ -814,37 +883,20 @@ export class SummaryFootballPage implements AfterViewInit {
     }
     // Only normalize if total is significantly different from 100 (allow for small rounding errors)
     else if (Math.abs(total - 100) > 0.1) {
-      console.log("Normalizing values because total is", total);
       homeValue = (homeValue / total) * 100;
       awayValue = (awayValue / total) * 100;
     }
 
-    // FORMAT TO 2 DECIMAL PLACES HERE - This was missing
     homeValue = parseFloat(homeValue.toFixed(2));
     awayValue = parseFloat(awayValue.toFixed(2));
 
-    const data = [homeValue, awayValue];
-    console.log("Final chart data:", data);
-
-    // ADDITIONAL DEBUG - Show what percentage each slice should be
-    console.log(
-      `Home slice should be: ${homeValue}% = ${(
-        (homeValue / 100) *
-        360
-      ).toFixed(1)}°`
-    );
-    console.log(
-      `Away slice should be: ${awayValue}% = ${(
-        (awayValue / 100) *
-        360
-      ).toFixed(1)}°`
-    );
-
+    // Match HTML layout: Away team (right/red) first, Home team (left/green) second
+    const data = [awayValue, homeValue];
     const labels = [
-      this.homeTeamObj.parentclubteam.teamName || "Home Team",
       this.awayTeamObj.parentclubteam.teamName || "Away Team",
+      this.homeTeamObj.parentclubteam.teamName || "Home Team",
     ];
-    const colors = ["green", "red"]; // Home team = green, Away team = red (matching HTML)
+    const colors = ["red", "green"]; // Away team = red (index 0), Home team = green (index 1)
 
     let startAngle = -Math.PI / 2; // Start from top
 
@@ -854,11 +906,7 @@ export class SummaryFootballPage implements AfterViewInit {
     for (let i = 0; i < data.length; i++) {
       if (data[i] > 0) {
         const sliceAngle = (2 * Math.PI * data[i]) / 100;
-        console.log(
-          `Drawing slice ${i}: value=${data[i]}%, angle=${sliceAngle.toFixed(
-            4
-          )} radians, degrees=${((sliceAngle * 180) / Math.PI).toFixed(1)}°`
-        );
+        const teamType = i === 0 ? 'AWAY' : 'HOME';
 
         ctx.beginPath();
         ctx.arc(centerX, centerY, radius, startAngle, startAngle + sliceAngle);
@@ -878,15 +926,11 @@ export class SummaryFootballPage implements AfterViewInit {
     ctx.fill();
     ctx.closePath();
 
-    // Rest of your original logo drawing code...
+    // Draw team logos in the center
     const homeLogo = new Image();
     homeLogo.src =
       this.homeTeamObj.parentclubteam.logo_url ||
       "assets/imgs/default-team-logo.png";
-    console.log(
-      "Home team logo URL:",
-      this.homeTeamObj.parentclubteam.logo_url
-    );
     const awayLogo = new Image();
     awayLogo.src =
       this.awayTeamObj.parentclubteam.logo_url ||
@@ -900,6 +944,7 @@ export class SummaryFootballPage implements AfterViewInit {
       if (imagesLoaded === totalImages) {
         let logoWidth = 40;
         let logoHeight = 40;
+        // Reversed layout: Home team on left, Away team on right
         const homeLogoX = centerX - logoWidth - 15;
         const homeLogoY = centerY - logoHeight / 2;
         const awayLogoX = centerX + 15;

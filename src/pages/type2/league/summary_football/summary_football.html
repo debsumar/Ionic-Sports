@@ -87,15 +87,16 @@
     <p style="text-align: center;color: #f6ae4d;margin: 0px;">Possession</p>
 
     <div class="chartDiv">
-      <ion-col style="margin: 0; padding: 0" (click)="isAwayStatsPopupVisible = true">
-        <span style="color: red; font-size: 20px;">{{awayPoss}}%</span>
-        <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px;"></ion-icon>
-      </ion-col>
-      <canvas #doughnutCanvas width="200" height="200"></canvas>
       <ion-col style="margin: 0; padding: 0" (click)="isHomeStatsPopupVisible = true">
         <span style="color: green; font-size: 20px;">{{homePoss}}%</span>
         <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px; padding-right:20px;"></ion-icon>
       </ion-col>
+      <canvas #doughnutCanvas width="200" height="200"></canvas>
+      <ion-col style="margin: 0; padding: 0" (click)="isAwayStatsPopupVisible = true">
+        <span style="color: red; font-size: 20px;">{{awayPoss}}%</span>
+        <ion-icon name="create" style="color: rgba(0,0,0,0.50); font-size: 16px;"></ion-icon>
+      </ion-col>
+
     </div>
 
     <div class="stat-row" *ngIf="result_json">

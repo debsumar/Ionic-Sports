@@ -10,7 +10,7 @@ import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { LeagueMatch } from "../models/location.model";
-import { LeagueParticipationStatus, LeagueTeamPlayerStatusType } from "../../../../shared/utility/enums";
+import { LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus } from "../../../../shared/utility/enums";
 import { GetPlayerModel } from "../../team/models/team.model";
 import { GraphqlService } from "../../../../services/graphql.service";
 import gql from "graphql-tag";
@@ -723,6 +723,43 @@ export class LeagueMatchInfoPage {
       this.commonService.toastMessage("Match fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
     }
     )
+  }
+
+  // 🎯 Get display text and CSS class for invite status
+  getInviteStatusDisplay(inviteStatus: number, inviteStatusText?: string): { text: string; cssClass: string } {
+    // Handle null/undefined cases
+    if (inviteStatus === null || inviteStatus === undefined) {
+      return { text: inviteStatusText || 'Pending', cssClass: 'status-other' };
+    }
+
+    console.log('Processing invite_status:', inviteStatus, 'invite_status_text:', inviteStatusText);
+
+    // Playing status (green) - for Accepted (1) and AdminAccepted (4)
+    if (inviteStatus === LeaguePlayerInviteStatus.Accepted || inviteStatus === LeaguePlayerInviteStatus.AdminAccepted) {
+      console.log('Returning status-playing for invite_status:', inviteStatus);
+      return { text: 'Playing', cssClass: 'status-playing' };
+    }
+
+    // Not Playing status (red) - for Rejected (2) and AdminRejected (5)
+    if (inviteStatus === LeaguePlayerInviteStatus.Rejected || inviteStatus === LeaguePlayerInviteStatus.AdminRejected) {
+      console.log('Returning status-not-playing for invite_status:', inviteStatus);
+      return { text: 'Not Playing', cssClass: 'status-not-playing' };
+    }
+
+    // All other statuses (orange) - Pending (0), Cancelled (3), Maybe (8), etc.
+    // Use the text from API for display, fallback to enum mapping if needed
+    const statusLabels = {
+      [LeaguePlayerInviteStatus.Pending]: 'Pending',
+      [LeaguePlayerInviteStatus.Cancelled]: 'Cancelled',
+      [LeaguePlayerInviteStatus.AdminCancelled]: 'AdminCancelled',
+      [LeaguePlayerInviteStatus.AdminDeleted]: 'AdminDeleted',
+      [LeaguePlayerInviteStatus.Maybe]: 'Maybe',
+      [LeaguePlayerInviteStatus.AdminMaybe]: 'AdminMaybe'
+    };
+
+    const displayText = inviteStatusText || statusLabels[inviteStatus] || 'Unknown';
+    console.log('Returning status-other for invite_status:', inviteStatus, 'displayText:', displayText);
+    return { text: displayText, cssClass: 'status-other' };
   }
 
 }

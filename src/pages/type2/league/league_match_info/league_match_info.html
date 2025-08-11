@@ -135,12 +135,18 @@
                       class="margin_auto">
                   </ion-col>
                   <ion-col col-3 class="paidBlock margin_auto">
-                    <div *ngIf=isMatchPaid(item?.Match,item?.paid_amount) style="float: right; margin-top: 0px;">
+                    <div style="float: right; margin-top: 0px;">
+                      <p [class]="getInviteStatusDisplay(item.invite_status, item.invite_status_text).cssClass"
+                        style="margin-top:-10px">
+                        {{getInviteStatusDisplay(item.invite_status, item.invite_status_text).text}}
+                      </p>
+                    </div>
+                    <!-- <div *ngIf=isMatchPaid(item?.Match,item?.paid_amount) style="float: right; margin-top: 0px;">
                       <p class="pending">
                         <span>{{currencyDetails.CurrencySymbol}}{{item.paid_amount}}</span>
                       </p>
                       <p class="pending" style="margin-top:-10px">{{item.amount_pay_status_text}}</p>
-                    </div>
+                    </div> -->
                   </ion-col>
                 </ion-row>
               </ion-grid>

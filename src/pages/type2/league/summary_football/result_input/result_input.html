@@ -41,13 +41,13 @@
       <ion-list>
         <ion-item>
           <ion-label fixed style="flex: 1;">{{homeTeamObj?.parentclubteam?.teamName}}</ion-label>
-          <ion-input style="flex: 1;" type="number" [(ngModel)]="homeTeamGoals" min="0" max="150"
-            placeholder="0"></ion-input>
+          <ion-input class="input-40px" style="flex: 2; font-size: 30px !important; text-align: right !important;"
+            type="number" [(ngModel)]="homeTeamGoals" min="0" max="150" placeholder="0"></ion-input>
         </ion-item>
         <ion-item>
           <ion-label fixed style="flex: 1;">{{awayTeamObj?.parentclubteam?.teamName}}</ion-label>
-          <ion-input style="flex: 1;" type="number" [(ngModel)]="awayTeamGoals" min="0" max="150"
-            placeholder="0"></ion-input>
+          <ion-input class="input-40px" style="flex: 2; font-size: 30px !important; text-align: right !important;"
+            type="number" [(ngModel)]="awayTeamGoals" min="0" max="150" placeholder="0"></ion-input>
         </ion-item>
       </ion-list>
     </ion-card-content>
