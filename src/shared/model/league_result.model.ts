@@ -77,7 +77,7 @@ export interface PublishLeagueResultForActivitiesInput {
   Cricket?: CricketSectionModel;
 }
 
-// League Match Participant Input (unchanged)
+// League Match Participant Input
 export interface LeagueMatchParticipantInput {
   parentclubId: string;
   clubId: string;
@@ -93,6 +93,7 @@ export interface LeagueMatchParticipantInput {
   TeamId?: string;
   TeamId2?: string;
   leagueTeamPlayerStatusType?: number;
+  ActivityCode?: number;
 }
 
 // ===== FOOTBALL MODELS =====

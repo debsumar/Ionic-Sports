@@ -169,15 +169,10 @@ export class LeagueMatchInfoPage {
     this.leagueId = this.navParams.get("leagueId");
     this.activityId = this.navParams.get("activityId");
     this.activityCode = this.navParams.get("activityCode");
-    console.log("activityCode:", this.activityCode);
     this.existingteam = this.navParams.get("existingteam");
     this.selectedHomeTeamText = this.matchObj.homeusername != null ? this.matchObj.homeusername : 'Home Team';
     this.selectedAwayTeamText = this.matchObj.awayusername != null ? this.matchObj.awayusername : 'Away Team';
-    console.log(
-      `${this.navParams.get("selectedmatchId")}:${this.navParams.get(
-        "selectedmemberkey"
-      )}`
-    );
+
     this.storage.get('Currency').then((val) => {
       this.currencyDetails = JSON.parse(val);
     });
@@ -250,7 +245,6 @@ export class LeagueMatchInfoPage {
   }
 
   ionViewDidLoad() {
-    console.log("ionViewDidLoad LeagueMatchInfoPage");
   }
 
   getFilteredSections(): { title: string; items: LeagueMatchParticipantModel[] }[] {
@@ -272,14 +266,11 @@ export class LeagueMatchInfoPage {
     this.closeFab();
     const homeTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedHomeTeamText);
     const awayTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedAwayTeamText);
-    console.log("Selected Home Team:", homeTeam);
-    console.log(this.selectedHomeTeamText);
-    console.log(this.selectedAwayTeamText);
     this.selectedHomeTeamText != 'Home Team' ||
       this.selectedAwayTeamText != 'Away Team' ?
       this.navCtrl.push("SummaryFootballPage", {
         "match": this.matchObj, "leagueId": this.leagueId, "activityId": this.activityId, "homeTeam": homeTeam,
-        "awayTeam": awayTeam, "activityCode": this.activityCode,
+        "awayTeam": awayTeam, "activityCode": this.activityCode, isLeague: true
       }) :
       this.commonService.toastMessage('Select Home and Away Teams', 3000, ToastMessageType.Info,);
   }
@@ -420,22 +411,10 @@ export class LeagueMatchInfoPage {
          }
        `;
     this.graphqlService.query(playernstaffrole, { activityDetails: this.teamRolesInput }, 0).subscribe((data: any) => {
-      // this.commonService.hideLoader();
       this.roles = data.data.getTeamRoles.teamRoles;
-      console.log("Roles getting for player:", JSON.stringify(this.roles));
     },
       (error) => {
-        console.error("Error in fetching:", error);
-        if (error.graphQLErrors) {
-          console.error("GraphQL Errors:", error.graphQLErrors);
-          for (const gqlError of error.graphQLErrors) {
-            console.error("Error Message:", gqlError.message);
-            console.error("Error Extensions:", gqlError.extensions);
-          }
-        }
-        if (error.networkError) {
-          console.error("Network Error:", error.networkError);
-        }
+        this.commonService.toastMessage("Failed to fetch roles", 3000, ToastMessageType.Error);
       }
     )
     this.apollo
@@ -449,11 +428,8 @@ export class LeagueMatchInfoPage {
       .subscribe(
         ({ data }) => {
           this.roles = data["getTeamRoles"]["teamRoles"];
-          console.log("Getting Player Roles", this.roles);
-          // this.commonService.hideLoader();
         },
         (err) => {
-          console.log(JSON.stringify(err));
           this.commonService.toastMessage("failed to fetch role", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         })
   }
@@ -469,12 +445,11 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;
-        console.log("Update_League_Match_Participantipation_Role RESPONSE", JSON.stringify(res));
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
-        // this.sections.forEach(section => section.items = []); // Clear the sections array
         this.getLeagueMatchParticipant(0);
       } else {
-        console.log("error in Update_League_Fixture",)
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Failed to update role", 3000, ToastMessageType.Error);
       }
     },
       (err) => {
@@ -552,7 +527,6 @@ export class LeagueMatchInfoPage {
       this.getLeagueMatchParticipant(1);
     }
     this.getFilteredSections();
-    console.log('leagueTeamPlayerStatusType:', this.leagueMatchParticipantInput.leagueTeamPlayerStatusType);
   }
 
   //to fetch list of avilable teams
@@ -560,12 +534,7 @@ export class LeagueMatchInfoPage {
     // this.commonService.showLoader("Fetching teams...");
     this.httpService.post(`${API.Get_League_Participant_For_Match}`, this.leagueParticipantForMatchInput).subscribe((res: any) => {
       if (res) {
-        // this.commonService.hideLoader();
         this.leagueParticipantForMatchRes = res.data;
-        console.log("Get_League_Participant_For_Match RESPONSE", JSON.stringify(res.data));
-      } else {
-        // this.commonService.hideLoader();
-        console.log("error in fetching",)
       }
     }, error => {
       this.commonService.hideLoader();
@@ -579,12 +548,11 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;
-        console.log("Update_League_Fixture RESPONSE", JSON.stringify(res));
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
-        // this.sections.forEach(section => section.items = []); // Clear the sections array
         this.getLeagueMatchParticipant(1);
       } else {
-        console.log("error in Update_League_Fixture",)
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error);
       }
     },
       (err) => {
@@ -617,7 +585,6 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         this.leagueMatchParticipantRes = res.data || [];
-        console.log("Get_League_Match_Participant RESPONSE", JSON.stringify(res.data));
         this.sections.forEach(section => section.items = []);// Clear the sections array
         this.populateSections(); // Call populateSections after data is fetched
       }
@@ -668,12 +635,11 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;
-        console.log("Update_League_Match_Participation_Status RESPONSE", JSON.stringify(res));
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
-        // this.sections.forEach(section => section.items = []); // Clear the sections array
         this.getLeagueMatchParticipant(0);
       } else {
-        console.log("error in Update_League_Fixture",)
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Failed to update participation status", 3000, ToastMessageType.Error);
       }
     },
       (err) => {
@@ -732,17 +698,13 @@ export class LeagueMatchInfoPage {
       return { text: inviteStatusText || 'Pending', cssClass: 'status-other' };
     }
 
-    console.log('Processing invite_status:', inviteStatus, 'invite_status_text:', inviteStatusText);
-
     // Playing status (green) - for Accepted (1) and AdminAccepted (4)
     if (inviteStatus === LeaguePlayerInviteStatus.Accepted || inviteStatus === LeaguePlayerInviteStatus.AdminAccepted) {
-      console.log('Returning status-playing for invite_status:', inviteStatus);
       return { text: 'Playing', cssClass: 'status-playing' };
     }
 
     // Not Playing status (red) - for Rejected (2) and AdminRejected (5)
     if (inviteStatus === LeaguePlayerInviteStatus.Rejected || inviteStatus === LeaguePlayerInviteStatus.AdminRejected) {
-      console.log('Returning status-not-playing for invite_status:', inviteStatus);
       return { text: 'Not Playing', cssClass: 'status-not-playing' };
     }
 

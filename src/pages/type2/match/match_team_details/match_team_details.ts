@@ -161,8 +161,6 @@ export class MatchTeamDetailsPage {
 
   ) {
     this.match = JSON.parse(this.navParams.get("match"));
-    console.log('MATCH OBJ', this.match);
-    console.log('MATCH OBJ', this.match.activityId);
     this.selectedHomeTeamText = this.match.homeUserName != null ? this.match.homeUserName : 'Home Team';
     this.selectedAwayTeamText = this.match.awayUserName != null ? this.match.awayUserName : 'Away Team';
     this.storage.get('Currency').then((val) => {
@@ -186,7 +184,6 @@ export class MatchTeamDetailsPage {
         this.getActivitySpecificTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         // Defensive check for required match properties
         if (!this.match.activityId) {
-          console.error('Match activityId is missing:', this.match);
           this.commonService.toastMessage('Match activity data is missing', 3000, ToastMessageType.Error);
           this.navCtrl.pop();
           return;
@@ -240,18 +237,85 @@ export class MatchTeamDetailsPage {
       }
     });
   }
+  // publish() {
+  //   this.closeFab();
+
+  //   // Validate that teams are selected
+  //   if (this.selectedHomeTeamText === 'Home Team' || this.selectedAwayTeamText === 'Away Team') {
+  //     this.commonService.toastMessage('Select Home and Away Teams', 3000, ToastMessageType.Info);
+  //     return;
+  //   }
+
+  //   // Find the team objects by matching team IDs instead of names
+  //   let homeTeam: GetIndividualMatchParticipantModel | undefined;
+  //   let awayTeam: GetIndividualMatchParticipantModel | undefined;
+
+  //   // First try to find teams by team name
+  //   homeTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedHomeTeamText);
+  //   awayTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedAwayTeamText);
+
+  //   // If not found by name, try to find by team ID from match object
+  //   if (!homeTeam && this.match.homeUserId) {
+  //     homeTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.id === this.match.homeUserId);
+  //   }
+
+  //   if (!awayTeam && this.match.awayUserId) {
+  //     awayTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.id === this.match.awayUserId);
+  //   }
+
+  //   // If still not found, get the first two different teams from participants
+  //   if (!homeTeam || !awayTeam) {
+  //     const uniqueTeams = this.getIndividualMatchParticipantRes.reduce((teams, participant) => {
+  //       if (!teams.find(t => t.Team.id === participant.Team.id)) {
+  //         teams.push(participant);
+  //       }
+  //       return teams;
+  //     }, [] as GetIndividualMatchParticipantModel[]);
+
+  //     if (uniqueTeams.length >= 2) {
+  //       homeTeam = homeTeam || uniqueTeams[0];
+  //       awayTeam = awayTeam || uniqueTeams[1];
+  //     }
+  //   }
+
+  //   // Validate that teams were found
+  //   if (!homeTeam) {
+  //     this.commonService.toastMessage('Home team not found in participants. Please ensure teams are properly set up.', 3000, ToastMessageType.Error);
+  //     return;
+  //   }
+
+  //   if (!awayTeam) {
+  //     this.commonService.toastMessage('Away team not found in participants. Please ensure teams are properly set up.', 3000, ToastMessageType.Error);
+  //     return;
+  //   }
+
+  //   // Validate that teams are different
+  //   if (homeTeam.Team.id === awayTeam.Team.id) {
+  //     this.commonService.toastMessage('Home and away teams must be different', 3000, ToastMessageType.Error);
+  //     return;
+  //   }
+
+
+  // }
   publish() {
     this.closeFab();
-    const homeTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedHomeTeamText);
-    const awayTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedAwayTeamText);
+    const homeTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedHomeTeamText);
+    const awayTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedAwayTeamText);
     console.log("Selected Home Team:", homeTeam);
+    console.log("Selected Away Team:", awayTeam);
     console.log(this.selectedHomeTeamText);
     console.log(this.selectedAwayTeamText);
-    this.selectedHomeTeamText != 'Home Team' ||
+    this.selectedHomeTeamText != 'Home Team' &&
       this.selectedAwayTeamText != 'Away Team' ?
-      this.navCtrl.push("PublishFootballPage", {
-        "match": this.match, "homeTeam": homeTeam,
+      // Navigate to summary page
+      this.navCtrl.push("SummaryFootballPage", {
+        "match": this.match,
+        "leagueId": '',
+        "activityId": this.match.activityId,
+        "homeTeam": homeTeam,
         "awayTeam": awayTeam,
+        "activityCode": parseInt(this.match.ActivityCode),
+        "isLeague": false
       }) :
       this.commonService.toastMessage('Select Home and Away Teams', 3000, ToastMessageType.Info,);
   }
@@ -262,7 +326,6 @@ export class MatchTeamDetailsPage {
     }
   }
   ionViewDidLoad() {
-    console.log("ionViewDidLoad MatchTeamDetailsPage");
   }
   formatMatchStartDate(date) {
     return moment(date, "YYYY-MM-DD HH:mm").local().format("DD-MMM-YYYY hh:mm A");
@@ -401,20 +464,9 @@ export class MatchTeamDetailsPage {
        `;
     this.graphqlService.query(playernstaffrole, { activityDetails: this.teamRolesInput }, 0).subscribe((data: any) => {
       this.roles = data.data.getTeamRoles.teamRoles;
-      console.log("Roles getting for player:", JSON.stringify(this.roles));
     },
       (error) => {
-        console.error("Error in fetching roles:", error);
-        if (error.graphQLErrors) {
-          console.error("GraphQL Errors:", error.graphQLErrors);
-          for (const gqlError of error.graphQLErrors) {
-            console.error("Error Message:", gqlError.message);
-            console.error("Error Extensions:", gqlError.extensions);
-          }
-        }
-        if (error.networkError) {
-          console.error("Network Error:", error.networkError);
-        }
+        this.commonService.toastMessage("Failed to fetch roles", 3000, ToastMessageType.Error);
       }
     );
   }
@@ -427,13 +479,12 @@ export class MatchTeamDetailsPage {
       if (res) {
         this.commonService.hideLoader();
         var response = res.message;
-        console.log("Update_Match_Participant_Role RESPONSE", JSON.stringify(response));
         this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
         // Refresh the participant data
         this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
       } else {
         this.commonService.hideLoader();
-        console.log("error in Update_Match_Participant_Role");
+        this.commonService.toastMessage("Failed to update role", 3000, ToastMessageType.Error);
       }
     },
       (err) => {
@@ -452,13 +503,12 @@ export class MatchTeamDetailsPage {
       if (res) {
         this.commonService.hideLoader();
         var response = res.message;
-        console.log("Update_Match_Participation_Status RESPONSE", JSON.stringify(response));
         this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
         // Refresh the participant data
         this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
       } else {
         this.commonService.hideLoader();
-        console.log("error in Update_Match_Participation_Status");
+        this.commonService.toastMessage("Failed to update participation status", 3000, ToastMessageType.Error);
       }
     },
       (err) => {
@@ -502,7 +552,6 @@ export class MatchTeamDetailsPage {
       alert.addButton({
         text: 'OK',
         handler: (selectedVal) => {
-          console.log('Selected Value:', selectedVal);
           if (!selectedVal) {
             this.commonService.toastMessage("Please select a team", 3000, ToastMessageType.Info);
             return false; // prevent alert from dismissing          
@@ -551,7 +600,6 @@ export class MatchTeamDetailsPage {
       this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
     }
     this.getFilteredSections();
-    console.log('leagueTeamPlayerStatusType:', this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType);
   }
 
   //to fetch list of avilable players of both home & away teams
@@ -573,7 +621,6 @@ export class MatchTeamDetailsPage {
       if (res) {
         this.commonService.hideLoader();
         this.getIndividualMatchParticipantRes = res.data || [];
-        console.log("GetIndividualMatchParticipant RESPONSE", JSON.stringify(res.data));
         this.sections.forEach(section => section.items = []); // Clear the sections array
         this.populateSections(); // Call populateSections after data is fetched
       }
@@ -609,9 +656,6 @@ export class MatchTeamDetailsPage {
     this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, this.getActivitySpecificTeamInput).subscribe((res: any) => {
       if (res) {
         this.activitySpecificTeamsRes = res.data;
-        console.log("GET_ACTIVIY_SPECIFIC_TEAM RESPONSE", JSON.stringify(res.data));
-      } else {
-        console.log("error in fetching",)
       }
     }, error => {
       this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
@@ -624,11 +668,10 @@ export class MatchTeamDetailsPage {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;
-        console.log("Update_League_Fixture RESPONSE", JSON.stringify(res));
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
-        // this.getLeagueMatchParticipant(1);
       } else {
-        console.log("error in Update_League_Fixture",)
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error);
       }
     },
       (err) => {
@@ -661,7 +704,6 @@ export class MatchTeamDetailsPage {
           role: "cancel",
           // icon: "close",
           handler: () => {
-            console.log("Cancel clicked");
           },
         },
       ],
@@ -694,14 +736,12 @@ export class MatchTeamDetailsPage {
 
       }, (err) => {
         this.commonService.hideLoader();
-        console.error("GraphQL mutation error:", err);
         this.commonService.toastMessage("match deletion failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
       )
     } catch (error) {
-
-      console.error("An error occurred:", error);
-
+      this.commonService.hideLoader();
+      this.commonService.toastMessage("match deletion failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
     }
   }
 
@@ -712,17 +752,13 @@ export class MatchTeamDetailsPage {
       return { text: inviteStatusText || 'Pending', cssClass: 'status-other' };
     }
 
-    console.log('Processing invite_status:', inviteStatus, 'invite_status_text:', inviteStatusText);
-
     // Playing status (green) - for Accepted (1) and AdminAccepted (4)
     if (inviteStatus === LeaguePlayerInviteStatus.Accepted || inviteStatus === LeaguePlayerInviteStatus.AdminAccepted) {
-      console.log('Returning status-playing for invite_status:', inviteStatus);
       return { text: 'Playing', cssClass: 'status-playing' };
     }
 
     // Not Playing status (red) - for Rejected (2) and AdminRejected (5)
     if (inviteStatus === LeaguePlayerInviteStatus.Rejected || inviteStatus === LeaguePlayerInviteStatus.AdminRejected) {
-      console.log('Returning status-not-playing for invite_status:', inviteStatus);
       return { text: 'Not Playing', cssClass: 'status-not-playing' };
     }
 
@@ -738,7 +774,6 @@ export class MatchTeamDetailsPage {
     };
 
     const displayText = inviteStatusText || statusLabels[inviteStatus] || 'Unknown';
-    console.log('Returning status-other for invite_status:', inviteStatus, 'displayText:', displayText);
     return { text: displayText, cssClass: 'status-other' };
   }
 }

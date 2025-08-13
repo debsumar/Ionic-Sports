@@ -295,6 +295,7 @@ export class GetIndividualMatchParticipantModel {
     Match: ParticipantMatchData; // 🏟️ Nested match details
     teamrole: ParticipantTeamRoleData; // 🎭 Nested team role details
     invite_status_text: string;
+    fixture_id: string;
 }
 
 // ___________-----------------------
