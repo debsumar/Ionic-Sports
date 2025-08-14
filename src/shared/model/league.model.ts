@@ -69,3 +69,15 @@ export class RoundTypesModel {
     id: number;
     name: string;
 }
+
+export class RoundTypeInput {
+    parentclubId: string;
+    clubId: string;
+    activityId: string;
+    memberId: string;
+    action_type: number;
+    device_type: number;
+    app_type: number;
+    device_id: string;
+    updated_by: string;
+}

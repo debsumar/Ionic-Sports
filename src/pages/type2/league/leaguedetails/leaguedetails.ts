@@ -12,7 +12,6 @@ import {
 } from "ionic-angular";
 import * as moment from "moment";
 import { Storage } from "@ionic/storage";
-import { Apollo } from "apollo-angular";
 import { CommonService, ToastMessageType, ToastPlacement } from "../../../../services/common.service";
 import { AlertController } from "ionic-angular/components/alert/alert-controller";
 import { FirebaseService } from "../../../../services/firebase.service";
@@ -22,7 +21,6 @@ import gql from "graphql-tag";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { HttpService } from "../../../../services/http.service";
 import { DatePipe } from "@angular/common";
-import { AutocreatematchPage } from "../autocreatematch/autocreatematch";
 import { LeagueMatch } from "../models/location.model";
 import { API } from "../../../../shared/constants/api_constants";
 import { AppType } from "../../../../shared/constants/module.constants";
@@ -326,7 +324,16 @@ export class LeaguedetailsPage {
   }
 
   gotoEditPage(match: LeagueMatch) {
-    this.navCtrl.push("UpdateleaguematchPage", { match: match });
+    // this.navCtrl.push("EditmatchPage", { 
+    //   leagueId: this.individualLeague.id,
+    //   matchId: match.fixture_id,
+    //   leagueStartDate: this.individualLeague.start_date,
+    //   leagueEndDate: this.individualLeague.end_date,
+    //   location_id: this.individualLeague.location_id,
+    //   location_type: this.individualLeague.location_type,
+    //   league_type_text: this.individualLeague.league_type_text
+    // });
+    this.navCtrl.push("UpdateleaguematchPage", { match });
   }
 
   gotoManageTeamsPage() {
@@ -396,7 +403,8 @@ export class LeaguedetailsPage {
       leagueDate: this.individualLeague.start_date,
       leagueTime: this.individualLeague.start_time,
       location_id: this.individualLeague.location_id,
-      location_type: this.individualLeague.location_type
+      location_type: this.individualLeague.location_type,
+      activityId: this.individualLeague.activity.Id,
     });
   }
   formatMatchStartDate(date) {
@@ -986,6 +994,18 @@ export class LeaguedetailsPage {
     )
   }
 
+  showMatchActionSheet(match: LeagueMatch) {
+    if( this.individualLeague.league_type === 3) {
+      this.commonService.showMatchActionSheet(match, {
+          onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
+          onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
+          // onDelete: () => this.removeMatch(match),
+          // onUpdateResult: () => this.updateResult(match)
+      });
+    }else{
+      this.gotoMatchDetails(match);
+    }
+  }
 
 
 

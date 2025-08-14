@@ -429,7 +429,7 @@ export class TeamdetailsPage {
       0
     ).subscribe((response) => {
       this.commonService.hideLoader();
-      const message = "Player  removed successfully";
+      const message = "Player removed successfully";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
       this.getInvitedPlayers();
     }, (err) => {

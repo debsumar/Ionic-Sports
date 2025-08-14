@@ -11,7 +11,6 @@
       <button ion-button icon-only (click)="goToDashboardMenuPage()">
         <img src="assets/images/home.svg" class="home_btn" />
       </button>
-
       <button ion-button icon-only (click)="presentPopover($event)">
         <ion-icon name="more"></ion-icon>
       </button>
@@ -61,9 +60,6 @@
         <ion-option *ngFor="let club of clubs" value="{{club.Id}}">{{club.ClubName}}</ion-option>
       </ion-select>
     </ion-item>
-
-
-
 
     <ion-item>
       <ion-label>Category</ion-label>

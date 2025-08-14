@@ -26,16 +26,16 @@ export class CommonIdFields {
 }
 
 export class UserDeviceMetadata {
-  user_device_metadata:{
-    UserActionType?:number;
-    UserAppType:number,
-    UserDeviceType:number //this.sharedservice.getPlatform() == "android" ? 1:2
+  user_device_metadata: {
+    UserActionType?: number;
+    UserAppType: number,
+    UserDeviceType: number //this.sharedservice.getPlatform() == "android" ? 1:2
   }
-  user_postgre_metadata:{
+  user_postgre_metadata: {
     UserParentClubId?: string; //ParentClub Key
     UserClubId?: string; //ParentClub Key
     UserMemberId?: string; //ParentClub Key
-    UserActivityId?: string; 
+    UserActivityId?: string;
   }
 }
 
@@ -48,4 +48,16 @@ export class CommonRestApiDto {
   device_type?: number;
   app_type?: number;
   device_id?: string;
+}
+
+export class CommonRestApiDtoV1 {
+  parentclub_id?: string;
+  club_id?: string;
+  activity_id?: string;
+  member_id?: string;
+  action_type?: number;
+  device_type?: number;
+  app_type?: number;
+  device_id?: string;
+  updated_by?: string;
 }

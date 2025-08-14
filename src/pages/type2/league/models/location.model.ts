@@ -42,11 +42,13 @@ export class LeagueMatch {
     match_visibility: number
     home_participant_id?: string
     away_participant_id?:string;
+    payment_type: number;
+    member_fees:number;
+    non_member_fees:number;
+    league_type: number;
 }
 
 export class MatchEditInput {
-
-
     fixture_id: string
     match_id: string
     homeparticipant_id: string
@@ -56,5 +58,8 @@ export class MatchEditInput {
     match_title: string
     location_id: string
     match_visibility: number
-    match_description: string
+    match_description: string;
+    payment_type: number;
+    member_fees: number;
+    non_member_fees: number;
 }

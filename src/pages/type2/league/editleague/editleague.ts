@@ -451,54 +451,56 @@ export class EditleaguePage {
       return false;
     }
 
-    else if (this.league.capacity == 0 || this.league.capacity == undefined) {
-      let message = "Enter Capacity";
-      this.commonService.toastMessage(message, 3000)
+    else if (this.league.league_type != 3 && (this.league.capacity == 0 || this.league.capacity == undefined)) {
+      let message = "Enter capacity";
+      this.commonService.toastMessage(message, 2500)
       return false;
     }
-    else if (this.league.season == "" || this.league.season == undefined) {
+    else if (this.league.league_type != 3 && (this.league.season == "" || this.league.season == undefined)) {
       let message = "Enter season";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
       return false;
-    } else if (this.league.grade == "" || this.league.grade == undefined) {
+    } else if (this.league.league_type != 3 && (this.league.grade == "" || this.league.grade == undefined)) {
       let message = "Enter grade";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
       return false;
-    } else if (this.league.member_price == "" || this.league.member_price == undefined) {
-      let message = "Enter member fee";
+    } else if (this.league.league_type!= 3 && this.league.is_paid && (parseFloat(this.league.member_price) <= 0.00 || this.league.member_price == '')) {
+      let message = "Member fee should be greater than non-member fee";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
       return false;
-    } else if (this.league.non_member_price == "" || this.league.non_member_price == undefined) {
+    } 
+    else if (this.league.league_type!= 3 && this.league.is_paid && (parseFloat(this.league.non_member_price) <= 0.00 || this.league.non_member_price == '')) {
       let message = "Enter non-member fee";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
       return false;
-    } else if (this.league.contact_email == "" || this.league.contact_email == undefined) {
+    } else if (this.league.league_type != 3 && (this.league.contact_email == "" || this.league.contact_email == undefined)) {
       let message = "Enter conact email";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
       return false;
-    } else if (this.league.contact_phone == "" || this.league.contact_phone == undefined) {
+    } else if (this.league.league_type != 3 && (this.league.contact_phone == "" || this.league.contact_phone == undefined)) {
       let message = "Enter contact phone";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
       return false;
     }
-    if (this.leagueEditInput.leagueDetails.start_date == "") {
+    else if (this.leagueEditInput.leagueDetails.start_date == "") {
       let msg = "Please enter a valid start Date";
-      this.commonService.toastMessage(msg, 3000)
+      this.commonService.toastMessage(msg, 2500, ToastMessageType.Error)
       return false;
     } else if (
       moment(String(this.leagueEditInput.leagueDetails.end_date), "YYYY-MM-DD").isBefore(
         moment(String(this.leagueEditInput.leagueDetails.start_date), "YYYY-MM-DD")
       )
     ) {
-      let msg = "Your end Date is before start Date,Please enter valid end date";
+      let msg = "Your end date is before start Date,Please enter valid end date";
       this.commonService.toastMessage(msg, 2500, ToastMessageType.Error)
       return false;
     }
-    if (this.enrol_date == "") {
-      let msg = "Please enter a valid start Date";
+    else if (this.league.league_type != 3 && this.enrol_date == "") {
+      let msg = "Please enter a valid enrollment date";
       this.commonService.toastMessage(msg, 2500, ToastMessageType.Error)
       return false;
     } else if (
+      this.league.league_type != 3 &&
       moment(String(this.withdrwal_date), "YYYY-MM-DD").isBefore(
         moment(String(this.enrol_date), "YYYY-MM-DD")
       )
@@ -506,7 +508,7 @@ export class EditleaguePage {
       let msg = "Your withdrawal Date is before enrol date,Please enter valid withdrawal date";
       this.commonService.toastMessage(msg, 2500, ToastMessageType.Error)
       return false;
-    } else if (moment(this.withdrwal_date, "YYYY-MM-DD").isAfter(moment(this.league.end_date, "YYYY-MM-DD"))) {
+    } else if (this.league.league_type != 3 && moment(this.withdrwal_date, "YYYY-MM-DD").isAfter(moment(this.league.end_date, "YYYY-MM-DD"))) {
       let msg = "Withdrawal date is after the end date. Please enter a valid withdrawal date"
       this.commonService.toastMessage(msg, 2500, ToastMessageType.Error)
       return false;

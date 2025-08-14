@@ -4,6 +4,7 @@ import {
   NavController,
   AlertController,
   LoadingController,
+  ActionSheetController,
 } from "ionic-angular";
 import { ToastController } from "ionic-angular";
 import { Storage } from "@ionic/storage";
@@ -31,8 +32,9 @@ export class CommonService {
     public httpService: HttpClient,
     private apollo: Apollo,
     private sanitizer: DomSanitizer,
-    
-  ) {}
+    private actionSheetCtrl: ActionSheetController,
+
+  ) { }
   public navCtrl: NavController;
   //<Summary>
   //
@@ -46,11 +48,11 @@ export class CommonService {
   }
 
   getAgeFromYYYY_MM(date) {
-    if(date && date!==''){
+    if (date && date !== '') {
       let dob = moment(date, "YYYY-MM");
       let present = moment(new Date()).format("YYYY-MM");
       return moment(present, "YYYY-MM").diff(moment(dob, "YYYY-MM"), "years");
-    }else{
+    } else {
       return 0;
     }
   }
@@ -60,28 +62,28 @@ export class CommonService {
     const dobDate = new Date(dob);
 
     if (!isNaN(dobDate.getTime())) {
-        const currentDate = new Date();
-        let age = currentDate.getFullYear() - dobDate.getFullYear();
+      const currentDate = new Date();
+      let age = currentDate.getFullYear() - dobDate.getFullYear();
 
-        // Adjust age if the current month is before the birth month or if it's the birth month but before the birth day
-        if (
-            currentDate.getMonth() < dobDate.getMonth() ||
-            (currentDate.getMonth() === dobDate.getMonth() && currentDate.getDate() < dobDate.getDate())
-        ) {
-            age--;
-        }
+      // Adjust age if the current month is before the birth month or if it's the birth month but before the birth day
+      if (
+        currentDate.getMonth() < dobDate.getMonth() ||
+        (currentDate.getMonth() === dobDate.getMonth() && currentDate.getDate() < dobDate.getDate())
+      ) {
+        age--;
+      }
 
-        if(age <= 0){
-          return "N.A";
-        } else{
-          return age.toString();
-        }
-    } else {
-        //console.error("Invalid date format or value for DOB");
+      if (age <= 0) {
         return "N.A";
+      } else {
+        return age.toString();
+      }
+    } else {
+      //console.error("Invalid date format or value for DOB");
+      return "N.A";
     }
-  }  
- 
+  }
+
 
   validateNumber(input: any) {
     ///^[-+]?[0-9]+\.[0-9]+$/;
@@ -92,7 +94,7 @@ export class CommonService {
     }
   }
 
-  public sortingObjects(data: Array<object>, propname: string,order_type?: number): Array<object> {
+  public sortingObjects(data: Array<object>, propname: string, order_type?: number): Array<object> {
     let tempArray = data;
     let sortedArray = [];
     let iteration = data.length;
@@ -217,7 +219,7 @@ export class CommonService {
     arrayOfData.sort((a, b) => {
       const aDays = a.Days.split(',');
       const bDays = b.Days.split(',');
-      
+
       // Sort by days
       const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
       const aIndex = weekdays.indexOf(aDays[0]);
@@ -228,7 +230,7 @@ export class CommonService {
       if (aIndex > bIndex) {
         return 1;
       }
-      
+
       // Sort by start time
       if (a.StartTime < b.StartTime) {
         return -1;
@@ -368,16 +370,16 @@ export class CommonService {
   }
 
   getdateInDDMMYYYY(date) {
-    return moment(date,"YYYY-MM-DD").format("DD-MM-YYYY");
+    return moment(date, "YYYY-MM-DD").format("DD-MM-YYYY");
   }
 
 
-  getDateFromISOSrtring(isoDate){
+  getDateFromISOSrtring(isoDate) {
     return moment(isoDate).format('DD-MM-YY');
   }
   // Assuming your ISOString date is stored in a variable called 'isoDate'
 
-  
+
 
 
   //<Summary>
@@ -516,8 +518,8 @@ export class CommonService {
     return dd + "-" + month;
   }
 
-  getFormattedByInputFormat(inputFormat:any,date) {
-    return moment(+date,inputFormat).format("DD-MMM-YYYY, HH:mm");
+  getFormattedByInputFormat(inputFormat: any, date) {
+    return moment(+date, inputFormat).format("DD-MMM-YYYY, HH:mm");
   }
 
   itemTapped(event, item) {
@@ -539,7 +541,7 @@ export class CommonService {
       //console.log(val);
       let userDets = JSON.parse(val);
       let userKey = userDets.EmailID.split("@")[0]; //userid without gmail.com
-      this.ga.setUserId(userKey).then(() => {});
+      this.ga.setUserId(userKey).then(() => { });
       this.ga
         .trackView(page)
         .then(() => {
@@ -565,8 +567,8 @@ export class CommonService {
         msgType == ToastMessageType.Success
           ? "success"
           : msgType == ToastMessageType.Error
-          ? "error"
-          : "info",
+            ? "error"
+            : "info",
       showCloseButton: closeButton,
     });
     toast.present();
@@ -578,20 +580,20 @@ export class CommonService {
       content: loadertext,
     });
     this.loader.present();
-    
-      // let imgContent = '<div class="spinner1"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
-      // this.safeImage = this.sanitizer.bypassSecurityTrustHtml(imgContent);
-      // this.loader = this.loadingCtrl.create({
-      //     spinner: 'hide',
-      //     content: this.safeImage,
-      // });
-      // this.loader.present();
-  
+
+    // let imgContent = '<div class="spinner1"><div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div></div>';
+    // this.safeImage = this.sanitizer.bypassSecurityTrustHtml(imgContent);
+    // this.loader = this.loadingCtrl.create({
+    //     spinner: 'hide',
+    //     content: this.safeImage,
+    // });
+    // this.loader.present();
+
   }
 
   hideLoader() {
     //call this fn to hide loader
-    this.loader.dismiss().catch((err) => {});
+    this.loader.dismiss().catch((err) => { });
   }
 
   getMemberSignedUpType(memberObj): number {
@@ -605,7 +607,7 @@ export class CommonService {
     }
   }
 
-  alertWithText(title:string, message:string, btn_text:string) {
+  alertWithText(title: string, message: string, btn_text: string) {
     const alert = this.alertCtrl.create({
       title: title,
       subTitle: message,
@@ -638,7 +640,7 @@ export class CommonService {
     confirm.present();
   }
 
-  commonAlertWithStatus(title,message,btn1,btn2,callback) {
+  commonAlertWithStatus(title, message, btn1, btn2, callback) {
     let confirm = this.alertCtrl.create({
       title: title,
       message: message,
@@ -676,14 +678,14 @@ export class CommonService {
         {
           text: "No",
           role: "cancel",
-          handler: () => {},
+          handler: () => { },
         }
       ],
     });
     confirm.present();
   }
 
-  commonAlert_V3(title, message, agree_btn1_text,cancel_btn1_text, callback) {
+  commonAlert_V3(title, message, agree_btn1_text, cancel_btn1_text, callback) {
     let confirm = this.alertCtrl.create({
       title: title,
       message: message,
@@ -697,14 +699,14 @@ export class CommonService {
         {
           text: cancel_btn1_text,
           role: "cancel",
-          handler: () => {},
+          handler: () => { },
         }
       ],
     });
     confirm.present();
   }
 
-  commonAlert_V4(title, message, agree_btn1_text,cancel_btn1_text, callback) {
+  commonAlert_V4(title, message, agree_btn1_text, cancel_btn1_text, callback) {
     let confirm = this.alertCtrl.create({
       title: title,
       message: message,
@@ -712,7 +714,7 @@ export class CommonService {
         {
           text: cancel_btn1_text,
           role: "cancel",
-          handler: () => {},
+          handler: () => { },
         },
         {
           text: agree_btn1_text,
@@ -725,7 +727,7 @@ export class CommonService {
     confirm.present();
   }
 
-  commonAlert_V5(title, message, agree_btn1_text,cancel_btn1_text, callback) {
+  commonAlert_V5(title, message, agree_btn1_text, cancel_btn1_text, callback) {
     let confirm = this.alertCtrl.create({
       title: title,
       message: message,
@@ -750,23 +752,23 @@ export class CommonService {
 
   validateStartAndEndDate(startDate: string, endDate: string): boolean {
     if (startDate === "" || endDate === "") {
-        const msg = "Please enter valid start and end dates";
-        this.toastMessage(msg, 2500, ToastMessageType.Error);
-        return false;
-    } 
+      const msg = "Please enter valid start and end dates";
+      this.toastMessage(msg, 2500, ToastMessageType.Error);
+      return false;
+    }
     if (moment(endDate, "YYYY-MM-DD").isBefore(moment(startDate, "YYYY-MM-DD"))) {
-        const msg = "Your end date is before the start date. Please enter a valid end date.";
-        this.toastMessage(msg, 2500, ToastMessageType.Error);
-        return false;
+      const msg = "Your end date is before the start date. Please enter a valid end date.";
+      this.toastMessage(msg, 2500, ToastMessageType.Error);
+      return false;
     }
     return true;
   }
 
   validateTime(startTime: string, endTime: string): boolean {
     if (startTime === "" || endTime === "") {
-        const msg = "Please enter valid start and end times";
-        this.toastMessage(msg, 2500, ToastMessageType.Error);
-        return false;
+      const msg = "Please enter valid start and end times";
+      this.toastMessage(msg, 2500, ToastMessageType.Error);
+      return false;
     }
     if (moment(endTime, "HH:mm").isSame(moment(startTime, "HH:mm"))) {
       const msg = "Your end time and start time same. Please enter a valid time range.";
@@ -774,9 +776,9 @@ export class CommonService {
       return false;
     }
     if (moment(endTime, "HH:mm").isBefore(moment(startTime, "HH:mm"))) {
-        const msg = "Your end time is before the start time. Please enter a valid time range.";
-        this.toastMessage(msg, 2500, ToastMessageType.Error);
-        return false;
+      const msg = "Your end time is before the start time. Please enter a valid time range.";
+      this.toastMessage(msg, 2500, ToastMessageType.Error);
+      return false;
     }
     return true;
   }
@@ -826,10 +828,10 @@ export class CommonService {
     Firebase_id: "",
     Platform_type: null,
     DeviceModel: "",
-    AppType:1
+    AppType: 1
   };
   saveDeviceDetsforNotify(memberkey: string) {
-    if(this.sharedService.getOnesignalPlayerId() && this.sharedService.getDeviceId()){
+    if (this.sharedService.getOnesignalPlayerId() && this.sharedService.getDeviceId()) {
       let platform: string = this.sharedService.getPlatform();
       this.DeviceInput.Device_id = this.sharedService.getDeviceId();
       this.DeviceInput.Player_id = this.sharedService.getOnesignalPlayerId();
@@ -893,9 +895,9 @@ export class CommonService {
       );
   }
 
-  getUserDetsById(memberid:string){
+  getUserDetsById(memberid: string) {
     return new Promise((res, rej) => {
-      try{
+      try {
         const userQuery = gql`
         query getUserNDetsByKey_V1($firebasekey:String!) {
             getUserNDetsByKey_V1(Key:$firebasekey){
@@ -921,24 +923,24 @@ export class CommonService {
           }
         }
       `;
-      this.apollo
-        .query({
-          query: userQuery,
-          fetchPolicy: 'network-only',
-          //fetchPolicy: 'cache-first',
-         variables: { firebasekey:memberid} ,
-        })
-        .subscribe(({data}) => {
-          console.table(data["getUserNDetsByKey_V1"]);
-          res(data["getUserNDetsByKey_V1"])
-        },(err)=>{
-          rej(err);
-        });
-    }catch(err){
-      rej(err);
-    } 
-  })
-}
+        this.apollo
+          .query({
+            query: userQuery,
+            fetchPolicy: 'network-only',
+            //fetchPolicy: 'cache-first',
+            variables: { firebasekey: memberid },
+          })
+          .subscribe(({ data }) => {
+            console.table(data["getUserNDetsByKey_V1"]);
+            res(data["getUserNDetsByKey_V1"])
+          }, (err) => {
+            rej(err);
+          });
+      } catch (err) {
+        rej(err);
+      }
+    })
+  }
 
   isUUID(str) {
     const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -995,19 +997,19 @@ export class CommonService {
     return result;
   }
 
-  getAge(DOB){
+  getAge(DOB) {
     let year = DOB.split("-")[0];
     let currentYear = new Date().getFullYear();
     return Number(currentYear) - Number(year);
   }
 
   presentDynamicAlert(
-    title:string,
+    title: string,
     message: string,
     inputPlaceholder: string,
     cancelButtonText: string,
     updateButtonText: string,
-    default_value:any,
+    default_value: any,
     input_type: string,
     onUpdate: (inputValue: string) => void
   ) {
@@ -1019,7 +1021,7 @@ export class CommonService {
           name: 'inputValue',
           placeholder: inputPlaceholder,
           type: input_type, // Switch between number and text input
-          value:default_value
+          value: default_value
         },
       ],
       buttons: [
@@ -1036,7 +1038,7 @@ export class CommonService {
             if (data.inputValue.trim().length > 0) {
               onUpdate(data.inputValue);
             } else {
-              this.toastMessage('Input cannot be empty',2500,ToastMessageType.Error,ToastPlacement.Bottom);
+              this.toastMessage('Input cannot be empty', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
               return false; // Prevent closing the alert
             }
           },
@@ -1058,7 +1060,61 @@ export class CommonService {
     });
     alert.present();
   }
-  
+
+  showDynamicActionSheet(options: ActionSheetOptions) {
+    const actionSheet = this.actionSheetCtrl.create({
+      title: options.title,
+      buttons: options.buttons
+    });
+    actionSheet.present();
+  }
+
+  showMatchActionSheet(match: any, callbacks: MatchActionCallbacks) {
+    const buttons: ActionSheetButton[] = [];
+
+    if (callbacks.onViewDetails) {
+      buttons.push({
+        text: 'View Details',
+        icon: 'eye',
+        handler: callbacks.onViewDetails
+      });
+    }
+
+    if (callbacks.onEdit) {
+      buttons.push({
+        text: 'Edit Match',
+        icon: 'create',
+        handler: callbacks.onEdit
+      });
+    }
+
+    if (callbacks.onUpdateResult) {
+      buttons.push({
+        text: 'Update Result',
+        icon: 'trophy',
+        handler: callbacks.onUpdateResult
+      });
+    }
+
+    if (callbacks.onDelete) {
+      buttons.push({
+        text: 'Delete',
+        icon: 'trash',
+        handler: callbacks.onDelete
+      });
+    }
+
+    buttons.push({
+      text: 'Cancel',
+      role: 'cancel'
+    });
+
+    this.showDynamicActionSheet({
+      title: 'Match Options',
+      buttons
+    });
+  }
+
 
 
 
@@ -1073,12 +1129,32 @@ export enum ToastPlacement {
   Bottom,
 }
 
-export enum BookingMemberType{
+export enum BookingMemberType {
   MEMBER = 1,
-  ADMIN = 2, 
+  ADMIN = 2,
   COACH = 4,
   SUBADMIN = 6,
 }
+
+export interface ActionSheetButton {
+  text: string;
+  icon?: string;
+  role?: string;
+  handler?: () => void;
+}
+
+export interface ActionSheetOptions {
+  title?: string;
+  buttons: ActionSheetButton[];
+}
+
+export interface MatchActionCallbacks {
+  onEdit?: () => void;
+  onDelete?: () => void;
+  onUpdateResult?: () => void;
+  onViewDetails?: () => void;
+}
+
 // enum Notification {
 //     "SessionPayment",
 //     "HolidayCampPayment",

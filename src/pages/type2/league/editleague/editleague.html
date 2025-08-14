@@ -12,9 +12,18 @@
 
 <ion-content>
   <ion-list>
+
     <ion-item>
-      <ion-label>League Name</ion-label>
+      <ion-label>Competition Name</ion-label>
       <ion-input type="text" [(ngModel)]="league.league_name" ></ion-input>
+    </ion-item>
+    
+    <ion-item>
+      <ion-label>Activity</ion-label>
+      <ion-select [(ngModel)]="league.activity.ActivityCode" disabled="true">
+        <ion-option *ngFor="let activity of activities" value="{{activity.ActivityCode}}">{{activity.ActivityName}}
+        </ion-option>
+      </ion-select>
     </ion-item>
 
     <ion-item>
@@ -26,7 +35,7 @@
     </ion-item>
 
     <ion-item>
-      <ion-label>Location Type</ion-label>
+      <ion-label>Competition Type</ion-label>
       <ion-select [(ngModel)]="league.location_type" >
         <ion-option [value]="1">Club</ion-option>
         <ion-option [value]="2">Location</ion-option>
@@ -58,19 +67,9 @@
       </ion-select>
     </ion-item>
 
-
-    <ion-item>
-      <ion-label>Activity</ion-label>
-      <ion-select [(ngModel)]="league.activity.ActivityCode">
-        <ion-option *ngFor="let activity of activities" value="{{activity.ActivityCode}}">{{activity.ActivityName}}
-        </ion-option>
-      </ion-select>
-    </ion-item>
-
-
     <ion-item>
       <ion-label>League Type</ion-label>
-      <ion-select [(ngModel)]="league.league_type">
+      <ion-select [(ngModel)]="league.league_type" disabled="true"> 
         <ion-option *ngFor="let type of leagueType" [value]="type.value">{{type.key}}</ion-option>
         <!-- <ion-option value="1">Singles</ion-option>
         <ion-option value="2">Doubles</ion-option> -->
@@ -79,7 +78,7 @@
       </ion-select>
     </ion-item>
 
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>Category</ion-label>
       <ion-select [(ngModel)]="league.league_category">
         <ion-option *ngFor="let cat of leagueCategory" [value]="cat.value">{{cat.key}}</ion-option>
@@ -108,15 +107,14 @@
     </ion-item>
 
 
-
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>Last Date For Enrolment</ion-label>
       <ion-datetime displayFormat="DD/MM/YYYY" pickerFormat="DD MM YYYY" min="{{min}}" max="{{max}}"
         [(ngModel)]="enrol_date"></ion-datetime>
     </ion-item>
 
 
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>Last Date For Withdrawal</ion-label>
       <ion-datetime displayFormat="DD/MM/YYYY" pickerFormat="DD MM YYYY" min="{{min}}" max="{{max}}"
         [(ngModel)]="withdrwal_date">
@@ -124,40 +122,36 @@
     </ion-item>
 
 
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>Start Time</ion-label>
       <ion-datetime displayFormat="hh mm A" pickerFormat="hh mm A" minuteValues="0,10,20,30,40,50,60"
         [(ngModel)]="league.start_time"></ion-datetime>
     </ion-item>
 
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>End Time</ion-label>
       <ion-datetime displayFormat="hh mm A" pickerFormat="hh mm A" minuteValues="0,10,20,30,40,50,60"
         [(ngModel)]="league.end_time"></ion-datetime>
     </ion-item>
 
 
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>Early Arrival</ion-label>
       <ion-datetime displayFormat="hh mm A" pickerFormat="hh mm A" minuteValues="0,10,20,30,40,50,60"
         [(ngModel)]="league.early_arrival_time"></ion-datetime>
     </ion-item>
 
-
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>League Season</ion-label>
       <ion-input type="text" [(ngModel)]="league.season" class="textareastyle"></ion-input>
     </ion-item>
 
-
-
-
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>Capacity</ion-label>
       <ion-input type="text" [(ngModel)]="league.capacity" class="textareastyle"></ion-input>
     </ion-item>
 
-    <ion-item>
+    <ion-item *ngIf="league.league_type != 3">
       <ion-label>Grade</ion-label>
       <ion-input type="text" [(ngModel)]="league.grade" class="textareastyle"></ion-input>
     </ion-item>
@@ -178,27 +172,24 @@
       </ion-select>
     </ion-item>
 
-
-
-
   </ion-list>
 
 
-  <ion-item>
+  <ion-item *ngIf="league.league_type != 3">
     <ion-label>Contact Mail</ion-label>
-    <ion-input type="text" [disabled]="true" [(ngModel)]="leagueEditInput.leagueDetails.contact_email"
+    <ion-input type="text" [(ngModel)]="league.contact_email"
       class="right-align-input"></ion-input>
   </ion-item>
 
 
-  <ion-item>
+  <ion-item *ngIf="league.league_type != 3">
     <ion-label>Contact Phone</ion-label>
-    <ion-input type="text"  [(ngModel)]="leagueEditInput.leagueDetails.contact_phone"
+    <ion-input type="text"  [(ngModel)]="league.contact_phone"
       class="right-align-input"></ion-input>
   </ion-item>
 
 
-  <ion-item>
+  <ion-item *ngIf="league.league_type != 3">
     <ion-row>
       <ion-col col-12 no-padding class="flex_col">
         <p class="toggle_para">Paid</p>
@@ -211,17 +202,32 @@
   </ion-item>
 
 
-  <ion-item *ngIf="league.is_paid">
+  <!-- <ion-item *ngIf="league.is_paid">
     <ion-label>Fee Member<span *ngIf="currency != undefined">({{currency}})</span></ion-label>
-    <ion-input type="text" class="textareastyle" [(ngModel)]="league.member_price"></ion-input>
+    <ion-input type="number" class="textareastyle" [(ngModel)]="league.member_price"></ion-input>
   </ion-item>
 
   <ion-item *ngIf="league.is_paid">
     <ion-label>Fee Non Member<span *ngIf="currency != undefined">({{currency}})</span></ion-label>
-    <ion-input type="text" class="textareastyle" [(ngModel)]="league.non_member_price"></ion-input>
-  </ion-item>
+    <ion-input type="number" class="textareastyle" [(ngModel)]="league.non_member_price"></ion-input>
+  </ion-item> -->
+   <ion-item *ngIf="league.is_paid && league.league_type != 3">
+      <ion-label fixed>Fee Member
+        <span *ngIf="currency != undefined">({{currency}})</span>
+      </ion-label>
+      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+        [(ngModel)]="league.member_price"></ion-input>
+    </ion-item>
 
-  <div *ngIf="league.is_paid">
+    <ion-item *ngIf="league.is_paid && league.league_type != 3">
+      <ion-label> Fee Non Member
+        <span *ngIf="currency != undefined">({{currency}})</span>
+      </ion-label>
+      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+        [(ngModel)]="league.non_member_price"></ion-input>
+    </ion-item>
+
+  <div *ngIf="league.is_paid && league.league_type != 3">
   <ion-item>
     <ion-row>
       <ion-col col-12 no-padding class="flex_col">
@@ -261,7 +267,7 @@
 </div>
 
   
-  <ion-item>
+  <ion-item *ngIf="league.league_type != 3">
     <ion-row>
       <ion-col col-12 no-padding class="flex_col">
         <p class="toggle_para">Show Participants</p>

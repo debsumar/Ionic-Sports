@@ -1,7 +1,5 @@
 import { Component } from '@angular/core';
-import { Apollo } from 'apollo-angular';
-import { HttpLink } from 'apollo-angular-link-http';
-import { AlertController, IonicPage, LoadingController, NavController, NavParams, PopoverController, ToastController } from 'ionic-angular';
+import { AlertController, IonicPage, LoadingController, NavController, NavParams, PopoverController } from 'ionic-angular';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { SharedServices } from '../../../services/sharedservice';
 import { GraphqlService } from '../../../../services/graphql.service';
@@ -10,7 +8,10 @@ import gql from 'graphql-tag';
 import { Storage } from '@ionic/storage';
 import { LeagueParticipantModel } from '../models/league.model';
 import { HttpService } from '../../../../services/http.service';
-import { error } from 'console';
+import { API } from '../../../../shared/constants/api_constants';
+import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
+import { AppType } from '../../../../shared/constants/module.constants';
+
 import moment from 'moment';
 /**
  * Generated class for the UpdateleaguematchPage page.
@@ -33,17 +34,25 @@ export class UpdateleaguematchPage {
   privateType: boolean = true;
   locations: Locations[];
   participantData: LeagueParticipantModel[];
-
   filteredPrimaryParticipants: LeagueParticipantModel[];
   filteredSecondaryParticipants: LeagueParticipantModel[];
-
-
+  isChecked:boolean = false;
   match: string;
-
   data: LeagueMatch;
   start_date: string;
   start_time: string;
-
+  roundTypes: RoundTypesModel[] = [];
+  roundTypeInput: RoundTypeInput = {
+    parentclubId: '',
+    clubId: '',
+    activityId: '',
+    memberId: '',
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: '',
+    updated_by: ''
+  }
   inputObj: MatchEditInput = {
     fixture_id: '',
     match_id: '',
@@ -54,15 +63,16 @@ export class UpdateleaguematchPage {
     match_title: '',
     location_id: '',
     match_visibility: 0,
-    match_description: ''
+    match_description: '',
+    payment_type: 0,
+    member_fees: 0.00,
+    non_member_fees: 0.00
   }
 
   constructor(
     public alertCtrl: AlertController,
     public navCtrl: NavController,
     public navParams: NavParams,
-    private apollo: Apollo,
-    private httpLink: HttpLink,
     public commonService: CommonService,
     public loadingCtrl: LoadingController,
     public storage: Storage,
@@ -70,7 +80,6 @@ export class UpdateleaguematchPage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private sharedService: SharedServices,
-    private toastCtrl: ToastController,
     private httpService: HttpService
   ) {
     this.min = new Date().toISOString();
@@ -80,7 +89,8 @@ export class UpdateleaguematchPage {
     this.data = this.navParams.get("match");
 
     console.log("data is:", this.data);
-
+    this.isChecked = this.data.payment_type == 1 ? true : false;
+    this.publicType = this.data.match_visibility == 0 ? true : false;
     this.publicType = this.data.match_visibility == 0 ? true : false;
     this.inputObj.homeparticipant_id = this.data.home_team_id ? this.data.home_team_id : this.data.home_participant_id;
     this.inputObj.awayparticipant_id = this.data.away_team_id ? this.data.away_team_id : this.data.away_participant_id;
@@ -88,20 +98,51 @@ export class UpdateleaguematchPage {
     // this.start_date = this.formatDateString(start_date);
     // this.start_time = start_time;
     // Ensure the string contains a space to split correctly
-    const [date, time] = this.data.start_date.split(',');
-
+    const dateTimeParts = this.data.start_date.split(' ');
+    const date = dateTimeParts[1];
+    const time = dateTimeParts[2] || '00:00'; // Default to
 
     this.start_date = this.formatDateString(date)
     this.start_time = time;
 
     console.log('start date is', this.start_date);
     console.log('start time is', this.start_time);
+    this.roundTypeInput = new RoundTypeInput();
+    this.roundTypeInput.updated_by = this.sharedservice.getLoggedInUserId();
+    this.roundTypeInput.device_id = this.sharedservice.getDeviceId() || ""; 
+    this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+    this.roundTypeInput.clubId = '';//val.$key;
+    this.roundTypeInput.action_type = 0;
+    this.roundTypeInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+    this.roundTypeInput.app_type = AppType.ADMIN_NEW;          
+    this.getRoundTypes();
     this.getLocationForParentClub();
     this.getParticipants();
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad UpdateleaguematchPage');
+  }
+
+  getRoundTypes() {
+    //this.commonService.showLoader("Fetching info ...");
+    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe((res: any) => {
+      if (res) {
+        this.commonService.hideLoader();
+        this.roundTypes = res.data || [];
+        if( this.roundTypes.length > 0) {
+          this.inputObj.round = this.data.round; // Set default round type
+        }
+        console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
+      } else {
+        //this.commonService.hideLoader();
+        console.log("error in fetching",)
+      }
+    })
+  }
+
+  updateMatchPaymentType(isChecked: boolean): void {
+    this.inputObj.payment_type = isChecked ? 1 : 0;
   }
 
   changeType(val) {
@@ -247,7 +288,23 @@ export class UpdateleaguematchPage {
       let message = "Please select location";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
-    }
+    }else if (this.data.league_type == 3 && (this.inputObj.homeparticipant_id == "" || this.inputObj.homeparticipant_id == undefined)) {
+      let message = "Please select home participant";
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
+      return false;
+    } else if (this.data.league_type == 3 && (this.inputObj.awayparticipant_id == "" || this.inputObj.awayparticipant_id == undefined)) {
+      let message = "Please select away participant";
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
+      return false;
+    }else if(this.isChecked && (this.data.member_fees <= 0.00 || this.data.member_fees == undefined)) {
+      let message = "Please enter member fees";
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
+      return false;
+    } else if(this.isChecked && (this.data.non_member_fees <= 0.00 || this.data.non_member_fees == undefined)) {
+      let message = "Please enter non-member fees";
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
+      return false;
+    } 
     return true;
   }
 
@@ -266,7 +323,11 @@ export class UpdateleaguematchPage {
       this.inputObj.location_id = this.data.location_id;
       this.inputObj.match_title = this.data.match_title;
       this.inputObj.round = Number(this.data.round);
-
+      this.inputObj.location_id = this.data.location_id;
+      this.inputObj.payment_type = this.isChecked ? 1 : 0;
+      this.inputObj.match_description = this.data.description;
+      this.inputObj.member_fees = this.data.member_fees;
+      this.inputObj.non_member_fees = this.data.non_member_fees;
       this.inputObj.match_description = this.data.description;
 
       //this.inputObj.homeparticipant_id=this.inputObj.home_participant_id;

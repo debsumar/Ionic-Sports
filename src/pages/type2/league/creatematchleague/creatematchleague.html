@@ -96,7 +96,7 @@
 
 
 
-    <ion-item>
+    <ion-item class="allign-right">
       <ion-label fixed>Match Title</ion-label>
       <ion-input type="text" [(ngModel)]="inputObj.MatchName"></ion-input>
     </ion-item>
@@ -113,6 +113,21 @@
       </ion-row>
     </ion-item>
 
+    <ion-item *ngIf="this.inputObj.MatchPaymentType==1" class="allign-right">
+      <ion-label fixed>Fee Member
+        <span *ngIf="currency != undefined">({{currency}})</span>
+      </ion-label>
+      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+        [(ngModel)]="inputObj.Member_Fee"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="this.inputObj.MatchPaymentType==1" class="allign-right">
+      <ion-label> Fee Non Member
+        <span *ngIf="currency != undefined">({{currency}})</span>
+      </ion-label>
+      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+        [(ngModel)]="inputObj.Non_Member_Fee"></ion-input>
+    </ion-item>
 
     <ion-item>
       <ion-row>

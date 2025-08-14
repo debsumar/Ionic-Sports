@@ -11,9 +11,7 @@
   </ion-header>
   
   <ion-content>
-  
     <ion-list>
-  
       <ion-item>
         <ion-label>Start Date</ion-label>
         <ion-datetime displayFormat="DD/MM/YYYY" pickerFormat="DD MM YYYY" min="{{min}}" max="{{max}}" [(ngModel)]="start_date"></ion-datetime>
@@ -25,41 +23,70 @@
           [(ngModel)]="start_time"></ion-datetime>
       </ion-item>
   
-      <ion-item>
-        <ion-label>Participants 1</ion-label>
-        <ion-select placeholder=" <<Select>>" [(ngModel)]="inputObj.homeparticipant_id " (ionChange)="filterParticipants()">
-        <ion-option *ngFor="let participant of filteredPrimaryParticipants" 
-          value="{{participant.id}}">{{participant.participant_name}}</ion-option>
+      <div *ngIf="this.data.league_type!=3">
+        <ion-item>
+          <ion-label>Participants 1</ion-label>
+          <ion-select placeholder=" <<Select>>" [(ngModel)]="inputObj.homeparticipant_id " (ionChange)="filterParticipants()">
+          <ion-option *ngFor="let participant of filteredPrimaryParticipants" 
+            value="{{participant.id}}">{{participant.participant_name}}</ion-option>
+          </ion-select>
+        </ion-item>
+  
+        <ion-item>
+          <ion-label>Participants 2</ion-label>
+          <ion-select placeholder=" <<Select>>" [(ngModel)]="inputObj.awayparticipant_id" (ionChange)="filterParticipants()">
+          <ion-option *ngFor="let participant of filteredSecondaryParticipants"
+            value="{{participant.id}}">{{participant.participant_name}}</ion-option>
+          </ion-select>
+        </ion-item>
+      </div>
+
+    <ion-item>
+      <ion-label>Round/Stage/Type</ion-label>
+      <ion-select [(ngModel)]="data.round">
+        <ion-option *ngFor="let roundType of roundTypes" [value]="roundType.id">{{roundType.name}}</ion-option>
       </ion-select>
-      </ion-item>
+    </ion-item>
   
-      <ion-item>
-        <ion-label>Participants 2</ion-label>
-        <ion-select placeholder=" <<Select>>" [(ngModel)]="inputObj.awayparticipant_id" (ionChange)="filterParticipants()">
-        <ion-option *ngFor="let participant of filteredSecondaryParticipants"
-          value="{{participant.id}}">{{participant.participant_name}}</ion-option>
-      </ion-select>
-      </ion-item>
-  
-      <ion-item>
-        <ion-label>Round/Stage</ion-label>
-        <ion-select [(ngModel)]="data.round">
-          <ion-option value="1">First Round</ion-option>
-          <ion-option value="2">Second Round</ion-option>
-        </ion-select>
-      </ion-item>
-  
-      <ion-item>
+      <!-- <ion-item>
         <ion-label>Location</ion-label>
         <ion-select [(ngModel)]="data.location_id">
           <ion-option *ngFor="let location of locations" value="{{location.id}}">{{location.name}}</ion-option>
         </ion-select>
-      </ion-item>
+      </ion-item> -->
   
       <ion-item>
         <ion-label fixed>Match Title</ion-label>
         <ion-input type="text" [(ngModel)]="data.match_title"></ion-input>
       </ion-item>
+
+      <ion-item>
+      <ion-row>
+        <ion-col col-12 no-padding class="flex_col">
+          <p class="toggle_para">Paid</p>
+          <label class="toggle">
+            <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
+            <span data-unchecked="No" data-checked="Yes"></span>
+          </label>
+        </ion-col>
+      </ion-row>
+    </ion-item>
+
+    <ion-item *ngIf="this.data.payment_type == 1 && isChecked" class="allign-right">
+      <ion-label fixed>Fee Member
+        <span *ngIf="currency != undefined">({{currency}})</span>
+      </ion-label>
+      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+        [(ngModel)]="data.member_fees"></ion-input>
+    </ion-item>
+
+    <ion-item *ngIf="this.data.payment_type == 1 && isChecked" class="allign-right">
+      <ion-label> Fee Non Member
+        <span *ngIf="currency != undefined">({{currency}})</span>
+      </ion-label>
+      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+        [(ngModel)]="data.non_member_fees"></ion-input>
+    </ion-item>
   
       <ion-item>
         <ion-row>

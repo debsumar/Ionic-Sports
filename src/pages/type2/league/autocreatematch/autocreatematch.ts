@@ -1,14 +1,17 @@
 import { Component } from '@angular/core';
-import { AlertController, IonicPage, LoadingController, NavController, NavParams } from 'ionic-angular';
+import { IonicPage, NavController, NavParams } from 'ionic-angular';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { SharedServices } from '../../../services/sharedservice';
 import gql from 'graphql-tag';
 import { GraphqlService } from '../../../../services/graphql.service';
 import { LeagueParticipantModel } from '../models/league.model';
-import { CreateLeagueMatchInput, UserDeviceMetadataField, UserPostgreMetadataField } from '../leaguemodels/creatematchforleague.dto';
+import { CreateLeagueMatchInputV1, UserDeviceMetadataField, UserPostgreMetadataField } from '../leaguemodels/creatematchforleague.dto';
 import moment from 'moment';
-import { finalize } from 'rxjs/operators';
 import { HttpService } from '../../../../services/http.service';
+import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
+import { API } from '../../../../shared/constants/api_constants';
+import { AppType } from '../../../../shared/constants/module.constants';
+
 
 /**
  * Generated class for the AutocreatematchPage page.
@@ -26,6 +29,7 @@ import { HttpService } from '../../../../services/http.service';
 export class AutocreatematchPage {
   min: any;
   max: any;
+  selectedRound:number = 0;
   leagueId: string;
   matchDate: string;
   matchTime: string;
@@ -33,48 +37,53 @@ export class AutocreatematchPage {
   generatedMatches: GeneratedMatch[] = [];
   selectedPlayers: LeagueParticipantModel[] = [];
   publicType: boolean = true;
-  selectedRound: number = 1;
   privateType: boolean = true;
   location_id: string;
   location_type: number;
   isLoading: boolean = false;
+  isChecked: boolean = false;
 
   // Initialize the input object
-  inputObj: CreateLeagueMatchInput = {
-    MatchName: '',
-    CreatedBy: '',
-    LeagueId: '',
-    GroupId: '',
-    Stage: 0,
-    Round: 0,
-    MatchVisibility: 0,
-    MatchDetails: '',
-    StartDate: '',
-    primary_participant_id: '',
-    secondary_participant_id: '',
-    user_postgre_metadata: {
-      UserParentClubId: '',
-      UserActivityId: ''
-    },
-    user_device_metadata: {
-      UserAppType: 0,
-      UserActionType: 0,
-      UserDeviceType: 0
-    },
+  inputObj: CreateLeagueMatchInputV1 = {
+    league_id: '',
+    participant_ids: [],
+    round: 0,
+    match_status: 1,
+    match_name: '',
+    group_id: '',
+    stage: 0,
+    match_details: '',
+    start_date: '',
+    start_time: '',
     location_id: '',
-    location_type: 0,
-    EndDate: '',
-    MatchPaymentType: 0
+    location_type: '',
+    end_date: '',
+    match_payment_type: 0,
+    member_fees: 0.00,
+    non_member_fees: 0.00,
   };
+  roundTypes: RoundTypesModel[] = [];
 
+  roundTypeInput: RoundTypeInput = {
+    parentclubId: '',
+    clubId: '',
+    activityId: '',
+    memberId: '',
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: '',
+    updated_by: ''
+  }
   numberofMatches: number;
   numberofPlayers: number;
+  matchType: string = 'singles';
+  team1Players: LeagueParticipantModel[] = [];
+  team2Players: LeagueParticipantModel[] = [];
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private alertCtrl: AlertController,
-    private loadingCtrl: LoadingController,
     public commonService: CommonService,
     public sharedservice: SharedServices,
     private graphqlService: GraphqlService,
@@ -85,12 +94,47 @@ export class AutocreatematchPage {
     this.matchTime = this.navParams.get('leagueTime');
     this.location_id = this.navParams.get('location_id');
     this.location_type = this.navParams.get('location_type');
-    this.inputObj.location_id = this.location_id;
-    this.inputObj.location_type = this.location_type;
+    
     this.min = new Date().toISOString();
     this.max = "2049-12-31";
+
+    this.roundTypeInput = new RoundTypeInput();
+    this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+    this.roundTypeInput.action_type = 0;
+    this.roundTypeInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+    this.roundTypeInput.app_type = AppType.ADMIN_NEW;
+    this.inputObj = new CreateLeagueMatchInputV1();
+    this.inputObj.parentclub_id = this.sharedservice.getPostgreParentClubId();
+    this.inputObj.activity_id = this.navParams.get('activity_id');
+    this.inputObj.updated_by = this.sharedservice.getLoggedInUserId();
+    this.inputObj.match_status = 1; // Default to public match
+    this.inputObj.location_id = this.location_id;
+    this.inputObj.location_type = this.location_type.toString();
+    this.getRoundTypes();
     this.getPlayers();
   }
+
+
+  getRoundTypes() {
+    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe((res: any) => {
+      if (res) {
+        this.roundTypes = res.data || [];
+        this.selectedRound = this.roundTypes.length > 0 ? this.roundTypes[0].id : 0; // Default to first round type
+        console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
+      } else {
+        this.commonService.hideLoader();
+        console.log("error in fetching",)
+      }
+    },(error) => {
+      console.error("Error fetching round types:", error);
+      if (error && error.error && error.error.message) {
+        this.commonService.toastMessage(error.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      } else {
+        this.commonService.toastMessage('Failed to fetch round types', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      }
+    });
+  }
+
   getPlayers() {
     const parentclubId = this.sharedservice.getPostgreParentClubId();
     const GetLeagueParticipantInput = {
@@ -105,7 +149,7 @@ export class AutocreatematchPage {
           id
           participant_name
            participant_details{
-          user_id
+           user_id
            is_child
            is_enable
            parent_id
@@ -132,9 +176,15 @@ export class AutocreatematchPage {
           isSelected: false
         }));
       },
-        (error) => {
+      (error) => {
           // this.handleError(error);
-        });
+          console.error("Error fetching league participants:", error);
+          if (error && error.error && error.error.message) {
+            this.commonService.toastMessage(error.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          } else {
+            this.commonService.toastMessage('Failed to fetch match participants', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          }
+      });
   }
 
   getSelectedPlayersCount(): number {
@@ -144,11 +194,11 @@ export class AutocreatematchPage {
 
   changeType(val) {
     this.publicType = val == 'public' ? true : false;
-    this.inputObj.MatchVisibility = val == 'private' ? 1 : 0;
+    this.inputObj.match_status = val == 'public' ? 1 : 0; // 1 for public, 0 for private
   }
 
   updateMatchPaymentType(isChecked: boolean): void {
-    this.inputObj.MatchPaymentType = isChecked ? 1 : 0;
+    this.inputObj.match_payment_type = isChecked ? 1 : 0;
   }
 
 
@@ -181,18 +231,17 @@ export class AutocreatematchPage {
     }
   }
 
-
-  resetMatch() {
-    this.navCtrl.pop();
-  }
   updateMatchCounts() {
-    // Count selected players
+    if (this.matchType === 'doubles') {
+      this.updateDoublesMatchCounts();
+      return;
+    }
+    
+    // Count selected players for singles
     const selectedPlayers = this.players.filter(player => player.isSelected);
     this.numberofPlayers = selectedPlayers.length;
 
     // Calculate number of matches
-    // For example, if each player plays against every other player once:
-    // this.numberofMatches = this.calculateNumberOfMatches(this.numberofPlayers);
     if (selectedPlayers.length >= 2) {
       this.numberofMatches = this.calculateNumberOfMatches(this.numberofPlayers);
     } else {
@@ -206,153 +255,129 @@ export class AutocreatematchPage {
     return Math.floor((numberOfPlayers * (numberOfPlayers - 1)) / 2);
   }
 
-  // async generateMatches() {
-  //   try {
-  //     const selectedPlayers = this.players.filter(player => player.isSelected);
+  resetMatch() {
+    this.navCtrl.pop();
+  }
 
-  //     if (selectedPlayers.length < 2) {
-  //       this.commonService.toastMessage(
-  //         'Please select at least 2 players',
-  //         2500,
-  //         ToastMessageType.Error,
-  //         ToastPlacement.Bottom
-  //       );
-  //       return;
-  //     }
+  onMatchTypeChange() {
+    this.team1Players = [];
+    this.team2Players = [];
+    this.players.forEach(player => player.isSelected = false);
+    this.updateMatchCounts();
+  }
 
-  //     if (!this.selectedRound) {
-  //       this.commonService.toastMessage(
-  //         'Please select a round',
-  //         2500,
-  //         ToastMessageType.Error,
-  //         ToastPlacement.Bottom
-  //       );
-  //       return;
-  //     }
+  isPlayerInTeam1(player: LeagueParticipantModel): boolean {
+    return this.team1Players.some(p => p.participant_details.user_id === player.participant_details.user_id);
+  }
 
-  //     if (!this.matchDate || !this.matchTime) {
-  //       this.commonService.toastMessage(
-  //         'Please select match date and time',
-  //         2500,
-  //         ToastMessageType.Error,
-  //         ToastPlacement.Bottom
-  //       );
-  //       return;
-  //     }
+  isPlayerInTeam2(player: LeagueParticipantModel): boolean {
+    return this.team2Players.some(p => p.participant_details.user_id === player.participant_details.user_id);
+  }
 
+  isPlayerDisabledForTeam1(player: LeagueParticipantModel): boolean {
+    return this.team1Players.length >= 2 && !this.isPlayerInTeam1(player) || this.isPlayerInTeam2(player);
+  }
 
-  //     this.isLoading = true;
-  //     this.commonService.showLoader('Generating matches...');
+  isPlayerDisabledForTeam2(player: LeagueParticipantModel): boolean {
+    return this.team2Players.length >= 2 && !this.isPlayerInTeam2(player) || this.isPlayerInTeam1(player);
+  }
 
-  //     const payload = {
-  //       leagueId: this.leagueId,
-  //       playerIds: selectedPlayers.map(player => player.participant_details.user_id),
-  //       round: Number(this.selectedRound),
-  //       isPublic: this.publicType
-  //     };
+  selectPlayerForTeam1(player: LeagueParticipantModel, event: any) {
+    if (event.checked) {
+      if (this.team1Players.length < 2 && !this.isPlayerInTeam2(player)) {
+        this.team1Players.push(player);
+      }
+    } else {
+      this.team1Players = this.team1Players.filter(p => p.participant_details.user_id !== player.participant_details.user_id);
+    }
+    this.updateDoublesMatchCounts();
+  }
 
-  //     // Using HttpClient instead of GraphQL
-  //     this.httpService.post(
-  //       'league/generate-matches',
-  //       payload
-  //     ).subscribe((res: any) => {
-  //       this.numberofPlayers = res.data.numberOfPlayers;
-  //       this.numberofMatches = res.data.numberOfMatches;
-  //       this.generatedMatches = res.data.matches.map(match => ({
-  //         ...match,
-  //         match_date: this.matchDate,
-  //         match_time: this.matchTime
-  //       }));
+  selectPlayerForTeam2(player: LeagueParticipantModel, event: any) {
+    if (event.checked) {
+      if (this.team2Players.length < 2 && !this.isPlayerInTeam1(player)) {
+        this.team2Players.push(player);
+      }
+    } else {
+      this.team2Players = this.team2Players.filter(p => p.participant_details.user_id !== player.participant_details.user_id);
+    }
+    this.updateDoublesMatchCounts();
+  }
 
-  //       this.commonService.toastMessage(
-  //         'Matches generated successfully',
-  //         2500,
-  //         ToastMessageType.Success,
-  //         ToastPlacement.Bottom
-  //       );
-  //     })
-  //   } catch (error) {
-  //     console.error('Error generating matches:', error);
-  //     this.generatedMatches = [];
-  //     this.commonService.toastMessage(
-  //       error.message || 'Failed to generate matches',
-  //       2500,
-  //       ToastMessageType.Error,
-  //       ToastPlacement.Bottom
-  //     );
-  //   } finally {
-  //     this.isLoading = false;
-  //     this.commonService.hideLoader();
-  //   }
-  // }
+  updateDoublesMatchCounts() {
+    this.numberofPlayers = this.team1Players.length + this.team2Players.length;
+    this.numberofMatches = (this.team1Players.length === 2 && this.team2Players.length === 2) ? 1 : 0;
+  }
 
 
   private isValidToCreateMatch(): boolean {
-    // return (
-    //   this.matchDate &&
-    //   this.matchTime &&
-    //   this.generatedMatches &&
-    //   this.generatedMatches.length > 0
-    // );
+    if (this.matchType === 'doubles') {
+      if (this.team1Players.length !== 2 || this.team2Players.length !== 2) {
+        this.commonService.toastMessage('Please select 2 players for each team', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+        return false;
+      }
+    } else {
+      const selectedPlayers = this.players.filter(player => player.isSelected);
+      if(!selectedPlayers || selectedPlayers.length < 2) {
+        this.commonService.toastMessage('Please select at least 2 players', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+        return false;
+      }
+    }
+    
+    if(!this.matchDate || !this.matchTime) {
+      this.commonService.toastMessage('Please select match date and time', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      return false;
+    }
+    if(!this.selectedRound || +this.selectedRound <= 0) {
+      this.commonService.toastMessage('Please select a valid round', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      return false;
+    }
+    if(this.inputObj.match_payment_type == 1 && (!this.inputObj.member_fees || this.inputObj.non_member_fees <= 0)) {
+      this.commonService.toastMessage('Please enter valid fees for members and non-members', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      return false;
+    }
 
-    const selectedPlayers = this.players.filter(player => player.isSelected);
-    return (
-      selectedPlayers.length >= 2 && // Check for selected players
-      !!this.selectedRound &&        // Check if round is selected
-      !!this.matchDate &&            // Check if date is selected
-      !!this.matchTime              // Check if time is selected
-    );
+    return true;
   }
 
 
   async createMatch() {
-    if (!this.isValidToCreateMatch()) {
-      this.commonService.toastMessage(
-        'Please select match date, time, and at least 2 players',
-        2500,
-        ToastMessageType.Error,
-        ToastPlacement.Bottom
-      );
-      return;
-    }
-
     try {
+      if(!this.isValidToCreateMatch()) {
+        this.commonService.toastMessage('Please select match date, time, and at least 2 players',2500,ToastMessageType.Error,ToastPlacement.Bottom);
+        return;
+      }
       this.commonService.showLoader('Creating matches...');
 
-      // Step 1: Generate Matches
-      const selectedPlayers = this.players.filter(player => player.isSelected);
-      const payload = {
-        leagueId: this.leagueId,
-        playerIds: selectedPlayers.map(player => player.participant_details.user_id),
-        round: Number(this.selectedRound),
-        isPublic: this.publicType,
-      };
+      
+      let selectedPlayers;
+      if (this.matchType === 'doubles') {
+        selectedPlayers = [...this.team1Players, ...this.team2Players];
+      } else {
+        selectedPlayers = this.players.filter(player => player.isSelected);
+      }
+      
+      this.inputObj.league_id = this.leagueId,
+      this.inputObj.participant_ids = selectedPlayers.map(player => player.id)
+      this.inputObj.round = Number(this.selectedRound),
+      this.inputObj.match_name = '',
+      this.inputObj.start_date = moment(new Date(this.matchDate + ' ' + this.matchTime).getTime()).format('YYYY-MM-DD'),
+      this.inputObj.start_time = moment(new Date(this.matchDate + ' ' + this.matchTime).getTime()).format('HH:mm'),
+      this.inputObj.end_date = moment(new Date(this.matchDate + ' ' + this.matchTime).getTime()).format('YYYY-MM-DD'),
+      this.inputObj.group_id = '',
+      this.inputObj.stage = this.selectedRound,
+      this.inputObj.match_details = '',
+      this.inputObj.match_payment_type = this.isChecked ? 1 : 0; //
+    
+      this.inputObj.app_type = AppType.ADMIN_NEW;
+      this.inputObj.action_type = 1; // Assuming 1 is the action type for creating matches
+      this.inputObj.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+      this.inputObj.device_id = this.sharedservice.getDeviceId() || '';
 
-      //await this.httpService.post('league/generate-matches', payload).toPromise();
-      // this.generatedMatches = generatedMatchesResponse.data.matches.map(match => ({
-      //   ...match,
-      //   match_date: this.matchDate,
-      //   match_time: this.matchTime,
-      // }));
-      // await this.httpService.post(
-      //   'league/generate-matches',
-      //   payload
-      // ).subscribe((res: any) => {
-      //   this.numberofPlayers = res.data.numberOfPlayers;
-      //   this.numberofMatches = res.data.numberOfMatches;
-      //   this.generatedMatches = res.data.matches.map(match => ({
-      //     ...match,
-      //     match_date: this.matchDate,
-      //     match_time: this.matchTime
-      //   }));
-
-
-      // })
-
-      await new Promise((resolve, reject) => {
-        this.httpService.post('league/generate-matches', payload)
-          .subscribe({
+      this.httpService.post(`${API.GENERATE_MATCHES}`, this.inputObj).subscribe({
             next: (res: any) => {
+              this.commonService.hideLoader();
+              this.commonService.toastMessage('Matches created successfully',2500,ToastMessageType.Success,ToastPlacement.Bottom);
               this.numberofPlayers = res.data.numberOfPlayers;
               this.numberofMatches = res.data.numberOfMatches;
               this.generatedMatches = res.data.matches.map(match => ({
@@ -360,173 +385,28 @@ export class AutocreatematchPage {
                 match_date: this.matchDate,
                 match_time: this.matchTime
               }));
-              resolve(true);
+              this.navCtrl.pop();
             },
             error: (error) => {
-              reject(error);
+              if (error && error.error && error.error.message) {
+                this.commonService.toastMessage(error.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+              }
+              else {
+                this.commonService.toastMessage('Failed to create matches', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+              }
+              console.error('Error creating matches:', error);
+              this.commonService.hideLoader();
             }
-          });
       });
-      // Step 2: Create Matches
-
-      if (!this.generatedMatches || this.generatedMatches.length === 0) {
-        throw new Error('No matches were generated');
-      }
-
-      const matchInputs = this.generatedMatches.map(match => {
-        const p1 = this.players.find(p => match.player1_id === p.participant_details.user_id);
-        const p2 = this.players.find(p => match.player2_id === p.participant_details.user_id);
-        return {
-          ...this.inputObj,
-          LeagueId: this.leagueId,
-          MatchName: '',
-          CreatedBy: this.sharedservice.getLoggedInId(),
-          StartDate: moment(new Date(this.matchDate + ' ' + this.matchTime).getTime()).format('YYYY-MM-DD HH:mm'),
-          primary_participant_id: p1.id,
-          secondary_participant_id: p2.id,
-          Round: Number(this.selectedRound),
-          user_postgre_metadata: {
-            UserParentClubId: this.sharedservice.getPostgreParentClubId(),
-          },
-          user_device_metadata: {
-            UserAppType: 0,
-            UserActionType: 0,
-            UserDeviceType: this.sharedservice.getPlatform() === 'android' ? 1 : 2,
-          },
-        };
-      });
-
-      const CREATE_MATCHES_MUTATION = gql`
-      mutation addBulkMatchesToLeague($createLeagueMatchesInput: [CreateLeagueMatchInput!]!) {
-        addBulkMatchesToLeague(createLeagueMatchesInput: $createLeagueMatchesInput) {
-          league {
-            id
-          }
-          match {
-            Id
-          }
-        }
-      }
-    `;
-
-      const response = await this.graphqlService.mutate(
-        CREATE_MATCHES_MUTATION,
-        { createLeagueMatchesInput: matchInputs },
-        0
-      ).toPromise();
-
-      if (response.data.addBulkMatchesToLeague) {
-        this.commonService.toastMessage(
-          'Matches created successfully',
-          2500,
-          ToastMessageType.Success,
-          ToastPlacement.Bottom
-        );
-        this.navCtrl.pop();
-      } else {
-        throw new Error('Failed to create matches');
-      }
     } catch (error) {
       console.error('Error creating matches:', error);
-      this.commonService.toastMessage(
-        error.message || 'Failed to create matches',
-        2500,
-        ToastMessageType.Error,
-        ToastPlacement.Bottom
-      );
+      this.commonService.toastMessage(error.message || 'Failed to create matches',2500,ToastMessageType.Error,ToastPlacement.Bottom);
     } finally {
       this.commonService.hideLoader();
     }
   }
 
-  // createMatch() {
-  //   if (!this.isValidToCreateMatch()) {
-  //     this.commonService.toastMessage(
-  //       'Please select match date, time and at least 2 players',
-  //       2500,
-  //       ToastMessageType.Error,
-  //       ToastPlacement.Bottom
-  //     );
-  //     return;
-  //   }
-
-  //   this.commonService.showLoader('Creating matches...');
-
-
-  //   const CREATE_MATCHES_MUTATION = gql`
-  //     mutation addBulkMatchesToLeague($createLeagueMatchesInput: [CreateLeagueMatchInput!]!) {
-  //       addBulkMatchesToLeague(createLeagueMatchesInput: $createLeagueMatchesInput) {
-  //         league {
-  //           id
-  //         }
-  //         match {
-  //           Id
-  //         }
-  //       }
-  //     }
-  //   `;
-
-  //   // Create match inputs from generated matches
-  //   const matchInputs = this.generatedMatches.map(match => {
-  //     const p1 = this.players.find(p => match.player1_id === p.participant_details.user_id);
-  //     const p2 = this.players.find(p => match.player2_id === p.participant_details.user_id);
-  //     const matchInput: CreateLeagueMatchInput = {
-  //       ...this.inputObj,
-  //       LeagueId: this.leagueId,
-  //       MatchName: '',
-  //       CreatedBy: this.sharedservice.getLoggedInId(),
-  //       StartDate: moment(new Date(this.matchDate + " " + this.matchTime).getTime()).format("YYYY-MM-DD HH:mm"),
-  //       primary_participant_id: p1.id,
-  //       secondary_participant_id: p2.id,
-  //       //Stage: 0,
-  //       Round: Number(this.selectedRound),
-  //       user_postgre_metadata: {
-  //         UserParentClubId: this.sharedservice.getPostgreParentClubId(),
-
-  //       },
-  //       user_device_metadata: {
-  //         UserAppType: 0,
-  //         UserActionType: 0,
-  //         UserDeviceType: this.sharedservice.getPlatform() == "android" ? 1 : 2
-  //       },
-
-  //     };
-  //     return matchInput;
-  //   });
-
-  //   console.log('match inputs', JSON.stringify(matchInputs));
-
-  //   // Make the GraphQL mutation call
-  //   this.graphqlService.mutate(
-  //     CREATE_MATCHES_MUTATION,
-  //     { createLeagueMatchesInput: matchInputs },
-  //     0
-  //   ).subscribe({
-  //     next: (response: any) => {
-  //       this.commonService.hideLoader();
-  //       if (response.data.addBulkMatchesToLeague) {
-  //         this.commonService.toastMessage(
-  //           'Matches created successfully',
-  //           2500,
-  //           ToastMessageType.Success,
-  //           ToastPlacement.Bottom
-  //         );
-  //         this.navCtrl.pop();
-  //       } else {
-  //         this.commonService.toastMessage(
-  //           'Failed to create matches',
-  //           2500,
-  //           ToastMessageType.Error,
-  //           ToastPlacement.Bottom
-  //         );
-  //       }
-  //     },
-  //     error: (error) => {
-  //       this.commonService.hideLoader();
-  //       // this.handleError(error);
-  //     }
-  //   });
-  // }
+  
 }
 
 
@@ -549,4 +429,6 @@ interface GenerateMatchesInput {
   round: number;
   isPublic: boolean;
 }
+
+
 

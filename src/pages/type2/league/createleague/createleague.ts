@@ -245,6 +245,7 @@ export class CreateleaguePage {
         })
   }
   getActivityList() {
+    this.commonService.showLoader("Fetching activities...");
     const club_activity_input: ClubActivityInput = {
       ParentClubKey: this.parentClubKey,
       ClubKey: this.selectedClub,
@@ -265,6 +266,7 @@ export class CreateleaguePage {
       `;
     this.graphqlService.query(clubs_activity_query, { input_obj: club_activity_input }, 0)
       .subscribe((res: any) => {
+        this.commonService.hideLoader();
         this.club_activities = res.data.getAllActivityByVenue as Activity[];
         if (this.club_activities.length > 0) {
           this.leagueCreationInput.league.activity_code = String(this.club_activities[0].ActivityCode);
@@ -273,7 +275,7 @@ export class CreateleaguePage {
         }
       },
         (error) => {
-          //this.commonService.hideLoader();
+          this.commonService.hideLoader();
           this.commonService.toastMessage("No activities found", 2500, ToastMessageType.Error)
           console.error("Error in fetching:", error);
           // Handle the error here, you can display an error message or take appropriate action.

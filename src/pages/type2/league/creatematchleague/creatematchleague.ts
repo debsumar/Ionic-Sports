@@ -1,6 +1,4 @@
 import { Component } from '@angular/core';
-import { Apollo } from 'apollo-angular';
-import { HttpLink } from 'apollo-angular-link-http';
 import {
   AlertController,
   IonicPage,
@@ -8,7 +6,6 @@ import {
   NavController,
   NavParams,
   PopoverController,
-  ToastController
 } from 'ionic-angular';
 import {
   CommonService,
@@ -21,13 +18,13 @@ import { SharedServices } from '../../../services/sharedservice';
 import moment from "moment";
 import gql from 'graphql-tag';
 import { ClubVenue } from "../models/venue.model"
-import { LeagueParticipantModel, LeaguesForParentClubModel } from '../models/league.model';
+import { LeagueParticipantModel } from '../models/league.model';
 import { CreateLeagueMatchInput, LeagueGroup, LeagueGroupInput, UserDeviceMetadataField, UserPostgreMetadataField } from '../leaguemodels/creatematchforleague.dto';
 import { GraphqlService } from '../../../../services/graphql.service';
 import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
-import { RoundTypesModel } from '../../../../shared/model/league.model';
+import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
 
 
 /**
@@ -75,16 +72,10 @@ export class CreatematchleaguePage {
     updated_by: ''
   }
 
-
-
   parentClubId: string
-
   leagueGroup: LeagueGroup[]
-
   leagueId: string
-
   matchType: string
-
   isChecked: boolean = false;
   leagueGroupInput: LeagueGroupInput = {
     ParentClubKey: '',
@@ -123,7 +114,9 @@ export class CreatematchleaguePage {
     location_id: '',
     location_type: 0,
     EndDate: '',
-    MatchPaymentType: 0
+    MatchPaymentType: 0,
+    Member_Fee: '0.00',
+    Non_Member_Fee: '0.00'
   }
 
   participantData: LeagueParticipantModel[];
@@ -139,12 +132,11 @@ export class CreatematchleaguePage {
 
   secondary_participant_id2: string
   activityId: string;
-
+  postgre_parentclub_id: string;
   constructor(
     public alertCtrl: AlertController,
     public navCtrl: NavController,
     public navParams: NavParams,
-    private apollo: Apollo,
     private httpService: HttpService,
     public commonService: CommonService,
     public loadingCtrl: LoadingController,
@@ -154,78 +146,83 @@ export class CreatematchleaguePage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private sharedService: SharedServices,
-    private toastCtrl: ToastController,) {
+    ) {
 
-    this.storage.get("userObj").then((val) => {
-      val = JSON.parse(val);
-
-      this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-      this.roundTypeInput.clubId = val.$key;
-      this.roundTypeInput.action_type = 0;
-      this.roundTypeInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
-      this.roundTypeInput.app_type = AppType.ADMIN_NEW;
-
-
-      this.getRoundTypes();
-
-    });
-
-    this.leagueId = this.navParams.get("leagueId");
-    this.location_id = this.navParams.get('location_id');
-    this.location_type = this.navParams.get('location_type');
-    console.log("location_id from navParams:", this.location_id);
-    this.inputObj.location_id = this.location_id;
-    this.inputObj.location_type = this.location_type;
-    this.leagueStartDate = this.navParams.get("leagueStartDate");
-    this.leagueEndDate = this.navParams.get("leagueEndDate");
-    console.log("league start date is:", this.leagueStartDate);
-    this.activityId = this.navParams.get("activityId");
-    console.log("activityId from navParams:", this.activityId);
+        this.leagueId = this.navParams.get("leagueId");
+        this.location_id = this.navParams.get('location_id');
+        this.location_type = this.navParams.get('location_type');
+        this.inputObj.location_id = this.location_id;
+        this.inputObj.location_type = this.location_type;
+        this.leagueStartDate = this.navParams.get("leagueStartDate");
+        this.leagueEndDate = this.navParams.get("leagueEndDate");
+        this.activityId = this.navParams.get("activityId");
+        console.log("activityId from navParams:", this.activityId);
+        //console.log("league start date is:", this.leagueStartDate);
 
 
-    // this.max = "2049-12-31";
-    this.startTime = "09:00";
-    this.endTime = "23:59"
+        // this.max = "2049-12-31";
+        this.startTime = "09:00";
+        this.endTime = "23:59"
 
-    this.parentClubId = this.sharedService.getPostgreParentClubId();
-    this.leagueGroupInput.ParentClubId = this.parentClubId;
-    this.leagueGroupInput.leagueId = this.leagueId;
-    this.inputObj.user_postgre_metadata.UserParentClubId = this.parentClubId;
-    this.inputObj.user_postgre_metadata.UserActivityId = this.activityId;
-    // console.log("inputObj after setting UserActivityId:", JSON.stringify(this.inputObj.user_postgre_metadata));
-    this.inputObj.user_device_metadata.UserActionType = 0;
-    this.inputObj.user_device_metadata.UserAppType = AppType.ADMIN_NEW;
-    this.inputObj.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+        this.parentClubId = this.sharedService.getPostgreParentClubId();
+        this.leagueGroupInput.ParentClubId = this.parentClubId;
+        this.leagueGroupInput.leagueId = this.leagueId;
+        this.inputObj.user_postgre_metadata.UserParentClubId = this.parentClubId;
+        this.inputObj.user_device_metadata.UserActionType = 0;
+        this.inputObj.user_device_metadata.UserAppType = 0;
+        this.inputObj.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2;
 
-    this.inputObj.CreatedBy = this.sharedservice.getLoggedInId();
+        this.inputObj.CreatedBy = this.sharedservice.getLoggedInId();
 
-    this.inputObj.LeagueId = this.leagueId;
+        this.inputObj.LeagueId = this.leagueId;
 
-    this.matchType = this.navParams.get("league_type_text");
+        this.matchType = this.navParams.get("league_type_text");
 
-    const inputFormat = 'DD-MMM-YYYY, ddd';
+        const inputFormat = 'DD-MMM-YYYY, ddd';
 
-    if (this.leagueStartDate) {
-      // Parse the date string using moment and format it to ISO 8601
-      this.min = moment(this.leagueStartDate, inputFormat).format('YYYY-MM-DD');
-      this.startDate = moment(this.leagueStartDate, inputFormat).format('YYYY-MM-DD');
-      this.max = this.leagueEndDate ? moment(this.leagueEndDate, inputFormat).format('YYYY-MM-DD') : moment('2049-12-31', 'YYYY-MM-DD').format('YYYY-MM-DD');
-      console.log("min date is:", this.min);
-      console.log("max date is:", this.max);
-    } else {
-      // If leagueStartDate is not valid, use the current date as the default
-      this.min = moment().format('YYYY-MM-DD');
-      this.startDate = moment().format('YYYY-MM-DD');
-    }
+        if (this.leagueStartDate) {
+          // Parse the date string using moment and format it to ISO 8601
+          this.min = moment(this.leagueStartDate, inputFormat).format('YYYY-MM-DD');
+          this.startDate = moment(this.leagueStartDate, inputFormat).format('YYYY-MM-DD');
+          this.max = this.leagueEndDate ? moment(this.leagueEndDate, inputFormat).format('YYYY-MM-DD') : moment('2049-12-31', 'YYYY-MM-DD').format('YYYY-MM-DD');
+          
+        } else {
+          // If leagueStartDate is not valid, use the current date as the default
+          this.min = moment().format('YYYY-MM-DD');
+          this.startDate = moment().format('YYYY-MM-DD');
+        }
+
+        this.getLoggedInData();
+        this.getParticipants();
+
+  }
 
 
-
-
-
-    this.getParticipants();
-    //  this.getLocationForParentClub();
-
-    // this.getLeagueGroups();
+  async getLoggedInData() {
+     const [login_obj,postgre_parentclub] = await Promise.all([
+          this.storage.get('userObj'),
+          this.storage.get('postgre_parentclub'),
+      ])
+    
+        if(login_obj) {
+          this.parentClubKey = JSON.parse(login_obj).UserInfo[0].ParentClubKey;
+          const val = JSON.parse(login_obj);
+          this.roundTypeInput = new RoundTypeInput();
+          this.roundTypeInput.updated_by = this.sharedservice.getLoggedInUserId();
+          this.roundTypeInput.device_id = this.sharedservice.getDeviceId() || ""; 
+          this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+          this.roundTypeInput.clubId = val.$key;
+          this.roundTypeInput.action_type = 0;
+          this.roundTypeInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+          this.roundTypeInput.app_type = AppType.ADMIN_NEW;
+          this.getRoundTypes();
+        }
+        if(postgre_parentclub){
+           this.postgre_parentclub_id = postgre_parentclub.Id
+           console.log("parentclubid is:", this.postgre_parentclub_id);
+           this.getClubVenues();
+        }    
+        
   }
 
 
@@ -243,48 +240,41 @@ export class CreatematchleaguePage {
   }
 
 
-
-  getClubVenues = () => {
-    this.commonService.showLoader("Please wait...");
-    const clubVenuesQuery = gql`
-      query getAllClubVenues($ParentClub: String!) {
-        getAllClubVenues(ParentClub: $ParentClub) {
-         
-          ClubName
-          ClubKey
-          LocationType
+  getClubVenues() {
+      const clubs_input = {
+        parentclub_id:this.postgre_parentclub_id,
+        user_postgre_metadata:{
+          UserMemberId:this.sharedservice.getLoggedInUserId()
+        },
+        user_device_metadata:{
+          UserAppType:0,
+          UserDeviceType:this.sharedservice.getPlatform() == "android" ? 1:2
         }
       }
-    `;
-    this.apollo
-      .query({
-        query: clubVenuesQuery,
-        fetchPolicy: "network-only",
-        variables: { ParentClub: "-KuAlAWygfsQX9t_RqNZ" },
-      })
-      .subscribe(
-        ({ data }) => {
-          this.commonService.hideLoader();
-          console.log(
-            "Clubs  data" + JSON.stringify(data["getAllClubVenues"])
-          );
-          this.commonService.hideLoader();
-          this.clubVenues = data["getAllClubVenues"];
-          if (this.clubVenues.length > 0) {
-            // this.inputObj.ClubKey = this.clubVenues[0].ClubKey;
-            // this.leagueCreationInput.league.venueType = this.clubVenues[0].LocationType;
+      const clubs_query = gql`
+          query getVenuesByParentClub($clubs_input: ParentClubVenuesInput!){
+            getVenuesByParentClub(clubInput:$clubs_input){
+                  Id
+                  ClubName
+                  FirebaseId
+                  MapUrl
+                  sequence
+              }
           }
-        },
-        (err) => {
-          this.commonService.toastMessage(
-            "Club venue fetch failed",
-            2500,
-            ToastMessageType.Error,
-            ToastPlacement.Bottom
-          );
-        }
-      );
-  };
+          `;
+          this.graphqlService.query(clubs_query,{clubs_input: clubs_input},0)
+              .subscribe((res: any) => {
+                this.clubVenues = res.data.getVenuesByParentClub;
+                //console.log("clubs lists:", JSON.stringify(this.clubs));
+                //this.selectedClub = this.clubs[0].FirebaseId;
+                
+              },
+             (error) => {
+                  //this.commonService.hideLoader();
+                  console.error("Error in fetching:", error);
+                 // Handle the error here, you can display an error message or take appropriate action.
+          });            
+  }
 
 
   //this api will give all the location available for parentclub
@@ -480,27 +470,32 @@ export class CreatematchleaguePage {
 
   validateInput() {
     if (this.startTime == "" || this.startTime == undefined) {
-      let message = "Please enter a valid start date";
+      const message = "Please enter a valid start date";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
     }
-
-    if (!this.activityId || this.activityId === "") {
-      let message = "Activity ID is missing. Please try again.";
+    else if (this.inputObj.MatchName == "" || this.inputObj.MatchName == undefined) {
+      let message = "Please enter match title";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
     }
-
-    // else if (this.inputObj.MatchName == "" || this.inputObj.MatchName == undefined) {
-    //   let message = "Please enter match name";
-    //   this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
-    //   return false;
-    // }
     //  if(this.inputObj.location_id==""||this.inputObj.location_id==undefined){
     //   let message="Please select location";
     //   this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
     //   return false;
     // }
+
+     else if ((this.inputObj.MatchPaymentType == 1) && (parseFloat(this.inputObj.Member_Fee) <= 0 || this.inputObj.Member_Fee == undefined || this.inputObj.Member_Fee == '0.00')) {
+      const message = "Enter member fee";
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
+      return false;
+    }
+     else if ((this.inputObj.MatchPaymentType == 1) && (parseFloat(this.inputObj.Non_Member_Fee) <= 0 || this.inputObj.Non_Member_Fee == undefined || this.inputObj.Non_Member_Fee == '0.00')) {
+      const message = "Enter member fee";
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
+      return false;
+    }
+
     return true;
   }
 
@@ -539,16 +534,20 @@ export class CreatematchleaguePage {
 
         this.inputObj.Round = Number(this.inputObj.Round);
 
+        if (this.inputObj.MatchPaymentType!= 1) {
+          this.inputObj.Member_Fee = "0.00";
+          this.inputObj.Non_Member_Fee = "0.00";
+        } 
+
         // this.inputObj.StartDate = moment(new Date(this.startDate + " " + this.startTime).getTime()).format("YYYY-MM-DD HH:mm");
         this.inputObj.StartDate = this.startDate + " " + this.startTime;
         // this.inputObj.StartDate = new Date(this.startDate + " " + this.startTime).toISOString(); //iso date string if needed uncomment this line
 
         this.inputObj.EndDate = this.startDate + " " + this.endTime;
 
-        console.log('Final inputObj before API call:', JSON.stringify(this.inputObj));
-        console.log('input date is:', this.inputObj.EndDate);
-        console.log(new Date(this.startDate + " " + this.startTime).getTime());
-        this.commonService.showLoader("Creating...");
+        // console.log('input date is:', this.inputObj.EndDate);
+        // console.log(new Date(this.startDate + " " + this.startTime).getTime());
+        this.commonService.showLoader("Creating Match...");
         const createLeagueMutation = gql`
         mutation addMatchToLeague($createLeagueMatchInput: CreateLeagueMatchInput!) {
           addMatchToLeague(createLeagueMatchInput: $createLeagueMatchInput){
@@ -586,14 +585,3 @@ export class CreatematchleaguePage {
 
 }
 
-export class RoundTypeInput {
-  parentclubId: string;
-  clubId: string;
-  activityId: string;
-  memberId: string;
-  action_type: number;
-  device_type: number;
-  app_type: number;
-  device_id: string;
-  updated_by: string;
-}
