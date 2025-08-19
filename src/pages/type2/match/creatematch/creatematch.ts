@@ -233,10 +233,9 @@ export class CreatematchPage {
         `;
     this.graphqlService.query(clubs_query, { clubs_input: clubs_input }, 0)
       .subscribe((res: any) => {
+        this.clubs = res.data.getVenuesByParentClub || [];
         if (this.clubs.length > 0) {
           this.selectedClub = this.clubs[0].Id;
-          //  this.selectedClub = this.clubs[0].FirebaseId; // Set default selected club
-          //this.getActivityList(); // Fetch the activities for the default club
           this.getClubActivity();
         }
 
