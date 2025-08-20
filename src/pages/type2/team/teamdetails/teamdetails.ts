@@ -719,7 +719,11 @@ export class TeamdetailsPage {
   }
 
   updateroleforstaffPage(staff) {
-    this.navCtrl.push("UpdateroleforstaffPage", { "team": this.team, "staffId": staff.id });
+    this.navCtrl.push("UpdateroleforstaffPage", { 
+      "team": this.team, 
+      "staffId": staff.id,
+      "currentRole": staff.role 
+    });
   }
 
   // getProfile() {
@@ -826,7 +830,11 @@ export class TeamdetailsPage {
   //for update role
   addRoleforPlayerandStaff(member) {
     console.log("TEAM OBJ is", this.team);
-    this.navCtrl.push("AddroleforplayernstaffPage", { "team": this.team, "memberId": member.id });
+    this.navCtrl.push("AddroleforplayernstaffPage", { 
+      "team": this.team, 
+      "memberId": member.id,
+      "currentRole": member.teamrole 
+    });
   }
 
 
