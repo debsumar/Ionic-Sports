@@ -1,5 +1,6 @@
 
 export const API = {
+    GET_PARENTCLUB_USER_BY_FIREBASEID: `parentclubuser/by_firebase_loggedinkey`,
     CAMP_SESSION_CAPACITY_UPDATE: `holidaycamp/updateSessionCapcity`,
     CHECK_STRIPE_AVAILABILITY: `payment/stripe_availability`,
     GET_PARENTCLUB_STRIPES: `payment/paerntclub_stripe_accounts`,
@@ -86,7 +87,7 @@ export const API = {
     Get_League_Participant_For_Match: `league/GetLeagueParticipantForMatch`,
     Update_League_Fixture: `league/UpdateLeagueFixture`,
     Get_League_Match_Participant: `league/GetLeagueMatchParticipant`,
-    Update_League_Match_Participation_Status: `league/UpdateLeagueMatchParticipationStatus⁠`,
+    Update_League_Match_Participation_Status: `league/UpdateLeagueMatchParticipationStatus`,
     Update_League_Match_Participantipation_Role: `league/update_league_match_participant_role`,
     Get_Round_Types: `league/getRoundTypes`,
     GENERATE_MATCHES: `league/generate-matches`,

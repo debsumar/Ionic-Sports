@@ -68,7 +68,7 @@ export interface PublishLeagueResultForActivitiesInput {
   device_id: string;
   updated_by: string;
   created_by: string;
-  activityCode: string;
+  activityCode: number;
   leaguefixtureId: string;
   homeLeagueParticipationId: string;
   awayLeagueParticipationId: string;
@@ -161,24 +161,31 @@ export interface TennisSectionModel {
   HOME_TEAM?: TennisTeamStatsModel;
   AWAY_TEAM?: TennisTeamStatsModel;
   SET_SCORES?: TennisSetScoreModel[];
+  RESULT?: TennisResultStatsModel;
+}
+
+export interface TennisResultStatsModel {
+  DESCRIPTION: string;
+  WINNER_ID: string;
+  RESULT_STATUS: string;
 }
 
 export interface TennisTeamStatsModel {
   IS_WINNER?: boolean;
-  NAME?: string;
+  TEAM_NAME?: string;
   TEAM_ID?: string;
-  SETS_WON?: number;
-  GAMES_WON?: number;
-  ACES?: number;
-  DOUBLE_FAULTS?: number;
+  SETS_WON?: string;
+  GAMES_WON?: string;
+  ACES?: string;
+  DOUBLE_FAULTS?: string;
   FIRST_SERVE_PERCENTAGE?: string;
-  WINNERS?: number;
-  UNFORCED_ERRORS?: number;
-  BREAK_POINTS_WON?: number;
+  WINNERS?: string;
+  UNFORCED_ERRORS?: string;
+  BREAK_POINTS_WON?: string;
 }
 
 export interface TennisSetScoreModel {
-  SET_NUMBER?: number;
+  SET_NUMBER?: string;
   SCORE?: string;
   WINNER?: string;
 }
@@ -190,6 +197,7 @@ export interface TennisResultModel {
   HOME_TEAM?: TennisTeamStatsModel;
   AWAY_TEAM?: TennisTeamStatsModel;
   SET_SCORES?: TennisSetScoreModel[];
+
 }
 
 // ===== CRICKET MODELS =====

@@ -366,3 +366,4 @@ this.sharedService.getUserData();
 - Use emoji comments: `// 🏢 Parent club ID`
 - Cache frequently accessed data
 - Validate all user inputs
+- **NO OPTIONAL CHAINING**: Avoid using optional chaining (`?.`) - use explicit null checks instead

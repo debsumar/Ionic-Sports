@@ -22,6 +22,16 @@
 
   <ion-list>
     <ion-item>
+      <ion-label>Match Title</ion-label>
+      <ion-input type="text" [(ngModel)]="createMatchInput.MatchTitle"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Venue</ion-label>
+      <ion-select (ionChange)="onChangeOfClub()" [(ngModel)]="selectedClub">
+        <ion-option *ngFor="let club of clubs" value="{{club.Id}}">{{club.ClubName}}</ion-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
       <ion-label>Activity</ion-label>
       <ion-select [(ngModel)]="activityId">
         <ion-option *ngFor="let type of activities" value="{{type.id}}">{{type.activity_name}}</ion-option>
@@ -47,18 +57,10 @@
         [max]="maxDate"></ion-datetime>
     </ion-item>
 
-
     <ion-item>
       <ion-label>Time</ion-label>
       <ion-datetime displayFormat="hh mm A" pickerFormat="hh mm A" minuteValues="0,10,20,30,40,50,60"
         [(ngModel)]="startTime"></ion-datetime>
-    </ion-item>
-
-    <ion-item>
-      <ion-label>Venue</ion-label>
-      <ion-select (ionChange)="onChangeOfClub()" [(ngModel)]="selectedClub">
-        <ion-option *ngFor="let club of clubs" value="{{club.Id}}">{{club.ClubName}}</ion-option>
-      </ion-select>
     </ion-item>
 
     <ion-item>
@@ -71,12 +73,6 @@
         <!-- <ion-option value="hawaii">Ladies</ion-option> -->
       </ion-select>
     </ion-item>
-
-    <ion-item>
-      <ion-label>Match Title</ion-label>
-      <ion-input type="text" [(ngModel)]="createMatchInput.MatchTitle"></ion-input>
-    </ion-item>
-
 
     <ion-item>
       <ion-row>
@@ -97,15 +93,13 @@
         </ion-col>
       </ion-row>
     </ion-item>
+
     <ion-item>
       <ion-row>
         <ion-col col-12 no-padding class="flex_col">
           <p class="toggle_para">Paid</p>
           <label class="toggle">
-            <input type="checkbox" 
-            [(ngModel)]="isChecked" 
-            (ngModelChange)="updateMatchPaymentType($event)"
-            >
+            <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
             <span data-unchecked="No" data-checked="Yes"></span>
           </label>
         </ion-col>
@@ -117,22 +111,16 @@
         <span *ngIf="currency != undefined">({{currency}})</span>
       </ion-label>
       <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
-        [(ngModel)]="createMatchInput.MemberFees" [value]="createMatchInput.MemberFees || '0.00'"></ion-input>
+        [(ngModel)]="createMatchInput.MemberFees"></ion-input>
     </ion-item>
 
     <ion-item *ngIf="this.createMatchInput.MatchPaymentType==1" class="allign-right">
       <ion-label>Non Member Fee
         <span *ngIf="currency != undefined">({{currency}})</span>
       </ion-label>
-      <ion-input type="number" class="textareastyle" 
-        [(ngModel)]="createMatchInput.NonMemberFees" [value]="createMatchInput.NonMemberFees || '0.00'"></ion-input>
+      <ion-input type="number" class="textareastyle" [(ngModel)]="createMatchInput.NonMemberFees"></ion-input>
     </ion-item>
   </ion-list>
-
-
-
-
-
 
   <ion-item>
     <!-- <ion-label floating style="padding-left: 10px">Match Description</ion-label> -->

@@ -169,7 +169,7 @@ export class SummaryFootballPage implements AfterViewInit {
     device_id: '',
     updated_by: '',
     created_by: '',
-    activityCode: '',
+    activityCode: 0,
     leaguefixtureId: '',
     homeLeagueParticipationId: '',
     awayLeagueParticipationId: '',
@@ -1294,7 +1294,7 @@ export class SummaryFootballPage implements AfterViewInit {
         updated_by: memberId,
         created_by: memberId,
         activityId: this.activityId,
-        activityCode: this.activityCode.toString(),
+        activityCode: this.activityCode,
         leaguefixtureId: leaguefixtureId,
       };
     } catch (error) {
@@ -1313,7 +1313,7 @@ export class SummaryFootballPage implements AfterViewInit {
         updated_by: '',
         created_by: '',
         activityId: '',
-        activityCode: '',
+        activityCode: 0,
         leaguefixtureId: '',
       };
     }

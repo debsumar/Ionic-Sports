@@ -656,8 +656,8 @@ export class TeamdetailsPage {
   //**c.Staff Can Remove ***/
   removeStaff(staffid) {
     let confirm = this.alertCtrl.create({
-      title: 'Delete Staff',
-      message: 'Are you sure you want to delete the staff? ',
+      title: 'Remove Staff',
+      message: 'Are you sure you want to remove the staff? ',
       buttons: [
         {
           text: 'No',
@@ -719,10 +719,10 @@ export class TeamdetailsPage {
   }
 
   updateroleforstaffPage(staff) {
-    this.navCtrl.push("UpdateroleforstaffPage", { 
-      "team": this.team, 
+    this.navCtrl.push("UpdateroleforstaffPage", {
+      "team": this.team,
       "staffId": staff.id,
-      "currentRole": staff.role 
+      "currentRole": staff.role
     });
   }
 
@@ -830,10 +830,10 @@ export class TeamdetailsPage {
   //for update role
   addRoleforPlayerandStaff(member) {
     console.log("TEAM OBJ is", this.team);
-    this.navCtrl.push("AddroleforplayernstaffPage", { 
-      "team": this.team, 
+    this.navCtrl.push("AddroleforplayernstaffPage", {
+      "team": this.team,
       "memberId": member.id,
-      "currentRole": member.teamrole 
+      "currentRole": member.teamrole
     });
   }
 

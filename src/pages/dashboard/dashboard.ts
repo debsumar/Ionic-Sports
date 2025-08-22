@@ -143,73 +143,70 @@ export class Dashboard {
   ionViewDidLoad() {
     this.sharedService.setThemeType(2);
     this.isIOS = this.plt.is("ios");
-    this.getLanguage();
-    this.events.subscribe("language", (res) => {
-      this.getLanguage();
-    });
-    // this.langService.getLanguageData().subscribe((res)=>{
-    //   this.LangObj = res;
-    // });
-
-
-
-
-    //console.log(this.LangObj.Dashboard);
-    this.storage.get("isAppAdminLogin").then((val) => {
-      this.isAppAdminLoggedin = val ? val : false;
-    });
-
     this.nodeUrl = this.sharedService.getnodeURL();
     this.userData = this.sharedService.getUserData();
     this.nesturl = this.sharedService.getnestURL();
-    //this.getParentClubImage();
-    console.log(this.userData);
+
     this.checkDeviceToken();
     this.commonService.screening("DashBoard");
     this.getCurrencyDetials();
-
     this.getParentClubDetails();
     this.getFooterMenus();
     this.authenticate();
-    this.storage.get("LoginWhen").then((when) => {
-      if (when == "first" && this.userData != undefined) {
-        //this.getSessionDetails();
-        //this.getSchoolSessionDetails()
-        //this.getHolidayCampDetails();
-        //this.getSchoolSessionEnrolDets();
-        this.getMemberDetails();
-        this.getPostgreParentclub();
-        // this.getactivebookingDetails();
-        //this.getCoachDetails();
-        this.getEvents();
-        this.storage.set("LoginWhen", "notFirst");
-      }
-    });
 
-    this.storage
-      .get("dashboard_latest_refresh")
-      .then((time) => {
-        let dt1 = new Date().getMinutes();
-        let dt2 = new Date(time).getMinutes();
-        let diff = dt1 - dt2;
-        console.log(diff);
-        if (diff >= 1) {
-          if (this.userData != undefined) {
+    // Use Promise.all to handle all storage operations in parallel
+    Promise.all([
+      this.storage.get("language"),
+      this.storage.get("isAppAdminLogin"),
+      this.storage.get("LoginWhen"),
+      this.storage.get("dashboard_latest_refresh")
+    ])
+      .then(([language, isAppAdmin, loginWhen, lastRefresh]) => {
+        // Handle language data
+        if (language && language.data) {
+          this.LangObj = language.data;
+        }
+
+        // Handle admin login status
+        this.isAppAdminLoggedin = isAppAdmin || false;
+
+        // Handle first login actions
+        if (loginWhen === "first" && this.userData) {
+          this.getMemberDetails();
+          this.getPostgreParentclub();
+          this.storage.set("LoginWhen", "notFirst");
+        }
+
+        // Handle refresh timing
+        if (lastRefresh) {
+          const dt1 = new Date().getMinutes();
+          const dt2 = new Date(lastRefresh).getMinutes();
+          const diff = dt1 - dt2;
+
+          if (diff >= 1 && this.userData) {
             this.getSessionDetails();
-            //this.getHolidayCampDetails();
             this.getTermSessionEnrolDetails();
-            //this.getSchoolSessionEnrolDets();
             this.getMemberDetails();
             this.getPostgreParentclub();
-            //this.getactivebookingDetails();
             this.getCoachDetails();
             this.getEvents();
           }
+        } else if (this.userData) {
+          // If no last refresh time, fetch data anyway
+          this.getSessionDetails();
+          this.getTermSessionEnrolDetails();
+          this.getMemberDetails();
+          this.getPostgreParentclub();
+          this.getCoachDetails();
+          this.getEvents();
         }
       })
-      .catch((error) => {
-        console.log(error);
+      .catch(error => {
+        console.error("Error loading dashboard data:", error);
       });
+
+    // Subscribe to language changes
+    this.events.subscribe("language", () => this.getLanguage());
   }
 
   getCoachIdsByFirebaseKeys(coach_ids): Promise<any> {
@@ -350,144 +347,105 @@ export class Dashboard {
   //navigate to inbox page
   gotoInbox() {
     // this.navCtrl.push('PostPage');
-    // this.navCtrl.push("AdmingroupchatPage");
-    this.navCtrl.push("AskMePage");
+    this.navCtrl.push("AdmingroupchatPage");
   }
 
   user: any;
   ionViewWillEnter() {
-    this.storage.get("isLogin").then((val) => {
-      if (val == true) {
-        this.storage.get("userObj").then(async (val) => {
-          this.user = JSON.parse(val);
+    // Handle login and user data first (needs to be sequential due to await)
+    this.storage.get("isLogin").then(async (isLoggedIn) => {
+      if (isLoggedIn === true) {
+        try {
+          const userObjStr = await this.storage.get("userObj");
+          this.user = JSON.parse(userObjStr);
           this.sharedService.setLoggedInId(this.user.$key);
           this.sharedService.setParentclubKey(this.user.UserInfo[0].ParentClubKey);
-          if (this.user.RoleType == "4" && this.user.UserType == "2") {
+
+          if (this.user.RoleType === "4" && this.user.UserType === "2") {
             this.sharedService.setLoggedInType(BookingMemberType.COACH);
-            if (this.user.$key != "") {
+            if (this.user.$key !== "") {
               const coach_obj = await this.getCoachIdsByFirebaseKeys([this.user.UserInfo[0].CoachKey]);
               this.sharedService.setCanCoachSeeRevenue(coach_obj.is_show_revenue);
               this.showPendingPayments = coach_obj.is_show_revenue;
             }
           }
-        }).catch((err) => { });
+        } catch (err) {
+          console.error("Error processing user data:", err);
+        }
       }
     });
 
-    this.storage.get("postgre_parentclub").then((data) => {
-      if (data != null && data != undefined) {
-        this.sharedService.setPostgreParentClubId(data.Id);
-      } else {
-        this.getPostgreParentclub();
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
-    this.storage.get("sessionDetails").then((data) => {
-      if (data != null) {
-        this.sessionDetails = data;
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
+    // Load all other storage data in parallel
+    Promise.all([
+      this.storage.get("postgre_parentclub"),
+      this.storage.get("sessionDetails"),
+      this.storage.get("session_enroldets"),
+      this.storage.get("scl_session_enroldets"),
+      this.storage.get("monthly_session_enroldets"),
+      this.storage.get("memberDetails"),
+      this.storage.get("coachDetails"),
+      this.storage.get("activeBookingsCount"),
+      this.storage.get("eventDetails"),
+      this.storage.get("loggedin_user")
+    ])
+      .then(([parentClub, sessionDetails, sessionEnrolDets, sclSessionEnrolDets,
+        monthlySessionEnrolDets, memberDetails, coachDetails, activeBookings, eventDetails, loggedinuser]) => {
 
-    this.storage.get("sessionDetails").then((data) => {
-      if (data != null) {
-        this.schoolSessionDetails = data;
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
+        if (loggedinuser) {
+          const loggedin_user_info = JSON.parse(loggedinuser);
+          this.sharedService.setLoggedInUserId(loggedin_user_info.id);
+        }
 
-    this.storage.get("session_enroldets").then((data) => {
-      if (data != null) {
-        this.sessionEnrolDetails = data;
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
+        // Handle parent club data
+        if (parentClub != null && parentClub != undefined) {
+          this.sharedService.setPostgreParentClubId(parentClub.Id);
+        } else {
+          this.getPostgreParentclub();
+        }
 
-    this.storage.get("scl_session_enroldets").then((data) => {
-      if (data != null) {
-        this.sclSessionEnrolDetails = data;
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
+        // Handle session details
+        if (sessionDetails != null) {
+          this.sessionDetails = sessionDetails;
+          this.schoolSessionDetails = sessionDetails; // Both use the same data source
+        }
 
-    this.storage.get("monthly_session_enroldets").then((data) => {
-      if (data != null) {
-        this.monthlySessionEnrolDetails = data;
-      }
-    }).catch((error) => {
-      console.log(error);
-    });
+        // Handle session enrollment details
+        if (sessionEnrolDets != null) {
+          this.sessionEnrolDetails = sessionEnrolDets;
+        }
 
-    // this.storage.get("holidayCampDetails")
-    // .then((data) => {
-    //     if (data != null) {
-    //       this.holidayCampDetails = data;
-    //     }
-    // }).catch((error) => {
-    //     console.log(error);
-    // });
-    // this.storage.get("sclSessionDetails")
-    //   .then((data) => {
-    //     if (data != null) {
-    //       this.schoolSessionDetails = data;
-    //     }
-    // })
-    // .catch((error) => {
-    //     console.log(error);
-    // });
+        // Handle school session enrollment details
+        if (sclSessionEnrolDets != null) {
+          this.sclSessionEnrolDetails = sclSessionEnrolDets;
+        }
 
-    this.storage.get("memberDetails")
-      .then((data) => {
-        if (data != null) {
-          this.memberDetails = data;
+        // Handle monthly session enrollment details
+        if (monthlySessionEnrolDets != null) {
+          this.monthlySessionEnrolDetails = monthlySessionEnrolDets;
+        }
+
+        // Handle member details
+        if (memberDetails != null) {
+          this.memberDetails = memberDetails;
+        }
+
+        // Handle coach details
+        if (coachDetails != null) {
+          this.coachDetails = coachDetails;
+        }
+
+        // Handle active bookings
+        if (activeBookings != null) {
+          this.bookingInfo = activeBookings;
+        }
+
+        // Handle event details
+        if (eventDetails != null) {
+          this.EventObj = eventDetails;
         }
       })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    this.storage.get("coachDetails")
-      .then((data) => {
-        if (data != null) {
-          this.coachDetails = data;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    this.storage.get("activeBookingsCount")
-      .then((data) => {
-        if (data != null) {
-          this.bookingInfo = data;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-
-    this.storage.get("eventDetails")
-      .then((data) => {
-        if (data != null) {
-          this.EventObj = {
-            TotalEvents: 0,
-            TotalEnrolled: 0,
-            TotRevenue: "0.00",
-            TotFreeEvents: 0,
-            TotPaidEventd: 0,
-            TicketsSold: 0,
-          };
-          this.EventObj = data;
-          //this.Events.length = this.EventObj.TotalEvents;
-        }
-      })
-      .catch((error) => {
-        console.log(error);
+      .catch(error => {
+        console.error("Error loading dashboard cached data:", error);
       });
   }
 

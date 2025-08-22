@@ -5,7 +5,10 @@ import { HttpService } from '../../../../../services/http.service';
 import { API } from '../../../../../shared/constants/api_constants';
 import { SharedServices } from '../../../../services/sharedservice';
 import { AppType } from '../../../../../shared/constants/module.constants';
-import { ResultStatusModel } from '../../models/league.model';
+import { LeagueParticipationForMatchModel, ResultStatusModel } from '../../models/league.model';
+import { LeagueMatch } from '../../models/location.model';
+import { AllMatchData } from '../../../../../shared/model/match.model';
+import { TeamsForParentClubModel } from '../../models/team.model';
 
 @IonicPage()
 @Component({
@@ -14,9 +17,14 @@ import { ResultStatusModel } from '../../models/league.model';
   providers: [HttpService]
 })
 export class TennisResultInputPage {
-  matchObj: any;
-  homeTeamObj: any;
-  awayTeamObj: any;
+  homeTeamObj: LeagueParticipationForMatchModel;
+  awayTeamObj: LeagueParticipationForMatchModel;
+  matchObj: LeagueMatch;
+
+  // Match flow properties
+  matchTeamObj: AllMatchData;
+  hometeamMatchObj: TeamsForParentClubModel;
+  awayteamMatchObj: TeamsForParentClubModel;
   result_json: any;
   selectedWinner: string = "";
   resultStatus: string = "1";
@@ -24,13 +32,15 @@ export class TennisResultInputPage {
   awaySetsWon: number = 0;
   homeGamesWon: number = 0;
   awayGamesWon: number = 0;
-  
+
   resultStatusList: ResultStatusModel[] = [];
   selectedResultStatus: ResultStatusModel | null = null;
   isLoadingStatuses: boolean = false;
   activityId: string;
   activityCode: number;
   getResultStatusByActivityInput: any = {};
+  isLeague: boolean = false;
+
 
   constructor(
     public navCtrl: NavController,
@@ -40,13 +50,22 @@ export class TennisResultInputPage {
     public sharedservice: SharedServices,
     public viewCtrl: ViewController
   ) {
-    this.matchObj = this.navParams.get('matchObj');
-    this.homeTeamObj = this.navParams.get('homeTeamObj');
-    this.awayTeamObj = this.navParams.get('awayTeamObj');
+    this.isLeague = this.navParams.get("isLeague") || false;
     this.result_json = this.navParams.get('result_json') || {};
     this.activityId = this.navParams.get('activityId');
     this.activityCode = this.navParams.get('activityCode');
-    
+    if (this.isLeague) {
+      // League flow initialization
+      this.matchObj = this.navParams.get("matchObj");
+      this.homeTeamObj = this.navParams.get("homeTeamObj");
+      this.awayTeamObj = this.navParams.get("awayTeamObj");
+    } else {
+      // Match flow initialization
+      this.matchTeamObj = this.navParams.get("matchObj");
+      this.hometeamMatchObj = this.navParams.get("homeTeamObj");
+      this.awayteamMatchObj = this.navParams.get("awayTeamObj");
+    }
+
     this.initializeValues();
     this.initializeResultStatusInput();
     this.getResultStatusByActivity();
@@ -57,12 +76,12 @@ export class TennisResultInputPage {
       this.selectedWinner = this.result_json.RESULT.WINNER_ID || "";
       this.resultStatus = this.result_json.RESULT.RESULT_STATUS || "1";
     }
-    
+
     if (this.result_json.HOME_TEAM) {
       this.homeSetsWon = parseInt(this.result_json.HOME_TEAM.SETS_WON) || 0;
       this.homeGamesWon = parseInt(this.result_json.HOME_TEAM.GAMES_WON) || 0;
     }
-    
+
     if (this.result_json.AWAY_TEAM) {
       this.awaySetsWon = parseInt(this.result_json.AWAY_TEAM.SETS_WON) || 0;
       this.awayGamesWon = parseInt(this.result_json.AWAY_TEAM.GAMES_WON) || 0;
@@ -165,7 +184,7 @@ export class TennisResultInputPage {
 
       const winnerSets = this.selectedWinner === (this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.id) ? this.homeSetsWon : this.awaySetsWon;
       const loserSets = this.selectedWinner === (this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.id) ? this.awaySetsWon : this.homeSetsWon;
-      
+
       if (winnerSets <= loserSets) {
         this.commonService.toastMessage('Winner must have won more sets than the loser', 3000, ToastMessageType.Error);
         return false;

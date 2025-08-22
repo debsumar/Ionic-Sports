@@ -11,7 +11,7 @@ import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { error } from "console";
 import { AllMatchData, GetIndividualMatchParticipantModel, MatchModelV2, } from "../../../../shared/model/match.model";
-import { LeagueMatchActionType, MatchType, LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus } from "../../../../shared/utility/enums";
+import { LeagueMatchActionType, MatchType, LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus, ActivityTypeEnum } from "../../../../shared/utility/enums";
 import { API } from "../../../../shared/constants/api_constants";
 import { HttpService } from "../../../../services/http.service";
 import { AppType } from "../../../../shared/constants/module.constants";
@@ -237,78 +237,22 @@ export class MatchTeamDetailsPage {
       }
     });
   }
-  // publish() {
-  //   this.closeFab();
 
-  //   // Validate that teams are selected
-  //   if (this.selectedHomeTeamText === 'Home Team' || this.selectedAwayTeamText === 'Away Team') {
-  //     this.commonService.toastMessage('Select Home and Away Teams', 3000, ToastMessageType.Info);
-  //     return;
-  //   }
-
-  //   // Find the team objects by matching team IDs instead of names
-  //   let homeTeam: GetIndividualMatchParticipantModel | undefined;
-  //   let awayTeam: GetIndividualMatchParticipantModel | undefined;
-
-  //   // First try to find teams by team name
-  //   homeTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedHomeTeamText);
-  //   awayTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.teamName === this.selectedAwayTeamText);
-
-  //   // If not found by name, try to find by team ID from match object
-  //   if (!homeTeam && this.match.homeUserId) {
-  //     homeTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.id === this.match.homeUserId);
-  //   }
-
-  //   if (!awayTeam && this.match.awayUserId) {
-  //     awayTeam = this.getIndividualMatchParticipantRes.find(team => team.Team.id === this.match.awayUserId);
-  //   }
-
-  //   // If still not found, get the first two different teams from participants
-  //   if (!homeTeam || !awayTeam) {
-  //     const uniqueTeams = this.getIndividualMatchParticipantRes.reduce((teams, participant) => {
-  //       if (!teams.find(t => t.Team.id === participant.Team.id)) {
-  //         teams.push(participant);
-  //       }
-  //       return teams;
-  //     }, [] as GetIndividualMatchParticipantModel[]);
-
-  //     if (uniqueTeams.length >= 2) {
-  //       homeTeam = homeTeam || uniqueTeams[0];
-  //       awayTeam = awayTeam || uniqueTeams[1];
-  //     }
-  //   }
-
-  //   // Validate that teams were found
-  //   if (!homeTeam) {
-  //     this.commonService.toastMessage('Home team not found in participants. Please ensure teams are properly set up.', 3000, ToastMessageType.Error);
-  //     return;
-  //   }
-
-  //   if (!awayTeam) {
-  //     this.commonService.toastMessage('Away team not found in participants. Please ensure teams are properly set up.', 3000, ToastMessageType.Error);
-  //     return;
-  //   }
-
-  //   // Validate that teams are different
-  //   if (homeTeam.Team.id === awayTeam.Team.id) {
-  //     this.commonService.toastMessage('Home and away teams must be different', 3000, ToastMessageType.Error);
-  //     return;
-  //   }
-
-
-  // }
   publish() {
     this.closeFab();
+    
+    // Debug: Check available team properties
+    console.log("Available teams:", this.activitySpecificTeamsRes);
+    console.log("Looking for home team:", this.selectedHomeTeamText);
+    console.log("Looking for away team:", this.selectedAwayTeamText);
+    
     const homeTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedHomeTeamText);
     const awayTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedAwayTeamText);
     console.log("Selected Home Team:", homeTeam);
     console.log("Selected Away Team:", awayTeam);
-    console.log(this.selectedHomeTeamText);
-    console.log(this.selectedAwayTeamText);
-    this.selectedHomeTeamText != 'Home Team' &&
-      this.selectedAwayTeamText != 'Away Team' ?
-      // Navigate to summary page
-      this.navCtrl.push("SummaryFootballPage", {
+
+    if (this.selectedHomeTeamText != 'Home Team' && this.selectedAwayTeamText != 'Away Team') {
+      const params = {
         "match": this.match,
         "leagueId": '',
         "activityId": this.match.activityId,
@@ -316,8 +260,18 @@ export class MatchTeamDetailsPage {
         "awayTeam": awayTeam,
         "activityCode": parseInt(this.match.ActivityCode),
         "isLeague": false
-      }) :
-      this.commonService.toastMessage('Select Home and Away Teams', 3000, ToastMessageType.Info,);
+      };
+
+      if (parseInt(this.match.ActivityCode) === ActivityTypeEnum.TENNIS) {
+        this.navCtrl.push("TennisSummaryTennisPage", params);
+      } else if (parseInt(this.match.ActivityCode) === ActivityTypeEnum.FOOTBALL) {
+        this.navCtrl.push("SummaryFootballPage", params);
+      } else if (parseInt(this.match.ActivityCode) === ActivityTypeEnum.CRICKET) {
+        this.navCtrl.push("CricketSummaryPage", params);
+      }
+    } else {
+      this.commonService.toastMessage('Select Home and Away Teams', 3000, ToastMessageType.Info);
+    }
   }
 
   closeFab() {

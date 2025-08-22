@@ -244,7 +244,6 @@ export class LeagueMatchInfoPage {
   }
 
   ionViewDidLoad() {
-    console.log("ionViewDidLoad LeagueMatchInfoPage");
   }
 
   getFilteredSections(): { title: string; items: LeagueMatchParticipantModel[] }[] {
@@ -266,25 +265,28 @@ export class LeagueMatchInfoPage {
     this.closeFab();
     const homeTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedHomeTeamText);
     const awayTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedAwayTeamText);
-    console.log("Selected Home Team:", homeTeam);
-    console.log(this.selectedHomeTeamText);
-    console.log(this.selectedAwayTeamText);
+
     if (this.selectedHomeTeamText != 'Home Team' && this.selectedAwayTeamText != 'Away Team') {
       const params = {
         "match": this.matchObj, "leagueId": this.leagueId, "activityId": this.activityId, "homeTeam": homeTeam,
-        "awayTeam": awayTeam, "activityCode": this.activityCode,
+        "awayTeam": awayTeam, "activityCode": this.activityCode, isLeague: true,
       };
-      
+
       if (parseInt(this.activityCode) === ActivityTypeEnum.TENNIS) {
-        this.navCtrl.push("TennisSummaryTennisPage", {
-            "match": this.matchObj, "leagueId": this.leagueId, "activityId": this.activityId, "homeTeam": homeTeam,
-            "awayTeam": awayTeam, "activityCode": this.activityCode,
-        })
+        this.navCtrl.push("TennisSummaryTennisPage",
+          // {
+          // "match": this.matchObj, "leagueId": this.leagueId, "activityId": this.activityId, "homeTeam": homeTeam,
+          // "awayTeam": awayTeam, "activityCode": this.activityCode,
+          // }
+          params
+        )
       } else if (parseInt(this.activityCode) === ActivityTypeEnum.FOOTBALL) {
-        this.navCtrl.push("SummaryFootballPage", {
-            "match": this.matchObj, "leagueId": this.leagueId, "activityId": this.activityId, "homeTeam": homeTeam,
-            "awayTeam": awayTeam, "activityCode": this.activityCode,
-        })
+        this.navCtrl.push("SummaryFootballPage", params
+          // {
+          // "match": this.matchObj, "leagueId": this.leagueId, "activityId": this.activityId, "homeTeam": homeTeam,
+          // "awayTeam": awayTeam, "activityCode": this.activityCode,
+          // }
+        )
       } else if (parseInt(this.activityCode) === ActivityTypeEnum.CRICKET) {
         this.navCtrl.push("CricketSummaryPage", params);
       }
@@ -358,7 +360,7 @@ export class LeagueMatchInfoPage {
           icon: 'female',
           handler: () => {
             //for updating roles
-            // console.log("selected Member log", member);
+
             if (this.leagueMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
               this.showRoles(member);
             } else {
@@ -374,7 +376,7 @@ export class LeagueMatchInfoPage {
   showRoles(member: LeagueMatchParticipantModel): void {
     this.closeFab();
     if (this.roles.length > 0) {
-      // console.log(this.roles);
+
       let alert = this.alertCtrl.create();
       alert.setTitle(`Select Role`);
 
@@ -398,7 +400,7 @@ export class LeagueMatchInfoPage {
           else {
             // Update the member's teamrole before calling updatePlayerRole
             const selectedRole = this.roles.find(r => r.id === selectedVal);
-            // console.log("selectedRole", selectedRole);
+
             this.updateLeagueMatchParticipantipationRoleInput.role_id = selectedRole.id;
             this.updateLeagueMatchParticipantipationRoleInput.role_type = parseInt(selectedRole.role_type);
             this.updatePlayerRole(member);
@@ -431,20 +433,10 @@ export class LeagueMatchInfoPage {
     this.graphqlService.query(playernstaffrole, { activityDetails: this.teamRolesInput }, 0).subscribe((data: any) => {
       // this.commonService.hideLoader();
       this.roles = data.data.getTeamRoles.teamRoles;
-      console.log("Roles getting for player:", JSON.stringify(this.roles));
+
     },
       (error) => {
-        console.error("Error in fetching:", error);
-        if (error.graphQLErrors) {
-          console.error("GraphQL Errors:", error.graphQLErrors);
-          for (const gqlError of error.graphQLErrors) {
-            console.error("Error Message:", gqlError.message);
-            console.error("Error Extensions:", gqlError.extensions);
-          }
-        }
-        if (error.networkError) {
-          console.error("Network Error:", error.networkError);
-        }
+
       }
     )
     this.apollo
@@ -458,11 +450,11 @@ export class LeagueMatchInfoPage {
       .subscribe(
         ({ data }) => {
           this.roles = data["getTeamRoles"]["teamRoles"];
-          console.log("Getting Player Roles", this.roles);
+
           // this.commonService.hideLoader();
         },
         (err) => {
-          console.log(JSON.stringify(err));
+
           this.commonService.toastMessage("failed to fetch role", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         })
   }
@@ -478,12 +470,10 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;
-        console.log("Update_League_Match_Participantipation_Role RESPONSE", JSON.stringify(res));
+
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
         // this.sections.forEach(section => section.items = []); // Clear the sections array
         this.getLeagueMatchParticipant(0);
-      } else {
-        console.log("error in Update_League_Fixture",)
       }
     },
       (err) => {
@@ -499,7 +489,7 @@ export class LeagueMatchInfoPage {
   showAvailableTeams(isHomeTeam: boolean): void {
     this.closeFab();
     if (this.leagueParticipantForMatchRes.length > 0) {
-      // console.log(this.leagueParticipantForMatchRes);
+
       let alert = this.alertCtrl.create();
       alert.setTitle(`Select Team`);
 
@@ -561,7 +551,7 @@ export class LeagueMatchInfoPage {
       this.getLeagueMatchParticipant(1);
     }
     this.getFilteredSections();
-    console.log('leagueTeamPlayerStatusType:', this.leagueMatchParticipantInput.leagueTeamPlayerStatusType);
+
   }
 
   //to fetch list of avilable teams
@@ -571,10 +561,9 @@ export class LeagueMatchInfoPage {
       if (res) {
         // this.commonService.hideLoader();
         this.leagueParticipantForMatchRes = res.data;
-        console.log("Get_League_Participant_For_Match RESPONSE", JSON.stringify(res.data));
+
       } else {
         // this.commonService.hideLoader();
-        console.log("error in fetching",)
       }
     }, error => {
       this.commonService.hideLoader();
@@ -588,12 +577,10 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;
-        console.log("Update_League_Fixture RESPONSE", JSON.stringify(res));
+
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
         // this.sections.forEach(section => section.items = []); // Clear the sections array
         this.getLeagueMatchParticipant(1);
-      } else {
-        console.log("error in Update_League_Fixture",)
       }
     },
       (err) => {
@@ -626,7 +613,7 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         this.leagueMatchParticipantRes = res.data || [];
-        console.log("Get_League_Match_Participant RESPONSE", JSON.stringify(res.data));
+
         this.sections.forEach(section => section.items = []);// Clear the sections array
         this.populateSections(); // Call populateSections after data is fetched
       }
@@ -677,12 +664,10 @@ export class LeagueMatchInfoPage {
       if (res) {
         this.commonService.hideLoader();
         var res = res.message;
-        console.log("Update_League_Match_Participation_Status RESPONSE", JSON.stringify(res));
+
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
         // this.sections.forEach(section => section.items = []); // Clear the sections array
         this.getLeagueMatchParticipant(0);
-      } else {
-        console.log("error in Update_League_Fixture",)
       }
     },
       (err) => {
@@ -741,17 +726,17 @@ export class LeagueMatchInfoPage {
       return { text: inviteStatusText || 'Pending', cssClass: 'status-other' };
     }
 
-    console.log('Processing invite_status:', inviteStatus, 'invite_status_text:', inviteStatusText);
+
 
     // Playing status (green) - for Accepted (1) and AdminAccepted (4)
     if (inviteStatus === LeaguePlayerInviteStatus.Accepted || inviteStatus === LeaguePlayerInviteStatus.AdminAccepted) {
-      console.log('Returning status-playing for invite_status:', inviteStatus);
+
       return { text: 'Playing', cssClass: 'status-playing' };
     }
 
     // Not Playing status (red) - for Rejected (2) and AdminRejected (5)
     if (inviteStatus === LeaguePlayerInviteStatus.Rejected || inviteStatus === LeaguePlayerInviteStatus.AdminRejected) {
-      console.log('Returning status-not-playing for invite_status:', inviteStatus);
+
       return { text: 'Not Playing', cssClass: 'status-not-playing' };
     }
 
@@ -767,7 +752,7 @@ export class LeagueMatchInfoPage {
     };
 
     const displayText = inviteStatusText || statusLabels[inviteStatus] || 'Unknown';
-    console.log('Returning status-other for invite_status:', inviteStatus, 'displayText:', displayText);
+
     return { text: displayText, cssClass: 'status-other' };
   }
 

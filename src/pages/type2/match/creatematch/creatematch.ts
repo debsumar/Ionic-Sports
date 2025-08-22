@@ -285,12 +285,12 @@ export class CreatematchPage {
     //   return false;
     // }
 
-     else if ((this.createMatchInput.MatchPaymentType == 1) && ((this.createMatchInput.MemberFees) <= 0 || this.createMatchInput.MemberFees == undefined || this.createMatchInput.MemberFees == 0.00)) {
+    else if ((this.createMatchInput.MatchPaymentType == 1) && ((+this.createMatchInput.MemberFees) <= 0 || this.createMatchInput.MemberFees == undefined || this.createMatchInput.MemberFees == 0.00)) {
       const message = "Enter member fee";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
     }
-     else if ((this.createMatchInput.MatchPaymentType == 1) && ((this.createMatchInput.NonMemberFees) <= 0 || this.createMatchInput.NonMemberFees == undefined || this.createMatchInput.NonMemberFees == 0.00)) {
+    else if ((this.createMatchInput.MatchPaymentType == 1) && ((+this.createMatchInput.NonMemberFees) <= 0 || this.createMatchInput.NonMemberFees == undefined || this.createMatchInput.NonMemberFees == 0.00)) {
       const message = "Enter non-member fee";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
@@ -300,8 +300,8 @@ export class CreatematchPage {
   }
 
   saveMatchDetails() {
-    if(this.validateInput()) {
-      try{
+    if (this.validateInput()) {
+      try {
         this.commonService.showLoader();
         const postgreClub = this.clubs.find(clubName => clubName.Id === this.selectedClub);
         console.log("club", postgreClub);
@@ -357,31 +357,31 @@ export class CreatematchPage {
                 }
               }
             `;
-          const mutationVaribale = { matchInput: this.createMatchInput };
-          this.graphqlService.mutate(createMatch, mutationVaribale, 0).subscribe((res: any) => {
-            // this.commonService.hideLoader();
-            this.commonService.showLoader();
-            const message = "Match created successfully";
-            this.commonService.updateCategory("match");
-            this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-            this.navCtrl.pop();
-            //this.navCtrl.pop().then(() => this.navCtrl.pop());
-          }, (err) => {
-            this.commonService.hideLoader();
-            if(err.errors && err.errors.length > 0){
-              this.commonService.toastMessage(err.errors[0].message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-            } else {
-              this.commonService.toastMessage("Match creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-            }
-            console.error("Error in fetching:", err);
-          })
-      }catch(e){
+        const mutationVaribale = { matchInput: this.createMatchInput };
+        this.graphqlService.mutate(createMatch, mutationVaribale, 0).subscribe((res: any) => {
+          // this.commonService.hideLoader();
+          this.commonService.showLoader();
+          const message = "Match created successfully";
+          this.commonService.updateCategory("match");
+          this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+          this.navCtrl.pop();
+          //this.navCtrl.pop().then(() => this.navCtrl.pop());
+        }, (err) => {
+          this.commonService.hideLoader();
+          if (err.errors && err.errors.length > 0) {
+            this.commonService.toastMessage(err.errors[0].message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          } else {
+            this.commonService.toastMessage("Match creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          }
+          console.error("Error in fetching:", err);
+        })
+      } catch (e) {
         this.commonService.hideLoader();
         this.commonService.toastMessage("Match creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
     }
   }
-  
+
   goToDashboardMenuPage() {
     this.navCtrl.setRoot("Dashboard");
   }
