@@ -10,7 +10,7 @@ import gql from "graphql-tag";
 import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { error } from "console";
-import { AllMatchData, GetIndividualMatchParticipantModel, MatchModelV2, } from "../../../../shared/model/match.model";
+import { AllMatchData, GetIndividualMatchParticipantModel, } from "../../../../shared/model/match.model";
 import { LeagueMatchActionType, MatchType, LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus, ActivityTypeEnum } from "../../../../shared/utility/enums";
 import { API } from "../../../../shared/constants/api_constants";
 import { HttpService } from "../../../../services/http.service";
@@ -39,6 +39,7 @@ export class MatchTeamDetailsPage {
   selectedAwayTeamText: string;
 
   getIndividualMatchParticipantRes: GetIndividualMatchParticipantModel[] = [];
+  allParticipants: GetIndividualMatchParticipantModel[] = []; // 📊 Store all participants for counting
   match: AllMatchData;
   // homeTeamPlayers: TeamMemberData[] = [];
   // awayTeamPlayers: TeamMemberData[] = [];
@@ -126,6 +127,22 @@ export class MatchTeamDetailsPage {
     AppType: 0,
     ActionType: 0,
     activityCode: 0,
+  }
+
+  updateLeagueMatchInviteStatusInput: UpdateLeagueMatchInviteStatusInput = {
+    parentclubId: "",
+    clubId: "",
+    activityId: "",
+    memberId: "",
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: "",
+    updated_by: "",
+    created_by: "",
+    MatchId: "",
+    ParticipationId: "",
+    InviteStatus: 0
   }
   // sections: { title: string; items: any[] }[] = [
   sections: { title: string; items: GetIndividualMatchParticipantModel[] }[] = [
@@ -231,8 +248,19 @@ export class MatchTeamDetailsPage {
         this.updateMatchParticipationStatusInput.LeagueId = ""; // Set to empty string as required
         this.updateMatchParticipationStatusInput.MatchId = this.match.MatchId;
 
+        // Initialize updateLeagueMatchInviteStatusInput
+        this.updateLeagueMatchInviteStatusInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+        this.updateLeagueMatchInviteStatusInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateLeagueMatchInviteStatusInput.action_type = LeagueMatchActionType.MATCH;
+        this.updateLeagueMatchInviteStatusInput.app_type = AppType.ADMIN_NEW;
+        this.updateLeagueMatchInviteStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+        this.updateLeagueMatchInviteStatusInput.MatchId = this.match.MatchId;
+
         this.getActivitySpecificTeam();
-        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+        // 📊 Load all participants first for accurate counts
+        this.loadAllParticipantsForCounts().then(() => {
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+        });
         this.getRoleForPlayers();
       }
     });
@@ -240,12 +268,12 @@ export class MatchTeamDetailsPage {
 
   publish() {
     this.closeFab();
-    
+
     // Debug: Check available team properties
     console.log("Available teams:", this.activitySpecificTeamsRes);
     console.log("Looking for home team:", this.selectedHomeTeamText);
     console.log("Looking for away team:", this.selectedAwayTeamText);
-    
+
     const homeTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedHomeTeamText);
     const awayTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedAwayTeamText);
     console.log("Selected Home Team:", homeTeam);
@@ -342,19 +370,49 @@ export class MatchTeamDetailsPage {
 
   //ActionSheet Controller
   presentActionSheet(member: GetIndividualMatchParticipantModel) {
+    // if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType !== LeagueTeamPlayerStatusType.All) {
+    //   this.commonService.toastMessage('Please select "All" filter to perform actions', 3000, ToastMessageType.Info);
+    //   return;
+    // }
     let actionSheet = this.actionSheetCtrl.create({
       title: `${member.user.FirstName} ${member.user.LastName}`,
       buttons: [
         {
+          text: 'Confirmed',
+          icon: 'checkmark-circle',
+          cssClass: 'action-sheet-confirmed',
+          handler: () => {
+            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted);
+          }
+        },
+        {
+          text: 'Maybe',
+          icon: 'help-circle',
+          cssClass: 'action-sheet-maybe',
+          handler: () => {
+            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe);
+          }
+        },
+        {
+          text: 'Declined',
+          icon: 'close-circle',
+          cssClass: 'action-sheet-declined',
+          handler: () => {
+            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined);
+            // Handle declined status
+          }
+        },
+        {
           text: 'Update Role',
-          icon: 'female',
+          icon: 'people',
           handler: () => {
             //for updating roles
+            this.showRoles(member);
             if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
-              this.showRoles(member);
-            } else {
-              this.commonService.toastMessage('Please select "All" filter to update role', 3000, ToastMessageType.Info);
-              event.preventDefault(); // Prevent the action from starting
+              //   this.showRoles(member);
+              // } else {
+              //   this.commonService.toastMessage('Please select "All" filter to update role', 3000, ToastMessageType.Info);
+              //   // event.preventDefault(); // Prevent the action from starting 
             }
           }
         },
@@ -435,10 +493,37 @@ export class MatchTeamDetailsPage {
         var response = res.message;
         this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
         // Refresh the participant data
-        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        this.loadAllParticipantsForCounts().then(() => {
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        });
       } else {
         this.commonService.hideLoader();
         this.commonService.toastMessage("Failed to update role", 3000, ToastMessageType.Error);
+      }
+    },
+      (err) => {
+        this.commonService.hideLoader();
+        this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error);
+      });
+  }
+
+  updateLeagueMatchInviteStatus(member: GetIndividualMatchParticipantModel, inviteStatus: LeaguePlayerInviteStatus) {
+    this.commonService.showLoader("Please wait...");
+    this.updateLeagueMatchInviteStatusInput.ParticipationId = member.id;
+    this.updateLeagueMatchInviteStatusInput.InviteStatus = inviteStatus;
+
+    this.httpService.post(`${API.UpdateLeagueMatchInviteStatus}`, this.updateLeagueMatchInviteStatusInput).subscribe((res: any) => {
+      if (res) {
+        this.commonService.hideLoader();
+        var response = res.message;
+        this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
+        // Refresh the participant data
+        this.loadAllParticipantsForCounts().then(() => {
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        });
+      } else {
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Failed to update Invitation status", 3000, ToastMessageType.Error);
       }
     },
       (err) => {
@@ -459,7 +544,9 @@ export class MatchTeamDetailsPage {
         var response = res.message;
         this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
         // Refresh the participant data
-        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        this.loadAllParticipantsForCounts().then(() => {
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        });
       } else {
         this.commonService.hideLoader();
         this.commonService.toastMessage("Failed to update participation status", 3000, ToastMessageType.Error);
@@ -484,6 +571,25 @@ export class MatchTeamDetailsPage {
     }
     // Default: show all
     return this.sections;
+  }
+
+  getPlayingCount(): number {
+    return this.allParticipants.filter(p => p.participant_status === LeagueParticipationStatus.PARTICIPANT).length;
+  }
+
+  getBenchCount(): number {
+    return this.allParticipants.filter(p => p.participant_status === LeagueParticipationStatus.NON_PARTICIPANT).length;
+  }
+
+  getAllCount(): number {
+    return this.allParticipants.length;
+  }
+
+  getAcceptedCount(sectionItems: GetIndividualMatchParticipantModel[]): number {
+    return sectionItems.filter(item =>
+      item.invite_status === LeaguePlayerInviteStatus.Accepted ||
+      item.invite_status === LeaguePlayerInviteStatus.AdminAccepted
+    ).length;
   }
 
   showAvailableTeams(isHomeTeam: boolean): void {
@@ -549,11 +655,42 @@ export class MatchTeamDetailsPage {
     this.getActivitySpecificTeam();
 
     if (this.activeType && this.match.homeUserId !== null) {
-      this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+      this.loadAllParticipantsForCounts().then(() => {
+        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+      });
     } else if (!this.activeType && this.match.awayUserId !== null) {
-      this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+      this.loadAllParticipantsForCounts().then(() => {
+        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+      });
     }
     this.getFilteredSections();
+  }
+
+  // 📊 Load all participants for accurate counting
+  loadAllParticipantsForCounts(): Promise<void> {
+    return new Promise((resolve) => {
+      let teamId: string | null = null;
+      if (this.selectedTeam) {
+        teamId = this.selectedTeam.id;
+      } else if (this.activeType && this.match.homeUserId !== null) {
+        teamId = this.match.homeUserId;
+      } else if (!this.activeType && this.match.awayUserId !== null) {
+        teamId = this.match.awayUserId;
+      }
+
+      const input = { ...this.getIndividualMatchParticipantInput };
+      input.TeamId = teamId;
+      input.leagueTeamPlayerStatusType = LeagueTeamPlayerStatusType.All;
+
+      this.httpService.post(`${API.GetIndividualMatchParticipant}`, input).subscribe((res: any) => {
+        if (res) {
+          this.allParticipants = res.data || [];
+        }
+        resolve();
+      }, () => {
+        resolve();
+      });
+    });
   }
 
   //to fetch list of avilable players of both home & away teams
@@ -575,6 +712,12 @@ export class MatchTeamDetailsPage {
       if (res) {
         this.commonService.hideLoader();
         this.getIndividualMatchParticipantRes = res.data || [];
+
+        // 📊 Update allParticipants only when fetching all data
+        if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
+          this.allParticipants = res.data || [];
+        }
+
         this.sections.forEach(section => section.items = []); // Clear the sections array
         this.populateSections(); // Call populateSections after data is fetched
       }
@@ -703,7 +846,7 @@ export class MatchTeamDetailsPage {
   getInviteStatusDisplay(inviteStatus: number, inviteStatusText?: string): { text: string; cssClass: string } {
     // Handle null/undefined cases
     if (inviteStatus === null || inviteStatus === undefined) {
-      return { text: inviteStatusText || 'Pending', cssClass: 'status-other' };
+      return { text: inviteStatusText || 'Accepted', cssClass: 'status-other' };
     }
 
     // Playing status (green) - for Accepted (1) and AdminAccepted (4)
@@ -712,8 +855,13 @@ export class MatchTeamDetailsPage {
     }
 
     // Not Playing status (red) - for Rejected (2) and AdminRejected (5)
-    if (inviteStatus === LeaguePlayerInviteStatus.Rejected || inviteStatus === LeaguePlayerInviteStatus.AdminRejected) {
-      return { text: 'Not Playing', cssClass: 'status-not-playing' };
+    if (inviteStatus === LeaguePlayerInviteStatus.Declined || inviteStatus === LeaguePlayerInviteStatus.AdminDeclined) {
+      return { text: 'Declined', cssClass: 'status-not-playing' };
+    }
+
+    ///add nother condition for Maybe and admin maybe
+    if (inviteStatus === LeaguePlayerInviteStatus.Maybe || inviteStatus === LeaguePlayerInviteStatus.AdminMaybe) {
+      return { text: 'Maybe', cssClass: 'status-maybe' };
     }
 
     // All other statuses (orange) - Pending (0), Cancelled (3), Maybe (8), etc.
@@ -729,6 +877,32 @@ export class MatchTeamDetailsPage {
 
     const displayText = inviteStatusText || statusLabels[inviteStatus] || 'Unknown';
     return { text: displayText, cssClass: 'status-other' };
+  }
+
+  // 🎯 Get icon name based on invite status
+  getInviteStatusIcon(inviteStatus: number): string {
+    // Handle null/undefined cases
+    if (inviteStatus === null || inviteStatus === undefined) {
+      return 'checkmark-circle';
+    }
+
+    // Confirmed status - for Accepted (1) and AdminAccepted (4)
+    if (inviteStatus === LeaguePlayerInviteStatus.Accepted || inviteStatus === LeaguePlayerInviteStatus.AdminAccepted) {
+      return 'checkmark-circle';
+    }
+
+    // Declined status - for Rejected (2) and AdminRejected (5)
+    if (inviteStatus === LeaguePlayerInviteStatus.Declined || inviteStatus === LeaguePlayerInviteStatus.AdminDeclined) {
+      return 'close-circle';
+    }
+
+    // Maybe status - for Maybe and AdminMaybe
+    if (inviteStatus === LeaguePlayerInviteStatus.Maybe || inviteStatus === LeaguePlayerInviteStatus.AdminMaybe) {
+      return 'help-circle';
+    }
+
+    // Default for all other statuses
+    return 'warning';
   }
 }
 
@@ -817,4 +991,19 @@ export class UpdateMatchParticipationStatusInput {
   ParticipationStatus: number; // 📊 Participation status
 }
 
+export class UpdateLeagueMatchInviteStatusInput {
+  parentclubId: string;
+  clubId: string;
+  activityId: string;
+  memberId: string;
+  action_type: number;
+  device_type: number;
+  app_type: number;
+  device_id: string;
+  updated_by: string;
+  created_by: string;
+  MatchId: string;
+  ParticipationId: string;
+  InviteStatus: number;
+}
 

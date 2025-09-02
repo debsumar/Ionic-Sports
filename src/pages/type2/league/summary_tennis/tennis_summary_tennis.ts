@@ -909,6 +909,8 @@ export class TennisSummaryTennisPage {
       ...this.createBaseResultInput(),
       Tennis: {
         LEAGUE_FIXTURE_ID: this.getLeagueFixtureId(),
+        RESULT_STATUS: data.RESULT_STATUS || '',
+        WINNER_ID: data.WINNER_ID || '',
         HOME_TEAM: {
           NAME: this.getHomeTeamName(),
           TEAM_ID: this.getHomeTeamId(),

@@ -197,7 +197,7 @@ export interface TennisResultModel {
   HOME_TEAM?: TennisTeamStatsModel;
   AWAY_TEAM?: TennisTeamStatsModel;
   SET_SCORES?: TennisSetScoreModel[];
-
+  RESULT?: TennisResultStatsModel;
 }
 
 // ===== CRICKET MODELS =====

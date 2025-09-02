@@ -107,4 +107,5 @@ export const API = {
     FetchAllMatches: `match/FetchAllMatches`,
     UPDATE_RESULT_ENTITY: `LeagueResult/updateResultEntity`,
     GET_RESULT_STATUS_BY_ACTIVITY: `LeagueResult/getResultStatusByActivity`,
+    UpdateLeagueMatchInviteStatus: `league/UpdateLeagueMatchInviteStatus`,
 }

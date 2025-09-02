@@ -22,7 +22,7 @@ import { API } from "../../../../shared/constants/api_constants";
  * Generated class for the MatchhistoryPage page.
  *
  * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
+ * Ionic pages and navigation.ch
  */
 
 @IonicPage()
@@ -41,17 +41,17 @@ export class MatchhistoryPage {
     FetchType: 5,
   };
   fetchAllMatchesInput: FetchAllMatchesInput = {
-      parentclubId: "",
-      clubId: "",
-      activityId: "",
-      memberId: "",
-      action_type: 0,
-      device_type: 0,
-      app_type: 0,
-      device_id: "",
-      updated_by: "",
-      created_by: "",
-      FetchType: 0
+    parentclubId: "",
+    clubId: "",
+    activityId: "",
+    memberId: "",
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: "",
+    updated_by: "",
+    created_by: "",
+    FetchType: 0
   };
   matches: MatchModel[] = [];
   filteredMatchlist: AllMatchData[] = [];
@@ -62,7 +62,7 @@ export class MatchhistoryPage {
   filteredteams: TeamsForParentClubModel[] = [];
   leaguesForParentClub: LeaguesForParentClubModel[] = [];
   filteredleagues: LeaguesForParentClubModel[] = [];
-    
+
   ParentClubTeamFetchInput: ParentClubTeamFetchInput = {
     user_postgre_metadata: new UserPostgreMetadataField,
     user_device_metadata: new UserDeviceMetadataField
@@ -91,7 +91,7 @@ export class MatchhistoryPage {
           if (val.$key != "") {
             // this.FetchMatchesInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
             this.fetchMatchesInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
-            this.fetchAllMatchesInput =  new FetchAllMatchesInput();
+            this.fetchAllMatchesInput = new FetchAllMatchesInput();
             this.fetchMatchesInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
             this.fetchAllMatchesInput.parentclubId = this.sharedservice.getPostgreParentClubId();
             this.fetchAllMatchesInput.memberId = this.sharedservice.getLoggedInUserId();
@@ -131,11 +131,11 @@ export class MatchhistoryPage {
 
   //function to get the list of league
   getLeaguesForParentClub = () => {
-      // this.commonService.showLoader("Fetching Leagues...");
-      this.LeagueFetchInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
-      this.LeagueFetchInput.user_device_metadata.UserAppType = 0;
-      this.LeagueFetchInput.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2
-      const leaguesforparentclubQuery = gql`
+    // this.commonService.showLoader("Fetching Leagues...");
+    this.LeagueFetchInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
+    this.LeagueFetchInput.user_device_metadata.UserAppType = 0;
+    this.LeagueFetchInput.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2
+    const leaguesforparentclubQuery = gql`
         query getLeaguesForParentClub($ParentClubDetails: LeagueFetchInput!) {
           getLeaguesForParentClub(ParentClubDetails: $ParentClubDetails) {
             id
@@ -165,35 +165,35 @@ export class MatchhistoryPage {
           }
         }
       `;
-      this.graphqlService.query(leaguesforparentclubQuery, { ParentClubDetails: this.LeagueFetchInput }, 0).subscribe((res: any) => {
+    this.graphqlService.query(leaguesforparentclubQuery, { ParentClubDetails: this.LeagueFetchInput }, 0).subscribe((res: any) => {
+      // this.commonService.hideLoader();
+      this.leaguesForParentClub = res.data.getLeaguesForParentClub;
+      this.filteredleagues = JSON.parse(JSON.stringify(this.leaguesForParentClub));
+    },
+      (error) => {
         // this.commonService.hideLoader();
-        this.leaguesForParentClub = res.data.getLeaguesForParentClub;
-        this.filteredleagues = JSON.parse(JSON.stringify(this.leaguesForParentClub));
-      },
-        (error) => {
-          // this.commonService.hideLoader();
-          this.commonService.toastMessage("Fetching failed for leagues", 2500, ToastMessageType.Error);
-          console.error("Error in fetching:", error);
-        })
+        this.commonService.toastMessage("Fetching failed for leagues", 2500, ToastMessageType.Error);
+        console.error("Error in fetching:", error);
+      })
   };
 
   fetchAllMatches() {
-      this.commonService.showLoader("Fetching matches...");
-      
-      this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe((res: any) => {
-        if (res) {
-          this.commonService.hideLoader();
-          this.fetchAllMatchesRes = res.data;
-          this.matchlist = this.fetchAllMatchesRes.AllMatches;
-          console.log("FetchAllMatches RESPONSE", JSON.stringify(res.data));
-          this.filteredMatchlist = JSON.parse(JSON.stringify(this.matchlist));  
-        } else {
-          console.log("error in fetching",)
-        }
-      }, error => {
+    this.commonService.showLoader("Fetching matches...");
+
+    this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe((res: any) => {
+      if (res) {
         this.commonService.hideLoader();
-        this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
-      });
+        this.fetchAllMatchesRes = res.data;
+        this.matchlist = this.fetchAllMatchesRes.AllMatches;
+        console.log("FetchAllMatches RESPONSE", JSON.stringify(res.data));
+        this.filteredMatchlist = JSON.parse(JSON.stringify(this.matchlist));
+      } else {
+        console.log("error in fetching",)
+      }
+    }, error => {
+      this.commonService.hideLoader();
+      this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
+    });
   }
 
 
@@ -254,9 +254,9 @@ export class MatchhistoryPage {
     this.filteredleagues = this.leaguesForParentClub;
   }
 
-  
 
-  
+
+
 }
 
 

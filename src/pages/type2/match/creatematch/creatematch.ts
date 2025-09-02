@@ -359,8 +359,7 @@ export class CreatematchPage {
             `;
         const mutationVaribale = { matchInput: this.createMatchInput };
         this.graphqlService.mutate(createMatch, mutationVaribale, 0).subscribe((res: any) => {
-          // this.commonService.hideLoader();
-          this.commonService.showLoader();
+          this.commonService.hideLoader();
           const message = "Match created successfully";
           this.commonService.updateCategory("match");
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
