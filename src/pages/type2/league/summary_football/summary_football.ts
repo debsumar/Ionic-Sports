@@ -1293,8 +1293,8 @@ export class SummaryFootballPage implements AfterViewInit {
         device_id: deviceId || '',
         updated_by: memberId,
         created_by: memberId,
-        activityId: this.activityId,
-        activityCode: this.activityCode,
+        activityId: this.activityId || "",
+        activityCode: +this.activityCode,
         leaguefixtureId: leaguefixtureId,
       };
     } catch (error) {
