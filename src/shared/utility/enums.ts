@@ -38,13 +38,20 @@ export enum LeagueMatchActionType {
 }
 
 export enum MatchType {
-    SINGLES = 0,
-    DOUBLES = 1,
-    TEAM = 2,
+    SINGLES = 1,
+    DOUBLES = 2,
+    TEAM = 3,
 }
 
 export enum ActivityTypeEnum {
     TENNIS = 1001,
     FOOTBALL = 1002,
     CRICKET = 1015,
+}
+
+export enum PaymentStatusEnum {
+    Due = 0,
+    Paid = 1,
+    PendingVerification = 3,
+    Failed = 4,
 }

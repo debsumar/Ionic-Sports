@@ -1,6 +1,4 @@
 import { Component } from "@angular/core";
-import { Apollo } from "apollo-angular";
-import { HttpLink } from "apollo-angular-link-http";
 import gql from "graphql-tag";
 import {
   IonicPage,
@@ -15,9 +13,8 @@ import {
   ToastPlacement,
 } from "../../../services/common.service";
 import { Storage } from "@ionic/storage";
-import { FirebaseService } from "../../../services/firebase.service";
 import { SharedServices } from "../../services/sharedservice";
-import { MatchModel } from "./models/match.model";
+import { FetchAllMatchesInput, MatchModel } from "./models/match.model";
 import * as moment from "moment";
 import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../services/graphql.service";
@@ -342,17 +339,5 @@ export class FetchMatchesInput {
   }
 }
 
-export interface FetchAllMatchesInput {
-  parentclubId: string; // 🏢 Parent club ID
-  clubId: string; // 🏢 Club ID
-  activityId: string; // ⚽ Activity ID
-  memberId: string; // 🧑‍ User/Member ID
-  action_type: number; // ⚙️ Type of action
-  device_type: number; // 📱 Type of device
-  app_type: number; // 📱 Type of application
-  device_id: string; // 🆔 Device identifier
-  updated_by: string; // 🧑‍ Identifier of the updater
-  created_by: string | null; // 🧑‍ Identifier of the creator (can be null)
-  FetchType: number; // 🔍 Type of fetch operation
-}
+
 

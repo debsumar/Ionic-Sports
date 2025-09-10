@@ -2,9 +2,10 @@ import { Storage } from '@ionic/storage';
 // import { Platform, NavParams, ViewController } from "ionic-angular";
 import { IonicPage, ToastController, AlertController, NavController } from 'ionic-angular';
 import { Component } from '@angular/core';
-import { ViewController, Platform, NavParams } from 'ionic-angular';
+import { ModalController, ViewController, Platform, NavParams } from 'ionic-angular';
 import { FirebaseService } from '../../../services/firebase.service';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../services/common.service';
+import { SharedServices } from '../../services/sharedservice';
 import gql from 'graphql-tag';
 import { ParentClub } from '../../../shared/model/club.model';
 import { GraphqlService } from '../../../services/graphql.service';
@@ -29,15 +30,14 @@ export class MailToMemberByAdminPage {
   numberOfPeople = "0 People";
   navigateFrom = "";
   campDetails: any;
-  module_obj:EmailModalForModule;
-  constructor(public navCtrl: NavController, 
-    public alertCtrl: AlertController, 
+  module_obj: EmailModalForModule;
+  constructor(public navCtrl: NavController,
+    public alertCtrl: AlertController,
     //private sharedservice: SharedServices, 
     public storage: Storage, private commonService: CommonService,
-    //private fb: FirebaseService, 
-    public platform: Platform, 
+    private fb: FirebaseService, public platform: Platform,
     private params: NavParams, public viewCtrl: ViewController,
-    private graphqlService:GraphqlService) {
+    private graphqlService: GraphqlService) {
 
     this.module_obj = this.params.get("email_modal");
     //console.log(this.sessionDetails);
@@ -46,11 +46,11 @@ export class MailToMemberByAdminPage {
       if (this.module_obj.email_users.length > 0) {
         this.numberOfPeople = this.module_obj.email_users.length + " recipients";
       }
-    }else if (this.module_obj.type == ModuleTypeForEmail.WEEKLYSESSION) {
+    } else if (this.module_obj.type == ModuleTypeForEmail.WEEKLYSESSION) {
       if (this.module_obj.email_users.length > 0) {
         this.numberOfPeople = this.module_obj.email_users.length + " recipients"
         //this.emailObj.Message = `Dear ${this.memberList[0].FirstName},`;
-      } 
+      }
     }
     else if (this.module_obj.type == ModuleTypeForEmail.MEMBER) {
       if (this.module_obj.email_users.length > 0) {
@@ -58,21 +58,21 @@ export class MailToMemberByAdminPage {
         this.emailObj.Message = `Dear ${this.module_obj.email_users[0].MemberName},`;
       }
 
-    }else if (this.module_obj.type == ModuleTypeForEmail.EVENTS) {
+    } else if (this.module_obj.type == ModuleTypeForEmail.EVENTS) {
       this.emailObj.Message = "Dear All,";
       if (this.module_obj.email_users.length > 0) {
         this.numberOfPeople = this.module_obj.email_users.length + " recipients"
       }
-    }else if (this.module_obj.type == ModuleTypeForEmail.ATTENDANCE) {
+    } else if (this.module_obj.type == ModuleTypeForEmail.ATTENDANCE) {
       //this.emailObj.Subject == "Attendance"?"Session Cancellation Email":"";
       //this.emailObj.Message = `Dear All,\n\nYour Session ${this.module_obj.module_info.module_booking_name} on ${this.module_obj.CancelledSession} ${this.module_obj.module_info.module_booking_start_time} at ${this.module_obj.module_info.module_booking_club_name} is cancelled. Please speak to your instructor for more details.`;
       if (this.module_obj.email_users.length > 0) {
         this.numberOfPeople = this.module_obj.email_users.length + " recipients";
       }
     }
-     else if(this.module_obj.type == ModuleTypeForEmail.HOLIDAYCAMP) {
+    else if (this.module_obj.type == ModuleTypeForEmail.HOLIDAYCAMP) {
       this.campDetails = this.params.get("CampDetails");
-      this.emailObj.Message = "Dear All,";     
+      this.emailObj.Message = "Dear All,";
       if (this.module_obj.email_users.length > 0) {
         this.numberOfPeople = this.module_obj.email_users.length + " recipients";
       }
@@ -81,7 +81,7 @@ export class MailToMemberByAdminPage {
       if (this.module_obj.email_users.length > 0) {
         this.numberOfPeople = this.module_obj.email_users.length + " recipients";
       }
-    }else if (this.module_obj.type == ModuleTypeForEmail.LEAGUE) {
+    } else if (this.module_obj.type == ModuleTypeForEmail.LEAGUE || this.module_obj.type == ModuleTypeForEmail.LEAGUE_TEAM) {
       this.emailObj.Message = "Dear All,";
       if (this.module_obj.email_users.length > 0) {
         this.numberOfPeople = this.module_obj.email_users.length + " recipients";
@@ -94,16 +94,16 @@ export class MailToMemberByAdminPage {
 
   //get parentclub setup
   getParentclubDetails() {
-    this.storage.get("postgre_parentclub").then((parentclub:ParentClub) => {  
+    this.storage.get("postgre_parentclub").then((parentclub: ParentClub) => {
       if (parentclub != null) {
-          this.parentClubDetails = parentclub;
-          //this.emailObj.Message += "\n\n\n\nKind Regards,\n" + this.parentClubDetails.ParentClubName + "\n" + "Ph:" + this.parentClubDetails.ContactPhone;
-          this.emailObj.Message += "\n\n\n\nKind Regards,\n" + this.parentClubDetails.ParentClubName + "\n";
+        this.parentClubDetails = parentclub;
+        //this.emailObj.Message += "\n\n\n\nKind Regards,\n" + this.parentClubDetails.ParentClubName + "\n" + "Ph:" + this.parentClubDetails.ContactPhone;
+        this.emailObj.Message += "\n\n\n\nKind Regards,\n" + this.parentClubDetails.ParentClubName + "\n";
       }
     })
   }
 
-  
+
   sendEmails() {
     try {
       const emailFormembers = {
@@ -117,29 +117,28 @@ export class MailToMemberByAdminPage {
         CCEmail: this.parentClubDetails.ParentClubAdminEmailID,
         Subject: this.emailObj.Subject,
         Message: this.emailObj.Message,
-        Purpose:"Term Session"
-      } 
-    
+      }
+
       emailFormembers.Members = this.module_obj.email_users;
-      
+
       const email_mutation = gql`
       mutation sendNotificationEmail($emailInput: EmailNotification!) {
         sendNotificationEmail(emailInput: $emailInput)
-      }` 
-      
+      }`
+
       const email_variable = { emailInput: emailFormembers };
-      this.graphqlService.mutate(email_mutation, email_variable,0).subscribe((response)=>{
-        this.commonService.toastMessage("Mail sent successfully",2500,ToastMessageType.Success, ToastPlacement.Bottom);
+      this.graphqlService.mutate(email_mutation, email_variable, 0).subscribe((response) => {
+        this.commonService.toastMessage("Mail sent successfully", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
         //this.emailObj.Message = "Dear All,\n\n\n\nSincerely Yours,\n" + this.parentClubDetails.ParentClubName + "\n" + "Ph:" + this.parentClubDetails.ContactPhone + "\n" + this.parentClubDetails.ParentClubAdminEmailID;
         this.emailObj.Message = "Dear All,\n\n\n\nSincerely Yours,\n" + this.parentClubDetails.ParentClubName + "\n" + this.parentClubDetails.ParentClubAdminEmailID;
         this.emailObj.Subject = "";
         this.navCtrl.pop();
         //this.navCtrl.remove(this.navCtrl.getActive().index - 1, 2);
-      },(err)=>{
-        //this.commonService.hideLoader();
-        this.commonService.toastMessage("Email sent failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
-      });        
-      
+      }, (err) => {
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Email sent failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      });
+
     } catch (ex) {
       console.log(JSON.stringify(ex));
       this.commonService.toastMessage("Error in sending email", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
@@ -147,9 +146,9 @@ export class MailToMemberByAdminPage {
 
   }
 
-  validateEmail(){
+  validateEmail() {
     if (this.emailObj.Subject.trim() == "") {
-      this.commonService.toastMessage("Please enter subject",3000,ToastMessageType.Error,ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please enter subject", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
       return false;
     }
     return true;
@@ -177,7 +176,7 @@ export class MailToMemberByAdminPage {
         ]
       });
       alert.present();
-    } 
+    }
   }
 
 
@@ -209,28 +208,28 @@ export class MailToMemberByAdminPage {
 
 
 
-export class EmailModalForModule{
-  module_info?:{
-    module_id:string;
-    module_booking_club_id:string
-    module_booking_club_name:string;
-    module_booking_coach_id:string;
-    module_booking_coach_name:string;
-    module_booking_name:string;
-    module_booking_start_date:string;
-    module_booking_end_date:string;
-    module_booking_start_time:string;  
+export class EmailModalForModule {
+  module_info?: {
+    module_id: string;
+    module_booking_club_id: string
+    module_booking_club_name: string;
+    module_booking_coach_id: string;
+    module_booking_coach_name: string;
+    module_booking_name: string;
+    module_booking_start_date: string;
+    module_booking_end_date: string;
+    module_booking_start_time: string;
   }
-  email_users:EmailUsers[];
-  type:number;                           
+  email_users: EmailUsers[];
+  type: number;
 }
 
-export class EmailUsers{
-  IsChild:boolean
-  ParentId:string
-  MemberId:string
-  MemberEmail:string
-  MemberName:string                  
+export class EmailUsers {
+  IsChild: boolean
+  ParentId: string
+  MemberId: string
+  MemberEmail: string
+  MemberName: string
 }
 
 export enum ModuleTypeForEmail {
@@ -239,13 +238,13 @@ export enum ModuleTypeForEmail {
   WEEKLYSESSION = 102,
   SCHOOLSESSION = 103,
   COURTBOOKING = 105,
-  EVENTS = 800,
+  EVENTS = 106,
   ATTENDANCE = 107,
   MEMBER = 110,
   HOLIDAYCAMP = 500,
-  LEAGUE = 600
+  LEAGUE = 600,
+  LEAGUE_TEAM = 125
 }
-
 export enum ModuleReportTypeForEmail {
   TERMSESSION_REPORT = 100, //for firebase it's termsession 100,monthly 101,weekly 102
   MONTHLYSESSION_REPORT = 101,

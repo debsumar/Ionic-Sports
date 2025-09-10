@@ -25,7 +25,7 @@ import { API } from "../../../../shared/constants/api_constants";
 import { RoundTypeInput, RoundTypesModel } from "../../../../shared/model/league.model";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { LeagueVenueType } from "../../../../shared/utility/enums";
-
+import { CatandType } from "../../league/models/location.model";
 /**
  * Generated class for the CreatematchPage page.
  *
@@ -57,11 +57,11 @@ export class CreatematchPage {
     device_id: '',
     updated_by: ''
   }
-
+  leagueType: CatandType[] = [];
   ActivityKey: string
   createMatchInput: CreateMatchInput = {
     Round: 0,
-    MatchType: 0,
+    MatchType: 1,
     MatchVenueName: "",
     MatchVenueId: '',
     MatchVenueKey: "",
@@ -162,6 +162,7 @@ export class CreatematchPage {
       // this.getAllActivities();
       // this.getClubVenues();
       // this.saveMatchDetails();
+      this.getMatchTypes();
       this.getListOfClub();
       this.getRoundTypes();
     });
@@ -179,15 +180,22 @@ export class CreatematchPage {
   gotoHome() {
     this.navCtrl.push("Dashboard");
   }
+
+  getMatchTypes() {
+    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, this.commonInput).subscribe((res: any) => {
+      this.leagueType = res["data"]
+    }, (error) => {
+      this.commonService.toastMessage("type fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+    })
+  }
+  
   getRoundTypes() {
     this.commonService.showLoader("Fetching info ...");
-
     this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe((res: any) => {
       if (res) {
         this.commonService.hideLoader();
         this.roundTypes = res.data || [];
         console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
-
       } else {
         this.commonService.hideLoader();
         console.log("error in fetching",)

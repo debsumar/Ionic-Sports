@@ -37,12 +37,18 @@
         <ion-option *ngFor="let type of activities" value="{{type.id}}">{{type.activity_name}}</ion-option>
       </ion-select>
     </ion-item>
-    <ion-item>
+    <!-- <ion-item>
       <ion-label>Match Type</ion-label>
       <ion-select [(ngModel)]="createMatchInput.MatchType">
         <ion-option value="0">Singles</ion-option>
         <ion-option value="1">Doubles</ion-option>
         <ion-option value="2">Team</ion-option>
+      </ion-select>
+    </ion-item> -->
+    <ion-item>
+      <ion-label>Match Type</ion-label>
+      <ion-select [(ngModel)]="createMatchInput.MatchType" (ionChange)="onLeagueTypeChange($event)">
+        <ion-option *ngFor="let type of leagueType" [value]="type.value">{{type.key}}</ion-option>
       </ion-select>
     </ion-item>
     <ion-item>
@@ -99,7 +105,10 @@
         <ion-col col-12 no-padding class="flex_col">
           <p class="toggle_para">Paid</p>
           <label class="toggle">
-            <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
+            <input type="checkbox" 
+            [(ngModel)]="isChecked" 
+            (ngModelChange)="updateMatchPaymentType($event)"
+            >
             <span data-unchecked="No" data-checked="Yes"></span>
           </label>
         </ion-col>
@@ -111,14 +120,15 @@
         <span *ngIf="currency != undefined">({{currency}})</span>
       </ion-label>
       <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
-        [(ngModel)]="createMatchInput.MemberFees"></ion-input>
+        [(ngModel)]="createMatchInput.MemberFees" ></ion-input>
     </ion-item>
 
     <ion-item *ngIf="this.createMatchInput.MatchPaymentType==1" class="allign-right">
       <ion-label>Non Member Fee
         <span *ngIf="currency != undefined">({{currency}})</span>
       </ion-label>
-      <ion-input type="number" class="textareastyle" [(ngModel)]="createMatchInput.NonMemberFees"></ion-input>
+      <ion-input type="number" class="textareastyle" 
+        [(ngModel)]="createMatchInput.NonMemberFees"></ion-input>
     </ion-item>
   </ion-list>
 

@@ -40,7 +40,7 @@
         [(ngModel)]="startTime"></ion-datetime>
     </ion-item>
 
-    <div *ngIf="matchType === 'Singles'">
+    <div *ngIf="inputObj.match_type == '1'">
       <ion-item>
         <ion-label>Participants 1</ion-label>
         <ion-select placeholder=" <Select>" [(ngModel)]="inputObj.primary_participant_id"
@@ -60,7 +60,7 @@
       </ion-item>
     </div>
 
-    <div *ngIf="matchType === 'Doubles'">
+    <div *ngIf="inputObj.match_type == '2'">
       <ion-item>
         <ion-label>Team 1 - Player 1</ion-label>
         <ion-select placeholder="Select" [(ngModel)]="inputObj.primary_participant_id">
@@ -73,7 +73,7 @@
 
       <ion-item>
         <ion-label>Team 1 - Player 2</ion-label>
-        <ion-select placeholder="Select" [(ngModel)]="primary_participant_id2">
+        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.primary_participant_id2" (ionChange)="filterParticipants()">
           <ion-option *ngFor="let participant of participantData" [value]="participant.id"
             [disabled]="participant.id === inputObj.primary_participant_id || participant.id === inputObj.secondary_participant_id || participant.id === secondary_participant_id2">
             {{participant.participant_name}}
@@ -93,7 +93,7 @@
 
       <ion-item>
         <ion-label>Team 2 - Player 2</ion-label>
-        <ion-select placeholder="Select" [(ngModel)]="secondary_participant_id2">
+        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.secondary_participant_id2" (ionChange)="filterParticipants()">
           <ion-option *ngFor="let participant of participantData" [value]="participant.id"
             [disabled]="participant.id === inputObj.primary_participant_id || participant.id === primary_participant_id2 || participant.id === inputObj.secondary_participant_id">
             {{participant.participant_name}}

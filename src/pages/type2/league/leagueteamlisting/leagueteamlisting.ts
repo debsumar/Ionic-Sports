@@ -55,11 +55,7 @@ export class LeagueteamlistingPage {
   };
   matches: MatchModel[] = [];
   filteredMatches: MatchModel[] = [];
-
-
-
   ParentClubTeam: TeamsForParentClubModel[] = [];
-
   teamsForParentClub: TeamsForParentClubModel[] = [];
   filteredteams: TeamsForParentClubModel[] = [];
   leaguesForParentClub: LeaguesForParentClubModel[] = [];
@@ -69,10 +65,6 @@ export class LeagueteamlistingPage {
   today = moment().format("DD-MM-YYYY");
   Today: number = 0;
   searchInput: "";
-
-
-
-
   isPublish: boolean = true;
   isPending: boolean = true;
   private subscription: RxSubscription; // Use the renamed type

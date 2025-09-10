@@ -174,6 +174,12 @@ export class User {
   LastName: string;
   Gender: string;
   DOB: string;
+  IsChild:boolean;
+  ParentId:string;
+  EmailID:string;
+  PhoneNumber:string;
+  ParentEmailID:string;
+  ParentPhoneNumber:string;
   member_type: number;
   FirebaseKey: string;
   media_consent: boolean;
@@ -281,6 +287,8 @@ export interface ResultStatusModel {
   status: string;
 }
 
+
+
 export class ParentClubTeamFetchInput {
   user_postgre_metadata: UserPostgreMetadataField
   user_device_metadata: UserDeviceMetadataField
@@ -305,3 +313,4 @@ export class FetchMatchesInput {
   // MemberKey: string;
   FetchType: number;
 }
+

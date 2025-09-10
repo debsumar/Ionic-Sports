@@ -75,7 +75,7 @@ export class CreatematchleaguePage {
   parentClubId: string
   leagueGroup: LeagueGroup[]
   leagueId: string
-  matchType: string
+  
   isChecked: boolean = false;
   leagueGroupInput: LeagueGroupInput = {
     ParentClubKey: '',
@@ -102,6 +102,9 @@ export class CreatematchleaguePage {
     StartDate: '',
     primary_participant_id: '',
     secondary_participant_id: '',
+    primary_participant_id2: '',
+    secondary_participant_id2: '',
+    match_type: 1,
     user_postgre_metadata: {
       UserParentClubId: '',
       UserActivityId: ''
@@ -127,10 +130,6 @@ export class CreatematchleaguePage {
   selectedParticipant1: LeagueParticipantModel;
   location_id: string;
   location_type: number;
-
-  primary_participant_id2: string;
-
-  secondary_participant_id2: string
   activityId: string;
   postgre_parentclub_id: string;
   constructor(
@@ -176,7 +175,7 @@ export class CreatematchleaguePage {
 
     this.inputObj.LeagueId = this.leagueId;
 
-    this.matchType = this.navParams.get("league_type_text");
+    this.inputObj.match_type = +this.navParams.get("league_type");
 
     const inputFormat = 'DD-MMM-YYYY, ddd';
 
@@ -185,7 +184,6 @@ export class CreatematchleaguePage {
       this.min = moment(this.leagueStartDate, inputFormat).format('YYYY-MM-DD');
       this.startDate = moment(this.leagueStartDate, inputFormat).format('YYYY-MM-DD');
       this.max = this.leagueEndDate ? moment(this.leagueEndDate, inputFormat).format('YYYY-MM-DD') : moment('2049-12-31', 'YYYY-MM-DD').format('YYYY-MM-DD');
-
     } else {
       // If leagueStartDate is not valid, use the current date as the default
       this.min = moment().format('YYYY-MM-DD');
@@ -337,32 +335,35 @@ export class CreatematchleaguePage {
   }
 
   filterParticipants() {
-    if (this.matchType === 'Singles') {
+    if (+this.inputObj.match_type === 1) {
       this.filteredPrimaryParticipants = this.participantData.filter(
-        participant => participant.id !== this.inputObj.secondary_participant_id
+        participant => 
+          participant.id === this.inputObj.primary_participant_id || 
+          participant.id !== this.inputObj.secondary_participant_id
       );
 
       this.filteredSecondaryParticipants = this.participantData.filter(
-        participant => participant.id !== this.inputObj.primary_participant_id
-      );
-    } else if (this.matchType === 'Doubles') {
-      // Doubles filtering logic
-      // Filter for Team 1 (exclude all Team 2 players and selected Team 1 players)
-      this.filteredPrimaryParticipants = this.participantData.filter(
-        participant =>
-          participant.id !== this.inputObj.secondary_participant_id &&
-          participant.id !== this.secondary_participant_id2 &&
-          participant.id !== this.primary_participant_id2 &&
+        participant => 
+          participant.id === this.inputObj.secondary_participant_id || 
           participant.id !== this.inputObj.primary_participant_id
       );
+    } else if (+this.inputObj.match_type === 2) {
+      // Filter for Team 1 - include current selection or exclude other selected players
+      this.filteredPrimaryParticipants = this.participantData.filter(
+        participant =>
+          participant.id === this.inputObj.primary_participant_id ||
+          participant.id === this.inputObj.primary_participant_id2 ||
+          (participant.id !== this.inputObj.secondary_participant_id &&
+           participant.id !== this.inputObj.secondary_participant_id2)
+      );
 
-      // Filter for Team 2 (exclude all Team 1 players and selected Team 2 players)
+      // Filter for Team 2 - include current selection or exclude other selected players
       this.filteredSecondaryParticipants = this.participantData.filter(
         participant =>
-          participant.id !== this.inputObj.primary_participant_id &&
-          participant.id !== this.primary_participant_id2 &&
-          participant.id !== this.secondary_participant_id2 &&
-          participant.id !== this.inputObj.secondary_participant_id
+          participant.id === this.inputObj.secondary_participant_id ||
+          participant.id === this.inputObj.secondary_participant_id2 ||
+          (participant.id !== this.inputObj.primary_participant_id &&
+           participant.id !== this.inputObj.primary_participant_id2)
       );
     }
   }
@@ -495,7 +496,19 @@ export class CreatematchleaguePage {
     //   this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
     //   return false;
     // }
-
+    else if (+this.inputObj.match_type === 1) {
+      if (!this.inputObj.primary_participant_id || !this.inputObj.secondary_participant_id) {
+        this.commonService.toastMessage("Please select both participants for singles match", 2500, ToastMessageType.Error);
+        return false;
+      }
+    }
+    else if (+this.inputObj.match_type === 2) {
+      if (!this.inputObj.primary_participant_id || !this.inputObj.primary_participant_id2 || 
+          !this.inputObj.secondary_participant_id || !this.inputObj.secondary_participant_id2) {
+        this.commonService.toastMessage("Please select all players for doubles match", 2500, ToastMessageType.Error);
+        return false;
+      }
+    }
     else if ((this.inputObj.MatchPaymentType == 1) && (parseFloat(this.inputObj.Member_Fee) <= 0 || this.inputObj.Member_Fee == undefined || this.inputObj.Member_Fee == '0.00')) {
       const message = "Enter member fee";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
@@ -540,24 +553,21 @@ export class CreatematchleaguePage {
   async createMatchForLeague() {
     try {
       if (this.validateInput()) {
-        this.inputObj.primary_participant_id = this.inputObj.primary_participant_id;
-        this.inputObj.secondary_participant_id = this.inputObj.secondary_participant_id;
-
         this.inputObj.Round = Number(this.inputObj.Round);
-
         if (this.inputObj.MatchPaymentType != 1) {
           this.inputObj.Member_Fee = "0.00";
           this.inputObj.Non_Member_Fee = "0.00";
         }
 
-        // this.inputObj.StartDate = moment(new Date(this.startDate + " " + this.startTime).getTime()).format("YYYY-MM-DD HH:mm");
-        this.inputObj.StartDate = this.startDate + " " + this.startTime;
-        // this.inputObj.StartDate = new Date(this.startDate + " " + this.startTime).toISOString(); //iso date string if needed uncomment this line
+        this.inputObj.match_type = +this.inputObj.match_type;
+        if (this.inputObj.MatchPaymentType != 1) {
+          this.inputObj.Member_Fee = "0.00";
+          this.inputObj.Non_Member_Fee = "0.00";
+        }
 
-        this.inputObj.EndDate = this.startDate + " " + this.endTime;
+        this.inputObj.StartDate = moment(new Date(this.startDate + " " + this.startTime).getTime()).format("YYYY-MM-DD HH:mm");
+        this.inputObj.EndDate = moment(new Date(this.startDate + " " + this.endTime).getTime()).format("YYYY-MM-DD HH:mm");//this.startDate + " " + this.endTime;
 
-        // console.log('input date is:', this.inputObj.EndDate);
-        // console.log(new Date(this.startDate + " " + this.startTime).getTime());
         this.commonService.showLoader("Creating Match...");
         const createLeagueMutation = gql`
         mutation addMatchToLeague($createLeagueMatchInput: CreateLeagueMatchInput!) {

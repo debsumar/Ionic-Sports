@@ -29,11 +29,6 @@ export class TeamsForParentClubModel {
     ParentClubKey: string;
     ClubKey: string;
   }
-  club: {
-    ClubName: string;
-    FirebaseId: string;
-    Id: string;
-  }
   isSelect: boolean;
   logo_url: string;
 

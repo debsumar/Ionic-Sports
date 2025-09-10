@@ -14,7 +14,6 @@ import { Activity } from '../models/activity.model';
 import { GraphqlService } from '../../../../services/graphql.service';
 import { TeamImageUploadService } from '../../team/team_image_upload/team_image_upload.service';
 import { Camera, CameraOptions, PictureSourceType } from '@ionic-native/camera';
-import { IClubDetails } from '../../../../shared/model/club.model';
 
 /**
  * Generated class for the EditteamPage page.
@@ -33,7 +32,7 @@ export class EditteamPage {
   img_url: string = "";
 
   publicType: boolean = true;
-  clubs: IClubDetails[] = [];
+  clubVenues: ClubVenue[] = [];
   privateType: boolean = true;
   postgre_parentclubId: string;
 
@@ -212,68 +211,59 @@ export class EditteamPage {
   }
 
   selectClubName() {
-    const clubIndex = this.clubs.findIndex(
-      (club) => club.FirebaseId === this.parentClubTeamEdit.teamDetailsInput.venueKey,
+    const cluubIndex = this.clubVenues.findIndex(
+      (club) => club.ClubKey === this.parentClubTeamEdit.teamDetailsInput.venueKey,
     );
     this.parentClubTeamEdit.teamDetailsInput.venueKey =
-      clubIndex > -1 ? this.clubs[clubIndex].ClubName : "";
+      cluubIndex > -1 ? this.clubVenues[cluubIndex].ClubName : "";
   }
 
 
-  //getting venues using getVenuesByParentClub API
+  //getting venues
   getClubVenues = () => {
     this.commonService.showLoader("Please wait...");
-    const clubs_input = {
-      parentclub_id: this.postgre_parentclubId,
-      user_postgre_metadata: {
-        UserMemberId: this.sharedService.getLoggedInId()
-      },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedService.getPlatform() == "android" ? 1 : 2
-      }
-    }
     const clubVenuesQuery = gql`
-      query getVenuesByParentClub($clubs_input: ParentClubVenuesInput!){
-        getVenuesByParentClub(clubInput:$clubs_input){
-          Id
+      query getAllClubVenues($ParentClub: String!) {
+        getAllClubVenues(ParentClub: $ParentClub) {
           ClubName
-          FirebaseId
-          MapUrl
-          sequence
+          ClubKey
+          LocationType
         }
       }
     `;
     this.graphqlService.query(
       clubVenuesQuery,
-      { clubs_input: clubs_input },
-      0
+      { ParentClub: this.parentClubTeamEdit.ParentClubKey },
+      1
     ).subscribe(({ data }) => {
       this.commonService.hideLoader();
       console.log(
-        "venues data" + JSON.stringify(data["getVenuesByParentClub"])
+        "teams data" + JSON.stringify(data["getAllClubVenues"])
       );
-      this.clubs = data["getVenuesByParentClub"] as IClubDetails[];
-      console.log("all venues:", this.clubs)
+      this.commonService.hideLoader();
+      this.clubVenues = data["getAllClubVenues"];
+      console.log("alll venues:", this.clubVenues)
 
-      if (this.clubs.length > 0) {
-        // Find venue by matching Id from team.club
-        const selectedVenue = this.clubs.find(venue =>
-          venue.Id === this.team.club.Id
-        );
+      if (this.clubVenues.length > 0) {
+        // Set the venueKey from the team data to pre-select the correct venue
+        this.venueKey = this.team.venueKey;
+        console.log("venue :", this.venueKey)
 
+        // Find the selected venue in the clubVenues array
+        const selectedVenue = this.clubVenues.find(venue => venue.ClubKey === this.venueKey);
         if (selectedVenue) {
-          this.venueKey = selectedVenue.FirebaseId;
-          this.parentClubTeamEdit.teamDetailsInput.venueKey = selectedVenue.FirebaseId;
-          this.parentClubTeamEdit.teamDetailsInput.venueType = 1;
+          this.parentClubTeamEdit.teamDetailsInput.venueKey = selectedVenue.ClubKey;
+          this.parentClubTeamEdit.teamDetailsInput.venueType = selectedVenue.LocationType;
         } else {
-          // Fallback to first venue
-          this.venueKey = this.clubs[0].FirebaseId;
-          this.parentClubTeamEdit.teamDetailsInput.venueKey = this.clubs[0].FirebaseId;
-          this.parentClubTeamEdit.teamDetailsInput.venueType = 1;
+          // Fallback to first venue if team's venue is not found
+          this.parentClubTeamEdit.teamDetailsInput.venueKey = this.clubVenues[0].ClubKey;
+          this.parentClubTeamEdit.teamDetailsInput.venueType = this.clubVenues[0].LocationType;
+          this.venueKey = this.clubVenues[0].ClubKey;
         }
         this.getActivity();
       }
+      console.log("activity", this.clubVenues);
+
     },
       (error) => {
         this.commonService.toastMessage(
@@ -318,7 +308,7 @@ export class EditteamPage {
 
 
       }
-      // console.log("activity", this.clubVenues);
+      console.log("activity", this.clubVenues);
 
     },
       (error) => {
@@ -336,13 +326,6 @@ export class EditteamPage {
   updateTeamDetails = async () => {
     console.log(JSON.stringify(this.parentClubTeamEdit));
     this.parentClubTeamEdit.teamDetailsInput.venueKey = this.venueKey;
-
-    // Find the club using FirebaseId and set the Postgres clubId
-    const club = this.clubs.find(club => club.FirebaseId === this.venueKey);
-    if (club) {
-      // Ensure we're using the Postgres ID for the club
-      console.log("Using Postgres club ID:", club.Id);
-    }
 
     this.parentClubTeamEdit.teamDetailsInput.teamVisibility = this.parentClubTeamEdit.teamDetailsInput.teamVisibility;
     this.parentClubTeamEdit.teamDetailsInput.teamDescription = this.team.teamDescription;

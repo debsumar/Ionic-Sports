@@ -27,22 +27,23 @@ export interface CreateLeagueMatchInput {
 }
 
 export class CreateLeagueMatchInputV1 extends CommonRestApiDtoV1 {
-    league_id: string;
-    participant_ids: string[];
-    round: number;
-    match_status: number;
-    match_name: string;
-    group_id: string;
-    stage: number;
-    match_details: string;
-    start_date: string;
-    start_time: string;
-    location_id: string;
-    location_type: string;
-    end_date: string;
-    match_payment_type: number;
-    member_fees: number;
-    non_member_fees: number;
+  league_id: string;
+  participant_ids: string[];
+  round: number;
+  match_status: number;
+  match_name: string;
+  group_id: string;
+  stage: number;
+  match_details: string;
+  start_date: string;
+  start_time: string;
+  location_id: string;
+  location_type: string;
+  end_date: string;
+  match_type:number;
+  match_payment_type: number;
+  member_fees: number;
+  non_member_fees: number;
 }
 
 export interface UserPostgreMetadataField {

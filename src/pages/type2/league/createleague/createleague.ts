@@ -24,8 +24,7 @@ import { CoachList, SchoolList } from '../leaguemodels/creatematchforleague.dto'
 import { CatandType, Locations } from '../models/location.model';
 import { ClubActivityInput, IClubDetails } from '../../../../shared/model/club.model';
 import { HttpService } from '../../../../services/http.service';
-import { error } from 'console';
-
+import { API } from '../../../../shared/constants/api_constants';
 
 
 /**
@@ -318,12 +317,11 @@ export class CreateleaguePage {
   // }
 
   getLeagueType() {
-    this.httpService.post(`league/getTypes`, this.commonInput).subscribe((res: any) => {
+    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, this.commonInput).subscribe((res: any) => {
       this.leagueType = res["data"]
     }, (error) => {
       this.commonService.toastMessage("type fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    }
-    )
+    })
   }
 
   gotoDashboard() {
