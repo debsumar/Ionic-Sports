@@ -783,7 +783,9 @@ export class LeagueMatchInfoPage {
 
         this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
         // this.sections.forEach(section => section.items = []); // Clear the sections array
-        this.getLeagueMatchParticipant(1);
+        this.loadAllParticipantsForCounts().then(() => {
+          this.getLeagueMatchParticipant(1);
+        });
       }
     },
       (err) => {
