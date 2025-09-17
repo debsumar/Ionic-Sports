@@ -2,10 +2,11 @@ page-matchhistory {
   .scroll-content {
     background-color: #f7f7f7;
   }
-  .toolbar-title{
-    color:#fff;
+
+  .toolbar-title {
+    color: #fff;
   }
-  
+
   // Tab button styling
   .selected {
     background-color: rgba($color: #2b92bb, $alpha: 0.15) !important;
@@ -77,9 +78,10 @@ page-matchhistory {
     }
   }
 
-  .card-ios{
+  .card-ios {
     width: calc(100%) !important;
   }
+
   // Card styling
   .Location-head {
     font-size: 1.6rem;
@@ -103,7 +105,7 @@ page-matchhistory {
     width: 100%;
   }
 
-  .card-text > span {
+  .card-text>span {
     color: gray;
   }
 
@@ -154,13 +156,15 @@ page-matchhistory {
   }
 
 
-  .participant_row{
-    .margin_right_5{
-      nargin-right:5px;
+  .participant_row {
+    .margin_right_5 {
+      nargin-right: 5px;
     }
+
     margin-bottom: 5px;
-    .commman_para{
-      width:100%;
+
+    .commman_para {
+      width: 100%;
       display: flex;
       align-items: center;
       overflow: hidden;
@@ -169,12 +173,13 @@ page-matchhistory {
       //justify-content: center;
     }
 
-    
+
     .users_para {
-      font-size:18px;
+      font-size: 18px;
       font-weight: 500;
+
       //color:#2b92bb !important;
-      ion-icon{
+      ion-icon {
         position: absolute;
         right: 0px;
         top: 5px;
@@ -182,12 +187,13 @@ page-matchhistory {
         font-size: 1.2em;
       }
     }
-    .sets_para{
-      span{
-        margin-right:9px;
-        font-size:18px;
+
+    .sets_para {
+      span {
+        margin-right: 9px;
+        font-size: 18px;
         font-weight: 800;
-        color:rgba(0, 0, 0, 0.65);
+        color: rgba(0, 0, 0, 0.65);
       }
     }
   }

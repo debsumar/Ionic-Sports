@@ -25,7 +25,7 @@ import { ModuleTypeForEmail } from "../../mailtomemberbyadmin/mailtomemberbyadmi
 
 @IonicPage()
 @Component({
-  selector: "page-league_match_info",
+  selector: "page-league-match-info",
   templateUrl: "league_match_info.html",
   providers: [HttpService]
 })

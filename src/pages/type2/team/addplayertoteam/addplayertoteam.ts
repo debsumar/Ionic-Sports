@@ -150,7 +150,7 @@ export class Addplayertoteam {
       this.venus_user_input.search_term = search_term || "";
       this.getMembersData();
     });
-    
+
     this.subscriptions.push(searchSubscription);
   }
 
@@ -241,7 +241,7 @@ export class Addplayertoteam {
       this.commonService.hideLoader();
       this.handleError(error, "Failed to fetch players");
     });
-    
+
     this.subscriptions.push(querySubscription);
 
   }
@@ -293,7 +293,7 @@ export class Addplayertoteam {
         this.handleError(error, "Failed to fetch members data");
       }
     );
-    
+
     this.subscriptions.push(membersSubscription);
 
   }
@@ -313,14 +313,14 @@ export class Addplayertoteam {
     if (!data || data.length > 10000) { // Basic size validation
       throw new Error('Invalid data format');
     }
-    
+
     const parsed = JSON.parse(data);
-    
+
     // Validate expected structure
     if (typeof parsed !== 'object' || parsed === null) {
       throw new Error('Invalid user data structure');
     }
-    
+
     return parsed;
   }
 
@@ -335,13 +335,13 @@ export class Addplayertoteam {
   // 🚨 Centralized error handling
   private handleError(error: any, userMessage: string) {
     let errorMsg = userMessage;
-    
+
     if (error.graphQLErrors && error.graphQLErrors.length > 0) {
       errorMsg = error.graphQLErrors[0].message || userMessage;
     } else if (error.networkError) {
       errorMsg = "Network connection error. Please check your internet connection.";
     }
-    
+
     this.commonService.toastMessage(errorMsg, 3000, ToastMessageType.Error);
   }
 
@@ -379,7 +379,7 @@ export class Addplayertoteam {
             this.handleError(error, "Failed to save player");
           }
         );
-        
+
         this.subscriptions.push(saveSubscription);
 
       } catch (error) {

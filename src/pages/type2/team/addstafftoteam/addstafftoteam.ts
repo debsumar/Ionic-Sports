@@ -62,7 +62,7 @@ export class AddstafftoteamPage {
   themeType: number;
   staff: StaffModel[] = [];
   filteredStaff: StaffModel[] = [];
-  
+
   private searchTerms = new Subject<string>();
   private selectedStaffSet = new Set<string>(); // 🚀 Performance optimization for staff selection
   private existingStaffSet = new Set<string>(); // 🚀 Performance optimization for existing staff check
@@ -133,7 +133,7 @@ export class AddstafftoteamPage {
     ).subscribe(search_term => {
       this.filterStaff(search_term);
     });
-    
+
     this.subscriptions.push(searchSubscription);
   }
 
@@ -200,7 +200,7 @@ export class AddstafftoteamPage {
       this.commonService.hideLoader();
       this.handleError(error, "Failed to fetch staff");
     });
-    
+
     this.subscriptions.push(staffSubscription);
 
   }
@@ -261,7 +261,7 @@ export class AddstafftoteamPage {
               this.handleError(error, "Failed to save staff");
             }
           );
-        
+
         this.subscriptions.push(saveSubscription);
       } catch (error) {
         this.commonService.hideLoader();
@@ -275,13 +275,13 @@ export class AddstafftoteamPage {
   // 🚨 Centralized error handling
   private handleError(error: any, userMessage: string) {
     let errorMsg = userMessage;
-    
+
     if (error.graphQLErrors && error.graphQLErrors.length > 0) {
       errorMsg = error.graphQLErrors[0].message || userMessage;
     } else if (error.networkError) {
       errorMsg = "Network connection error. Please check your internet connection.";
     }
-    
+
     this.commonService.toastMessage(errorMsg, 3000, ToastMessageType.Error);
   }
 
