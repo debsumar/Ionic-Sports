@@ -1093,12 +1093,13 @@ export class LeaguedetailsPage {
 
   showMatchActionSheet(match: LeagueMatch) {
     if( this.individualLeague.league_type === 3) {
-      this.commonService.showMatchActionSheet(match, {
-          onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
-          onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
+      //this.commonService.showMatchActionSheet(match, {
+          //onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
+          //onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
           // onDelete: () => this.removeMatch(match),
           // onUpdateResult: () => this.updateResult(match)
-      });
+      //});
+      this.gotoLeagueMatchInfoPage(match);
     }else{
       this.gotoMatchDetails(match);
     }

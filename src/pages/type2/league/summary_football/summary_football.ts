@@ -1536,7 +1536,7 @@ export class SummaryFootballPage implements AfterViewInit {
             DESCRIPTION: footballResultStats.DESCRIPTION || '',
             WINNER_ID: footballResultStats.WINNER_ID || '',
             LOSER_ID: loserId || '',
-            RESULT_STATUS: data.resultStatus || '0'
+            RESULT_STATUS: data.resultStatus || 0
           }
         }
       };

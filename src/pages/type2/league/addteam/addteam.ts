@@ -130,12 +130,12 @@ export class AddteamPage {
 
   getTeam() {
     this.commonService.showLoader("Fetching teams...");
-    
+
     const teamSubscription = this.httpService.post('league/getActivitySpecificTeam', this.inputObj).subscribe({
       next: (res: any) => {
         this.commonService.hideLoader();
         this.teamsForParentClub = res.data;
-        
+
         if (this.teamsForParentClub.length > 0) {
           this.teamsForParentClub = this.teamsForParentClub.map(team => ({
             ...team,
@@ -143,7 +143,7 @@ export class AddteamPage {
             isAlreadyExisted: this.existingTeamsSet.has(team.id)
           }));
         }
-        
+
         this.filteredteams = [...this.teamsForParentClub];
         this.updateTeamStates();
       },
@@ -181,7 +181,7 @@ export class AddteamPage {
       this.filteredteams = [...this.teamsForParentClub];
     } else {
       const term = searchTerm.toLowerCase().trim();
-      this.filteredteams = this.teamsForParentClub.filter(team => 
+      this.filteredteams = this.teamsForParentClub.filter(team =>
         team.teamName && team.teamName.toLowerCase().includes(term)
       );
     }
@@ -216,7 +216,7 @@ export class AddteamPage {
 
   assignTeams() {
     const selectedTeamsCount = this.leagueParticipantInput.parentclubteamIds.length;
-    
+
     if (selectedTeamsCount === 0) {
       this.commonService.toastMessage("Please select at least one team", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       return;
@@ -224,7 +224,7 @@ export class AddteamPage {
 
     try {
       this.commonService.showLoader("Please wait");
-      
+
       const submitMembersMutation = gql`
          mutation addParticipantToLeague($leagueParticipant: LeagueParticipantInput!) {
            addParticipantToLeague(leagueParticipant: $leagueParticipant) {

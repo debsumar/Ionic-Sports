@@ -402,7 +402,7 @@ export class AutocreatematchPage {
         this.inputObj.match_name = '',
         this.inputObj.match_type = +this.inputObj.match_type; // 0 - singles, 1 - doubles, 2 - teams
       this.inputObj.start_date = moment(new Date(this.matchDate + " " + this.matchTime).getTime()).format("YYYY-MM-DD HH:mm");
-        this.inputObj.end_date = moment(new Date(this.matchDate + " " + '23:59').getTime()).format("YYYY-MM-DD HH:mm");
+      this.inputObj.end_date = moment(new Date(this.matchDate + " " + '23:59').getTime()).format("YYYY-MM-DD HH:mm");
       this.inputObj.group_id = '',
         this.inputObj.stage = this.selectedRound,
         this.inputObj.match_details = '',

@@ -4,7 +4,7 @@ import { ActivityModel } from "../../match/models/match.model";
 
 export class TeamsForParentClubModel {
   isSelected?: boolean; // Add the 'selected' property
-  isAlreadyExisted?: boolean; // Add the 'isAlreadyExisted' property
+  isAlreadyExisted?: boolean;
   id: string;
   message: string;
   created_at: string;
