@@ -26,6 +26,11 @@ import { GetPlayerModel, GetStaffModel, MembersModel, TeamsForParentClubModel } 
 import { stringify } from "querystring";
 // import { teaminLeagueModel } from "../../league/models/league.model";
 import { GraphqlService } from "../../../../services/graphql.service";
+import { HttpService } from "../../../../services/http.service";
+import { API } from "../../../../shared/constants/api_constants";
+import { UpdateTeamMemberFieldsModel } from "../team.model";
+import { AppType } from "../../../../shared/constants/module.constants";
+import { LeaguePlayerInviteStatus } from "../../../../shared/utility/enums";
 
 
 /**
@@ -39,14 +44,11 @@ import { GraphqlService } from "../../../../services/graphql.service";
 @Component({
   selector: "page-teamdetails",
   templateUrl: "teamdetails.html",
+  providers: [HttpService]
+
 })
 export class TeamdetailsPage {
 
-  //**Player related stuff start from line no 129 ***/
-
-  //**staff related stuff start from line no 380 */
-
-  //**Team related stuff(edit,delete) start from line no 312*/
   searchTerm: string;
 
   activeType: boolean = true;
@@ -73,6 +75,24 @@ export class TeamdetailsPage {
   // lteam:teaminLeagueModel;
   lteam: TeamsForParentClubModel;
 
+  updateTeamMemberFieldsInput: UpdateTeamMemberFieldsInput = {
+    parentclubId: "",
+    clubId: "",
+    activityId: "",
+    memberId: "",
+    action_type: 0,
+    device_type: 0,
+    app_type: 0,
+    device_id: "",
+    updated_by: "",
+    created_by: "",
+    teamMemberId: "",
+    inviteType: 0,
+    playerStatus: 0,
+    inviteStatus: 0,
+    inviteUpdatedBy: ""
+  }
+  updateTeamMemberFieldsRes: UpdateTeamMemberFieldsModel;
 
   teamsForParentClub: TeamsForParentClubModel;
 
@@ -91,6 +111,7 @@ export class TeamdetailsPage {
     ActionType: 0,
     parentClubteamId: ""
   }
+
   // teams: teaminLeagueModel
 
   constructor(
@@ -108,7 +129,8 @@ export class TeamdetailsPage {
     private toastCtrl: ToastController,
     public sharedservice: SharedServices,
     public modalCtrl: ModalController,
-    private graphqlService: GraphqlService
+    private graphqlService: GraphqlService,
+    private httpService: HttpService
   ) {
     console.log(
       `${this.navParams.get("selectedteamId")}:${this.navParams.get(
@@ -144,6 +166,12 @@ export class TeamdetailsPage {
         this.getStaffInput.parentClubteamId = String(this.team.id);
         console.log("team id is:", this.getStaffInput.parentClubteamId)
 
+        // Initialize updateTeamMemberFieldsInput
+        this.updateTeamMemberFieldsInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+        this.updateTeamMemberFieldsInput.action_type = 0;
+        this.updateTeamMemberFieldsInput.app_type = AppType.ADMIN_NEW;
+        this.updateTeamMemberFieldsInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+        this.updateTeamMemberFieldsInput.updated_by = this.sharedservice.getLoggedInId();
         // this.teamRolesInput.activityCode=this.team.activity.activityCode;
 
       }
@@ -242,33 +270,41 @@ export class TeamdetailsPage {
   //ActionSheet Controller
   presentActionSheet(member: GetPlayerModel) {
     let actionSheet = this.actionSheetCtrl.create({
+      title: `${member.user.FirstName} ${member.user.LastName}`,
       buttons: [
+
+        {
+          text: 'Confirmed',
+          icon: 'checkmark-circle',
+          cssClass: 'action-sheet-confirmed',
+          handler: () => {
+            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted);
+          }
+        },
+        {
+          text: 'Maybe',
+          icon: 'help-circle',
+          cssClass: 'action-sheet-maybe',
+          handler: () => {
+            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe);
+          }
+        },
+        {
+          text: 'Declined',
+          icon: 'close-circle',
+          cssClass: 'action-sheet-declined',
+          handler: () => {
+            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined);
+          }
+        },
         {
           text: 'Update Role',
-          icon: 'female',
+          icon: 'people',
           handler: () => {
             //for updating roles
             this.addRoleforPlayerandStaff(member)
           }
         },
-
-
-        // {
-        //   text: 'Profile',
-        //   icon: 'ios-contact',
-        //   handler: () => {
-        //     this.getProfile();
-        //   }
-        // },
-        // {
-        //   text: 'Send Email',
-        //   icon: 'md-mail',
-        //   handler: () => {
-        //     this.sendMailToPlayer(member)
-        //     debugger
-        //   }
-        // },
-
         {
           text: 'Send Notification',
           icon: 'notifications',
@@ -276,8 +312,6 @@ export class TeamdetailsPage {
             this.sendNotificationToPlayer(member)
           }
         },
-
-
         {
           text: 'Remove Player',
           icon: 'ios-trash',
@@ -309,6 +343,12 @@ export class TeamdetailsPage {
             EmailID
             is_child
             parent_key
+            invite_status
+            invite_type
+            player_status
+            invite_status_text
+            player_status_text
+            invite_type_text
           }
          teamrole{
               role_type
@@ -848,6 +888,93 @@ export class TeamdetailsPage {
     toast.present();
   }
 
+  updateLeagueMatchInviteStatus(member: GetPlayerModel, inviteStatus: LeaguePlayerInviteStatus) {
+    this.updateTeamMemberFieldsInput.inviteStatus = inviteStatus;
+    this.updateTeamMemberFields(member.id, 0, 0, inviteStatus);
+  }
+
+
+  // 🎨 Get color based on invite status text
+  getInviteStatusColor(inviteStatusText: string): string {
+    if (!inviteStatusText) return '#32db64';
+
+    const text = inviteStatusText.toLowerCase();
+
+    if (text.includes('playing') || text.includes('accepted') || text.includes('confirmed') || text.includes('admin accepted')) {
+      return '#32db64'; // Green
+    }
+    if (text.includes('declined') || text.includes('rejected') || text.includes('admin declined') || text.includes('admin cancelled') || text.includes('admin deleted')) {
+      return '#f53d3d'; // Red
+    }
+    if (text.includes('maybe')) {
+      return '#b8860b'; // Dark yellow
+    }
+    return '#f76e04'; // Orange for pending/other
+  }
+
+  // 🎯 Get icon based on invite status text
+  getInviteStatusIconByText(inviteStatusText: string): string {
+    if (!inviteStatusText) return 'checkmark-circle';
+
+    const text = inviteStatusText.toLowerCase();
+
+    if (text.includes('playing') || text.includes('accepted') || text.includes('confirmed') || text.includes('admin accepted')) {
+      return 'checkmark-circle';
+    }
+    if (text.includes('declined') || text.includes('rejected') || text.includes('admin declined') || text.includes('admin cancelled') || text.includes('admin deleted')) {
+      return 'close-circle';
+    }
+    if (text.includes('maybe')) {
+      return 'help-circle';
+    }
+    return 'warning';
+  }
+
+
+  updateTeamMemberFields(teamMemberId: string, inviteType: number, playerStatus: number, inviteStatus: number) {
+    this.commonService.showLoader("Updating team member...");
+
+    this.updateTeamMemberFieldsInput.teamMemberId = teamMemberId;
+    this.updateTeamMemberFieldsInput.inviteType = 0; //by default
+    // this.updateTeamMemberFieldsInput.inviteType = inviteType;
+    this.updateTeamMemberFieldsInput.playerStatus = playerStatus; //to be discussed??????
+    this.updateTeamMemberFieldsInput.inviteStatus = inviteStatus;
+    this.updateTeamMemberFieldsInput.inviteUpdatedBy = teamMemberId;
+
+    this.httpService.post(`${API.UPDATE_TEAM_MEMBER_FIELDS}`, this.updateTeamMemberFieldsInput).subscribe((res: any) => {
+      if (res) {
+        this.commonService.hideLoader();
+        this.commonService.toastMessage(res.message, 3000, ToastMessageType.Success);
+        this.updateTeamMemberFieldsRes = res;
+        this.getInvitedPlayers();
+      } else {
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Failed to update team member fields", 3000, ToastMessageType.Error);
+      }
+    }, (err) => {
+      this.commonService.hideLoader();
+      this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error);
+    });
+  }
+
+}
+
+export class UpdateTeamMemberFieldsInput {
+  parentclubId: string; // 🏢 Parent club ID
+  clubId: string; // 🏟️ Club ID
+  activityId: string; // ⚽ Activity ID
+  memberId: string; // 👤 Member ID
+  action_type: number; // ⚙️ Action type
+  device_type: number; // 📱 Device type (1=Android, 2=iOS)
+  app_type: number; // 📱 App type
+  device_id: string; // 🆔 Device ID
+  updated_by: string; // ✍️ User who updated
+  created_by: string; // ✍️ User who created
+  teamMemberId: string; // 👥 Team member ID
+  inviteType: number; // 📧 Invite type
+  playerStatus: number; // 📊 Player status
+  inviteStatus: number; // 📧 Invite status
+  inviteUpdatedBy: string; // ✍️ User who updated invite
 }
 
 

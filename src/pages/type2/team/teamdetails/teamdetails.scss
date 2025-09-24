@@ -6,9 +6,9 @@ page-teamdetails {
   .scroll-content {
     // background-color: #f7f7f7;
     // background: #F5F5F5;
-   
-      background-color: #f7f7f7;
-    
+
+    background-color: #f7f7f7;
+
   }
 
   .cardrow {
@@ -72,9 +72,11 @@ page-teamdetails {
     font-size: 16px;
     color: #154766;
   }
-.alignElement{
-  display: inline-block;
-}
+
+  .alignElement {
+    display: inline-block;
+  }
+
   //   .cardrow {
   //     margin: 0 0px;
   //     padding: 0 0px;
@@ -122,6 +124,7 @@ page-teamdetails {
     margin-right: 10px;
     margin-left: 10px;
     margin-bottom: 0px;
+    padding-bottom: 4px !important;
     border-bottom: 1px solid #CCCCCC;
     //  border-bottom: rgba(0, 0, 0, 0.64);
 
@@ -412,4 +415,72 @@ page-teamdetails {
       -webkit-transform: translateY(-1rem);
     }
   }
+
+  // Status display colors for invite status
+  .status-playing {
+    color: #32db64 !important; // Green for playing status
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .status-not-playing {
+    color: #f53d3d !important; // Red for not playing status
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .status-maybe {
+    color: #b8860b !important; // Dark yellow for maybe status
+    font-weight: 600;
+    font-size: 12px;
+  }
+
+  .status-other {
+    color: grey !important; // grey for other statuses
+    font-weight: 500;
+    font-size: 12px;
+  }
+
+  .status-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    height: 100%;
+
+    ion-icon {
+      font-size: 16px;
+    }
+
+    .status-text {
+      font-size: 12px;
+      font-weight: 600;
+    }
+  }
+}
+
+// Global action sheet styles
+.action-sheet-confirmed .action-sheet-icon {
+  color: #32db64 !important; // Green
+}
+
+.action-sheet-maybe .action-sheet-icon {
+  color: #b8860b !important; // Dark yellow
+}
+
+.action-sheet-declined .action-sheet-icon {
+  color: #f53d3d !important; // Red
+}
+
+// Alternative selectors if above doesn't work
+ion-action-sheet .action-sheet-confirmed ion-icon {
+  color: #32db64 !important;
+}
+
+ion-action-sheet .action-sheet-maybe ion-icon {
+  color: #b8860b !important;
+}
+
+ion-action-sheet .action-sheet-declined ion-icon {
+  color: #f53d3d !important;
 }

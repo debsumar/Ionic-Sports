@@ -135,8 +135,20 @@
 
     <ion-card class="cardStyle" (click)="presentActionSheet(player)" *ngFor="let player of   filteredParticipant">
       <ion-row>
-        <ion-col col-6 class="applyPadding"> {{player.user.FirstName}} {{player.user.LastName}}</ion-col>
-        <ion-col col-6 class="margin-auto">{{player.teamrole.role_name}}</ion-col>
+        <ion-col col-8 class="applyPadding">
+          <div>{{player.user.FirstName}} {{player.user.LastName}}</div>
+          <div style="padding-bottom: 4px;">{{player.teamrole.role_name}}</div>
+        </ion-col>
+        <ion-col col-4 class="status-col">
+          <div class="status-container">
+            <ion-icon [name]="getInviteStatusIconByText(player.user.invite_status_text)"
+              [style.color]="getInviteStatusColor(player.user.invite_status_text)">
+            </ion-icon>
+            <span class="status-text" [style.color]="getInviteStatusColor(player.user.invite_status_text)">
+              {{player.user.invite_status_text}}
+            </span>
+          </div>
+        </ion-col>
       </ion-row>
     </ion-card>
 
