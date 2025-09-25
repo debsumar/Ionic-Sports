@@ -793,6 +793,7 @@ export class SummaryFootballPage implements AfterViewInit {
               3000,
               ToastMessageType.Error
             );
+            this.calculateDefaultPossession(homeValue, awayValue);
             return false;
           }
         }
@@ -836,6 +837,18 @@ export class SummaryFootballPage implements AfterViewInit {
       this.commonService.toastMessage("Error validating possession values", 3000, ToastMessageType.Error);
       return false;
     }
+  }
+
+  calculateDefaultPossession(homeValue: number, awayValue: number): void {
+    if (this.isHomeStatsPopupVisible) {
+      this.homePoss = (100 - awayValue).toFixed(2);
+    } else {
+      this.awayPoss = (100 - homeValue).toFixed(2)//.split('.')[0];
+    }
+    // Redraw chart when data updates
+    setTimeout(() => {
+      this.drawDoughnutChart();
+    }, 100);
   }
 
   private areBothPossessionValuesPopulated(): boolean {

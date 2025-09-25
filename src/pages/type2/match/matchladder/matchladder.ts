@@ -19,6 +19,7 @@ import { LadderModel } from "../models/match.model";
 import { HttpLink } from "apollo-angular-link-http";
 import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../../services/graphql.service";
+import { ThemeService } from "../../../../services/theme.service";
 import { error } from "console";
 /**
  * Generated class for the MatchladderPage page.
@@ -52,6 +53,8 @@ export class MatchladderPage {
   headtohead: any;
   filteredLadderHead: any;
   parentclubKey: string;
+  isDarkTheme: boolean = false;
+  
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
@@ -63,6 +66,7 @@ export class MatchladderPage {
     public fb: FirebaseService,
     public sharedservice: SharedServices,
     private graphqlService: GraphqlService,
+    private themeService: ThemeService
   ) {
     this.commonService.category.pipe(first()).subscribe((data) => {
       if (data == "ladderlist") {
@@ -81,15 +85,26 @@ export class MatchladderPage {
   }
 
   ionViewDidLoad() { }
+  
   ionViewWillEnter() {
     console.log("ionViewDidLoad MatchladderPage");
-    // this.storage.get("userObj").then((val) => {
-    //   val = JSON.parse(val);
-    //   if (val.$key != "") {
-    //     this.parentclubKey = val.UserInfo[0].ParentClubKey;
-    //   }
-    //   this.getLadderList();
-    // });
+    
+    // Subscribe to theme changes
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const ladderElement = document.querySelector('page-matchladder');
+    if (ladderElement) {
+      if (isDark) {
+        ladderElement.classList.remove('light-theme');
+      } else {
+        ladderElement.classList.add('light-theme');
+      }
+    }
   }
 
   getAgeCategories = () => {

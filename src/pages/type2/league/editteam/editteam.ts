@@ -1,19 +1,16 @@
 import { Component } from '@angular/core';
 import { ActionSheetController, IonicPage, NavController, NavParams, PopoverController, ToastController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
-import moment from "moment";
 import gql from 'graphql-tag';
 import { FirebaseService } from '../../../../services/firebase.service';
 import { SharedServices } from '../../../services/sharedservice';
-import { ClubVenue } from '../models/venue.model';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
-import { Apollo } from 'apollo-angular';
-import { HttpLink } from 'apollo-angular-link-http';
 import { EditTeamsForParentClubModel, TeamsForParentClubModel } from '../models/team.model';
 import { Activity } from '../models/activity.model';
 import { GraphqlService } from '../../../../services/graphql.service';
 import { TeamImageUploadService } from '../../team/team_image_upload/team_image_upload.service';
 import { Camera, CameraOptions, PictureSourceType } from '@ionic-native/camera';
+import { IClubDetails } from '../../../../shared/model/club.model';
 
 /**
  * Generated class for the EditteamPage page.
@@ -30,12 +27,13 @@ import { Camera, CameraOptions, PictureSourceType } from '@ionic-native/camera';
 })
 export class EditteamPage {
   img_url: string = "";
-
   publicType: boolean = true;
-  clubVenues: ClubVenue[] = [];
+  clubVenues: IClubDetails[] = [];
   privateType: boolean = true;
   postgre_parentclubId: string;
-
+  isShowImagePopup: boolean = false;
+  arrow: boolean = false;
+  popupImageUrl: string = "";
   parentClubTeamEdit: ParentClubTeamEdit = {
     ParentClubKey: "",
     MemberKey: "",
@@ -45,7 +43,7 @@ export class EditteamPage {
     teamDetailsInput: {
       activityCode: "",
       venueKey: "",
-      venueType: 0,
+      venueType: 1,
       ageGroup: "",
       teamName: "",
       teamStatus: 0,
@@ -65,9 +63,7 @@ export class EditteamPage {
     VenueKey: ""
   }
 
-  allactivity = [];
   types = [];
-  venueKey: string;
   editTeams: TeamsForParentClubModel;
   // team:EditTeamsForParentClubModel;
   team: TeamsForParentClubModel;
@@ -82,7 +78,6 @@ export class EditteamPage {
     public commonService: CommonService,
     public popoverCtrl: PopoverController,
     private toastCtrl: ToastController,
-    private apollo: Apollo,
     private graphqlService: GraphqlService,
     public actionSheetCtrl: ActionSheetController,
 
@@ -93,6 +88,8 @@ export class EditteamPage {
   ) {
     this.team = this.navParams.get("team");
     console.log(this.team);
+    this.parentClubTeamEdit.teamDetailsInput.venueKey = this.team.venueKey;
+    this.parentClubTeamEdit.teamDetailsInput.logo_url = this.team.logo_url;
     this.publicType = this.team.teamVisibility == '0' ? true : false
     console.log(this.team);
     this.storage.get("userObj").then((val) => {
@@ -101,13 +98,12 @@ export class EditteamPage {
         this.postgre_parentclubId = this.sharedService.getPostgreParentClubId();
 
         this.parentClubTeamEdit.teamId = this.team.id;
-        this.parentClubTeamEdit.ParentClubKey =
-          val.UserInfo[0].ParentClubKey;
+        this.parentClubTeamEdit.ParentClubKey = val.UserInfo[0].ParentClubKey;
         this.parentClubTeamEdit.MemberKey = val.$key;
         this.venueDetailsInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
         this.venueDetailsInput.MemberKey = val.$key;
         this.parentClubTeamEdit.teamDetailsInput.logo_url = this.team.logo_url
-        this.getClubVenues();
+        this.getParentClubVenues();
       }
     });
   }
@@ -212,7 +208,7 @@ export class EditteamPage {
 
   selectClubName() {
     const cluubIndex = this.clubVenues.findIndex(
-      (club) => club.ClubKey === this.parentClubTeamEdit.teamDetailsInput.venueKey,
+      (club) => club.FirebaseId === this.parentClubTeamEdit.teamDetailsInput.venueKey,
     );
     this.parentClubTeamEdit.teamDetailsInput.venueKey =
       cluubIndex > -1 ? this.clubVenues[cluubIndex].ClubName : "";
@@ -220,65 +216,60 @@ export class EditteamPage {
 
 
   //getting venues
-  getClubVenues = () => {
-    this.commonService.showLoader("Please wait...");
-    const clubVenuesQuery = gql`
-      query getAllClubVenues($ParentClub: String!) {
-        getAllClubVenues(ParentClub: $ParentClub) {
-          ClubName
-          ClubKey
-          LocationType
+  getParentClubVenues() {
+    const clubs_input = {
+      parentclub_id: this.sharedservice.getPostgreParentClubId(),
+      user_postgre_metadata: {
+        UserMemberId: this.sharedservice.getLoggedInUserId()
+      },
+      user_device_metadata: {
+        UserAppType: 0,
+        UserDeviceType: this.sharedservice.getPlatform() == "android" ? 1 : 2
+      }
+    }
+    const clubs_query = gql`
+          query getVenuesByParentClub($clubs_input: ParentClubVenuesInput!){
+            getVenuesByParentClub(clubInput:$clubs_input){
+                  Id
+                  ClubName
+                  FirebaseId
+                  MapUrl
+                  sequence
+              }
+          }
+          `;
+    this.graphqlService.query(clubs_query, { clubs_input: clubs_input }, 0)
+      .subscribe((res: any) => {
+        console.log("teams data" + JSON.stringify(res.data["getVenuesByParentClub"]));
+        this.commonService.hideLoader();
+        this.clubVenues = res.data["getVenuesByParentClub"];
+        console.log("alll venues:", this.clubVenues)
+
+        if (this.clubVenues.length > 0) {
+          // Set the venueKey from the team data to pre-select the correct venue
+
+          // Find the selected venue in the clubVenues array
+          const selectedVenue = this.clubVenues.find(venue => venue.FirebaseId === this.parentClubTeamEdit.teamDetailsInput.venueKey);
+          if (selectedVenue) {
+            this.parentClubTeamEdit.teamDetailsInput.venueKey = selectedVenue.FirebaseId;
+            //this.parentClubTeamEdit.teamDetailsInput.venueType = selectedVenue.LocationType;
+          } else {
+            // Fallback to first venue if team's venue is not found
+            this.parentClubTeamEdit.teamDetailsInput.venueKey = this.clubVenues[0].FirebaseId;
+            //this.parentClubTeamEdit.teamDetailsInput.venueType = this.clubVenues[0].LocationType;
+          }
+          this.getActivity();
         }
-      }
-    `;
-    this.graphqlService.query(
-      clubVenuesQuery,
-      { ParentClub: this.parentClubTeamEdit.ParentClubKey },
-      1
-    ).subscribe(({ data }) => {
-      this.commonService.hideLoader();
-      console.log(
-        "teams data" + JSON.stringify(data["getAllClubVenues"])
-      );
-      this.commonService.hideLoader();
-      this.clubVenues = data["getAllClubVenues"];
-      console.log("alll venues:", this.clubVenues)
-
-      if (this.clubVenues.length > 0) {
-        // Set the venueKey from the team data to pre-select the correct venue
-        this.venueKey = this.team.venueKey;
-        console.log("venue :", this.venueKey)
-
-        // Find the selected venue in the clubVenues array
-        const selectedVenue = this.clubVenues.find(venue => venue.ClubKey === this.venueKey);
-        if (selectedVenue) {
-          this.parentClubTeamEdit.teamDetailsInput.venueKey = selectedVenue.ClubKey;
-          this.parentClubTeamEdit.teamDetailsInput.venueType = selectedVenue.LocationType;
-        } else {
-          // Fallback to first venue if team's venue is not found
-          this.parentClubTeamEdit.teamDetailsInput.venueKey = this.clubVenues[0].ClubKey;
-          this.parentClubTeamEdit.teamDetailsInput.venueType = this.clubVenues[0].LocationType;
-          this.venueKey = this.clubVenues[0].ClubKey;
-        }
-        this.getActivity();
-      }
-      console.log("activity", this.clubVenues);
-
-    },
-      (error) => {
-        this.commonService.toastMessage(
-          "Club venue fetch failed",
-          2500,
-          ToastMessageType.Error,
-          ToastPlacement.Bottom
-        );
-      }
-    )
-  };
+        console.log("activity", this.clubVenues);
+      }, (error) => {
+        this.commonService.toastMessage("No venues found", 2500, ToastMessageType.Error)
+        console.error("Error in fetching:", error);
+      });
+  }
 
   getActivity() {
     //this.commonService.showLoader("Please wait...");
-    this.venueDetailsInput.VenueKey = this.venueKey;
+    this.venueDetailsInput.VenueKey = this.parentClubTeamEdit.teamDetailsInput.venueKey;
 
     console.log("venueKey for activity", this.venueDetailsInput.VenueKey);
     const activityQuery = gql`
@@ -325,7 +316,6 @@ export class EditteamPage {
   //Mutation for updating the team
   updateTeamDetails = async () => {
     console.log(JSON.stringify(this.parentClubTeamEdit));
-    this.parentClubTeamEdit.teamDetailsInput.venueKey = this.venueKey;
 
     this.parentClubTeamEdit.teamDetailsInput.teamVisibility = this.parentClubTeamEdit.teamDetailsInput.teamVisibility;
     this.parentClubTeamEdit.teamDetailsInput.teamDescription = this.team.teamDescription;
@@ -354,7 +344,7 @@ export class EditteamPage {
 
     const variables = { teamEditInput: this.parentClubTeamEdit };
 
-    await this.graphqlService.mutate(updateMut, variables, 0).subscribe((res: any) => {
+    this.graphqlService.mutate(updateMut, variables, 0).subscribe((res: any) => {
       this.commonService.hideLoader();
       this.commonService.toastMessage(
         "Team updated successfully",
@@ -385,17 +375,9 @@ export class EditteamPage {
   //age group hint
   ageGroupHint() {
     let message = "Enter age group separated by comma (,) e.g. 12U, 14U etc.";
-    this.showToast(message, 5000);
+    this.commonService.toastMessage(message, 2500, ToastMessageType.Info);
   }
 
-  showToast(m: string, dur: number) {
-    let toast = this.toastCtrl.create({
-      message: m,
-      duration: dur,
-      position: "bottom",
-    });
-    toast.present();
-  }
 
   goToDashboardMenuPage() {
     this.navCtrl.setRoot("Dashboard");
@@ -407,7 +389,20 @@ export class EditteamPage {
       ev: myEvent,
     });
   }
+
+  showImagePopup(imageUrl: string): void {
+    this.popupImageUrl = imageUrl;
+    this.isShowImagePopup = true;
+  }
+
+  closeImagePopup(): void {
+    this.isShowImagePopup = false;
+    this.popupImageUrl = "";
+  }
+
 } // ✅ Corrected closing bracket for the class
+
+
 
 export class ParentClubTeamEdit {
   ParentClubKey: string

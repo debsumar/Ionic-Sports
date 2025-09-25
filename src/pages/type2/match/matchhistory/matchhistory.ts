@@ -16,6 +16,7 @@ import { AllMatchData, MatchModelV3 } from "../../../../shared/model/match.model
 import { AppType } from "../../../../shared/constants/module.constants";
 import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
+import { ThemeService } from "../../../../services/theme.service";
 
 
 /**
@@ -72,6 +73,8 @@ export class MatchhistoryPage {
     user_postgre_metadata: new UserPostgreMetadataField,
     user_device_metadata: new UserDeviceMetadataField
   }
+  isDarkTheme: boolean = false;
+  private subscriptions: any[] = [];
 
   constructor(
     public navCtrl: NavController,
@@ -83,6 +86,7 @@ export class MatchhistoryPage {
     public sharedservice: SharedServices,
     public graphqlService: GraphqlService,
     private httpService: HttpService,
+    private themeService: ThemeService
   ) {
     this.commonService.category.pipe(first()).subscribe((data) => {
       if (data == "match_history") {
@@ -110,6 +114,38 @@ export class MatchhistoryPage {
 
   ionViewWillEnter() {
     console.log("MatchhistoryPage");
+    
+    // Subscribe to theme changes
+    const themeSubscription = this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+    this.subscriptions.push(themeSubscription);
+    
+    // Apply current theme immediately
+    this.isDarkTheme = this.themeService.getCurrentTheme();
+    this.applyTheme(this.isDarkTheme);
+  }
+
+  ionViewWillLeave() {
+    // Cleanup subscriptions
+    this.subscriptions.forEach(sub => {
+      if (sub && !sub.closed) {
+        sub.unsubscribe();
+      }
+    });
+    this.subscriptions = [];
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const historyElement = document.querySelector('page-matchhistory');
+    if (historyElement) {
+      if (isDark) {
+        historyElement.classList.remove('light-theme');
+      } else {
+        historyElement.classList.add('light-theme');
+      }
+    }
   }
 
   changeType(index: number) {

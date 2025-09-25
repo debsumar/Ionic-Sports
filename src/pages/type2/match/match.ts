@@ -23,6 +23,7 @@ import { HttpService } from "../../../services/http.service";
 import { API } from "../../../shared/constants/api_constants";
 import { AllMatchData, MatchModelV3 } from "../../../shared/model/match.model";
 import { AppType } from "../../../shared/constants/module.constants";
+import { ThemeService } from "../../../services/theme.service";
 /**
  * Generated class for the MatchPage page.
  *
@@ -73,6 +74,7 @@ export class MatchPage {
   Today: number = 0;
   isPublish: boolean = true;
   isPending: boolean = true;
+  isDarkTheme: boolean = false;
 
   // sum: number = 0;
   // totalMatches = this.matches.filter((element) => {
@@ -88,7 +90,7 @@ export class MatchPage {
     public sharedservice: SharedServices,
     private graphqlService: GraphqlService,
     private httpService: HttpService,
-
+    private themeService: ThemeService
   ) {
     this.commonService.category.pipe(first()).subscribe((data) => {
       if (data == "matchlist") {
@@ -115,6 +117,23 @@ export class MatchPage {
 
   ionViewWillEnter() {
     console.log("MatchPage");
+    
+    // Subscribe to theme changes
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const matchElement = document.querySelector('page-match');
+    if (matchElement) {
+      if (isDark) {
+        matchElement.classList.remove('light-theme');
+      } else {
+        matchElement.classList.add('light-theme');
+      }
+    }
   }
 
   // 🔄 Method to get the string representation of MatchType from the enum
@@ -129,6 +148,42 @@ export class MatchPage {
       default:
         return 'Unknown'; // 🤷 Handle unexpected values
     }
+  }
+
+  // 🎨 Get color based on match type with theme support
+  getMatchTypeColor(matchType: number): string {
+    const isDark = this.themeService.getCurrentTheme();
+    
+    switch (matchType) {
+      case MatchType.TEAM:
+        return isDark ? '#32db64' : '#28a745'; // Green - darker in light theme
+      case MatchType.SINGLES:
+        return isDark ? '#35adff' : '#007bff'; // Blue - darker in light theme
+      case MatchType.DOUBLES:
+        return isDark ? '#f76e04' : '#fd7e14'; // Orange - slightly different in light theme
+      default:
+        return '#2b92bb'; // Primary blue for unknown types
+    }
+  }
+
+  // 🎨 Get color based on match type name string with theme support
+  getMatchTypeColorByName(matchTypeName: string): string {
+    if (!matchTypeName) return '#2b92bb';
+    
+    const type = matchTypeName.toLowerCase();
+    const isDark = this.themeService.getCurrentTheme();
+    
+    if (type.includes('team')) {
+      return isDark ? '#32db64' : '#28a745'; // Green
+    }
+    if (type.includes('singles') || type.includes('single')) {
+      return isDark ? '#35adff' : '#007bff'; // Blue
+    }
+    if (type.includes('doubles') || type.includes('double')) {
+      return isDark ? '#f76e04' : '#fd7e14'; // Orange
+    }
+    
+    return '#2b92bb'; // Primary blue for unknown types
   }
 
   gotoDashboard() {

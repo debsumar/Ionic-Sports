@@ -25,7 +25,7 @@ import { LeagueMatch } from "../models/location.model";
 import { API } from "../../../../shared/constants/api_constants";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { ParticipantModel } from "../../match/matchdetails/matchdetails";
-
+import { MatchType } from "../../../../shared/utility/enums";
 /**
  * Generated class for the LeaguedetailsPage page.
  *
@@ -42,7 +42,7 @@ import { ParticipantModel } from "../../match/matchdetails/matchdetails";
 export class LeaguedetailsPage {
   @ViewChild('fab') fab: FabContainer;
   participants: ParticipantModel[] = [];
-  teams:TeamsModal[];
+  teams: TeamsModal[];
   TeamsType: boolean = true;
   MatchesType: boolean = true;
   league: LeaguesForParentClubModel;
@@ -293,7 +293,7 @@ export class LeaguedetailsPage {
     });
   }
 
-  getActiveTeams = (match:LeagueMatch) => {
+  getActiveTeams = (match: LeagueMatch) => {
     //this.commonService.showLoader("Fetching teams...");
     this.teams = [];
     const getTeamsQuery = gql`
@@ -316,7 +316,7 @@ export class LeaguedetailsPage {
           }
       }
     }`;
-    this.graphqlService.query(getTeamsQuery, { matchDetailsInput: {MatchId:match.match_id} }, 0)
+    this.graphqlService.query(getTeamsQuery, { matchDetailsInput: { MatchId: match.match_id } }, 0)
       .subscribe(
         (res: any) => {
           const data = res.data;
@@ -325,23 +325,23 @@ export class LeaguedetailsPage {
           // );
           //this.commonService.hideLoader();
           this.teams = data["getTeamsByMatch"];
-          console.log(this.teams.length); 
-          const participants_length = match.league_type == 0 ? 1 : 2; 
+          console.log(this.teams.length);
+          const participants_length = match.league_type == 0 ? 1 : 2;
           //this.teams = this.sortByTeamName(this.teams);
-          if(this.teams.length > 0){
-            for(let i=0; i < this.teams.length;i++){
+          if (this.teams.length > 0) {
+            for (let i = 0; i < this.teams.length; i++) {
               this.teams[i]["IsWinner"] = false;
-              this.teams[i]['Sets_Points']=[];
+              this.teams[i]['Sets_Points'] = [];
               // if(this.match.Result && this.match.Result.ResultStatus == 1){
               //   this.teams[i]["IsWinner"] = this.match.Result.Winner.Id === this.teams[i].Id ? true : false;
               //   this.teams[i]["Sets_Points"] = this.match.Result && this.match.Result.ResultDetails ? JSON.parse(this.match.Result.ResultDetails.split(":")[i]) : [];
               //   //this.teams[i]["Sets_Points"] = this.match.Result.Winner.Id === this.teams[i].Id ? JSON.parse(this.match.Result.ResultDetails.split(":")[i]) : [];
-                
+
               // }
-              
-              for(let j=0; j < participants_length;j++){
+
+              for (let j = 0; j < participants_length; j++) {
                 console.log(`${j}:${this.teams[i].Participants[j]}`);
-                if(this.teams[i].Participants[j] && this.teams[i].Participants[j].User && this.teams[i].Participants[j].User.FirebaseKey!=''){
+                if (this.teams[i].Participants[j] && this.teams[i].Participants[j].User && this.teams[i].Participants[j].User.FirebaseKey != '') {
                   this.teams[i].Participants[j].User["isUserAvailable"] = true;
                 }
                 else {
@@ -350,11 +350,11 @@ export class LeaguedetailsPage {
                     InviteType: 0,
                     ParticipationStatus: 0,
                     PaymentStatus: 0,
-                    User:{
-                      FirstName:'',
-                      LastName:'',
-                      FirebaseKey:'',
-                      isUserAvailable:false
+                    User: {
+                      FirstName: '',
+                      LastName: '',
+                      FirebaseKey: '',
+                      isUserAvailable: false
                     }
                   }
                   this.teams[i].Participants[j] = participant_obj;
@@ -370,7 +370,7 @@ export class LeaguedetailsPage {
         (err) => {
           //this.commonService.hideLoader();
           console.log(JSON.stringify(err));
-          this.commonService.toastMessage("Failed to fetch teams",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+          this.commonService.toastMessage("Failed to fetch teams", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         }
       );
   }
@@ -402,7 +402,7 @@ export class LeaguedetailsPage {
         {
           text: "Update Result",
           handler: () => {
-            
+
             //this.updateResult(match);
             const todays_date = moment().format("YYYY-MM-DD hh:mm A");
             // if (moment(this.match.MatchStartDate, "YYYY-MM-DD hh:mm A").isAfter(todays_date)) {
@@ -649,7 +649,7 @@ export class LeaguedetailsPage {
     confirm.present();
   }
 
-  
+
   deleteLeague() {
     try {
       const removeLeague = gql`
@@ -743,10 +743,17 @@ export class LeaguedetailsPage {
         0
       ).subscribe((response) => {
         this.commonService.hideLoader();
-        const message = actionType === 1 ? "Member removed successfully" : "Member withdrawal successfully";
+        let message: string = '';
+        if (this.individualLeague.league_type === MatchType.TEAM && this.leagueStanding.length === 1) {
+          message = "Team removed from the competition";
+        } else {
+          message = actionType === 1 ? "Member removed successfully" : "Member withdrawal successfully";
+        }
+
         this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
         // this.weeklySessionDetails();
-        this.individualLeague.league_type_text != 'Team' ? this.getLeagueParticipants() : this.teamStanding();
+        //this.individualLeague.league_type_text != 'Team' ? this.getLeagueParticipants() : this.teamStanding();
+        this.individualLeague.league_type !== MatchType.TEAM ? this.getLeagueParticipants() : this.teamStanding();
         this.getLeagueDetails();
       }, (err) => {
         this.commonService.hideLoader();
@@ -881,7 +888,7 @@ export class LeaguedetailsPage {
   }
 
   openTeamActions(team: LeagueStandingModel) {
-    this.navCtrl.push("LeaguematchdetailsPage");
+    //this.navCtrl.push("LeaguematchdetailsPage");
     //this.navCtrl.push("UpdateleaguematchPage", { leagueId: this.individualLeague.id });
 
     let actionSheet = this.actionSheetCtrl.create({
@@ -1092,15 +1099,15 @@ export class LeaguedetailsPage {
   }
 
   showMatchActionSheet(match: LeagueMatch) {
-    if( this.individualLeague.league_type === 3) {
+    if (this.individualLeague.league_type === 3) {
       //this.commonService.showMatchActionSheet(match, {
-          //onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
-          //onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
-          // onDelete: () => this.removeMatch(match),
-          // onUpdateResult: () => this.updateResult(match)
+      //onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
+      //onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
+      // onDelete: () => this.removeMatch(match),
+      // onUpdateResult: () => this.updateResult(match)
       //});
       this.gotoLeagueMatchInfoPage(match);
-    }else{
+    } else {
       this.gotoMatchDetails(match);
     }
   }
@@ -1145,21 +1152,21 @@ export class UserDeviceMetadataField {
 }
 
 
-export class TeamsModal{
-  Id:string;
-  TeamName:string;
-  Participants:TeamParticipants[]
+export class TeamsModal {
+  Id: string;
+  TeamName: string;
+  Participants: TeamParticipants[]
 }
 
-export class TeamParticipants{
-  PaymentStatus:number
-  InviteStatus:number
-  InviteType:number
-  ParticipationStatus:number
-  User:{FirstName:string,LastName:string,FirebaseKey:string,isUserAvailable?:boolean}  
+export class TeamParticipants {
+  PaymentStatus: number
+  InviteStatus: number
+  InviteType: number
+  ParticipationStatus: number
+  User: { FirstName: string, LastName: string, FirebaseKey: string, isUserAvailable?: boolean }
 }
 
-export class PublishResultInput{
+export class PublishResultInput {
   CreatedBy: string; //MemberKey
   ResultDetails: string; //MemberKey
   resultDescription: string; //MemberKey

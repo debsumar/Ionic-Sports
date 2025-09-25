@@ -18,6 +18,7 @@ import { FetchMatchesInput, LeagueFetchInput, LeaguesForParentClubModel, ParentC
 import { MatchModel } from '../../match/models/match.model';
 import { GraphqlService } from '../../../../services/graphql.service';
 import { CommonLeagueService } from '../commonleague.service';
+import { ThemeService } from '../../../../services/theme.service';
 
 
 
@@ -37,6 +38,7 @@ import { CommonLeagueService } from '../commonleague.service';
 export class LeagueteamlistingPage {
   activeIndex: number = 0;
   Title: string = "Leagues";
+
 
 
   ParentClubTeamFetchInput: ParentClubTeamFetchInput = {
@@ -80,7 +82,8 @@ export class LeagueteamlistingPage {
     public sharedservice: SharedServices,
     public modalCtrl: ModalController,
     private graphqlService: GraphqlService,
-    private leagueService: CommonLeagueService
+    private leagueService: CommonLeagueService,
+    private themeService: ThemeService
   ) {
 
     this.leagueService.activeTypeSubject.subscribe(type => {
@@ -110,13 +113,27 @@ export class LeagueteamlistingPage {
   }
 
   ionViewWillEnter() {
+    // Subscribe to global theme changes
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
 
     if (this.activeIndex === 1) {
       this.getTeamsForParentClub();
     } else {
       this.getLeaguesForParentClub();
     }
+  }
 
+  private applyTheme(isDark: boolean): void {
+    const leagueElement = document.querySelector('page-leagueteamlisting');
+    if (leagueElement) {
+      if (isDark) {
+        leagueElement.classList.remove('light-theme');
+      } else {
+        leagueElement.classList.add('light-theme');
+      }
+    }
   }
 
 
@@ -553,10 +570,25 @@ export class LeagueteamlistingPage {
     this.filteredteams = this.teamsForParentClub;
   }
 
-
-
-
-
+  // 🎨 Get color based on league type text with theme support
+  getLeagueTypeColor(leagueTypeText: string): string {
+    if (!leagueTypeText) return '#2b92bb';
+    
+    const type = leagueTypeText.toLowerCase();
+    const isDark = this.themeService.getCurrentTheme();
+    
+    if (type.includes('teams') || type.includes('team')) {
+      return isDark ? '#32db64' : '#28a745'; // Green - darker in light theme
+    }
+    if (type.includes('singles') || type.includes('single')) {
+      return isDark ? '#35adff' : '#007bff'; // Blue - darker in light theme
+    }
+    if (type.includes('doubles') || type.includes('double')) {
+      return isDark ? '#f76e04' : '#fd7e14'; // Orange - slightly different in light theme
+    }
+    
+    return '#2b92bb'; // Primary blue stays consistent
+  }
 
 
 }

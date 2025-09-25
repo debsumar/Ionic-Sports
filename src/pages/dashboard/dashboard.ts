@@ -19,6 +19,7 @@ import { Apollo } from "apollo-angular";
 import gql from "graphql-tag";
 //import { of } from 'rxjs/observable/of';
 import { GraphqlService } from "../../services/graphql.service";
+import { ThemeService } from "../../services/theme.service";
 
 @IonicPage()
 @Component({
@@ -136,6 +137,7 @@ export class Dashboard {
     public fb: FirebaseService,
     private apollo: Apollo,
     private graphqlService: GraphqlService,
+    private themeService: ThemeService,
   ) {
     this.nestUrl = this.sharedService.getnestURL();
   }
@@ -146,6 +148,12 @@ export class Dashboard {
     this.nodeUrl = this.sharedService.getnodeURL();
     this.userData = this.sharedService.getUserData();
     this.nesturl = this.sharedService.getnestURL();
+
+    // Subscribe to global theme changes
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
 
     this.checkDeviceToken();
     this.commonService.screening("DashBoard");
@@ -445,15 +453,7 @@ export class Dashboard {
           this.EventObj = eventDetails;
         }
 
-        // Handle theme preference
-        if (isDarkTheme !== null) {
-          this.isDarkTheme = isDarkTheme;
-          const dashboardElement = document.querySelector('dashboard-page');
-          if (dashboardElement && !this.isDarkTheme) {
-            dashboardElement.classList.add('light-theme');
-            document.body.classList.add('light-theme');
-          }
-        }
+
       })
       .catch(error => {
         console.error("Error loading dashboard cached data:", error);
@@ -1109,10 +1109,13 @@ export class Dashboard {
   }
 
   toggleTheme(): void {
-    this.isDarkTheme = !this.isDarkTheme;
+    this.themeService.toggleTheme();
+  }
+
+  private applyTheme(isDark: boolean): void {
     const dashboardElement = document.querySelector('dashboard-page');
     if (dashboardElement) {
-      if (this.isDarkTheme) {
+      if (isDark) {
         dashboardElement.classList.remove('light-theme');
         document.body.classList.remove('light-theme');
       } else {
@@ -1120,7 +1123,6 @@ export class Dashboard {
         document.body.classList.add('light-theme');
       }
     }
-    this.storage.set('dashboardTheme', this.isDarkTheme);
   }
 
 

@@ -14,6 +14,7 @@ import { CommonService, ToastMessageType } from "../../../services/common.servic
 import moment, { Moment } from "moment";
 import { CommonLeagueService } from "../league/commonleague.service";
 import { LeagueteamlistingPage } from "../league/leagueteamlisting/leagueteamlisting";
+import { ThemeService } from "../../../services/theme.service";
 
 // import { IonicPage } from 'ionic-angular';
 @IonicPage()
@@ -55,7 +56,8 @@ export class TournamentPage {
     public fb: FirebaseService,
     public actionSheetCtrl: ActionSheetController,
     public alertCtrl: AlertController,
-    private leagueService: CommonLeagueService
+    private leagueService: CommonLeagueService,
+    private themeService: ThemeService
   ) {
     this.currentActiveType = this.leagueService.getActiveLeagueType();
 
@@ -81,6 +83,18 @@ export class TournamentPage {
   ionViewWillEnter() {
     this.currentActiveType = this.leagueService.getActiveLeagueType();
     console.log('Tournament page will enter, current type:', this.currentActiveType);
+    
+    // Subscribe to global theme
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      const tournamentElement = document.querySelector('page-tournament');
+      if (tournamentElement) {
+        if (isDark) {
+          tournamentElement.classList.remove('light-theme');
+        } else {
+          tournamentElement.classList.add('light-theme');
+        }
+      }
+    });
   }
 
   // 🎯 New improved method using ViewChild

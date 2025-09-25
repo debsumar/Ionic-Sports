@@ -16,14 +16,10 @@ import {
   ToastPlacement,
 } from "../../../../services/common.service";
 import { Storage } from "@ionic/storage";
-import { Apollo } from "apollo-angular";
-import { HttpLink } from "apollo-angular-link-http";
 import { FirebaseService } from "../../../../services/firebase.service";
-import moment from "moment";
 import gql from "graphql-tag";
 import { SharedServices } from "../../../services/sharedservice";
 import { GetPlayerModel, GetStaffModel, MembersModel, TeamsForParentClubModel } from "../models/team.model";
-import { stringify } from "querystring";
 // import { teaminLeagueModel } from "../../league/models/league.model";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { HttpService } from "../../../../services/http.service";
@@ -50,7 +46,6 @@ import { LeaguePlayerInviteStatus } from "../../../../shared/utility/enums";
 export class TeamdetailsPage {
 
   searchTerm: string;
-
   activeType: boolean = true;
   invitedType: boolean = true;
   playerType: boolean = true;
@@ -117,8 +112,6 @@ export class TeamdetailsPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private apollo: Apollo,
-    private httpLink: HttpLink,
     public actionSheetCtrl: ActionSheetController,
     public loadingCtrl: LoadingController,
     public storage: Storage,
@@ -154,13 +147,8 @@ export class TeamdetailsPage {
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
       if (val.$key != "") {
-
-
-        this.parentClubKey =
-          val.UserInfo[0].ParentClubKey;
-
-        this.getStaffInput.ParentClubKey =
-          val.UserInfo[0].ParentClubKey;
+        this.parentClubKey = val.UserInfo[0].ParentClubKey;
+        this.getStaffInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
         this.getStaffInput.MemberKey = val.$key;
 
         this.getStaffInput.parentClubteamId = String(this.team.id);
@@ -871,7 +859,7 @@ export class TeamdetailsPage {
   addRoleforPlayerandStaff(member) {
     console.log("TEAM OBJ is", this.team);
     this.navCtrl.push("AddroleforplayernstaffPage", {
-      "team": this.team,
+      "team": this.teamsForParentClub,
       "memberId": member.id,
       "currentRole": member.teamrole
     });

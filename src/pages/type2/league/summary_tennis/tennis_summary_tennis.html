@@ -16,7 +16,7 @@
         <span>{{matchDate}}</span>
       </div>
       <div class="detail-item" *ngIf="matchLocation">
-        <ion-icon name="location" color="primary"></ion-icon>
+        <ion-icon name="pin" color="primary"></ion-icon>
         <span>{{matchLocation}}</span>
       </div>
     </div>
@@ -56,7 +56,8 @@
   </div>
 
   <!-- Set Scores Display -->
-  <div class="set-scores-section" *ngIf="result_json && result_json.SET_SCORES && result_json.SET_SCORES.length > 0" (click)="gotoSetInputPage(true)">
+  <div class="set-scores-section" *ngIf="result_json && result_json.SET_SCORES && result_json.SET_SCORES.length > 0"
+    (click)="gotoSetInputPage(true)">
     <div class="section-header">
       <ion-icon name="trophy" color="warning"></ion-icon>
       <h4>Set Scores</h4>
