@@ -16,6 +16,24 @@ page-league-match-info {
     box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
   }
 
+  .action_btns_div{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-40%, -20%);
+    button{
+      height: 2em;
+      ion-icon{
+       color: #2b92bb !important;
+       font-size: 1.5em !important;
+      }
+    }
+  }
+
   .tab-icon {
     // left: -40px;
     // position: absolute;

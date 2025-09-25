@@ -729,6 +729,10 @@ export class LeagueMatchInfoPage {
     }
   }
 
+  EditLeague(){
+    this.navCtrl.push("UpdateleaguematchPage", { match:this.matchObj })
+  }
+
   //tab change
   changeType(val: boolean) {
     this.sections.forEach(section => section.items = []); // Clear the sections array
@@ -935,30 +939,44 @@ export class LeagueMatchInfoPage {
 
   // 🎯 Get display text and CSS class for invite status
   getInviteStatusDisplay(inviteStatus: number, inviteStatusText?: string): { text: string; cssClass: string } {
-    // Always use invite_status_text from response if available
-    const displayText = inviteStatusText || 'Unknown';
-    
     // Handle null/undefined cases
     if (inviteStatus === null || inviteStatus === undefined) {
-      return { text: displayText, cssClass: 'status-other' };
+      return { text: inviteStatusText || 'Accepted', cssClass: 'status-other' };
     }
 
     // Playing status (green) - for Accepted (1) and AdminAccepted (4)
-    if (inviteStatus === LeaguePlayerInviteStatus.Accepted || inviteStatus === LeaguePlayerInviteStatus.AdminAccepted) {
-      return { text: displayText, cssClass: 'status-playing' };
+    if (inviteStatus === LeaguePlayerInviteStatus.Accepted) {
+      return { text: 'Playing', cssClass: 'status-playing' };
+    }
+    if (inviteStatus === LeaguePlayerInviteStatus.AdminAccepted) {
+      return { text: 'Coach Accepted', cssClass: 'status-playing' };
     }
 
     // Not Playing status (red) - for Rejected (2) and AdminRejected (5)
-    if (inviteStatus === LeaguePlayerInviteStatus.Declined || inviteStatus === LeaguePlayerInviteStatus.AdminDeclined) {
-      return { text: displayText, cssClass: 'status-not-playing' };
+    if (inviteStatus === LeaguePlayerInviteStatus.Declined) {
+      return { text: 'Declined', cssClass: 'status-not-playing' };
+    }
+    if (inviteStatus === LeaguePlayerInviteStatus.AdminDeclined) {
+      return { text: 'Coach Declined', cssClass: 'status-not-playing' };
     }
 
     // Maybe status
-    if (inviteStatus === LeaguePlayerInviteStatus.Maybe || inviteStatus === LeaguePlayerInviteStatus.AdminMaybe) {
-      return { text: displayText, cssClass: 'status-maybe' };
+    if (inviteStatus === LeaguePlayerInviteStatus.Maybe) {
+      return { text: 'Maybe', cssClass: 'status-maybe' };
+    }
+    if (inviteStatus === LeaguePlayerInviteStatus.AdminMaybe) {
+      return { text: 'Coach Maybe', cssClass: 'status-maybe' };
     }
 
     // All other statuses (orange) - Pending (0), Cancelled (3), etc.
+    const statusLabels = {
+      [LeaguePlayerInviteStatus.Pending]: 'Pending',
+      [LeaguePlayerInviteStatus.Cancelled]: 'Cancelled',
+      [LeaguePlayerInviteStatus.AdminCancelled]: 'Coach Cancelled',
+      [LeaguePlayerInviteStatus.AdminDeleted]: 'Coach Deleted'
+    };
+
+    const displayText = inviteStatusText || statusLabels[inviteStatus] || 'Unknown';
     return { text: displayText, cssClass: 'status-other' };
   }
 

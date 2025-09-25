@@ -18,6 +18,6 @@ import { ThemeService } from '../../../services/theme.service';
   exports: [
     TournamentPage
   ],
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+  schemas: [CUSTOM_ELEMENTS_SCHEMA]
 })
-export class TournamentPageModule {}
+export class TournamentPageModule { }

@@ -33,10 +33,9 @@
           </ion-col>
           <ion-col col-2 style="margin:auto">
             <!-- <button ion-button icon-only clear (click)="selectTeamLogo()"> -->
-            <img *ngIf="!parentClubTeamEdit.teamDetailsInput.logoUrl" src="assets/images/upload.svg" class="add_icon"
-              (click)="selectTeamLogo()">
-            <img *ngIf="parentClubTeamEdit.teamDetailsInput.logo_url"
-              [src]="parentClubTeamEdit.teamDetailsInput.logo_url" class="add_icon"
+            <img *ngIf="parentClubTeamEdit.teamDetailsInput.logo_url==''" src="assets/images/upload.svg" class="add_icon" (click)="selectTeamLogo()">
+            <img *ngIf="parentClubTeamEdit.teamDetailsInput.logo_url!=''" [src]="parentClubTeamEdit.teamDetailsInput.logo_url"
+              class="add_icon"
               (click)="showImagePopup(parentClubTeamEdit.teamDetailsInput.logoUrl)">
             <!-- </button> -->
           </ion-col>
@@ -45,7 +44,7 @@
 
       <ion-item>
         <ion-label>Venue</ion-label>
-        <ion-select (ionChange)="getActivity()" [(ngModel)]="this.parentClubTeamEdit.teamDetailsInput.venueKey">
+        <ion-select (ionChange)="getActivity()" [(ngModel)]="parentClubTeamEdit.teamDetailsInput.venueKey">
           <ion-option *ngFor="let club of clubVenues" value="{{club.FirebaseId}}">
             {{club.ClubName}}</ion-option>
         </ion-select>

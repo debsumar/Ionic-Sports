@@ -44,6 +44,7 @@
         <div style="display: flex; align-items: center;">
           <ion-icon style="padding-left: 20px; color: #2b92bb; font-size: 1.5em"
             [name]="individualLeague?.league_visibility==0?'ios-globe':'ios-lock-outline'"></ion-icon>
+          <p class="smalltext">{{individualLeague?.league_visibility == 0 ? "Public" : "Private"}}</p>
         </div>
 
         <div class="action_btns_div">
@@ -145,7 +146,7 @@
                 <td class="firstcol" style="white-space: nowrap;" (click)="openTeamActions(score)">
                   {{score?.parentclubteam?.teamName}}
                 </td>
-                <td class="otherclumn">{{score.rank}}</td>
+                <td class="otherclumn">{{score.matches}}</td>
                 <td class="otherclumn">{{score.wins}}</td>
                 <td class="otherclumn">{{score.loss}}</td>
                 <td class="otherclumn">{{score.draw}}</td>
@@ -259,7 +260,7 @@
           <!-- Match Footer -->
           <div class="match-card-footer">
             <div class="result-status-dropdown">
-              <ion-icon name="flag" [color]="mat.ResultStatus == 1 ? 'success' : 'warning'"></ion-icon>
+              <!-- <ion-icon name="flag" [color]="mat.ResultStatus == 1 ? 'success' : 'warning'"></ion-icon> -->
               <span class="status-text" [ngClass]="mat.ResultStatus == 1 ? 'status-published' : 'status-pending'">
                 {{mat.ResultStatus == 1 ? mat.result_status_text : 'Result Pending'}}
               </span>
@@ -267,6 +268,7 @@
             <div class="visibility-info">
               <ion-icon [name]="mat.match_visibility==0?'globe':'lock-closed'"
                 [color]="mat.match_visibility==0?'success':'medium'"></ion-icon>
+              <span>{{mat.match_visibility == 0 ? 'Public' : 'Private'}}</span>
             </div>
           </div>
         </div>

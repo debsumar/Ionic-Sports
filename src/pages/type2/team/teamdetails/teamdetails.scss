@@ -20,8 +20,8 @@ page-teamdetails {
     top: 35%;
     left: 50%;
     transform: translate(-30%, -20%);
-
     button {
+      height: 2em !important;
       ion-icon {
         color: #2b92bb !important;
         font-size: 1.4em !important;

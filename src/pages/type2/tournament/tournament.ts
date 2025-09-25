@@ -83,7 +83,7 @@ export class TournamentPage {
   ionViewWillEnter() {
     this.currentActiveType = this.leagueService.getActiveLeagueType();
     console.log('Tournament page will enter, current type:', this.currentActiveType);
-    
+
     // Subscribe to global theme
     this.themeService.isDarkTheme$.subscribe(isDark => {
       const tournamentElement = document.querySelector('page-tournament');

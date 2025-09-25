@@ -20,7 +20,7 @@ import { Device } from "@ionic-native/device";
 import { ApolloModule } from "apollo-angular";
 import { SharedServices } from "../pages/services/sharedservice";
 import { APOLLO_OPTIONS } from "apollo-angular";
-import { HttpLink,HttpLinkModule } from "apollo-angular-link-http";
+import { HttpLink, HttpLinkModule } from "apollo-angular-link-http";
 import { environment as devEnvironment } from '../environments/environment';
 import { environment as prodEnvironment } from '../environments/environment.prod';
 import { createApollo } from "./apollo.config";
@@ -29,8 +29,8 @@ import { GraphqlService } from "../services/graphql.service";
 import { CommonService } from "../services/common.service";
 import { CommonLeagueService } from "../pages/type2/league/commonleague.service";
 import { ThemeService } from "../services/theme.service";
-  
-       
+
+
 
 @NgModule({
   declarations: [
@@ -45,7 +45,7 @@ import { ThemeService } from "../services/theme.service";
     ),
     ApolloModule,
     HttpLinkModule,
-    AngularFireModule.initializeApp(prodEnvironment.production ? prodEnvironment.firebaseConfig:devEnvironment.firebaseConfig),
+    AngularFireModule.initializeApp(prodEnvironment.production ? prodEnvironment.firebaseConfig : devEnvironment.firebaseConfig),
     AngularFireDatabaseModule,
     HttpClientModule,
     IonicStorageModule.forRoot(),
@@ -80,4 +80,4 @@ import { ThemeService } from "../services/theme.service";
     { provide: ErrorHandler, useClass: IonicErrorHandler },
   ],
 })
-export class AppModule {}
+export class AppModule { }
