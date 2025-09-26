@@ -18,11 +18,11 @@
   <!-- Competitions Tab Content -->
   <div *ngIf="activeIndex==0" class="tab-content">
     <!-- Modern Search Card -->
-    <div class="modern-search-card">
-      <ion-searchbar class="sleek-searchbar" placeholder="Search competitions, activities, venues..."
-        [(ngModel)]="searchInput" (ionInput)="getLeagueSearch($event)" autocorrect="off"
-        showCancelButton="focus"></ion-searchbar>
-    </div>
+    <!-- <div class="modern-search-card"> -->
+    <ion-searchbar class="sleek-searchbar" placeholder="Search competitions, activities, venues..."
+      [(ngModel)]="searchInput" (ionInput)="getLeagueSearch($event)" autocorrect="off"
+      showCancelButton="focus"></ion-searchbar>
+    <!-- </div> -->
 
     <!-- Competitions Grid -->
     <div class="competitions-container" *ngIf="filteredleagues.length > 0">
@@ -48,7 +48,8 @@
                 <span class="detail-text">{{league.start_date}}</span>
               </div>
               <div class="detail-item type-badge">
-                <span class="badge-text" [style.background-color]="getLeagueTypeColor(league.league_type_text)" style="color: white;">{{league.league_type_text}}</span>
+                <span class="badge-text" [style.background-color]="getLeagueTypeColor(league.league_type_text)"
+                  style="color: white;">{{league.league_type_text}}</span>
               </div>
             </div>
             <div class="detail-row">
@@ -82,8 +83,8 @@
   <div *ngIf="activeIndex==1" class="tab-content">
     <!-- Modern Search Card -->
     <div class="modern-search-card">
-      <ion-searchbar class="sleek-searchbar" placeholder="Search teams, activities..."
-        (ionInput)="getTeamItems($event)" autocorrect="off" showCancelButton="focus"></ion-searchbar>
+      <ion-searchbar class="sleek-searchbar" placeholder="Search teams, activities..." (ionInput)="getTeamItems($event)"
+        autocorrect="off" showCancelButton="focus"></ion-searchbar>
     </div>
 
     <!-- Teams Grid -->

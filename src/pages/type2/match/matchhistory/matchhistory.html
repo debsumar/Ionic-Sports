@@ -14,85 +14,16 @@
       <span>Matches</span>
     </button>
   </div>
-<!-- the commented code below is the original match history display code, and it shows matches(singles/doubles) which are published -->
-<!-- <ion-row style="width: 100%; height: 100%">
-  <div style="width: 100%; height: 100%">
-   
-    <ion-list *ngIf="filteredMatches.length>0">
-      <ion-card
-        (click)="gotoMatchdetailsPage(history)"
-        class="matchcard"
-        *ngFor="let history of filteredMatches"
-      >
-        <ion-card-content>
-          <ion-row style="margin-bottom: 10px; padding-top: 5px">
-            <ion-col col-12 no-padding>
-              <p class="dets_para">
-                <span float-left>{{history.MatchTitle}}</span>
-                <span float-right
-                  >{{formatMatchStartDate(history.MatchStartDate)}}</span
-                >
-               
-              </p>
-              <p
-                class="dets_para"
-                style="margin-top: 21px !important; font-size: 12px !important"
-              >
-                {{history.Activity.ActivityName}}
-              </p>
-            </ion-col>
-          </ion-row>
-          <ion-row
-            *ngFor="let team of history.Teams;let j=index;"
-            class="participant_row"
-          >
-            <ion-col
-              col-8
-              style="padding: 5px 5px 5px 0px !important"
-              [style.border-bottom]="j==0 ? '1px solid #b4b0b0' : 'none'"
-            >
-              <p class="users_para commman_para">
-                <span
-                  *ngFor="let participant of team.Participants;let k=index;"
-                  [style.color]="team.IsWinner ? 'green' : 'red'"
-                  >{{participant.User.FirstName}}
-                  <span *ngIf="k!=team.Participants.length-1">,</span>
-                </span>
-                <span *ngIf="team.IsWinner" style="margin-right: 5px">
-                  <ion-icon name="md-trophy"></ion-icon>
-                </span>
-              </p>
-            </ion-col>
-            <ion-col col-4 style="padding: 6px 5px 5px 10px !important">
-              <p class="sets_para commman_para" style="">
-                <span *ngFor="let set of team.Sets_Points;let l=index"
-                  >{{set}}</span
-                >
-              </p>
-            </ion-col>
-          </ion-row>
-          <ion-row style="margin-top: 10px">
-            <ion-col col-12 no-padding>
-              <p class="dets_para" style="color: rgba(0, 0, 0, 0.3) !important">
-                <span float-left>{{history.VenueName}}</span>
-              </p>
-            </ion-col>
-          </ion-row>
-        </ion-card-content>
-      </ion-card>
-    </ion-list>
-  </div>
-</ion-row> -->
 
 
   <!-- Competitions Tab Content -->
   <div *ngIf="activeIndex==0" class="tab-content">
     <!-- Modern Search Card -->
-    <div class="modern-search-card">
-      <ion-searchbar class="sleek-searchbar" placeholder="Search competitions, activities, venues..."
-        [(ngModel)]="searchInput" (ionInput)="getLeagueSearch($event)" autocorrect="off"
-        showCancelButton="focus"></ion-searchbar>
-    </div>
+    <!-- <div class="modern-search-card"> -->
+    <ion-searchbar class="sleek-searchbar" placeholder="Search competitions, activities, venues..."
+      [(ngModel)]="searchInput" (ionInput)="getLeagueSearch($event)" autocorrect="off"
+      showCancelButton="focus"></ion-searchbar>
+    <!-- </div> -->
 
     <!-- Competitions Grid -->
     <div class="competitions-container" *ngIf="filteredleagues.length > 0">

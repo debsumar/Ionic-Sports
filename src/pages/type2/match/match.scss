@@ -17,6 +17,7 @@ page-match {
 
       .stat-number {
         color: #1e293b;
+        text-align: center;
       }
 
       .stat-label {
@@ -28,27 +29,32 @@ page-match {
       }
     }
 
-    .modern-search-card {
-      .sleek-searchbar {
-        background: #ffffff;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    .sleek-searchbar {
+      background: transparent;
+      border-radius: 8px;
 
-        .searchbar-input {
-          color: #1e293b;
+      .searchbar-input {
+        border-radius: 8px;
+        background: #e2e8f0;
+        border: none;
+        color: #1e293b;
+        padding: 8px 12px 8px 32px;
+        font-size: 14px;
 
-          &::placeholder {
-            color: #64748b;
-          }
-        }
-
-        .searchbar-search-icon {
+        &::placeholder {
           color: #64748b;
         }
+      }
 
-        .searchbar-clear-icon {
-          color: #64748b;
-        }
+      .searchbar-search-icon {
+        color: #64748b;
+        left: 8px;
+        font-size: 16px;
+      }
+
+      .searchbar-clear-icon {
+        color: #64748b;
+        right: 8px;
       }
     }
 
@@ -71,7 +77,7 @@ page-match {
           }
 
           .card-subtitle {
-            color: #64748b !important;
+            color: #32db64 !important;
           }
         }
 
@@ -179,12 +185,21 @@ page-match {
           font-size: 24px;
           font-weight: 700;
           color: #f1f5f9;
+          text-align: center;
         }
 
         .stat-label {
           font-size: 12px;
           color: #94a3b8;
           font-weight: 500;
+        }
+
+        &.today-stat {
+          padding-right: 48px;
+        }
+
+        &.total-stat {
+          padding-left: 48px;
         }
       }
 
@@ -196,37 +211,34 @@ page-match {
     }
   }
 
-  .modern-search-card {
-    margin: 0 4px 12px 4px;
+  .sleek-searchbar {
+    background: transparent;
+    border-radius: 8px;
+    // margin: 8px;
+    margin-bottom: 4px;
 
-    .sleek-searchbar {
-      background: #1e293b;
-      border: 1px solid #334155;
+    .searchbar-input {
       border-radius: 8px;
-      margin: 0;
+      background: #334155;
+      border: none;
+      color: #f1f5f9;
+      padding: 8px 12px 8px 32px;
+      font-size: 14px;
 
-      .searchbar-input {
-        background: transparent;
-        border: none;
-        color: #f1f5f9;
-        padding: 8px 12px 8px 32px;
-        font-size: 14px;
-
-        &::placeholder {
-          color: #94a3b8;
-        }
-      }
-
-      .searchbar-search-icon {
+      &::placeholder {
         color: #94a3b8;
-        left: 8px;
-        font-size: 16px;
       }
+    }
 
-      .searchbar-clear-icon {
-        color: #94a3b8;
-        right: 8px;
-      }
+    .searchbar-search-icon {
+      color: #94a3b8;
+      left: 8px;
+      font-size: 16px;
+    }
+
+    .searchbar-clear-icon {
+      color: #94a3b8;
+      right: 8px;
     }
   }
 
@@ -293,8 +305,8 @@ page-match {
         }
 
         .card-subtitle {
-          font-size: 12px;
-          color: #94a3b8;
+          font-size: 18px;
+          color: #8b5cf6;
           margin: 0;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -318,9 +330,10 @@ page-match {
       .match-details {
         .detail-row {
           display: flex;
-          justify-content: space-between;
+          justify-content: center;
           align-items: center;
           margin-bottom: 8px;
+          gap: 20px;
 
           &:last-child {
             margin-bottom: 0;
@@ -330,11 +343,7 @@ page-match {
             display: flex;
             align-items: center;
             gap: 4px;
-            flex: 1;
-
-            &.venue {
-              justify-content: flex-end;
-            }
+            justify-content: center;
 
             .detail-icon {
               font-size: 12px;
