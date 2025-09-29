@@ -11,10 +11,10 @@ import { SharedServices } from '../../../services/sharedservice';
 import { MemberShipData, MemberShips, MemberShipUser, VenueUser } from '../model/member';
 import { GraphqlService } from '../../../../services/graphql.service';
 import gql from 'graphql-tag';
-import { IClubDetails } from '../../session/sessions_club.model';
 import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
 import { first } from 'rxjs/operators';
+import { IClubDetails } from '../../../../shared/model/club.model';
 /**
  * Generated class for the MemberprofilePage page.
  *
@@ -83,7 +83,7 @@ export class ShowmembershipPage {
         private sharedservice: SharedServices,
         private graphqlService: GraphqlService
     ) {
-        
+
     }
 
     ionViewWillEnter() {
@@ -104,15 +104,15 @@ export class ShowmembershipPage {
                     this.getUserMemberships();
                     this.getMemberShipForParentClub();
                 }),
-                this.FamilyMember = this.navParams.get("MemberInfo");
+                    this.FamilyMember = this.navParams.get("MemberInfo");
                 //console.log("family member info is:", this.FamilyMember);
-        
+
                 if ((this.ParentClubKey = this.navParams.get("ParentClubKey")) && (this.selectedClubKey = this.navParams.get("ClubKey")) && (this.MemberKey = this.navParams.get("MemberKey"))) {
                     this.isDirectedEdit = true
                     this.nodeUrl = "https://activitypro-nest-261607.appspot.com"
                 } else {
                     this.isDirectedEdit = false
-                }  
+                }
             }
         })
     }
@@ -139,7 +139,7 @@ export class ShowmembershipPage {
                 }
             }
             `;
-            this.graphqlService.query(clubs_query, { clubs_input: clubs_input }, 0)
+        this.graphqlService.query(clubs_query, { clubs_input: clubs_input }, 0)
             .subscribe((res: any) => {
                 this.clubs = res.data.getVenuesByParentClub as IClubDetails[];
                 console.log("Clubs list:", this.clubs);
@@ -159,10 +159,10 @@ export class ShowmembershipPage {
                     console.log("Club not found");
                 }
             },
-            (error) => {
-                this.comonService.toastMessage("No venues found", 2500, ToastMessageType.Error)
-                console.error("Error in fetching:", error);
-            })                
+                (error) => {
+                    this.comonService.toastMessage("No venues found", 2500, ToastMessageType.Error)
+                    console.error("Error in fetching:", error);
+                })
     }
 
 
@@ -352,15 +352,15 @@ export class ShowmembershipPage {
                         // if (eachSetup.membership_packages[0].subscription_status == 0) {
                         //     this.gotoassignmembership(eachSetup)
                         // } 
-                        if(eachSetup.membership_package.enrolled_count < eachSetup.max_member || eachSetup.membership_packages[0].subscription_status == 0){
+                        if (eachSetup.membership_package.enrolled_count < eachSetup.max_member || eachSetup.membership_packages[0].subscription_status == 0) {
                             this.gotoassignmembership(eachSetup)
                         }
                         else {
-                            if(eachSetup.membership_package.enrolled_count >= eachSetup.max_member){
+                            if (eachSetup.membership_package.enrolled_count >= eachSetup.max_member) {
                                 this.comonService.toastMessage("No family member(s) left to add", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
                                 return false;
                             }
-                            this.comonService.toastMessage("You can't modify the paid membership", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
+                            this.comonService.toastMessage("You can't modify the paid membership", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
                         }
 
                     }
@@ -372,7 +372,7 @@ export class ShowmembershipPage {
                         if (eachSetup.membership_packages[0].subscription_status == 0) {
                             this.goassignpayment(eachSetup)
                         } else {
-                            this.comonService.toastMessage("You can't modify the paid membership", 2500,ToastMessageType.Error,ToastPlacement.Bottom)
+                            this.comonService.toastMessage("You can't modify the paid membership", 2500, ToastMessageType.Error, ToastPlacement.Bottom)
                         }
                     }
                 },
@@ -394,8 +394,8 @@ export class ShowmembershipPage {
         actionSheet.present();
     }
 
-    goassignpayment(eachSetup:MemberShipUser) {
-        this.navCtrl.push("EditFeesMembershipPage", { eachSetup: eachSetup,  clubId: this.inputObj.clubId,memberId: this.FamilyMember.Id, ParentClubKey: this.ParentClubKey })
+    goassignpayment(eachSetup: MemberShipUser) {
+        this.navCtrl.push("EditFeesMembershipPage", { eachSetup: eachSetup, clubId: this.inputObj.clubId, memberId: this.FamilyMember.Id, ParentClubKey: this.ParentClubKey })
     }
 
     getFilterItems(ev: any) {
@@ -422,15 +422,15 @@ export class ShowmembershipPage {
         this.SetupDisplay = this.Setups;
     }
 
-    gotoassignmembership(eachSetup:MemberShipUser) {
-        this.navCtrl.push("EditmembershipPage", { Isnew:false, clubId: this.inputObj.clubId,memberId: this.FamilyMember.Id, membership_id: eachSetup.id })
+    gotoassignmembership(eachSetup: MemberShipUser) {
+        this.navCtrl.push("EditmembershipPage", { Isnew: false, clubId: this.inputObj.clubId, memberId: this.FamilyMember.Id, membership_id: eachSetup.id })
     }
 
     gotoassignfromrecommended(eachSetup: MemberShipData) {
-        this.navCtrl.push("AssignmembershipsPage", {Isnew:true, clubId: this.inputObj.clubId, memberId: this.FamilyMember.Id, membership_id: eachSetup.id })
+        this.navCtrl.push("AssignmembershipsPage", { Isnew: true, clubId: this.inputObj.clubId, memberId: this.FamilyMember.Id, membership_id: eachSetup.id })
     }
 
-    ionViewWillLeave(){
+    ionViewWillLeave() {
         this.comonService.updateCategory("");
     }
 

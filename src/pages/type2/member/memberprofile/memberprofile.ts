@@ -1,8 +1,8 @@
 import { Component, OnInit } from "@angular/core";
-import { IonicPage,NavController,NavParams,AlertController,ToastController, Toast,} from "ionic-angular";
+import { IonicPage, NavController, NavParams, AlertController, ToastController, Toast, } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { Events } from "ionic-angular";
-import { CommonService,ToastMessageType,ToastPlacement,} from "../../../../services/common.service";
+import { CommonService, ToastMessageType, ToastPlacement, } from "../../../../services/common.service";
 import { CallNumber } from "../../../../../node_modules/@ionic-native/call-number";
 import { FirebaseService } from "../../../../services/firebase.service";
 import * as moment from "moment";
@@ -25,13 +25,13 @@ import { ModuleTypes } from "../../../../shared/constants/module.constants";
 @Component({
   selector: "page-memberprofile",
   templateUrl: "memberprofile.html",
-  providers:[HttpService]
+  providers: [HttpService]
 })
 export class MemberprofilePage implements OnInit {
   LangObj: any = {}; //by vinod
   memberInfo = new VenueUser();
   type: string = "";
-  family_members:FamilyMember[] = [];
+  family_members: FamilyMember[] = [];
   preparedAllClubMemberArr = [];
   selectedParentClubKey = "";
   payloadObj: any = {
@@ -39,7 +39,7 @@ export class MemberprofilePage implements OnInit {
     MemberKeys: "",
     ParentClubId: "",
     MemberIds: "",
-    ClubKey:"",
+    ClubKey: "",
     AppType: 1,
   };
   headers: any;
@@ -53,14 +53,14 @@ export class MemberprofilePage implements OnInit {
   time: number;
   Duration: string;
   nodeUrl: string;
-  AllowHandicap:boolean = false;
+  AllowHandicap: boolean = false;
   courtbookingstatus = false;
   goldMemberStatus = false;
-  AllowMediaConsent:boolean = true;
+  AllowMediaConsent: boolean = true;
   CoachStatus = false;
-  membertype:string = "";
+  membertype: string = "";
   ngOnInit(): void {
-    
+
   }
 
 
@@ -75,35 +75,35 @@ export class MemberprofilePage implements OnInit {
     public commonService: CommonService,
     public navCtrl: NavController,
     public navParams: NavParams,
-    private graphqlService:GraphqlService,
-    private httpService:HttpService
+    private graphqlService: GraphqlService,
+    private httpService: HttpService
   ) {
-    
-      
+
+
   }
 
 
-  ionViewWillEnter(){
+  ionViewWillEnter() {
     this.commonService.category.pipe(first()).subscribe((data) => {
       if (data == "user_profile") {
         //this.memberInfo = this.navParams.get("member_id");
         this.getUserDetails();
-        console.log("memberdets:",this.memberInfo);
+        console.log("memberdets:", this.memberInfo);
         this.commonService.updateCategory("");
         this.type = this.navParams.get("type");
-        if(this.type == 'Member'){
+        if (this.type == 'Member') {
           this.membertype = "Member";
-        }else if(this.type == 'Holidaycampmember'){
+        } else if (this.type == 'Holidaycampmember') {
           this.membertype = "HolidayCampMember";
-        } else{
+        } else {
           this.membertype = "SchoolMember";
         }
         this.nodeUrl = "https://activitypro-nest-261607.appspot.com";
       }
-    })    
+    })
   }
- 
-  
+
+
 
   //deep copy
   keepCloning(objectpassed) {
@@ -118,16 +118,16 @@ export class MemberprofilePage implements OnInit {
     return temporarystorage;
   }
 
-  getUserDetails(){
+  getUserDetails() {
     const user_input = {
-      member_id:this.navParams.get("member_id"),
-      user_postgre_metadata:{
-        UserMemberId:this.sharedservice.getLoggedInId()
+      member_id: this.navParams.get("member_id"),
+      user_postgre_metadata: {
+        UserMemberId: this.sharedservice.getLoggedInId()
       },
-      user_device_metadata:{
-        UserAppType:0,
+      user_device_metadata: {
+        UserAppType: 0,
         //UserActionType
-        UserDeviceType:this.sharedservice.getPlatform() == "android" ? 1:2, //Which app {1:Android,2:IOS,3:Web,4:API}
+        UserDeviceType: this.sharedservice.getPlatform() == "android" ? 1 : 2, //Which app {1:Android,2:IOS,3:Web,4:API}
       }
     }
     const userQuery = gql`
@@ -154,30 +154,31 @@ export class MemberprofilePage implements OnInit {
           medical_condition
           parent_status
           media_consent
+          emergency_number
       }
     }
   `;
-  this.graphqlService.query(userQuery,{user_input:user_input},0).subscribe(({data}) => {
+    this.graphqlService.query(userQuery, { user_input: user_input }, 0).subscribe(({ data }) => {
       //console.log('challeges data' + data["getFamilyMembers"]);
       console.timeEnd();
       console.log("time ended");
       this.memberInfo = data["getUserDetsForAdmin"];
-      if(this.memberInfo)this.getFamilyDetails()
-    },(err)=>{
+      if (this.memberInfo) this.getFamilyDetails()
+    }, (err) => {
       //this.commonService.hideLoader();
-      this.commonService.toastMessage("Users fetch failed",3000,ToastMessageType.Error,ToastPlacement.Bottom);
+      this.commonService.toastMessage("Users fetch failed", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
     });
   }
 
-  getFamilyDetails(){
+  getFamilyDetails() {
     console.log("time started")
     console.time();
-    const family_input:FamilyMemberInput = {
-      ParentClubKey:this.sharedservice.getPostgreParentClubId(),
-      MemberKey:this.navParams.get("member_id"),//this.memberInfo.parentFirebaseKey, using firebase
-      AppType:0,
-      DeviceType:this.sharedservice.getPlatform() == "android" ? 1:2, //Which app {1:Android,2:IOS,3:Web,4:API}
-      ActionType:3  //pass 2 to send postgreId,Pass 1 to send Firebasekey in above MemberKey field
+    const family_input: FamilyMemberInput = {
+      ParentClubKey: this.sharedservice.getPostgreParentClubId(),
+      MemberKey: this.navParams.get("member_id"),//this.memberInfo.parentFirebaseKey, using firebase
+      AppType: 0,
+      DeviceType: this.sharedservice.getPlatform() == "android" ? 1 : 2, //Which app {1:Android,2:IOS,3:Web,4:API}
+      ActionType: 3  //pass 2 to send postgreId,Pass 1 to send Firebasekey in above MemberKey field
       //ClubKey:"" // if u need to get data from firebase
     }
     const userQuery = gql`
@@ -211,35 +212,35 @@ export class MemberprofilePage implements OnInit {
       }
     }
   `;
-  this.graphqlService.query(userQuery,{family_input:family_input},0).subscribe(({data}) => {
+    this.graphqlService.query(userQuery, { family_input: family_input }, 0).subscribe(({ data }) => {
       //console.log('challeges data' + data["getFamilyMembers"]);
       console.timeEnd();
       console.log("time ended");
       this.family_members = data["getFamilyMembers"] as FamilyMember[];
       this.getMemberships()
-    },(err)=>{
+    }, (err) => {
       //this.commonService.hideLoader();
-      this.commonService.toastMessage("Users fetch failed",3000,ToastMessageType.Error,ToastPlacement.Bottom);
+      this.commonService.toastMessage("Users fetch failed", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
     });
   }
 
 
-  getMemberships(){
+  getMemberships() {
     const memberkeys = [];
     //memberkeys.push(this.memberInfo.parentFirebaseKey);
-    this.family_members.forEach((member) => {memberkeys.push(member.FirebaseKey)});
+    this.family_members.forEach((member) => { memberkeys.push(member.FirebaseKey) });
 
     this.httpService
-        //.get(`${API.MEMBERSHIP_INFO}?parentClubKey=${this.sharedservice.getParentclubKey()}&clubKey=${this.memberInfo.clubkey}&memberKeys=${memberkeys}`,)
-        .get(`${API.MEMBERSHIP_INFO}?parentClubKey=${this.sharedservice.getParentclubKey()}&clubKey=${this.memberInfo.clubkey}&memberKeys=${memberkeys}`,null,null,0)
-        .subscribe((res: any) => {
-          console.table(`memberships:${res}`);
-         for(const member of this.family_members){
-            if(res.data.memberShipDetailsForMember[member.FirebaseKey] && res.data.memberShipDetailsForMember[member.FirebaseKey].length > 0){
-              member["MembershipName"] = res.data.memberShipDetailsForMember[member.FirebaseKey].SetupName;
-            }
-         }
-        });
+      //.get(`${API.MEMBERSHIP_INFO}?parentClubKey=${this.sharedservice.getParentclubKey()}&clubKey=${this.memberInfo.clubkey}&memberKeys=${memberkeys}`,)
+      .get(`${API.MEMBERSHIP_INFO}?parentClubKey=${this.sharedservice.getParentclubKey()}&clubKey=${this.memberInfo.clubkey}&memberKeys=${memberkeys}`, null, null, 0)
+      .subscribe((res: any) => {
+        console.table(`memberships:${res}`);
+        for (const member of this.family_members) {
+          if (res.data.memberShipDetailsForMember[member.FirebaseKey] && res.data.memberShipDetailsForMember[member.FirebaseKey].length > 0) {
+            member["MembershipName"] = res.data.memberShipDetailsForMember[member.FirebaseKey].SetupName;
+          }
+        }
+      });
   }
 
   getMembership() {
@@ -248,7 +249,7 @@ export class MemberprofilePage implements OnInit {
       JSON.stringify(this.family_members)
     );
     this.fb
-      .getAllWithQuery(`Membership/MembershipAssigned/${this.sharedservice.getParentclubKey()}`,{ orderByKey: true, equalTo: this.memberInfo.clubkey })
+      .getAllWithQuery(`Membership/MembershipAssigned/${this.sharedservice.getParentclubKey()}`, { orderByKey: true, equalTo: this.memberInfo.clubkey })
       .subscribe((data) => {
         if (data.length > 0) {
           data.forEach((selectedConfig) => {
@@ -262,7 +263,7 @@ export class MemberprofilePage implements OnInit {
                     if (
                       configuration[i].IsActive &&
                       this.memberInfo.parentFirebaseKey ==
-                        configuration[configuration.length - 1] &&
+                      configuration[configuration.length - 1] &&
                       configuration[i].Validity >= new Date().getTime()
                     ) {
                       this.memberInfo["MembershipName"] =
@@ -291,7 +292,7 @@ export class MemberprofilePage implements OnInit {
                       configuration[i].IsChild == false &&
                       configuration[i].IsActive &&
                       configuration[configuration.length - 1] ==
-                        this.memberInfo.parentFirebaseKey
+                      this.memberInfo.parentFirebaseKey
                     ) {
                       this.membershipAssigned = true;
                     }
@@ -379,7 +380,7 @@ export class MemberprofilePage implements OnInit {
   ionViewDidEnter() {
     //this.getDetails();
   }
-  
+
   goToMemberProfilePage() {
     this.navCtrl.push("BookinghistoryPage", {
       member_info: this.memberInfo,
@@ -397,10 +398,10 @@ export class MemberprofilePage implements OnInit {
   // }
   goToshowMembershipPage() {
     //console.log("membershipinfo is:",this.memberInfo);
-    this.navCtrl.push("ShowmembershipPage", {MemberInfo:this.memberInfo });
+    this.navCtrl.push("ShowmembershipPage", { MemberInfo: this.memberInfo });
     this.commonService.updateCategory("update_user_memberships_list")
   }
-  
+
   goToshowMemberChallenges() { //commented part of 
     if (this.family_members.length > 0) {
       this.navCtrl.push("Userchallenges", {
@@ -409,7 +410,7 @@ export class MemberprofilePage implements OnInit {
         FamilyMember: this.family_members,
       });
     } else {
-      this.commonService.toastMessage("Please add family member",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please add family member", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
     }
   }
 
@@ -437,7 +438,7 @@ export class MemberprofilePage implements OnInit {
         {
           text: "Yes",
           handler: () => {
-            this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),user_status:this.memberInfo.parent_status})
+            this.updateUserProfileExtraInfo({ id: this.navParams.get("member_id"), user_status: this.memberInfo.parent_status })
           },
         },
       ],
@@ -466,14 +467,14 @@ export class MemberprofilePage implements OnInit {
         {
           text: "Yes",
           handler: () => {
-            this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),is_enable:this.memberInfo.is_enable})
+            this.updateUserProfileExtraInfo({ id: this.navParams.get("member_id"), is_enable: this.memberInfo.is_enable })
           },
         },
       ],
     });
     confirm.present();
   }
-  
+
   showAlertForIsCourtBooking(msg) {
     const confirm = this.alertCtrl.create({
       title: "Allow Court Booking",
@@ -489,43 +490,43 @@ export class MemberprofilePage implements OnInit {
         {
           text: "Yes",
           handler: () => {
-            this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),allow_court_booking:this.memberInfo.allow_court_booking})
+            this.updateUserProfileExtraInfo({ id: this.navParams.get("member_id"), allow_court_booking: this.memberInfo.allow_court_booking })
           },
         },
       ],
     });
     confirm.present();
   }
-  activeConfirmation() {}
+  activeConfirmation() { }
 
   //updating gold_member/coach_status/media_consent/is_enable,deactivate
-  updateUserProfileExtraInfo(user_status):void{
-    try{
+  updateUserProfileExtraInfo(user_status): void {
+    try {
       this.commonService.showLoader("Please wait");
       const userQuery = gql`
       mutation updateUserExtraInfo($profile_input:UserExtraProfileInput!) {
         updateUserExtraInfo(userProfile:$profile_input)
       }
       `;
-      this.graphqlService.mutate(userQuery,{profile_input:user_status},0)
-      .subscribe(({ data }) => {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage("Profile successfully updated",2500,ToastMessageType.Success,ToastPlacement.Bottom);
-        if(user_status.user_status!==undefined){
-          this.navCtrl.pop();
-        }
-      },(err) => {
-        this.commonService.hideLoader();
-        if(err.errors && err.errors.length > 0){
-          this.commonService.toastMessage(err.errors[0].message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-        }else{
-          this.commonService.toastMessage("Profile update failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-        }
-      });      
-    }catch(ex){
+      this.graphqlService.mutate(userQuery, { profile_input: user_status }, 0)
+        .subscribe(({ data }) => {
+          this.commonService.hideLoader();
+          this.commonService.toastMessage("Profile successfully updated", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+          if (user_status.user_status !== undefined) {
+            this.navCtrl.pop();
+          }
+        }, (err) => {
+          this.commonService.hideLoader();
+          if (err.errors && err.errors.length > 0) {
+            this.commonService.toastMessage(err.errors[0].message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          } else {
+            this.commonService.toastMessage("Profile update failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          }
+        });
+    } catch (ex) {
       this.commonService.hideLoader();
       this.commonService.toastMessage("Profile update failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    }   
+    }
   }
 
   //sending notification
@@ -533,50 +534,50 @@ export class MemberprofilePage implements OnInit {
     // this.navCtrl.push("Type2NotificationToIndividualMember", {
     //   MemberDetails: this.memberInfo,
     // });
-    
-    this.navCtrl.push("Type2NotificationSession",{
-      users:[this.memberInfo.Id],
-      type:ModuleTypes.MEMBER,
-      heading:`Hey:${this.memberInfo.parent_firstname} ${this.memberInfo.parent_lastname}`
-    });            
+
+    this.navCtrl.push("Type2NotificationSession", {
+      users: [this.memberInfo.Id],
+      type: ModuleTypes.MEMBER,
+      heading: `Hey:${this.memberInfo.parent_firstname} ${this.memberInfo.parent_lastname}`
+    });
   }
 
   //sending email
   sentAnEmailToMember() {
     const member_list = [];
-      member_list.push({
-              IsChild:false,
-              ParentId:"",
-              MemberId:this.memberInfo.Id, 
-              MemberEmail:this.memberInfo.email, 
-              MemberName: this.memberInfo.parent_firstname + " " + this.memberInfo.parent_lastname
-      })
-      const session = {}
-      const email_modal = {
-          module_info:session,
-          email_users:member_list,
-          type:110
-      }
-      this.navCtrl.push("MailToMemberByAdminPage", {email_modal});
-       
+    member_list.push({
+      IsChild: false,
+      ParentId: "",
+      MemberId: this.memberInfo.Id,
+      MemberEmail: this.memberInfo.email,
+      MemberName: this.memberInfo.parent_firstname + " " + this.memberInfo.parent_lastname
+    })
+    const session = {}
+    const email_modal = {
+      module_info: session,
+      email_users: member_list,
+      type: 110
+    }
+    this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+
   }
 
   //dialing phone number
   callToMember() {
-    if(this.memberInfo.phone_number !== undefined || this.memberInfo.phone_number!==""){
+    if (this.memberInfo.phone_number !== undefined || this.memberInfo.phone_number !== "") {
       if (this.callNumber.isCallSupported()) {
         this.callNumber
           .callNumber(this.memberInfo.phone_number, true)
           .then(() => console.log())
           .catch(() => console.log());
       } else {
-        this.commonService.toastMessage("Your device is not supporting to lunch call dialer.",2500,ToastMessageType.Info,ToastPlacement.Bottom);
+        this.commonService.toastMessage("Your device is not supporting to lunch call dialer.", 2500, ToastMessageType.Info, ToastPlacement.Bottom);
       }
-    }else{
-      this.commonService.toastMessage("Invalid phone number.", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
+    } else {
+      this.commonService.toastMessage("Invalid phone number.", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
     }
   }
-  
+
   changeActiveState() {
     // if(this.memberInfo.IsActive == true){
     //   this.memberInfo.IsActive = false;
@@ -618,7 +619,7 @@ export class MemberprofilePage implements OnInit {
     //   let age = this.commonService.getAgeFromYYYY_MM(
     //     this.family_members[i].DOB
     //   );
-      
+
     //   if (isNaN(age)) {
     //     this.family_members[i].Age = "";
     //   } else {
@@ -641,20 +642,20 @@ export class MemberprofilePage implements OnInit {
   }
 
   getClubDetails() {
-    const club$Obs = this.fb.getAllWithQuery(`/Club/Type2/${this.sharedservice.getParentclubKey()}`, {orderByChild: "IsEnable",equalTo: true,}).subscribe((data) => {
-        this.clubs = data;
-        club$Obs.unsubscribe();
-        console.log(data);
-        if (data.length != 0) {
-          this.selectedClubKey = this.clubs[0].$key;
-          try {
-            // this.getClubMmebers(this.selectedClubKey);
-          } catch (ex) {
-          } finally {
-            //this.loading.dismiss().catch(() => { });
-          }
+    const club$Obs = this.fb.getAllWithQuery(`/Club/Type2/${this.sharedservice.getParentclubKey()}`, { orderByChild: "IsEnable", equalTo: true, }).subscribe((data) => {
+      this.clubs = data;
+      club$Obs.unsubscribe();
+      console.log(data);
+      if (data.length != 0) {
+        this.selectedClubKey = this.clubs[0].$key;
+        try {
+          // this.getClubMmebers(this.selectedClubKey);
+        } catch (ex) {
+        } finally {
+          //this.loading.dismiss().catch(() => { });
         }
-      });
+      }
+    });
   }
   closeModal() {
     let modal = document.getElementById("customModal8");
@@ -693,22 +694,22 @@ export class MemberprofilePage implements OnInit {
         {
           text: "Yes",
           handler: () => {
-            this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),is_gold_member:this.memberInfo.is_gold_member})
+            this.updateUserProfileExtraInfo({ id: this.navParams.get("member_id"), is_gold_member: this.memberInfo.is_gold_member })
           },
         },
       ],
     });
     confirm.present();
   }
-  
+
   allowMediaConsent() {
     const title = "Allow Media";
     const message = `Are you sure you want to change the setting?`;
-    this.commonService.commonAlertWithStatus(title,message,"No","Yes",(status:boolean)=>{
-      if(status){
-        this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),allow_media_consent:this.memberInfo.media_consent})
+    this.commonService.commonAlertWithStatus(title, message, "No", "Yes", (status: boolean) => {
+      if (status) {
+        this.updateUserProfileExtraInfo({ id: this.navParams.get("member_id"), allow_media_consent: this.memberInfo.media_consent })
       }
-      else{
+      else {
         this.memberInfo.media_consent = !this.memberInfo.media_consent;
       }
     });
@@ -728,7 +729,7 @@ export class MemberprofilePage implements OnInit {
         {
           text: "Yes",
           handler: () => {
-            this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),is_coach:this.memberInfo.is_coach})
+            this.updateUserProfileExtraInfo({ id: this.navParams.get("member_id"), is_coach: this.memberInfo.is_coach })
           },
         },
       ],
