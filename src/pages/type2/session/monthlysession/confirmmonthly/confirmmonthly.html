@@ -52,7 +52,7 @@
 <div class="action_dev">
   <ion-row style="margin-top:10px">
     <ion-col col-12 style="margin:auto">
-      <ion-list radio-group [(ngModel)]="move_frequency">
+      <!-- <ion-list radio-group [(ngModel)]="move_frequency">
         <ion-item *ngIf="user_subscription && user_subscription.is_paid">
           <ion-label>Immediate</ion-label>
           <ion-radio value="1" checked></ion-radio>
@@ -61,7 +61,23 @@
           <ion-label>Next Month</ion-label>
           <ion-radio value="2"></ion-radio>
         </ion-item>
-      </ion-list>
+      </ion-list> -->
+      <div padding>
+        <h3>If Current Month is Already Paid</h3>
+        <ul>
+          <li>New subscription payment starts from next month</li>
+          <li>Keep the existing billing cycle/date</li>
+          <li>Existing subscription cancels at period end</li>
+        </ul>
+        <h3>If Current Month Not Paid (or Trial)</h3>
+        <ul>
+          <li>New subscription starts this month with full month charge</li>
+          <li>Keep the existing billing cycle/date</li>
+          <li>Existing subscription cancels immediately</li>
+        </ul>
+        <!-- <h3>Key Principle</h3>
+        <p>Maintaining payment continuity while ensuring users don't lose value from payments already made</p> -->
+      </div>
     </ion-col>
   </ion-row>
 

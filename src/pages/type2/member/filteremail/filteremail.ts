@@ -362,50 +362,50 @@ async getParentClubUsers(){
   }
   email() {
       try {
-          let notificationDetailsObjForMember = {
-              ParentClubKey: this.parentClubKey,
-              ClubKey: this.selectedClub,
-              ClubName: this.clubName,
-              ClubShortName: this.clubShortName,
-              Message: this.emailObj.Message,
-              Subject: this.emailObj.Subject,
-              // SendTo: "",
-              SendBy: "ClubAdmin",
-              ComposeOn: new Date().getTime(),
-              Purpose: "Notification",
-              MemberKey: "",
-              MemberName: "",
-              MemberEmailId: "",
-              Status: "Unread",
-              Type: ""
-          };
-          let notificationDetailsObjForAdmin = {
-              ParentClubKey: this.parentClubKey,
-              ClubKey: this.selectedClub,
-              ClubName: this.clubName,
-              ClubShortName: this.clubShortName,
-              Message: this.emailObj.Message,
-              Subject: this.emailObj.Subject,
-              // SendTo: "",
-              SendBy: "ClubAdmin",
-              Type: "",
-              ComposeOn: new Date().getTime(),
-              Purpose: "Notification",
-              Member: []
+          // let notificationDetailsObjForMember = {
+          //     ParentClubKey: this.parentClubKey,
+          //     ClubKey: this.selectedClub,
+          //     ClubName: this.clubName,
+          //     ClubShortName: this.clubShortName,
+          //     Message: this.emailObj.Message,
+          //     Subject: this.emailObj.Subject,
+          //     // SendTo: "",
+          //     SendBy: "ClubAdmin",
+          //     ComposeOn: new Date().getTime(),
+          //     Purpose: "Notification",
+          //     MemberKey: "",
+          //     MemberName: "",
+          //     MemberEmailId: "",
+          //     Status: "Unread",
+          //     Type: ""
+          // };
+          // let notificationDetailsObjForAdmin = {
+          //     ParentClubKey: this.parentClubKey,
+          //     ClubKey: this.selectedClub,
+          //     ClubName: this.clubName,
+          //     ClubShortName: this.clubShortName,
+          //     Message: this.emailObj.Message,
+          //     Subject: this.emailObj.Subject,
+          //     // SendTo: "",
+          //     SendBy: "ClubAdmin",
+          //     Type: "",
+          //     ComposeOn: new Date().getTime(),
+          //     Purpose: "Notification",
+          //     Member: []
 
-          };
-          let notificationDetailsObjForMemberInner = {
-              MemberKey: "",
-              MemberName: "",
-              MemberEmailId: "",
-              Status: "Unread"
-          }
+          // };
+          // let notificationDetailsObjForMemberInner = {
+          //     MemberKey: "",
+          //     MemberName: "",
+          //     MemberEmailId: "",
+          //     Status: "Unread"
+          // }
           
           let emailFormembers = {
               Members: [],
               ImagePath: this.parentClubDetails.ParentClubAppIconURL,
-              // FromEmail: "activitypro17@gmail.com",
-              FromEmail:"beactive@activitypro.co.uk",
+              FromEmail: "info@activitypro.app",
+              //FromEmail:"beactive@activitypro.co.uk",
               FromName: this.parentClubDetails.ParentClubName,
               ToEmail: this.parentClubDetails.ParentClubAdminEmailID,
               ToName: this.parentClubDetails.ParentClubName,
@@ -427,11 +427,11 @@ async getParentClubUsers(){
               
               const email_variable = { emailInput: emailFormembers };
               this.graphqlService.mutate(email_mutation, email_variable,0).subscribe((response)=>{
-                let firebs = this.fb;
-                let members = [];
-                members = this.filteredMember; //this.memberList;
-                let pc = this.parentClubKey;
-                let url = this.sharedservice.getEmailUrl();
+                //let firebs = this.fb;
+                //let members = [];
+                //members = this.filteredMember; //this.memberList;
+                // let pc = this.parentClubKey;
+                // let url = this.sharedservice.getEmailUrl();
                 this.commonService.hideLoader();
                 this.commonService.toastMessage("Mail sent successfully",2500,ToastMessageType.Success, ToastPlacement.Bottom);
                 this.emailObj.Message = "Dear All,\n\n\n\nSincerely Yours,\n" + this.parentClubDetails.ParentClubName + "\n" + "Ph:" + this.parentClubDetails.ContactPhone + "\n" + this.parentClubDetails.ParentClubAdminEmailID;

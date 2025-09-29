@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, AlertController, ToastController } from 'ionic-angular';
 import { FirebaseService } from '../../../../services/firebase.service';
-//import { Type2AssignMembershipSubCategory } from '../../assignmembership/assignmembershipsubcategory';
+import { Type2AssignMembershipSubCategory } from '../../assignmembership/assignmembershipsubcategory';
 import moment from 'moment'
 import { CommonService } from '../../../../services/common.service';
 

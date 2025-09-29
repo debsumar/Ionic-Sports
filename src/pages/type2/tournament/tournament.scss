@@ -1,19 +1,55 @@
+@import '../../../theme/android-sdk35-fixes.scss';
 page-tournament {
+  @include android-sdk35-fixes;
+  
+  // Default dark theme for the entire page
+  background: #0f172a !important;
 
   // Light Theme
   &.light-theme {
+    background: #f8fafc !important;
+    ion-header {
+      ion-navbar {
+        background: #ffffff;
+        border-bottom: 1px solid #e2e8f0;
+        
+        ion-title {
+          color: #1e293b;
+        }
+        
+        ion-buttons button {
+          color: #64748b;
+        }
+      }
+    }
+
     ion-content {
       background: #f8fafc !important;
+      
+      .scroll-content {
+        background: #f8fafc !important;
+      }
+      
+      .fixed-content {
+        background: #f8fafc !important;
+      }
     }
 
     .scroll-content {
       background: #f8fafc !important;
+      padding: 6px !important;
+      margin-bottom: 60px;
     }
 
-    ion-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    ion-card, .ion-card {
+      background: #ffffff !important;
+      border: 1px solid #e2e8f0 !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1) !important;
+      border-bottom: 1px solid #2b92bb !important;
+      
+      ion-card-content {
+        background: #ffffff !important;
+      }
     }
 
     .Location-head {
@@ -61,22 +97,86 @@ page-tournament {
 
     .selected {
       background-color: rgba(43, 146, 187, 0.15) !important;
+      border-radius: 8px;
 
       p {
         color: #2b92bb !important;
+        font-weight: 600;
       }
 
       ion-icon {
         color: #2b92bb !important;
       }
     }
+    
+    // Additional light theme styles
+    .location-cards > p {
+      color: #64748b !important;
+    }
+    
+    .location-cards > h3 {
+      color: #2b92bb !important;
+    }
+    
+    .fab_btn {
+      ion-fab-button {
+        background: #2b92bb !important;
+        color: #ffffff !important;
+      }
+    }
+    
+    // List and content styles for light theme
+    ion-list {
+      background: transparent !important;
+    }
+    
+    .margin_bottom {
+      background: transparent !important;
+    }
+    
+    // Ensure all text elements have proper light theme colors
+    .amount {
+      color: #1e293b !important;
+    }
+    
+    // Border and divider styles
+    .all {
+      border-image: linear-gradient(to bottom, #2b92bb, #60a5fa) 1 100% !important;
+    }
   }
 
   // Dark Theme (Default)
   width: 100%;
+  
+  ion-header {
+    ion-navbar {
+      background: #1e293b;
+      border-bottom: 1px solid #334155;
+      
+      ion-title {
+        color: #f1f5f9;
+      }
+      
+      ion-buttons button {
+        color: #cbd5e1;
+        
+        &:hover {
+          color: #f1f5f9;
+        }
+      }
+    }
+  }
 
   ion-content {
     background: #0f172a !important;
+    
+    .scroll-content {
+      background: #0f172a !important;
+    }
+    
+    .fixed-content {
+      background: #0f172a !important;
+    }
   }
 
   .scroll-content {

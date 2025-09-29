@@ -73,8 +73,7 @@
 
       <ion-item>
         <ion-label>Team 1 - Player 2</ion-label>
-        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.primary_participant_id2"
-          (ionChange)="filterParticipants()">
+        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.primary_participant_id2" (ionChange)="filterParticipants()">
           <ion-option *ngFor="let participant of participantData" [value]="participant.id"
             [disabled]="participant.id === inputObj.primary_participant_id || participant.id === inputObj.secondary_participant_id || participant.id === secondary_participant_id2">
             {{participant.participant_name}}
@@ -94,8 +93,7 @@
 
       <ion-item>
         <ion-label>Team 2 - Player 2</ion-label>
-        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.secondary_participant_id2"
-          (ionChange)="filterParticipants()">
+        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.secondary_participant_id2" (ionChange)="filterParticipants()">
           <ion-option *ngFor="let participant of participantData" [value]="participant.id"
             [disabled]="participant.id === inputObj.primary_participant_id || participant.id === primary_participant_id2 || participant.id === inputObj.secondary_participant_id">
             {{participant.participant_name}}
@@ -111,7 +109,7 @@
       <ion-input type="text" [(ngModel)]="inputObj.MatchName"></ion-input>
     </ion-item>
 
-    <!-- <ion-item>
+    <ion-item>
       <ion-row>
         <ion-col col-12 no-padding class="flex_col">
           <p class="toggle_para">Paid</p>
@@ -121,7 +119,7 @@
           </label>
         </ion-col>
       </ion-row>
-    </ion-item> -->
+    </ion-item>
 
     <ion-item *ngIf="this.inputObj.MatchPaymentType==1" class="allign-right">
       <ion-label fixed>Member Fee

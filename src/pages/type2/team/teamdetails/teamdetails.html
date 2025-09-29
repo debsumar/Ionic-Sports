@@ -158,9 +158,10 @@
 
 
     <ion-card class="cardStyle" (click)="actionSheetforStaff(player)" *ngFor="let player of filteredStaff;">
-      <ion-row>
-        <ion-col col-6 class="applyPadding">{{player.StaffDetail.name}}</ion-col>
-        <ion-col col-6 class="margin-auto">{{player.role.role_name}} </ion-col>
+      <ion-row style="height: 100%;">
+        <ion-col col-7 class="team_left_card">
+          <p class="para_overflow" style="font-weight: 500;">{{player.StaffDetail.name}}</p></ion-col>
+        <ion-col col-5 class="status-col team_right_card"><p class="para_overflow">{{player.role.role_name}}</p></ion-col>
       </ion-row>
     </ion-card>
   </div>

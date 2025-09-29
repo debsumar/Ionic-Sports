@@ -1,4 +1,10 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
 page-videomenueslisting {
+    @include android-sdk35-fixes;
+
+
+
    
     ion-card {
         width      : 97.8% !important;
@@ -337,5 +343,4 @@ page-videomenueslisting {
     }
 
     
-
 }

@@ -8,27 +8,27 @@ export class SharedServices {
     private emailUrl: string;
     private nodeURL: string;
     private nestURL: string;
-    private static graphqlURL: string;
+    private static graphqlURL:string;
     private cloudFrontURL: string;
-    private presignedURL: string;
-    private group_sessionsUrl: string;
-    private group_session_apikey: string;
-    private userData: any;
-    private ParentclubKey: string;
+    private presignedURL:string;
+    private group_sessionsUrl:string;
+    private group_session_apikey:string;
+    private userData:any;
+    private ParentclubKey:string;
     private SuperAdminKey: string;
     private AdminStatus: boolean;
-    private static TempNodeUrl: string = "";
-    private static TempSuperAdminKey: string = "";
-    private platform: string;
-    private deviceId: string;
-    private deviceDetsils: string;
-    private onesignalPlayerId: string;
-    private can_coach_see_revenue: boolean = false;
+    private static TempNodeUrl:string = "";
+    private static TempSuperAdminKey:string = "";
+    private platform:string;
+    private deviceId:string;
+    private deviceDetsils:string;
+    private onesignalPlayerId:string;
+    private can_coach_see_revenue:boolean = false;
     private apikeys_map = new Map();
-    private postgreParentClubId: string;
-    private loggedInId: string;
-    private loggedin_type: number;
-    private loggedInUserId: string;
+    private postgreParentClubId:string;
+    private loggedInId:string;
+    private loggedInUserId:string;
+    private loggedin_type:number;
     inclusionList: Array<String> = ["", " ", "-", ".", "..", "...", "A", "adhd", "fit", "good", "great", "healthy",
         "n", "n/a", "N/a", "na", "Na", "NA", "nil", "no", "No", "no e", "nobe", "non", "not applicable", "none", "nope", "None", "None\n\n", "Nope", "nothing", "Nothing", "ok", "Ok", "okay", "no problem",
         "Best", "best", "Good", 'good'
@@ -38,69 +38,69 @@ export class SharedServices {
         this.themeColor = 1;
         this.deviceToken = "";
         this.emailUrl = "";
-        this.ParentclubKey = ""
+        this.ParentclubKey=""
     }
-    setDeviceId(id: string) {
+    setDeviceId(id:string){
         this.deviceId = id;
     }
-    setdeviceDetails(details: string) {
+    setdeviceDetails(details:string){
         this.deviceDetsils = details;
     }
-    setOnesignalPlayerId(id: string) {
+    setOnesignalPlayerId(id:string){
         this.onesignalPlayerId = id;
     }
 
-    setApikey(key: string, value: string) {
-        this.apikeys_map.set(key, value);
+    setApikey(key:string,value:string){
+        this.apikeys_map.set(key,value);
     }
-
-    getApiKey(key: string) {
+    
+    getApiKey(key:string){
         return this.apikeys_map.get(key);
     }
 
-    setGroupSessionsURL(sessionurl: string) {
+    setGroupSessionsURL(sessionurl:string){
         this.group_sessionsUrl = sessionurl;
     }
-    getGroupSessionsURL() {
+    getGroupSessionsURL(){
         return this.group_sessionsUrl;
     }
-    setGroupSessionAPiKey(session_apikey: string) {
+    setGroupSessionAPiKey(session_apikey:string){
         this.group_session_apikey = session_apikey;
     }
-    getGroupSessionAPiKey() {
+    getGroupSessionAPiKey(){
         return this.group_session_apikey;
     }
-    setAdminStatus(status: boolean) {
+    setAdminStatus(status:boolean){
         this.AdminStatus = status;
     }
-    getAdminStatus() {
+    getAdminStatus(){
         return this.AdminStatus;
     }
-    setUserData(data) {
-        this.userData = data;
+    setUserData(data){
+        this.userData  = data;
     }
-    getUserData() {
+    getUserData(){
         return this.userData;
     }
     setnodeURL(url: string) {
         SharedServices.TempNodeUrl = url;
         this.nodeURL = url;
     }
-    getnodeURL() {
+     getnodeURL() {
         return this.nodeURL;
     }
-    static getTempNodeUrl() {
+    static getTempNodeUrl(){
         return this.TempNodeUrl;
     }
 
     setnestURL(url: string) {
         this.nestURL = url;
     }
-    getnestURL() {
+     getnestURL() {
         return this.nestURL;
     }
 
-    setgraphqlURL(url: string) {
+    setgraphqlURL(url: string){
         SharedServices.graphqlURL = url;
     }
 
@@ -108,35 +108,35 @@ export class SharedServices {
         return SharedServices.graphqlURL;
     }
 
-    setCloudfrontURL(url: string) {
+    setCloudfrontURL(url:string){
         this.cloudFrontURL = url;
     }
-    getCloudfrontURL() {
+    getCloudfrontURL(){ 
         return this.cloudFrontURL;
     }
 
-    setPresignedURL(url: string) {
+    setPresignedURL(url:string){
         this.presignedURL = url;
     }
-    getPresignedURL() {
+    getPresignedURL(){ 
         return this.presignedURL;
     }
 
-    setSuperAdminKey(key: string) {
+    setSuperAdminKey(key: string){
         SharedServices.TempSuperAdminKey = key;
         this.SuperAdminKey = key;
     }
-    getSuperAdminKey() {
+    getSuperAdminKey(){
         return this.SuperAdminKey;
     }
-    static getTempSuperAdminKey() {
+    static getTempSuperAdminKey(){
         return this.TempSuperAdminKey;
     }
-
+    
     setEmailUrl(url: string) {
         this.emailUrl = url;
     }
-    getEmailUrl() {
+     getEmailUrl() {
         return this.emailUrl;
     }
     setDeviceToken(token: string) {
@@ -172,90 +172,90 @@ export class SharedServices {
             this.menus = [];
         }
     }
-    setPlatform(platform: any) {
+    setPlatform(platform:any){
         this.platform = platform;
     }
-    getPlatform() {
+    getPlatform(){
         return this.platform;
     }
     getMenuList() {
         return this.menus;
     }
-    getParentclubKey(): string {
+    getParentclubKey():string{
         return this.ParentclubKey;
     }
-    setParentclubKey(ParentclubKey) {
+    setParentclubKey(ParentclubKey){
         this.ParentclubKey = ParentclubKey;
     }
 
-    setLoggedInId(loggedin_id: string) {
+    setLoggedInId(loggedin_id:string){
         this.loggedInId = loggedin_id;
     }
 
-    getLoggedInId() {
+    getLoggedInId(){
         return this.loggedInId;
     }
 
-    getDeviceId() {
+    getDeviceId(){
         return this.deviceId;
     }
-    getdeviceDetails() {
+    getdeviceDetails(){
         return this.deviceDetsils;
     }
-    getOnesignalPlayerId() {
+    getOnesignalPlayerId(){
         return this.onesignalPlayerId;
     }
-    getMedicalInclusionList() {
+    getMedicalInclusionList(){
         return this.inclusionList;
     }
-    setCanCoachSeeRevenue(coachRevStatus: boolean) {
+    setCanCoachSeeRevenue(coachRevStatus:boolean){
         this.can_coach_see_revenue = coachRevStatus;
     }
-    getCanCoachSeeRevenue() {
-        return this.can_coach_see_revenue;
-    }
-
-    setLoggedInType(type: number) { //coach or admin/subadmin/superadmin/receptionist
+    getCanCoachSeeRevenue(){
+       return this.can_coach_see_revenue; 
+    }  
+    
+    setLoggedInType(type:number){ //coach or admin/subadmin/superadmin/receptionist
         this.loggedin_type = type;
     }
-    getLoggedInType() { //coach or admin/subadmin/superadmin/receptionist
-        return this.loggedin_type;
+    getLoggedInType(){ //coach or admin/subadmin/superadmin/receptionist
+       return this.loggedin_type; 
     }
 
-    setPostgreParentClubId(posgtre_parentclub_id: string) {
+    setPostgreParentClubId(posgtre_parentclub_id:string){
         this.postgreParentClubId = posgtre_parentclub_id;
     }
 
-    getPostgreParentClubId() {
+    getPostgreParentClubId(){
         return this.postgreParentClubId;
     }
 
-    setLoggedInUserId(loggedin_user) {
+    setLoggedInUserId(loggedin_user){
         this.loggedInUserId = loggedin_user;
     }
 
-    getLoggedInUserId() {
-        return this.loggedInUserId;
+    getLoggedInUserId(){
+       return this.loggedInUserId; 
     }
-
+    
 }
 export class Menu {
     // title: string;
     // component: any;
     // icon: string;
     // Level: number;
-    DisplayTitle: string;
-    OriginalTitle: string;
+    DisplayTitle: string; 
+    OriginalTitle:string;
     MobComponent: string;
-    WebComponent: string;
-    MobIcon: string;
+    WebComponent: string; 
+    MobIcon:string;
     MobLocalImage: string;
-    MobCloudImage: string;
-    WebIcon: string;
+    MobCloudImage: string; 
+    WebIcon:string;
     WebLocalImage: string;
-    WebCloudImage: string;
-    MobileAccess: boolean;
-    WebAccess: boolean;
+    WebCloudImage:string;
+    MobileAccess:boolean;
+    WebAccess:boolean;
     Role: number;
     Type: number;
     Level: number

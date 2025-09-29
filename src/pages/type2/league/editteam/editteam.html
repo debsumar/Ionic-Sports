@@ -36,7 +36,7 @@
             <img *ngIf="parentClubTeamEdit.teamDetailsInput.logo_url==''" src="assets/images/upload.svg" class="add_icon" (click)="selectTeamLogo()">
             <img *ngIf="parentClubTeamEdit.teamDetailsInput.logo_url!=''" [src]="parentClubTeamEdit.teamDetailsInput.logo_url"
               class="add_icon"
-              (click)="showImagePopup(parentClubTeamEdit.teamDetailsInput.logoUrl)">
+              (click)="showImagePopup(parentClubTeamEdit.teamDetailsInput.logo_url)">
             <!-- </button> -->
           </ion-col>
         </ion-row>

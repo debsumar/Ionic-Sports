@@ -1,9 +1,6 @@
-addactivityfees-page{
-    .scroll-content{
-        padding: 16px 9px !important;
-    }
-     .image-div{
-            border: 1px solid gray;
-    padding: 0px 2px 1px 0px;
-    }
+@import '../../../theme/android-sdk35-fixes.scss';
+
+addactivityfees-page {
+    @include android-sdk35-fixes;
+
 }

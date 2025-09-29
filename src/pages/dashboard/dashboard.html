@@ -14,12 +14,11 @@
     </ion-navbar>
 </ion-header>
 
-<ion-content class="modern-dashboard" [style.top.px]="!isAppAdminLoggedin ? 0 : 55"
-    [style.paddingTop.px]="!isAppAdminLoggedin ? 30 : 0">
+<ion-content class="modern-dashboard" [style.top.px]="!isAppAdminLoggedin ? 0 : 55" [style.paddingTop.px]="!isAppAdminLoggedin ? 30 : 0">
     <ion-refresher slot="fixed" pullFactor="0.5" (ionRefresh)="doRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
     </ion-refresher>
-
+    
     <!-- Modern Header -->
     <div class="modern-header" [style.paddingTop.px]="!isAppAdminLoggedin ? 30 : 0">
         <div *ngIf="parentClubInfo != undefined" class="header-content">
@@ -35,12 +34,11 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Modern Dashboard Cards -->
     <div class="dashboard-container">
         <!-- Pending Payments Card -->
-        <div class="modern-card payment-card" (click)="goToPage('Payment')"
-            *ngIf="(dashboradView.PendingPaymentAdmin == undefined || dashboradView.PendingPaymentAdmin == 1) && (showPendingPayments) && sessionDetails.VenueDetails && sessionDetails.VenueDetails.length > 0">
+        <div class="modern-card payment-card" (click)="goToPage('Payment')" *ngIf="(dashboradView.PendingPaymentAdmin == undefined || dashboradView.PendingPaymentAdmin == 1) && (showPendingPayments) && sessionDetails.VenueDetails && sessionDetails.VenueDetails.length > 0">
             <div class="card-header">
                 <div class="card-icon-wrapper payment-bg">
                     <ion-icon name="card" class="card-icon"></ion-icon>
@@ -59,9 +57,7 @@
                 <div class="venue-list">
                     <div class="venue-row" *ngFor="let club of sessionDetails.VenueDetails">
                         <span class="venue-label" *ngIf="club.Total">{{club.ClubName}}</span>
-                        <span class="venue-value"
-                            *ngIf="userData!= undefined && club.Total">{{userData.Currency}}{{club.Total | number :
-                            '1.2-2'}}</span>
+                        <span class="venue-value" *ngIf="userData!= undefined && club.Total">{{userData.Currency}}{{club.Total | number : '1.2-2'}}</span>
                     </div>
                 </div>
             </div>
@@ -90,18 +86,16 @@
                     </div>
                     <div class="metric-item revenue-metric">
                         <div class="metric-value">
-                            <span *ngIf="userData!= undefined"
-                                class="currency-small">{{userData.Currency}}</span>{{EventObj.TotRevenue}}
+                            <span *ngIf="userData!= undefined" class="currency-small">{{userData.Currency}}</span>{{EventObj.TotRevenue}}
                         </div>
                         <div class="metric-label">Revenue</div>
                     </div>
                 </div>
             </div>
         </div>
-
+  
         <!-- Sessions & Enrollments Card -->
-        <div class="modern-card sessions-card"
-            *ngIf="(dashboradView.SessionCountAdmin == undefined || dashboradView.SessionCountAdmin == 1) && (sessionEnrolDetails.Total_Sessions > 0 || monthlySessionEnrolDetails.Total_Sessions > 0 || sclSessionEnrolDetails.Total_Sessions > 0 || holidayCampDetails.holidayCamps.length > 0)">
+        <div class="modern-card sessions-card" *ngIf="(dashboradView.SessionCountAdmin == undefined || dashboradView.SessionCountAdmin == 1) && (sessionEnrolDetails.Total_Sessions > 0 || monthlySessionEnrolDetails.Total_Sessions > 0 || sclSessionEnrolDetails.Total_Sessions > 0 || holidayCampDetails.holidayCamps.length > 0)">
             <div class="card-header">
                 <div class="card-icon-wrapper sessions-bg">
                     <ion-icon name="people" class="card-icon"></ion-icon>
@@ -113,16 +107,12 @@
             </div>
             <div class="card-body">
                 <!-- Term Sessions -->
-                <div class="session-row" *ngIf="sessionEnrolDetails.Total_Sessions > 0"
-                    (click)="goToPage('Type2ManageSession')">
-                    <div class="session-indicator term-indicator"
-                        [ngClass]="getSessionCountBg(sessionEnrolDetails.Total_Sessions)">
-                        {{sessionEnrolDetails.Total_Sessions}}</div>
+                <div class="session-row" *ngIf="sessionEnrolDetails.Total_Sessions > 0" (click)="goToPage('Type2ManageSession')">
+                    <div class="session-indicator term-indicator" [ngClass]="getSessionCountBg(sessionEnrolDetails.Total_Sessions)">{{sessionEnrolDetails.Total_Sessions}}</div>
                     <div class="session-details">
                         <h4 class="session-name">{{LangObj.dashboard_RegSes}}</h4>
                         <div class="session-metrics">
-                            <span class="metric"
-                                *ngIf="sessionEnrolDetails.Total_Hours && sessionEnrolDetails.Total_Hours != '0'">
+                            <span class="metric" *ngIf="sessionEnrolDetails.Total_Hours && sessionEnrolDetails.Total_Hours != '0'">
                                 <ion-icon name="time"></ion-icon>
                                 {{sessionEnrolDetails.Total_Hours | number : '1.1-1'}}h weekly
                             </span>
@@ -134,18 +124,14 @@
                     </div>
                     <ion-icon name="chevron-forward" class="chevron-icon"></ion-icon>
                 </div>
-
+                
                 <!-- Monthly Sessions -->
-                <div class="session-row" *ngIf="monthlySessionEnrolDetails.Total_Sessions > 0"
-                    (click)="goToPage('Type2ManageSession')">
-                    <div class="session-indicator monthly-indicator"
-                        [ngClass]="getSessionCountBg(monthlySessionEnrolDetails.Total_Sessions)">
-                        {{monthlySessionEnrolDetails.Total_Sessions}}</div>
+                <div class="session-row" *ngIf="monthlySessionEnrolDetails.Total_Sessions > 0" (click)="goToPage('Type2ManageSession')">
+                    <div class="session-indicator monthly-indicator" [ngClass]="getSessionCountBg(monthlySessionEnrolDetails.Total_Sessions)">{{monthlySessionEnrolDetails.Total_Sessions}}</div>
                     <div class="session-details">
                         <h4 class="session-name">Monthly Sessions</h4>
                         <div class="session-metrics">
-                            <span class="metric"
-                                *ngIf="monthlySessionEnrolDetails.Total_Hours && monthlySessionEnrolDetails.Total_Hours != '0'">
+                            <span class="metric" *ngIf="monthlySessionEnrolDetails.Total_Hours && monthlySessionEnrolDetails.Total_Hours != '0'">
                                 <ion-icon name="time"></ion-icon>
                                 {{monthlySessionEnrolDetails.Total_Hours | number : '1.1-1'}}h weekly
                             </span>
@@ -157,18 +143,14 @@
                     </div>
                     <ion-icon name="chevron-forward" class="chevron-icon"></ion-icon>
                 </div>
-
+                
                 <!-- School Sessions -->
-                <div class="session-row" *ngIf="sclSessionEnrolDetails.Total_Sessions > 0"
-                    (click)="goToPage('Type2SchoolSessionList')">
-                    <div class="session-indicator school-indicator"
-                        [ngClass]="getSessionCountBg(sclSessionEnrolDetails.Total_Sessions)">
-                        {{sclSessionEnrolDetails.Total_Sessions}}</div>
+                <div class="session-row" *ngIf="sclSessionEnrolDetails.Total_Sessions > 0" (click)="goToPage('Type2SchoolSessionList')">
+                    <div class="session-indicator school-indicator" [ngClass]="getSessionCountBg(sclSessionEnrolDetails.Total_Sessions)">{{sclSessionEnrolDetails.Total_Sessions}}</div>
                     <div class="session-details">
                         <h4 class="session-name">{{LangObj.dashboard_SchoolSns}}</h4>
                         <div class="session-metrics">
-                            <span class="metric"
-                                *ngIf="sclSessionEnrolDetails.Total_Hours && sclSessionEnrolDetails.Total_Hours != '0'">
+                            <span class="metric" *ngIf="sclSessionEnrolDetails.Total_Hours && sclSessionEnrolDetails.Total_Hours != '0'">
                                 <ion-icon name="time"></ion-icon>
                                 {{sclSessionEnrolDetails.Total_Hours | number : '1.1-1'}}h weekly
                             </span>
@@ -180,18 +162,14 @@
                     </div>
                     <ion-icon name="chevron-forward" class="chevron-icon"></ion-icon>
                 </div>
-
+                
                 <!-- Holiday Camps -->
-                <div class="session-row" *ngIf="campEnrolDetails.Total_Sessions > 0"
-                    (click)="goToPage('Type2HolidayCamp')">
-                    <div class="session-indicator camp-indicator"
-                        [ngClass]="getSessionCountBg(campEnrolDetails.Total_Sessions)">
-                        {{campEnrolDetails.Total_Sessions}}</div>
+                <div class="session-row" *ngIf="campEnrolDetails.Total_Sessions > 0" (click)="goToPage('Type2HolidayCamp')">
+                    <div class="session-indicator camp-indicator" [ngClass]="getSessionCountBg(campEnrolDetails.Total_Sessions)">{{campEnrolDetails.Total_Sessions}}</div>
                     <div class="session-details">
                         <h4 class="session-name">{{LangObj.dashboard_HolidayCamps}}</h4>
                         <div class="session-metrics">
-                            <span class="metric"
-                                *ngIf="campEnrolDetails.Total_Hours && campEnrolDetails.Total_Hours != '0'">
+                            <span class="metric" *ngIf="campEnrolDetails.Total_Hours && campEnrolDetails.Total_Hours != '0'">
                                 <ion-icon name="time"></ion-icon>
                                 {{campEnrolDetails.Total_Hours | number : '1.1-1'}}h total
                             </span>
@@ -205,7 +183,7 @@
                 </div>
             </div>
         </div>
-
+  
         <!-- Facility Booking Card -->
         <div class="modern-card booking-card" (click)="GotoBooking()" *ngIf="bookingInfo && type">
             <div class="card-header">
@@ -231,7 +209,7 @@
                 </div>
             </div>
         </div>
-
+  
         <!-- Booking Slots Accordion -->
         <div class="facility-accordion" *ngIf="bookingInfo.slotListing.length > 0 && type">
             <div class="modern-card accordion-card">
@@ -239,12 +217,10 @@
                     <div class="accordion-title">
                         <h3>Facility Bookings ({{bookingInfo.slotListing.length}})</h3>
                     </div>
-                    <ion-icon [name]="isFacilityExpanded ? 'arrow-down' : 'arrow-forward'"
-                        class="accordion-icon"></ion-icon>
+                    <ion-icon [name]="isFacilityExpanded ? 'arrow-down' : 'arrow-forward'" class="accordion-icon"></ion-icon>
                 </div>
                 <div class="accordion-content" [ngClass]="{'expanded': isFacilityExpanded}">
-                    <div class="facility-item" *ngFor="let slot of bookingInfo.slotListing"
-                        (click)="gotoBookings(0,slot)">
+                    <div class="facility-item" *ngFor="let slot of bookingInfo.slotListing" (click)="gotoBookings(0,slot)">
                         <div class="facility-details">
                             <div class="facility-info">
                                 <h4 class="facility-name">{{slot.name}}</h4>
@@ -255,9 +231,7 @@
                             </div>
                             <div class="facility-court">
                                 <span class="court-name">{{slot.courtname}}</span>
-                                <span class="slot-price"
-                                    *ngIf="userData.Currency!=undefined">{{userData.Currency}}{{slot.price | number :
-                                    '1.2-2'}}</span>
+                                <span class="slot-price" *ngIf="userData.Currency!=undefined">{{userData.Currency}}{{slot.price | number : '1.2-2'}}</span>
                             </div>
                         </div>
                         <div class="partner-note" *ngIf="slot.partnerAddedText">
@@ -267,10 +241,9 @@
                 </div>
             </div>
         </div>
-
+        
         <!-- School Payment Summary -->
-        <div class="modern-card school-payment-card" (click)="goToPage('SchoolpaymentreportPage')"
-            *ngIf="dashboradView.SessionCount && schoolSessionDetails.totalPaidAmount > 0 && showPendingPayments">
+        <div class="modern-card school-payment-card" (click)="goToPage('SchoolpaymentreportPage')" *ngIf="dashboradView.SessionCount && schoolSessionDetails.totalPaidAmount > 0 && showPendingPayments">
             <div class="card-header">
                 <div class="card-icon-wrapper school-bg">
                     <ion-icon name="school" class="card-icon"></ion-icon>
@@ -303,8 +276,7 @@
             </div>
         </div>
         <!-- Holiday Camp Payment Summary -->
-        <div class="modern-card camp-payment-card" (click)="goToPage('HolidaycamppaymentreportPage')"
-            *ngIf="dashboradView.SessionCount && holidayCampDetails.totalPaidAmount > 0 && showPendingPayments">
+        <div class="modern-card camp-payment-card" (click)="goToPage('HolidaycamppaymentreportPage')" *ngIf="dashboradView.SessionCount && holidayCampDetails.totalPaidAmount > 0 && showPendingPayments">
             <div class="card-header">
                 <div class="card-icon-wrapper camp-bg">
                     <ion-icon name="trophy" class="card-icon"></ion-icon>
@@ -336,7 +308,7 @@
                 </div>
             </div>
         </div>
-
+  
         <!-- Member Details Card -->
         <div class="modern-card members-card" (click)="goToPage('Type2Member')" *ngIf="dashboradView.Family">
             <div class="card-header">
@@ -345,7 +317,7 @@
                 </div>
                 <div class="card-info">
                     <!-- <h3 class="card-title">{{LangObj.MemDets}}</h3> -->
-                    <h3 class="card-title">Member Summary</h3>
+                     <h3 class="card-title">Member Summary</h3>
                     <p class="card-subtitle">Member reg venue summary</p>
                 </div>
                 <ion-icon name="arrow-forward" class="arrow-icon"></ion-icon>
@@ -370,8 +342,7 @@
                         <div class="club-summary" *ngIf="clubDet.member_count > 0 || clubDet.child_count > 0">
                             <div class="club-title">{{clubDet.clubname}}</div>
                             <div class="club-metrics">
-                                <span class="club-metric">{{clubDet.member_count}}
-                                    {{LangObj.dashboard_individuals}}</span>
+                                <span class="club-metric">{{clubDet.member_count}} {{LangObj.dashboard_individuals}}</span>
                                 <span class="club-metric">{{clubDet.child_count}} {{LangObj.dashboard_Family}}</span>
                             </div>
                         </div>
@@ -395,12 +366,8 @@
                 <div class="coach-listing">
                     <div class="coach-row" *ngFor="let coach of coachDetails; let i = index">
                         <div class="coach-profile">
-                            <img [src]="coach.profile_image"
-                                *ngIf="coach.profile_image != '' && coach.profile_image != null" alt="Coach"
-                                class="coach-image">
-                            <img src="assets/images/dummyCoach.jpg"
-                                *ngIf="coach.profile_image == '' || !coach.profile_image" alt="Coach"
-                                class="coach-image">
+                            <img [src]="coach.profile_image" *ngIf="coach.profile_image != '' && coach.profile_image != null" alt="Coach" class="coach-image">
+                            <img src="assets/images/dummyCoach.jpg" *ngIf="coach.profile_image == '' || !coach.profile_image" alt="Coach" class="coach-image">
                         </div>
                         <div class="coach-data">
                             <div class="coach-name">{{coach.first_name}} {{coach.last_name}}</div>
@@ -424,37 +391,37 @@
             </div>
         </div>
     </div>
-
+    
     <!-- Modern Empty State -->
-    <div class="modern-empty-state"
-        *ngIf="(!this.dashboradView.SessionCount) && (!this.dashboradView.Coach) && (!this.dashboradView.Family) && (this.EventObj.TotalEvents == 0) && (Events.length > 0)">
+    <div class="modern-empty-state" *ngIf="(!this.dashboradView.SessionCount) && (!this.dashboradView.Coach) && (!this.dashboradView.Family) && (this.EventObj.TotalEvents == 0) && (Events.length > 0)">
         <div class="empty-illustration">
-            <img src="https://firebasestorage.googleapis.com/v0/b/activityprouk-b5815/o/ActivityPro%2FAPAdminEmptyDashboard.svg?alt=media&token=36c01632-6ff0-4e29-aaf3-2e54ffd4a4d7"
-                alt="Empty Dashboard" class="empty-image">
+            <img src="https://firebasestorage.googleapis.com/v0/b/activityprouk-b5815/o/ActivityPro%2FAPAdminEmptyDashboard.svg?alt=media&token=36c01632-6ff0-4e29-aaf3-2e54ffd4a4d7" alt="Empty Dashboard" class="empty-image">
         </div>
         <div class="empty-text">
             <h2 class="empty-title">Let's start setting up your app!</h2>
             <p class="empty-description">Add some content to see your dashboard come to life</p>
         </div>
     </div>
-
-
-
-</ion-content>
-<ion-fab right bottom *ngIf="isChatEnable" class="bottom_10">
+  
+    
+  
+  </ion-content>
+  <ion-fab right bottom *ngIf="isChatEnable" class="bottom_10">
     <button ion-fab mini style="background-color: #2b92bb;" (click)="gotoInbox()"
         style="background-color:#2b92bb !important; color: white !important">
         <ion-icon name="chatbubbles"></ion-icon>
     </button>
-</ion-fab>
-
-<ion-footer>
+  </ion-fab>
+  
+  <ion-footer>
     <div class="footer_div" [ngClass]="{'footer_bottom_pad':isIOS}" *ngIf="footermenu.length > 0">
         <ion-row>
-            <ion-col *ngFor="let menu of footermenu;let i=index;">
+            <ion-col *ngFor="let menu of footermenu;let i=index;" >
                 <ion-icon *ngIf="menu.Icon!=''" [name]="menu.Icon" (click)="navigate(i)"></ion-icon>
                 <p (click)="navigate(i)">{{menu.DisplayName}}</p>
             </ion-col>
         </ion-row>
     </div>
-</ion-footer>
+  </ion-footer>
+  
+  

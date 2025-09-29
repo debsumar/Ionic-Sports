@@ -19,7 +19,6 @@ import { Apollo } from "apollo-angular";
 import gql from "graphql-tag";
 //import { of } from 'rxjs/observable/of';
 import { GraphqlService } from "../../services/graphql.service";
-import { ThemeService } from "../../services/theme.service";
 
 @IonicPage()
 @Component({
@@ -57,46 +56,46 @@ export class Dashboard {
   //   totalSessions: 0,
   // };
 
-  sessionDetails: ISessionPendingPayments = {
-    TotalAmountDue: "",
-    TotalCount: "",
-    VenueDetails: []
+  sessionDetails:ISessionPendingPayments = {
+    TotalAmountDue:"",
+    TotalCount:"",
+    VenueDetails:[]
   };
 
-  schoolSessionDetails: ISessionPendingPayments = {
-    TotalAmountDue: "",
-    TotalCount: "",
-    VenueDetails: []
+  schoolSessionDetails:ISessionPendingPayments = {
+    TotalAmountDue:"",
+    TotalCount:"",
+    VenueDetails:[]
   };
 
-  sessionEnrolDetails: ISessionEnrol = {
+  sessionEnrolDetails:ISessionEnrol = {
     Total_Sessions: "",
     Total_Members: "",
-    Total_Hours: "",
-    Activity_Summary: [],
+    Total_Hours:"",
+    Activity_Summary:[],
     Week_Summary: []
   };
 
-  sclSessionEnrolDetails: ISessionEnrol = {
+  sclSessionEnrolDetails:ISessionEnrol = {
     Total_Sessions: "",
     Total_Members: "",
-    Total_Hours: "",
-    Activity_Summary: [],
+    Total_Hours:"",
+    Activity_Summary:[],
     Week_Summary: []
   };
 
-  monthlySessionEnrolDetails: ISessionEnrol = {
+  monthlySessionEnrolDetails:ISessionEnrol = {
     Total_Sessions: "",
     Total_Members: "",
-    Total_Hours: "",
-    Activity_Summary: [],
+    Total_Hours:"",
+    Activity_Summary:[],
     Week_Summary: []
   };
-  campEnrolDetails: ISessionEnrol = {
+  campEnrolDetails:ISessionEnrol = {
     Total_Sessions: "",
     Total_Members: "",
-    Total_Hours: "",
-    Activity_Summary: [],
+    Total_Hours:"",
+    Activity_Summary:[],
     Week_Summary: []
   };
 
@@ -105,9 +104,9 @@ export class Dashboard {
     holidayCamps: [],
     totalMemberEnrolled: 0,
   };
-
+  
   memberDetails = {};
-  coachDetails: ICoachSessionsSummary[] = [];
+  coachDetails:ICoachSessionsSummary[] = [];
   //coachDetails:ICoachSessionsSummary[] = [];
   nodeUrl: string = "";
   Events: any = [];
@@ -137,7 +136,6 @@ export class Dashboard {
     public fb: FirebaseService,
     private apollo: Apollo,
     private graphqlService: GraphqlService,
-    private themeService: ThemeService,
   ) {
     this.nestUrl = this.sharedService.getnestURL();
   }
@@ -148,20 +146,14 @@ export class Dashboard {
     this.nodeUrl = this.sharedService.getnodeURL();
     this.userData = this.sharedService.getUserData();
     this.nesturl = this.sharedService.getnestURL();
-
-    // Subscribe to global theme changes
-    this.themeService.isDarkTheme$.subscribe(isDark => {
-      this.isDarkTheme = isDark;
-      this.applyTheme(isDark);
-    });
-
+    
     this.checkDeviceToken();
     this.commonService.screening("DashBoard");
     this.getCurrencyDetials();
     this.getParentClubDetails();
     this.getFooterMenus();
     this.authenticate();
-
+    
     // Use Promise.all to handle all storage operations in parallel
     Promise.all([
       this.storage.get("language"),
@@ -169,38 +161,29 @@ export class Dashboard {
       this.storage.get("LoginWhen"),
       this.storage.get("dashboard_latest_refresh")
     ])
-      .then(([language, isAppAdmin, loginWhen, lastRefresh]) => {
-        // Handle language data
-        if (language && language.data) {
-          this.LangObj = language.data;
-        }
-
-        // Handle admin login status
-        this.isAppAdminLoggedin = isAppAdmin || false;
-
-        // Handle first login actions
-        if (loginWhen === "first" && this.userData) {
-          this.getMemberDetails();
-          this.getPostgreParentclub();
-          this.storage.set("LoginWhen", "notFirst");
-        }
-
-        // Handle refresh timing
-        if (lastRefresh) {
-          const dt1 = new Date().getMinutes();
-          const dt2 = new Date(lastRefresh).getMinutes();
-          const diff = dt1 - dt2;
-
-          if (diff >= 1 && this.userData) {
-            this.getSessionDetails();
-            this.getTermSessionEnrolDetails();
-            this.getMemberDetails();
-            this.getPostgreParentclub();
-            this.getCoachDetails();
-            this.getEvents();
-          }
-        } else if (this.userData) {
-          // If no last refresh time, fetch data anyway
+    .then(([language, isAppAdmin, loginWhen, lastRefresh]) => {
+      // Handle language data
+      if (language && language.data) {
+        this.LangObj = language.data;
+      }
+      
+      // Handle admin login status
+      this.isAppAdminLoggedin = isAppAdmin || false;
+      
+      // Handle first login actions
+      if (loginWhen === "first" && this.userData) {
+        this.getMemberDetails();
+        this.getPostgreParentclub();
+        this.storage.set("LoginWhen", "notFirst");
+      }
+      
+      // Handle refresh timing
+      if (lastRefresh) {
+        const dt1 = new Date().getMinutes();
+        const dt2 = new Date(lastRefresh).getMinutes();
+        const diff = dt1 - dt2;
+        
+        if (diff >= 1 && this.userData) {
           this.getSessionDetails();
           this.getTermSessionEnrolDetails();
           this.getMemberDetails();
@@ -208,11 +191,20 @@ export class Dashboard {
           this.getCoachDetails();
           this.getEvents();
         }
-      })
-      .catch(error => {
-        console.error("Error loading dashboard data:", error);
-      });
-
+      } else if (this.userData) {
+        // If no last refresh time, fetch data anyway
+        this.getSessionDetails();
+        this.getTermSessionEnrolDetails();
+        this.getMemberDetails();
+        this.getPostgreParentclub();
+        this.getCoachDetails();
+        this.getEvents();
+      }
+    })
+    .catch(error => {
+      console.error("Error loading dashboard data:", error);
+    });
+    
     // Subscribe to language changes
     this.events.subscribe("language", () => this.getLanguage());
   }
@@ -245,14 +237,14 @@ export class Dashboard {
 
 
   //getting the apikeys which needs for different module api's
-  async authenticate() {
-    this.fb.loginToFirebaseAuth().then(async (val) => {
-      if (!this.sharedService.getApiKey("group-session")) {
-        setTimeout(async () => {
+  async authenticate(){
+    this.fb.loginToFirebaseAuth().then(async(val)=>{
+      if(!this.sharedService.getApiKey("group-session")){
+        setTimeout(async()=>{
           const access_id = await (await this.fb.getCurrentUser()).getIdToken();
           const authObj = {
-            IdToken: access_id,
-            AppType: 1,
+            IdToken:access_id,
+            AppType:1,
             // ParentClubKey:"",
             // ClubKey:"",
             // MemberKey:"",
@@ -269,36 +261,36 @@ export class Dashboard {
             }
           }
         `;
-          this.apollo
-            .query({
-              query: authQuery,
-              fetchPolicy: "no-cache",
-              variables: { auth: authObj },
-            })
-            .subscribe(
-              ({ data }) => {
-                if (data["authenticateUser"]["AuthObj"]) {
-                  data["authenticateUser"]["AuthObj"].forEach((auth: any) => {
+        this.apollo
+          .query({
+            query: authQuery,
+            fetchPolicy: "no-cache",
+            variables: { auth: authObj},
+          })
+          .subscribe(
+            ({ data }) => {
+                if(data["authenticateUser"]["AuthObj"]){
+                  data["authenticateUser"]["AuthObj"].forEach((auth:any)=>{
                     const module = auth.AuthKey.split("/");
                     //console.log(module[module.length-1]);
-                    if (module[module.length - 1] === "group-session")
-                      this.sharedService.setApikey("group-session", auth.AuthValue);
-                    else if (module[module.length - 1] === "leauge-api-key")
-                      this.sharedService.setApikey("league", auth.AuthValue);
+                    if(module[module.length-1] === "group-session")
+                      this.sharedService.setApikey("group-session",auth.AuthValue);
+                      else if(module[module.length-1] === "leauge-api-key")
+                      this.sharedService.setApikey("league",auth.AuthValue);
                   })
-                  console.log(`%cgrp_session_auth:${this.sharedService.getApiKey("group-session")}`, 'color:green;font-size:20px');
-                }
-              },
-              (err) => {
-                //this.commonService.hideLoader();
-                console.log(`%cfirebase auth api err:${JSON.stringify(err)}`, 'color:red;font-size:20px');
-                //this.commonService.toastMessage("Gallery fetch failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+                  console.log(`%cgrp_session_auth:${this.sharedService.getApiKey("group-session")}`,'color:green;font-size:20px');
               }
-            );
-        }, 1200)
+            },
+            (err) => {
+              //this.commonService.hideLoader();
+              console.log(`%cfirebase auth api err:${JSON.stringify(err)}`,'color:red;font-size:20px');
+              //this.commonService.toastMessage("Gallery fetch failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+            }
+          );          
+        },1200)
       }
-    }).catch((err) => {
-      console.log(`%cfirebase auth err:${JSON.stringify(err)}`, 'color:red;font-size:20px');
+    }).catch((err)=>{
+      console.log(`%cfirebase auth err:${JSON.stringify(err)}`,'color:red;font-size:20px');
     })
   }
 
@@ -326,30 +318,29 @@ export class Dashboard {
 
   //to know the chat function is available for this parentclub
   getParentClubDetails() {
-    this.fb.getAllWithQuery(`ParentClub/Type2/`, { orderByKey: true, equalTo: this.userData.UserInfo[0].ParentClubKey }).subscribe((data) => {
+    this.fb.getAllWithQuery(`ParentClub/Type2/`, {orderByKey: true,equalTo: this.userData.UserInfo[0].ParentClubKey}).subscribe((data) => {
       this.parentClubInfo = data[0];
-      if (data.length > 0 && data[0].IsChatEnable != undefined) {
-        this.isChatEnable = data[0].IsChatEnable == "true" || data[0].IsChatEnable ? true : false;
-      }
-      if (data.length > 0 && data[0].DashboardView != undefined) {
-        this.dashboradView = data[0].DashboardView;
-      }
-      if (data.length > 0 && data[0].DashboardView == undefined) {
-        this.dashboradView = {
-          SessionCount: true,
-          Coach: true,
-          Family: true,
-        };
-      }
-      if (data.length > 0 && data[0].DashboardView.FacilityBookings && data[0].DashboardView.FacilityBookings != 0) {
-        this.type = data[0].DashboardView.FacilityBookings;
-        this.getactivebookingDetails();
-      }
-      console.log(this.dashboradView);
-      this.checkDashBoardEmpty();
-    },
-      (err) => { }
-    );
+          if (data.length > 0 && data[0].IsChatEnable != undefined) {
+            this.isChatEnable = data[0].IsChatEnable == "true" || data[0].IsChatEnable ? true: false;}
+          if (data.length > 0 && data[0].DashboardView != undefined) {
+            this.dashboradView = data[0].DashboardView;
+          }
+          if (data.length > 0 && data[0].DashboardView == undefined) {
+            this.dashboradView = {
+              SessionCount: true,
+              Coach: true,
+              Family: true,
+            };
+          }
+          if (data.length > 0 && data[0].DashboardView.FacilityBookings && data[0].DashboardView.FacilityBookings!= 0) {
+            this.type = data[0].DashboardView.FacilityBookings;
+            this.getactivebookingDetails();
+          }
+          console.log(this.dashboradView);
+          this.checkDashBoardEmpty();
+        },
+        (err) => {}
+      );
   }
 
   //navigate to inbox page
@@ -368,7 +359,7 @@ export class Dashboard {
           this.user = JSON.parse(userObjStr);
           this.sharedService.setLoggedInId(this.user.$key);
           this.sharedService.setParentclubKey(this.user.UserInfo[0].ParentClubKey);
-
+          
           if (this.user.RoleType === "4" && this.user.UserType === "2") {
             this.sharedService.setLoggedInType(BookingMemberType.COACH);
             if (this.user.$key !== "") {
@@ -382,7 +373,7 @@ export class Dashboard {
         }
       }
     });
-
+    
     // Load all other storage data in parallel
     Promise.all([
       this.storage.get("postgre_parentclub"),
@@ -397,67 +388,75 @@ export class Dashboard {
       this.storage.get("loggedin_user"),
       this.storage.get("dashboardTheme")
     ])
-      .then(([parentClub, sessionDetails, sessionEnrolDets, sclSessionEnrolDets,
-        monthlySessionEnrolDets, memberDetails, coachDetails, activeBookings, eventDetails, loggedinuser, isDarkTheme]) => {
+    .then(([parentClub, sessionDetails, sessionEnrolDets, sclSessionEnrolDets, 
+           monthlySessionEnrolDets, memberDetails, coachDetails, activeBookings, eventDetails, loggedinuser, isDarkTheme]) => {
+      
+      if(loggedinuser){
+        const loggedin_user_info = JSON.parse(loggedinuser);
+        this.sharedService.setLoggedInUserId(loggedin_user_info.id);
+      }
 
-        if (loggedinuser) {
-          const loggedin_user_info = JSON.parse(loggedinuser);
-          this.sharedService.setLoggedInUserId(loggedin_user_info.id);
+      // Handle parent club data
+      if (parentClub != null && parentClub != undefined) {
+        this.sharedService.setPostgreParentClubId(parentClub.Id);
+      } else {
+        this.getPostgreParentclub();
+      }
+      
+      // Handle session details
+      if (sessionDetails != null) {
+        this.sessionDetails = sessionDetails;
+        this.schoolSessionDetails = sessionDetails; // Both use the same data source
+      }
+      
+      // Handle session enrollment details
+      if (sessionEnrolDets != null) {
+        this.sessionEnrolDetails = sessionEnrolDets;
+      }
+      
+      // Handle school session enrollment details
+      if (sclSessionEnrolDets != null) {
+        this.sclSessionEnrolDetails = sclSessionEnrolDets;
+      }
+      
+      // Handle monthly session enrollment details
+      if (monthlySessionEnrolDets != null) {
+        this.monthlySessionEnrolDetails = monthlySessionEnrolDets;
+      }
+      
+      // Handle member details
+      if (memberDetails != null) {
+        this.memberDetails = memberDetails;
+      }
+      
+      // Handle coach details
+      if (coachDetails != null) {
+        this.coachDetails = coachDetails;
+      }
+      
+      // Handle active bookings
+      if (activeBookings != null) {
+        this.bookingInfo = activeBookings;
+      }
+      
+      // Handle event details
+      if (eventDetails != null) {
+        this.EventObj = eventDetails;
+      }
+      
+      // Handle theme preference
+      if (isDarkTheme !== null) {
+        this.isDarkTheme = isDarkTheme;
+        const dashboardElement = document.querySelector('dashboard-page');
+        if (dashboardElement && !this.isDarkTheme) {
+          dashboardElement.classList.add('light-theme');
+          document.body.classList.add('light-theme');
         }
-
-        // Handle parent club data
-        if (parentClub != null && parentClub != undefined) {
-          this.sharedService.setPostgreParentClubId(parentClub.Id);
-        } else {
-          this.getPostgreParentclub();
-        }
-
-        // Handle session details
-        if (sessionDetails != null) {
-          this.sessionDetails = sessionDetails;
-          this.schoolSessionDetails = sessionDetails; // Both use the same data source
-        }
-
-        // Handle session enrollment details
-        if (sessionEnrolDets != null) {
-          this.sessionEnrolDetails = sessionEnrolDets;
-        }
-
-        // Handle school session enrollment details
-        if (sclSessionEnrolDets != null) {
-          this.sclSessionEnrolDetails = sclSessionEnrolDets;
-        }
-
-        // Handle monthly session enrollment details
-        if (monthlySessionEnrolDets != null) {
-          this.monthlySessionEnrolDetails = monthlySessionEnrolDets;
-        }
-
-        // Handle member details
-        if (memberDetails != null) {
-          this.memberDetails = memberDetails;
-        }
-
-        // Handle coach details
-        if (coachDetails != null) {
-          this.coachDetails = coachDetails;
-        }
-
-        // Handle active bookings
-        if (activeBookings != null) {
-          this.bookingInfo = activeBookings;
-        }
-
-        // Handle event details
-        if (eventDetails != null) {
-          this.EventObj = eventDetails;
-        }
-
-
-      })
-      .catch(error => {
-        console.error("Error loading dashboard cached data:", error);
-      });
+      }
+    })
+    .catch(error => {
+      console.error("Error loading dashboard cached data:", error);
+    });
   }
 
   checkDashBoardEmpty() {
@@ -471,17 +470,17 @@ export class Dashboard {
       this.isDashboardEmpty = true;
     }
   }
-
+  
   async getSessionDetails() {
     const session_pending_payload = {
-      parentclub_id: this.sharedService.getPostgreParentClubId(),
-      date: moment().format("YYYY-MM-DD"),
-      user_postgre_metadata: {
-        UserMemberId: this.sharedService.getLoggedInId()
+      parentclub_id:this.sharedService.getPostgreParentClubId(),
+      date:moment().format("YYYY-MM-DD"),
+      user_postgre_metadata:{
+        UserMemberId:this.sharedService.getLoggedInId()
       },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedService.getPlatform() == "android" ? 1 : 2
+      user_device_metadata:{
+        UserAppType:0,
+        UserDeviceType:this.sharedService.getPlatform() == "android" ? 1:2
       }
     }
 
@@ -498,20 +497,20 @@ export class Dashboard {
       }
     }
   `;
-
-    this.graphqlService.query(term_pending_ses_query, { pending_input: session_pending_payload }, 0).subscribe((res) => {
-      if (res.data["getPendingPaymentsTermSession"]) {
-        console.log(`%pending_sessions:${res.data["getPendingPaymentsTermSession"]}`, 'color:green;font-size:20px');
-        this.sessionDetails = res.data["getPendingPaymentsTermSession"] as ISessionPendingPayments;
-        this.storage.remove("sessionDetails");
-        this.storage.set("sessionDetails", this.sessionDetails);
-        this.storage.set("dashboard_latest_refresh", new Date().getTime());
-      }
-    },
+  
+    this.graphqlService.query(term_pending_ses_query,{pending_input: session_pending_payload},0).subscribe((res)=>{
+        if(res.data["getPendingPaymentsTermSession"]){
+            console.log(`%pending_sessions:${res.data["getPendingPaymentsTermSession"]}`,'color:green;font-size:20px');
+            this.sessionDetails = res.data["getPendingPaymentsTermSession"] as ISessionPendingPayments;
+            this.storage.remove("sessionDetails");
+            this.storage.set("sessionDetails", this.sessionDetails);
+            this.storage.set("dashboard_latest_refresh", new Date().getTime());
+        }
+      },
       (err) => {
-        console.log(`%pending_sessions err:${JSON.stringify(err)}`, 'color:red;font-size:10px');
+        console.log(`%pending_sessions err:${JSON.stringify(err)}`,'color:red;font-size:10px');
       }
-    );
+    );     
   }
 
   // async getSchoolSessionDetails() {
@@ -555,18 +554,18 @@ export class Dashboard {
   //   );     
   // }
 
-
+  
 
   //get term-session enrols
-  getTermSessionEnrolDetails() {
+  getTermSessionEnrolDetails(){
     const session_summary_payload = {
-      parentclub_id: this.sharedService.getPostgreParentClubId(),
-      user_postgre_metadata: {
-        UserMemberId: this.sharedService.getLoggedInId()
+      parentclub_id:this.sharedService.getPostgreParentClubId(),
+      user_postgre_metadata:{
+        UserMemberId:this.sharedService.getLoggedInId()
       },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedService.getPlatform() == "android" ? 1 : 2
+      user_device_metadata:{
+        UserAppType:0,
+        UserDeviceType:this.sharedService.getPlatform() == "android" ? 1:2
       }
     }
     const termStatsQuery = gql`
@@ -586,14 +585,14 @@ export class Dashboard {
       }
     }
   `;
-    this.graphqlService.query(termStatsQuery, { session_input: session_summary_payload }, 0).subscribe((res) => {
+    this.graphqlService.query(termStatsQuery,{session_input: session_summary_payload},0).subscribe((res)=>{
       this.sessionEnrolDetails = res.data.getSessionandMemberStats_V2 as ISessionEnrol;
       this.storage.remove("session_enroldets");
       this.storage.set("session_enroldets", this.sessionEnrolDetails);
-      this.storage.set("dashboard_latest_refresh", new Date().getTime());
-    }, (error) => {
+      this.storage.set("dashboard_latest_refresh", new Date().getTime()); 
+    },(error)=>{
       console.error("Error in fetching:", error);
-    })
+    })                     
   }
 
   // getHolidayCampDetails() {
@@ -632,13 +631,13 @@ export class Dashboard {
   // }
   getSchoolSessionEnrolDets() {
     const session_summary_payload = {
-      parentclub_id: this.sharedService.getPostgreParentClubId(),
-      user_postgre_metadata: {
-        UserMemberId: this.sharedService.getLoggedInId()
+      parentclub_id:this.sharedService.getPostgreParentClubId(),
+      user_postgre_metadata:{
+        UserMemberId:this.sharedService.getLoggedInId()
       },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedService.getPlatform() == "android" ? 1 : 2
+      user_device_metadata:{
+        UserAppType:0,
+        UserDeviceType:this.sharedService.getPlatform() == "android" ? 1:2
       }
     }
     const termStatsQuery = gql`
@@ -658,25 +657,25 @@ export class Dashboard {
       }
     }
   `;
-    this.graphqlService.query(termStatsQuery, { session_input: session_summary_payload }, 0).subscribe((res) => {
+    this.graphqlService.query(termStatsQuery,{session_input: session_summary_payload},0).subscribe((res)=>{
       this.sclSessionEnrolDetails = res.data.getSchoolSessionMemberStats as ISessionEnrol;
       this.storage.remove("scl_session_enroldets");
       this.storage.set("scl_session_enroldets", this.sclSessionEnrolDetails);
-      this.storage.set("dashboard_latest_refresh", new Date().getTime());
-    }, (error) => {
+      this.storage.set("dashboard_latest_refresh", new Date().getTime()); 
+    },(error)=>{
       console.error("Error in fetching:", error);
-    })
+    })  
   }
 
   getMonthlySessionEnrolDets() {
     const session_summary_payload = {
-      parentclub_id: this.sharedService.getPostgreParentClubId(),
-      user_postgre_metadata: {
-        UserMemberId: this.sharedService.getLoggedInId()
+      parentclub_id:this.sharedService.getPostgreParentClubId(),
+      user_postgre_metadata:{
+        UserMemberId:this.sharedService.getLoggedInId()
       },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedService.getPlatform() == "android" ? 1 : 2
+      user_device_metadata:{
+        UserAppType:0,
+        UserDeviceType:this.sharedService.getPlatform() == "android" ? 1:2
       }
     }
     const sesStatsQuery = gql`
@@ -696,25 +695,25 @@ export class Dashboard {
       }
     }
   `;
-    this.graphqlService.query(sesStatsQuery, { session_input: session_summary_payload }, 0).subscribe((res) => {
+    this.graphqlService.query(sesStatsQuery,{session_input: session_summary_payload},0).subscribe((res)=>{
       this.monthlySessionEnrolDetails = res.data.getMonthlySessionMemberStats as ISessionEnrol;
       this.storage.remove("monthly_session_enroldets");
       this.storage.set("monthly_session_enroldets", this.monthlySessionEnrolDetails);
-      this.storage.set("dashboard_latest_refresh", new Date().getTime());
-    }, (error) => {
+      this.storage.set("dashboard_latest_refresh", new Date().getTime()); 
+    },(error)=>{
       console.error("Error in fetching:", error);
-    })
+    })  
   }
 
   getHolidayCampEnrolDets() {
     const session_summary_payload = {
-      parentclub_id: this.sharedService.getPostgreParentClubId(),
-      user_postgre_metadata: {
-        UserMemberId: this.sharedService.getLoggedInId()
+      parentclub_id:this.sharedService.getPostgreParentClubId(),
+      user_postgre_metadata:{
+        UserMemberId:this.sharedService.getLoggedInId()
       },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedService.getPlatform() == "android" ? 1 : 2
+      user_device_metadata:{
+        UserAppType:0,
+        UserDeviceType:this.sharedService.getPlatform() == "android" ? 1:2
       }
     }
     const sesStatsQuery = gql`
@@ -734,14 +733,14 @@ export class Dashboard {
       }
     }
   `;
-    this.graphqlService.query(sesStatsQuery, { session_input: session_summary_payload }, 0).subscribe((res) => {
+    this.graphqlService.query(sesStatsQuery,{session_input: session_summary_payload},0).subscribe((res)=>{
       this.campEnrolDetails = res.data.getCampMemberStats as ISessionEnrol;
       this.storage.remove("camp_enroldets");
       this.storage.set("camp_enroldets", this.campEnrolDetails);
-      this.storage.set("dashboard_latest_refresh", new Date().getTime());
-    }, (error) => {
+      this.storage.set("dashboard_latest_refresh", new Date().getTime()); 
+    },(error)=>{
       console.error("Error in fetching:", error);
-    })
+    })  
   }
 
   getEvents() {
@@ -802,7 +801,7 @@ export class Dashboard {
         reqObj.loggedInKey = this.userData.UserInfo[0].CoachKey;
       }
       this.commonService.saveDeviceDetsforNotify(key);
-
+      
     }
   }
   roundOff(event) {
@@ -823,60 +822,60 @@ export class Dashboard {
       // }
       case "Type2ManageSession": {
         //if (parseInt(this.userData.RoleType) == 2) {
-        this.navCtrl.push("Type2ManageSession");
-        this.commonService.updateCategory('update_session_list')
+          this.navCtrl.push("Type2ManageSession");
+          this.commonService.updateCategory('update_session_list')
         //} 
-
+        
         break;
       }
       case "Type2SchoolSessionList": {
         //if (parseInt(this.userData.RoleType) == 2) {
-        this.commonService.updateCategory("update_scl_session_list");
-        this.navCtrl.push("Type2SchoolSessionList");
+          this.commonService.updateCategory("update_scl_session_list");
+          this.navCtrl.push("Type2SchoolSessionList");
         //} 
         break;
       }
-      //   case "Type2HolidayCamp": {
-      //     this.commonService.updateCategory('holidaycamp');
-      //     if (parseInt(this.userData.RoleType) == 2) {
-      //       this.navCtrl.push("Type2HolidayCamp");
-      //     } else if (parseInt(this.userData.RoleType) == 4) {
-      //       this.navCtrl.push("Type2HolidayCamp");
-      //     }
-      //     break;
-      //   }
-      //   case "SchoolpaymentreportPage": {
-      //     if (parseInt(this.userData.RoleType) == 2) {
-      //       this.navCtrl.push("SchoolpaymentreportPage");
-      //     } else if (parseInt(this.userData.RoleType) == 4) {
-      //       this.navCtrl.push("");
-      //     }
-      //     break;
-      //   }
-      //   case "HolidaycamppaymentreportPage": {
-      //     if (parseInt(this.userData.RoleType) == 2) {
-      //       this.navCtrl.push("HolidaycamppaymentreportPage");
-      //     } else if (parseInt(this.userData.RoleType) == 4) {
-      //       this.navCtrl.push("");
-      //     }
-      //     break;
-      //   }
-      //   case "Type2Member": {
-      //     if (parseInt(this.userData.RoleType) == 2) {
-      //       this.navCtrl.push("Type2Member");
-      //     } else if (parseInt(this.userData.RoleType) == 4) {
-      //       this.navCtrl.push("CoachMember");
-      //     }
-      //     break;
-      //   }
-      //   case "Type2Schedule": {
-      //     if (parseInt(this.userData.RoleType) == 2) {
-      //       this.navCtrl.push("Type2Schedule");
-      //     } else if (parseInt(this.userData.RoleType) == 4) {
-      //       this.navCtrl.push("");
-      //     }
-      //     break;
-      //   }
+    //   case "Type2HolidayCamp": {
+    //     this.commonService.updateCategory('holidaycamp');
+    //     if (parseInt(this.userData.RoleType) == 2) {
+    //       this.navCtrl.push("Type2HolidayCamp");
+    //     } else if (parseInt(this.userData.RoleType) == 4) {
+    //       this.navCtrl.push("Type2HolidayCamp");
+    //     }
+    //     break;
+    //   }
+    //   case "SchoolpaymentreportPage": {
+    //     if (parseInt(this.userData.RoleType) == 2) {
+    //       this.navCtrl.push("SchoolpaymentreportPage");
+    //     } else if (parseInt(this.userData.RoleType) == 4) {
+    //       this.navCtrl.push("");
+    //     }
+    //     break;
+    //   }
+    //   case "HolidaycamppaymentreportPage": {
+    //     if (parseInt(this.userData.RoleType) == 2) {
+    //       this.navCtrl.push("HolidaycamppaymentreportPage");
+    //     } else if (parseInt(this.userData.RoleType) == 4) {
+    //       this.navCtrl.push("");
+    //     }
+    //     break;
+    //   }
+    //   case "Type2Member": {
+    //     if (parseInt(this.userData.RoleType) == 2) {
+    //       this.navCtrl.push("Type2Member");
+    //     } else if (parseInt(this.userData.RoleType) == 4) {
+    //       this.navCtrl.push("CoachMember");
+    //     }
+    //     break;
+    //   }
+    //   case "Type2Schedule": {
+    //     if (parseInt(this.userData.RoleType) == 2) {
+    //       this.navCtrl.push("Type2Schedule");
+    //     } else if (parseInt(this.userData.RoleType) == 4) {
+    //       this.navCtrl.push("");
+    //     }
+    //     break;
+    //   }
     }
     // this.navCtrl.push("MenupagePage")
   }
@@ -900,7 +899,7 @@ export class Dashboard {
       event.complete();
     }, 3000);
   }
-
+  
   // getMemberDetails() {
   //   this.http.post(`${this.nodeUrl}/member/list`, { parentclubKey: this.userData.UserInfo[0].ParentClubKey }).subscribe((data) => {
   //     this.memberDetails = data;
@@ -922,15 +921,15 @@ export class Dashboard {
 
   getCoachDetails() {
     const coach_summary_payload = {
-      parentclub_id: this.sharedService.getPostgreParentClubId(),
-      user_postgre_metadata: {
-        UserMemberId: this.sharedService.getLoggedInId()
+      parentclub_id:this.sharedService.getPostgreParentClubId(),
+      user_postgre_metadata:{
+        UserMemberId:this.sharedService.getLoggedInId()
       },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedService.getPlatform() == "android" ? 1 : 2
+      user_device_metadata:{
+        UserAppType:0,
+        UserDeviceType:this.sharedService.getPlatform() == "android" ? 1:2
       },
-      date: new Date()
+      date:new Date()
     }
 
     const coach_list_query = gql`
@@ -946,19 +945,19 @@ export class Dashboard {
       }
     }
   `;
-    this.graphqlService.query(coach_list_query, { coach_input: coach_summary_payload }, 0).subscribe((res) => {
-      if (res.data["getParentClubCoachSessionSummary"]) {
-        console.log(`%coach_summary:${res.data["getParentClubCoachSessionSummary"]}`, 'color:green;font-size:20px');
-        this.coachDetails = res.data["getParentClubCoachSessionSummary"] as ICoachSessionsSummary[];
-        this.storage.set("coachDetails", this.coachDetails);
-      }
+  this.graphqlService.query(coach_list_query,{coach_input: coach_summary_payload},0).subscribe((res)=>{
+    if(res.data["getParentClubCoachSessionSummary"]){
+      console.log(`%coach_summary:${res.data["getParentClubCoachSessionSummary"]}`,'color:green;font-size:20px');
+      this.coachDetails = res.data["getParentClubCoachSessionSummary"] as ICoachSessionsSummary[];
+      this.storage.set("coachDetails", this.coachDetails);
+    }
     },
-      (err) => {
-        console.log(`%coach_summary err:${JSON.stringify(err)}`, 'color:red;font-size:10px');
-      });
+    (err) => {
+      console.log(`%coach_summary err:${JSON.stringify(err)}`,'color:red;font-size:10px');
+    });          
   }
 
-  getPostgreParentclub() {
+  getPostgreParentclub(){
     const parentclubId = this.userData.UserInfo[0].ParentClubKey;
     const parentclubQuery = gql`
     query getParentClubByFireabseId($parentclubId:String!) {
@@ -977,9 +976,9 @@ export class Dashboard {
         fetchPolicy: 'network-only',
         variables: { parentclubId },
       })
-      .subscribe(({ data }) => {
-        console.log("parentclub_info", data["getParentClubByFireabseId"]);
-        if (data["getParentClubByFireabseId"]) {
+      .subscribe(({data}) => {
+        console.log("parentclub_info",data["getParentClubByFireabseId"]);
+        if(data["getParentClubByFireabseId"]){
           this.sharedService.setPostgreParentClubId(data["getParentClubByFireabseId"]["Id"]);
           this.storage.set("postgre_parentclub", data["getParentClubByFireabseId"]);
           this.getSessionDetails();
@@ -991,7 +990,7 @@ export class Dashboard {
           //this.getactivebookingDetails(); this dependant on this.getParentClubImage()
           this.getCoachDetails();
         }
-      }, (err) => {
+      },(err)=>{
         console.log(JSON.stringify(err));
       });
   }
@@ -1000,8 +999,8 @@ export class Dashboard {
     this.fb
       .getAll(
         "/Menu/Type2/adminAppDashboardMenu/" +
-        this.userData.UserInfo[0].ParentClubKey +
-        "/"
+          this.userData.UserInfo[0].ParentClubKey +
+          "/"
       )
       .subscribe((data) => {
         console.log(data);
@@ -1028,7 +1027,7 @@ export class Dashboard {
   getactivebookingDetails() {
     let date = moment().format("YYYY-MM-DD");
     let type =
-      this.parentClubInfo.DashboardView.FacilityBookings && this.parentClubInfo.DashboardView.FacilityBookings != "" ? +this.parentClubInfo.DashboardView.FacilityBookings : 1;
+    this.parentClubInfo.DashboardView.FacilityBookings && this.parentClubInfo.DashboardView.FacilityBookings!= ""? +this.parentClubInfo.DashboardView.FacilityBookings: 1;
     this.http
       .get(
         `${this.nesturl}/courtbooking/bookingsummary_v2/${this.userData.UserInfo[0].ParentClubKey}/${type}/${date}`
@@ -1080,13 +1079,13 @@ export class Dashboard {
   }
 
   navigate(index: number) {
-    if (this.footermenu[index].Component === "Type2HolidayCamp") {
+    if(this.footermenu[index].Component === "Type2HolidayCamp"){
       this.commonService.updateCategory('update_camps_list');
       this.navCtrl.push(this.footermenu[index].Component);
-    } else if (this.footermenu[index].Component === "Type2SchoolSessionList") {
-      this.commonService.updateCategory('schoolsessions');
+    }else if(this.footermenu[index].Component === "Type2SchoolSessionList"){
+      this.commonService.updateCategory('schoolsessions'); 
       this.navCtrl.push(this.footermenu[index].Component);
-    } else if (this.footermenu[index].Component == "Type2ManageSession") {
+    }else if (this.footermenu[index].Component == "Type2ManageSession") {
       // if (this.user.RoleType == "4" && this.user.UserType == "2") {
       //   this.navCtrl.push("CoachManageSession");
       // }else{
@@ -1095,7 +1094,7 @@ export class Dashboard {
       // }
       this.commonService.updateCategory('update_session_list')
       this.navCtrl.push(this.footermenu[index].Component);
-    } else {
+    }else{
       this.navCtrl.push(this.footermenu[index].Component);
     }
   }
@@ -1109,13 +1108,10 @@ export class Dashboard {
   }
 
   toggleTheme(): void {
-    this.themeService.toggleTheme();
-  }
-
-  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = !this.isDarkTheme;
     const dashboardElement = document.querySelector('dashboard-page');
     if (dashboardElement) {
-      if (isDark) {
+      if (this.isDarkTheme) {
         dashboardElement.classList.remove('light-theme');
         document.body.classList.remove('light-theme');
       } else {
@@ -1123,6 +1119,10 @@ export class Dashboard {
         document.body.classList.add('light-theme');
       }
     }
+    this.storage.set('dashboardTheme', this.isDarkTheme);
+    
+    // Notify other pages about theme change
+    this.events.publish('theme:changed', this.isDarkTheme);
   }
 
 
@@ -1139,24 +1139,24 @@ export class Dashboard {
 
 
 
-interface ISessionPendingPayments {
-  TotalAmountDue: string;
-  TotalCount: string;
-  VenueDetails: []
+interface ISessionPendingPayments{
+  TotalAmountDue:string;
+  TotalCount:string;
+  VenueDetails:[]
 }
 
-interface IPendingSessionVenues {
-  ClubName: string;
-  Percentage: string;
-  Total: string;
+interface IPendingSessionVenues{
+  ClubName:string;
+  Percentage:string;
+  Total:string;
 }
 
 export interface ICoachSessionsSummary {
-  id: string;
-  first_name: string;
-  last_name: string
-  profile_image: string;
-  total_enrol_members: string;
+  id:string;
+  first_name:string;
+  last_name:string
+  profile_image:string;
+  total_enrol_members:string;
   sessions: number;
   total_hours: number;
 }
@@ -1164,7 +1164,7 @@ export interface ICoachSessionsSummary {
 export interface ISessionEnrol {
   Total_Sessions: string;
   Total_Members: string;
-  Total_Hours: string;
+  Total_Hours:string;
   Activity_Summary: IActivity_Summary[];
   Week_Summary: IWeekSummary_V2[];
 }
@@ -1181,6 +1181,6 @@ export interface IWeekSummary_V2 {
 export interface IDaySummary {
   Session: string;
   Member: string;
-  Total_Hours: string;
+  Total_Hours:string;
   ActivityName: string;
 }

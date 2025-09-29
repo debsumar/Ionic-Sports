@@ -2,12 +2,12 @@
   <!-- Header Stats Card -->
   <div class="modern-header-card">
     <div class="stats-container">
-      <div class="stat-item today-stat">
+      <div class="stat-item">
         <span class="stat-number">{{Today}}</span>
         <span class="stat-label">Today</span>
       </div>
       <div class="stat-divider"></div>
-      <div class="stat-item total-stat">
+      <div class="stat-item">
         <span class="stat-number">{{matchlist?.length}}</span>
         <span class="stat-label">Total</span>
       </div>
@@ -15,11 +15,15 @@
   </div>
 
   <!-- Search Card -->
-  <!-- <div class="modern-search-card"> -->
-  <ion-searchbar class="sleek-searchbar" placeholder="Search by Title, Activity, Players" [(ngModel)]="searchInput"
-    (ionInput)="getFilterEvents($event)" autocorrect="off">
-  </ion-searchbar>
-  <!-- </div> -->
+  <div class="modern-search-card">
+    <ion-searchbar 
+      class="sleek-searchbar"
+      placeholder="Search by Title, Activity, Players"
+      [(ngModel)]="searchInput" 
+      (ionInput)="getFilterEvents($event)"
+      autocorrect="off">
+    </ion-searchbar>
+  </div>
 
   <!-- Matches Container -->
   <div class="matches-container" *ngIf="filteredMatchlist.length > 0">
@@ -34,8 +38,7 @@
           <div class="card-subtitle">{{formatMatchStartDate(match.MatchStartDate)}}</div>
         </div>
         <div class="match-type-badge">
-          <span class="badge-text" [style.background-color]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))"
-            style="color: white !important;">{{getMatchTypeName(match.MatchType)}}</span>
+          <span class="badge-text" [style.background-color]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))" style="color: white !important;">{{getMatchTypeName(match.MatchType)}}</span>
         </div>
       </div>
 

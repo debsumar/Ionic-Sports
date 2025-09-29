@@ -1,4 +1,10 @@
+@import '../../../../../theme/android-sdk35-fixes.scss';
+
 page-viewcourt {
+    @include android-sdk35-fixes;
+
+
+
     .toolbar-title{
         color:white !important;
     }

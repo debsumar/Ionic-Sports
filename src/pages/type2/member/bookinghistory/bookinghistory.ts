@@ -40,11 +40,12 @@ export class BookinghistoryPage implements OnInit, OnDestroy {
     device_id: '',
     updated_by: ''
   }
-  termPendingPaymentsRes: TermPendingPaymentsModel = {
-    pending_sessions: [],
-    totalCount: '0',
-    totalDueAmountSum: '0'
-  };
+  // termPendingPaymentsRes: TermPendingPaymentsModel = {
+  //   pending_sessions: [],
+  //   totalCount: '0',
+  //   totalDueAmountSum: '0'
+  // };
+  termPendingPaymentsRes = [];
   getWeeklyPendingPaymentsInput: GetWeeklyPendingPaymentsInput = {
     parentclubId: '',
     clubId: '',
@@ -279,8 +280,45 @@ export class BookinghistoryPage implements OnInit, OnDestroy {
 
   // 🎯 Get button text based on current mode
   getPendingPaymentsButtonText(): string {
-    return this.isPendingPaymentsMode ? 'Pending' : 'Paid';
+    return this.isPendingPaymentsMode ? 'Pending' : 'All';
   }
+
+  //   getCurrentPaymentStats(): { amount: string, count: string } {
+  //   if (!this.isPendingPaymentsMode) {
+  //     return { amount: '0.00', count: '0' };
+  //   }
+
+  //   let amount = '0.00';
+  //   let count = '0';
+
+  //   switch (Number(this.selectedType)) {
+  //     case 0:
+  //       amount = this.termPendingPaymentsRes.totalDueAmountSum;
+  //       count = this.termPendingPaymentsRes.totalCount;
+  //       break;
+  //     case 1:
+  //       amount = this.weeklyPendingPaymentsRes.totalDueAmountSum;
+  //       count = this.weeklyPendingPaymentsRes.totalCount;
+  //       break;
+  //     case 2:
+  //       amount = this.holidaycampPendingPaymentRes.totalDueAmountSum;
+  //       count = this.holidaycampPendingPaymentRes.totalCount;
+  //       break;
+  //     case 4:
+  //       amount = this.schoolSessionPendingPaymentRes.totalDueAmountSum;
+  //       count = this.schoolSessionPendingPaymentRes.totalCount;
+  //       break;
+  //     case 5:
+  //       amount = this.monthlyPendingPaymentRes.totalDueAmountSum;
+  //       count = this.monthlyPendingPaymentRes.totalCount;
+  //       break;
+  //   }
+
+  //   this.TotalDueAmount = amount;
+  //   this.ListCount = count;
+
+  //   return { amount, count };
+  // }
 
   // 💰 Get current total amount based on selected session type
   getCurrentTotalAmount(): string {
@@ -290,8 +328,8 @@ export class BookinghistoryPage implements OnInit, OnDestroy {
 
     switch (Number(this.selectedType)) {
       case 0: // Term Sessions
-        this.TotalDueAmount = this.termPendingPaymentsRes.totalDueAmountSum;
-
+        //this.TotalDueAmount = this.termPendingPaymentsRes.totalDueAmountSum;
+        this.TotalDueAmount = this.termPendingPaymentsRes.reduce((sum, item) => sum + parseFloat(item.amount_due), 0);
         break;
       case 1: // Weekly Sessions  
         this.TotalDueAmount = this.weeklyPendingPaymentsRes.totalDueAmountSum;
@@ -333,6 +371,18 @@ export class BookinghistoryPage implements OnInit, OnDestroy {
     }, 500);
   }
 
+  // reInitializeModule() {
+  //   this.term_session_list = [];
+  //   this.weekly_session_list = [];
+  //   this.school_session_list = [];
+  //   this.holidaycamp_list = [];
+  //   this.courtbooking = [];
+  //   this.historyObj.PaidAmount = "0.00";
+  //   this.historyObj.DueAmount = "0.00";
+  //   this.historyObj.Discount = "0.00";
+  //   this.isNoBookings = false;
+  // }
+
   reInitializeModule() {
     // 🧹 Clear regular session arrays
     this.term_session_list = [];
@@ -344,11 +394,12 @@ export class BookinghistoryPage implements OnInit, OnDestroy {
     this.courtbooking = [];
 
     // 🧹 Clear pending payments data
-    this.termPendingPaymentsRes = {
-      pending_sessions: [],
-      totalCount: '0',
-      totalDueAmountSum: '0'
-    };
+    // this.termPendingPaymentsRes = {
+    //   pending_sessions: [],
+    //   totalCount: '0',
+    //   totalDueAmountSum: '0'
+    // };
+    this.termPendingPaymentsRes = [];
     this.weeklyPendingPaymentsRes = {
       pending_sessions: [],
       totalCount: '0',
@@ -394,12 +445,6 @@ export class BookinghistoryPage implements OnInit, OnDestroy {
     if (this.selectedType == 3 && this.court_booking_list.length == 0) {
       this.isNoBookings = true;
       this.no_bookings_text = "No Bookings Found";
-      this.commonService.toastMessage(
-        `No Bookings Found`,
-        2500,
-        ToastMessageType.Error,
-        ToastPlacement.Bottom
-      );
     }
     if (this.selectedType == 4 && this.school_session_list.length == 0) {
       this.isNoBookings = true;
@@ -494,213 +539,135 @@ export class BookinghistoryPage implements OnInit, OnDestroy {
     }
   }
 
+  // onModuleChange() {
+  //   this.reInitializeModule();
+  //   if (Number(this.selectedType == 0)) {
+  //     this.courtbookingactive = false;
+  //     this.getTermSessionBookings();
+  //   }
+  //   else if (Number(this.selectedType == 1)) {
+  //     this.courtbookingactive = false;
+  //     this.getWeeklySessionBookings();
+  //   }
+  //   else if (Number(this.selectedType == 2)) {
+  //     this.courtbookingactive = false;
+  //     this.getHolidayCampsBookings();
+  //   }
+  //   else if (Number(this.selectedType == 3)) {
+  //     this.getCourtBookingHistory();
+  //   } else if (Number(this.selectedType == 4)) {
+  //     this.getSchoolSessionBookings();
+  //   } else {
+  //     this.getMonthlySessionBookings();
+  //   }
+  // }
 
   //fetch pending payments for term sessions
-  getTermPendingPayments(): void {
-    // ⏳ Show loader before the API call
+  getTermPendingPayments() {
+    // this.setupPendingPaymentInputs();
     this.commonService.showLoader("Fetching info ...");
-
-    this.httpService.post(`${API.GetTermPendingPayments}`, this.getTermPendingPaymentsInput).subscribe({
-      next: (res: any) => {
-        // ✅ Hide loader on successful response (whether data is present or not)
+    this.httpService.post(`${API.GetTermPendingPayments}`, this.getTermPendingPaymentsInput).subscribe((res: any) => {
+      if (res) {
         this.commonService.hideLoader();
-
-        if (res && res.data) {
-          // ✅ Check if response and data exist
-          // Assuming res.data is the object containing the result, including totalCount
-          this.termPendingPaymentsRes = res.data;
-
-          // 📊 Show success toast with the count
-          this.commonService.toastMessage(
-            `${this.termPendingPaymentsRes.totalCount} Term Sessions Found`,
-            2500,
-            ToastMessageType.Success,
-            ToastPlacement.Bottom
-          );
-
-          console.log("✅ GetTermPendingPayments RESPONSE data:", JSON.stringify(res.data));
-        }
-      },
-      error: (err) => {
-        // ✅ Hide loader on error
-        this.commonService.hideLoader();
-
-        const errorMessage = err.error.message
-
+        this.termPendingPaymentsRes = res.data
+        // this.commonService.toastMessage(
+        //   `${this.termPendingPaymentsRes.totalCount } Term Sessions Found`,
+        //   2500,
+        //   ToastMessageType.Success,
+        //   ToastPlacement.Bottom
+        // );
         this.commonService.toastMessage(
-          `${errorMessage}`,
+          `${this.termPendingPaymentsRes.length } Term Sessions Found`,
           2500,
-          ToastMessageType.Error,
+          ToastMessageType.Success,
           ToastPlacement.Bottom
         );
-
-        console.error("❌ GetTermPendingPayments ERROR:", err);
+        console.log("GetTermPendingPayments RESPONSE", JSON.stringify(res.data));
+      } else {
+        this.commonService.hideLoader();
+        console.log("error in fetching",)
       }
-    });
+    })
   }
   //fetch pending payments for weekly sessions
-  GetPendingPaymentWeekly(): void {
-    // ⏳ Show loader before the API call
-    this.commonService.showLoader("Fetching info ...");
-
-    this.httpService.post(`${API.GetPendingPaymentWeekly}`, this.getWeeklyPendingPaymentsInput).subscribe({
-      next: (res: any) => {
-        // ✅ Hide loader on successful response (whether data is present or not)
+  GetPendingPaymentWeekly() {
+    // this.setupPendingPaymentInputs();
+    // this.commonService.showLoader("Fetching info ...");
+    this.httpService.post(`${API.GetPendingPaymentWeekly}`, this.getWeeklyPendingPaymentsInput).subscribe((res: any) => {
+      if (res) {
         this.commonService.hideLoader();
-
-        if (res) { // ✅ Check if response exists (assuming res is the data directly)
-          // the response structure is not wrapped within 'data' object, so using res directly
-          this.weeklyPendingPaymentsRes = res;
-          // 📊 Show success toast with the count
-          this.commonService.toastMessage(
-            `${this.weeklyPendingPaymentsRes.totalCount} Weekly Sessions Found`,
-            2500,
-            ToastMessageType.Success,
-            ToastPlacement.Bottom
-          );
-          console.log("✅ GetPendingPaymentWeekly RESPONSE:", JSON.stringify(res));
-        }
-      },
-      error: (err) => { // ❌ Handle errors during the HTTP request
-        // ✅ Hide loader on error
-        this.commonService.hideLoader();
-        const errorMessage = err.error.message
-
-        // 🚨 Show error message in toast
+        this.weeklyPendingPaymentsRes = res  // the response structure is not wrapped within 'data' object, so using res directly
         this.commonService.toastMessage(
-          `${errorMessage}`,
+          `${this.weeklyPendingPaymentsRes.totalCount} Weekly Sessions Found`,
           2500,
-          ToastMessageType.Error,
+          ToastMessageType.Success,
           ToastPlacement.Bottom
         );
-
+        console.log("GetPendingPaymentWeekly RESPONSE", JSON.stringify(res));
+      } else {
+        // this.commonService.hideLoader();
+        console.log("error in fetching",)
       }
-    });
+    })
   }
 
   //fetch pending payments for monthly sessions
-  MonthlyPendingPayment(): void {
-    // ⏳ Show loader before the API call
+  MonthlyPendingPayment() {
+    // this.setupPendingPaymentInputs();
     this.commonService.showLoader("Fetching info ...");
-
-    this.httpService.post(`${API.MonthlyPendingPayment}`, this.monthlyPendingPaymentInput).subscribe({
-      next: (res: any) => {
-        // ✅ Hide loader on successful response (whether data is present or not)
+    this.httpService.post(`${API.MonthlyPendingPayment}`, this.monthlyPendingPaymentInput).subscribe((res: any) => {
+      if (res) {
         this.commonService.hideLoader();
-
-        if (res) {
-          this.monthlyPendingPaymentRes = res.data;
-          // 📊 Show success toast with the count
-          this.commonService.toastMessage(
-            `${this.monthlyPendingPaymentRes.totalCount} Monthly Sessions Found`,
-            2500,
-            ToastMessageType.Success,
-            ToastPlacement.Bottom
-          );
-          console.log("✅ MonthlyPendingPayment RESPONSE data:", JSON.stringify(res.data));
-        }
-      },
-      error: (err) => { // ❌ Handle errors during the HTTP request
-        // ✅ Hide loader on error
-        this.commonService.hideLoader();
-        const errorMessage = err.error.message;
+        this.monthlyPendingPaymentRes = res.data;
         this.commonService.toastMessage(
-          `${errorMessage}`,
+          `${this.monthlyPendingPaymentRes.totalCount} Monthly Sessions Found`,
           2500,
-          ToastMessageType.Error,
+          ToastMessageType.Success,
           ToastPlacement.Bottom
         );
-
+        console.log("MonthlyPendingPayment RESPONSE", JSON.stringify(res.data));
+      } else {
+        this.commonService.hideLoader();
+        console.log("error in fetching",)
       }
-    });
+    })
   }
-
-
   //fetch pending payments for school sessions
-  // ...existing code...
-
-  /**
-   * 🌐 Fetches pending payments for School Sessions.
-   *    Shows loader, handles success with toast, and hides loader/shows error toast on failure.
-   */
-  SchoolSessionPendingPayment(): void {
-    // ⏳ Show loader before the API call
+  SchoolSessionPendingPayment() {
     this.commonService.showLoader("Fetching info ...");
-
-    this.httpService.post(`${API.SchoolSessionPendingPayment}`, this.schoolSessionPendingPaymentInput).subscribe({
-      next: (res: any) => {
-        // ✅ Hide loader on successful response (whether data is present or not)
+    this.httpService.post(`${API.SchoolSessionPendingPayment}`, this.schoolSessionPendingPaymentInput).subscribe((res: any) => {
+      if (res) {
         this.commonService.hideLoader();
-
-        if (res && res.data) { // ✅ Check if response and data exist
-          // Assuming res.data is the object containing pending_sessions, totalCount, etc.
-          this.schoolSessionPendingPaymentRes = res.data;
-          // 📊 Show success toast with the count
-          this.commonService.toastMessage(
-            `${this.schoolSessionPendingPaymentRes.totalCount} School Sessions Found`,
-            2500,
-            ToastMessageType.Success,
-            ToastPlacement.Bottom
-          );
-          console.log("✅ SchoolSessionPendingPayment RESPONSE data:", JSON.stringify(res.data));
-        }
-      },
-      error: (err) => { // ❌ Handle errors during the HTTP request
-        // ✅ Hide loader on error
-        this.commonService.hideLoader();
-        const errorMessage = err.error.message;
+        this.schoolSessionPendingPaymentRes = res.data;
         this.commonService.toastMessage(
-          `${errorMessage}`,
+          `${this.schoolSessionPendingPaymentRes.totalCount} School Sessions Found`,
           2500,
-          ToastMessageType.Error,
+          ToastMessageType.Success,
           ToastPlacement.Bottom
         );
-
+        console.log("SchoolSessionPendingPayment RESPONSE", JSON.stringify(res.data));
+      } else {
+        this.commonService.hideLoader();
+        console.log("error in fetching",)
       }
-    });
+    })
   }
-
-  // ...existing code...
 
   //fetch pending payments for Holiday Camp sessions
-  HolidayCampPendingPayment(): void {
-    // ⏳ Show loader before the API call
+  HolidayCampPendingPayment() {
     this.commonService.showLoader("Fetching info ...");
-
-    this.httpService.post(`${API.EnrolmentDetails}`, this.holdiayCampPendingPaymentInput).subscribe({
-      next: (res: any) => {
-        // ✅ Hide loader on successful response (whether data is present or not)
+    this.httpService.post(`${API.EnrolmentDetails}`, this.holdiayCampPendingPaymentInput).subscribe((res: any) => {
+      if (res) {
         this.commonService.hideLoader();
-
-        if (res) { // ✅ Check if response and data exist
-
-          this.holidaycampPendingPaymentRes = res; // the response structure is not wrapped within 'data' object, so using res directly
-          // 📊 Show success toast with the count
-          this.commonService.toastMessage(
-            `${this.holidaycampPendingPaymentRes.totalCount} Holiday Camps Found`, // ⚠️ Assuming totalCount is directly on res.data
-            2500,
-            ToastMessageType.Success,
-            ToastPlacement.Bottom
-          );
-          console.log("✅ HolidayCampPendingPayment RESPONSE data:", JSON.stringify(res.data));
-        }
-      },
-      error: (err) => { // ❌ Handle errors during the HTTP request
-        // ✅ Hide loader on error
+        this.holidaycampPendingPaymentRes = res   // the response structure is not wrapped within 'data' object, so using res directly
+        this.commonService.toastMessage(`${this.holidaycampPendingPaymentRes.totalCount} Hoiday Camps Found`,2500,ToastMessageType.Success,ToastPlacement.Bottom);
+        console.log("HolidayCampPendingPayment RESPONSE", JSON.stringify(res));
+      } else {
         this.commonService.hideLoader();
-        const errorMessage = err.error.message || 'Failed to fetch holiday camp pending payments.';
-        this.commonService.toastMessage(
-          `${errorMessage}`,
-          2500,
-          ToastMessageType.Error,
-          ToastPlacement.Bottom
-        );
-
+        console.log("error in fetching",)
       }
-    });
+    })
   }
-
-  // ...existing code...
 
   // 📡 Getting term session details of parent & family by parent postgre_id & firebasekey
   getTermSessionBookings() {
@@ -1005,3 +972,7 @@ export interface ITotalFamily {
   ClubKey: string;
   MemberKey: string;
 }
+
+
+
+

@@ -8,7 +8,6 @@
   <ion-navbar>
     <ion-title>Existing Accounts</ion-title>
   </ion-navbar>
-
 </ion-header>
 
 
@@ -48,8 +47,27 @@
     <!-- <page-commentforemptiness *ngIf="connectSetupDetails.length == 0" [customTitle]="Addasetup" (click)="goTocreatepage()"></page-commentforemptiness> -->
   </ion-grid>
   
-  <ion-fab mini right bottom #fab>
+  <!-- <ion-fab mini right bottom #fab>
       <button ion-fab mini  style="background-color: #2b92bb; color:white !important" (click)="goTocreatepage()"><ion-icon name="add" ></ion-icon></button>
-    </ion-fab>
+  </ion-fab> -->
+
+  <ion-fab mini right bottom #fab>
+    <button style="background-color:#2b92bb !important; color: white !important" ion-fab mini id="fav-ico">
+        <ion-icon name="add"></ion-icon>
+    </button>
+    <ion-fab-list side="top">
+        <p class="fabAttendanceText" style="margin-left: -100px;" (tap)="goTocreatepage(2)">Copy</p>
+        <button style="background-color:#2b92bb !important ;color: white !important" ion-fab class="fabTop"
+            (tap)="goTocreatepage(2)">
+            <ion-icon name="md-copy"></ion-icon>
+        </button>
+
+        <p class="fabAttendanceText" style=" margin-left: -100px;" (tap)="goTocreatepage(1)">Create</p>
+        <button style="background-color:#2b92bb !important ;color: white !important" ion-fab class="fabTop"
+            (tap)="goTocreatepage(1)">
+            <ion-icon name="md-create"></ion-icon>
+        </button>
+    </ion-fab-list>
+  </ion-fab>
 
 </ion-content>

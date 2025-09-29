@@ -18,7 +18,7 @@
   </ion-navbar>
 </ion-header>
 <ion-content>
-  <div style="background-color: #f2f5fa">
+  <div class="league-header-section">
     <ion-row *ngIf="individualLeague">
       <ion-col col-9>
         <ion-row class="cardrow">
@@ -44,7 +44,7 @@
         <div style="display: flex; align-items: center;">
           <ion-icon style="padding-left: 20px; color: #2b92bb; font-size: 1.5em"
             [name]="individualLeague?.league_visibility==0?'ios-globe':'ios-lock-outline'"></ion-icon>
-          <!-- <p class="smalltext">{{individualLeague?.league_visibility == 0 ? "Public" : "Private"}}</p> -->
+          <p class="smalltext">{{individualLeague?.league_visibility == 0 ? "Public" : "Private"}}</p>
         </div>
 
         <div class="action_btns_div">
@@ -266,9 +266,9 @@
               </span>
             </div>
             <div class="visibility-info">
-              <ion-icon [name]="mat.match_visibility==0?'globe':'lock-closed'"
+              <ion-icon [name]="mat.match_visibility==0?'globe':'lock'"
                 [color]="mat.match_visibility==0?'success':'medium'"></ion-icon>
-              <!-- <span>{{mat.match_visibility == 0 ? 'Public' : 'Private'}}</span> -->
+              <span>{{mat.match_visibility == 0 ? 'Public' : 'Private'}}</span>
             </div>
           </div>
         </div>

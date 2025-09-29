@@ -6,7 +6,7 @@ import { PopoverController, ToastController, NavController, Platform, ViewContro
 import { Storage } from '@ionic/storage';
 import * as firebase from 'firebase';
 import { IonicPage, AlertController } from 'ionic-angular';
-import { CommonService, ToastMessageType, ToastPlacement } from "../../../services/common.service";
+import { CommonService } from "../../../services/common.service";
 import { Type2CourtBookListModule } from '../courtsetup/courtbooklist.module';
 
 // import { reorderArray } from 'ionic-angular';
@@ -161,7 +161,7 @@ export class Type2TabConfig {
                 }
             }
         }, function (error) {
-            currentInvokingObj.commonService.toastMessage(error.message,2500,ToastMessageType.Error);
+            this.showToast(error.message, 3000);
         });
     }
     menuSetup() {
@@ -190,7 +190,7 @@ export class Type2TabConfig {
             this.fb.update(this.tabs[tabIndex].Key, "/TabConfig/Member/" + this.selectedParentClubKey, { TabSequenceNo: tabIndex });
         }
         let message = "Menus reorderd successfully."
-        this.commonService.toastMessage(message,2500,ToastMessageType.Success);
+        this.showToast(message, 2000);
         // } 
         // else {
         //     let message = "You can not reorder the first element.";
@@ -314,10 +314,10 @@ export class Type2TabConfig {
     validateInputs(data): boolean {
         if (data.DisplayText.length == 0 || data.DisplayText.length > 20) {
             if (data.DisplayText.length == 0) {
-                this.commonService.toastMessage("Display text must not be empty", 2500,ToastMessageType.Error);
+                this.showToast("Display text must not be empty.", 5000);
                 return false;
             } else {
-                this.commonService.toastMessage("Display text length must not exceed 20", 2500,ToastMessageType.Error);
+                this.showToast("Display text length must not exceed 20.", 5000);
                 return false;
             }
         } else {

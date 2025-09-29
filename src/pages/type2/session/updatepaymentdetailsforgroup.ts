@@ -11,8 +11,7 @@ import { GraphqlService } from '../../../services/graphql.service';
 import { TermSessionDets, TermSessionMembers } from './model/session_details.model';
 import gql from 'graphql-tag';
 import * as moment from 'moment';
-import { PaymentStatus, PaymentTypes } from '../../../shared/constants/payment.constants';
-// import { SessionPaymentUpdateInput } from '../school/dto/school_ses_payment.dto';
+import { SessionPaymentUpdateInput } from '../school/dto/school_ses_payment.dto';
 @IonicPage()
 @Component({
   selector: 'updatepaymentdetailsforgroup-page',
@@ -23,14 +22,14 @@ export class Type2PaymentDetailsForGroup {
   TermSessionDets
   parentClubKey: any;
   themeType: number;
-  payment_update_input: SessionPaymentUpdateInput = {
-    orderId: "",
+  payment_update_input:SessionPaymentUpdateInput = {
+    orderId:"",
     UpdatedBy: "",
-    user_payment: {
+    user_payment:{
       enrollementId: "",
-      transactionId: "",
-      payment_mode: 0,
-      payment_status: 0,
+      transactionId:"",
+      payment_mode:0,
+      payment_status:0,
       comments: "",
       amount: "",
       payment_date: moment().format('YYYY-MM-DD'),
@@ -38,20 +37,20 @@ export class Type2PaymentDetailsForGroup {
   }
 
   PaymentMethod = {
-    CASH: 0,
-    ONLINE: 1,
-    BACS: 2,
-    CHILDCAREVOUCHER: 3,
-    WALLET: 4,
-    CHEQUE: 5,
+    CASH:0,
+    ONLINE:1,
+    BACS:2,
+    CHILDCAREVOUCHER:3,
+    WALLET:4,
+    CHEQUE:5,
   }
 
   PaymentStatus = {
-    DUE: 0,
-    PAID: 1,
-    PENDINGVERIFICATION: 3,
+    DUE:0,
+    PAID:1,
+    PENDINGVERIFICATION:3,
   }
-
+  
   paymentDetails = {
     PaymentAmount: '',
     PaymentMode: '',
@@ -68,22 +67,22 @@ export class Type2PaymentDetailsForGroup {
   selectedMemberDetails: TermSessionMembers;
   selectedSessionDetails: TermSessionDets;
   constructor(
-    private commonService: CommonService,
+    private commonService: CommonService, 
     public alertCtrl: AlertController, public navParams: NavParams,
-    public storage: Storage,
-    public fb: FirebaseService,
-    public navCtrl: NavController,
-    public sharedservice: SharedServices,
-    public popoverCtrl: PopoverController,
-    private graphqlService: GraphqlService,
-  ) {
+      public storage: Storage,
+      public fb: FirebaseService, 
+      public navCtrl: NavController, 
+      public sharedservice: SharedServices, 
+      public popoverCtrl: PopoverController,
+      private graphqlService: GraphqlService,
+    ) {
     this.themeType = sharedservice.getThemeType();
     this.userData = sharedservice.getUserData();
 
     this.selectedMemberDetails = <TermSessionMembers>navParams.get('SelectedMember');
     this.selectedSessionDetails = <TermSessionDets>navParams.get('SessionDetails');
 
-    if (this.selectedMemberDetails.amount_pay_status != 0) {
+    if (this.selectedMemberDetails.amount_pay_status!=0) {
       this.payment_update_input.user_payment.amount = parseFloat(this.selectedMemberDetails.amount_paid).toFixed(2);
       this.payment_update_input.user_payment.payment_mode = Number(this.selectedMemberDetails.paidby);
       //this.payment_mode = amount_pay_status
@@ -104,13 +103,13 @@ export class Type2PaymentDetailsForGroup {
         this.payment_update_input.UpdatedBy = this.sharedservice.getLoggedInId();
       }
     });
-
+   
 
     //this.getDeviceTokenOfSelectedMember();
     this.paymentDetails.Comments = "Payment received. Thanks!";
     // this.loading.present();
     this.themeType = sharedservice.getThemeType();
-
+    
   }
 
 
@@ -131,7 +130,7 @@ export class Type2PaymentDetailsForGroup {
     console.log(re.test(ev.target.value));
     if (!re.test(ev.target.value)) {
       return false;
-    } else {
+    }else{
       return true;
     }
   }
@@ -159,23 +158,23 @@ export class Type2PaymentDetailsForGroup {
     confirm.present();
   }
 
-  updatePaymentInfo() {
+  updatePaymentInfo(){
     this.paymentDetails.PaymentAmount = parseFloat(this.paymentDetails.PaymentAmount).toFixed(2);
     let member = this.selectedMemberDetails;
-    if (this.validateInput()) { }
+    if (this.validateInput()) {}      
   }
 
   paymentStatus() {
     if (this.payment_update_input.user_payment.amount == undefined || this.payment_update_input.user_payment.amount == "") {
-      this.commonService.toastMessage("Please enter the amount", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please enter the amount", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     if (this.payment_update_input.user_payment.payment_mode == undefined) {
-      this.commonService.toastMessage("Please select payment mode", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please select payment mode", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     else if (this.payment_update_input.user_payment.payment_status == undefined) {
-      this.commonService.toastMessage("Please select payment status", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please select payment status", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     // else if (this.payment_update_input.user_payment.payment_status == PaymentStatus.PENDINGVERIFICATION) {
@@ -183,7 +182,7 @@ export class Type2PaymentDetailsForGroup {
     //   return false;
     // }
     else if (this.payment_update_input.user_payment.comments == "") {
-      this.commonService.toastMessage("Please enter comments", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please enter comments", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     else {
@@ -194,45 +193,45 @@ export class Type2PaymentDetailsForGroup {
   validateInput() {
     if (this.paymentDetails.Comments == "") {
       let message = "Please enter comments.";
-      this.commonService.toastMessage(message, 3000, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage(message, 3000,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     else {
       return true;
     }
-  }
+ }
 
+ 
 
-
-  //updating the session in postgre
-  updatePaymentInPostgre() {
+//updating the session in postgre
+updatePaymentInPostgre(){
     this.payment_update_input.user_payment.payment_mode = Number(this.payment_update_input.user_payment.payment_mode);
     this.payment_update_input.user_payment.payment_status = Number(this.payment_update_input.user_payment.payment_status);
-    if (this.paymentStatus()) {
+    if(this.paymentStatus()){
       this.commonService.showLoader("Please wait");
       const payment_update_mutation = gql`
       mutation updateSessionPaymentAdmin($payment_update_input: SessionPaymentInput_V3!) {
         updateSessionPaymentAdmin(sessionPaymentUpdateInput: $payment_update_input)
-      }`
-
-      const variables = { payment_update_input: this.payment_update_input }
-
-      this.graphqlService.mutate(payment_update_mutation, variables, 0).subscribe(
+      }` 
+      
+      const variables = {payment_update_input:this.payment_update_input}
+  
+      this.graphqlService.mutate(payment_update_mutation,variables,0).subscribe(
         result => {
           this.commonService.hideLoader();
           // Handle the result
-          this.commonService.toastMessage("Payment updated successfully", 2500, ToastMessageType.Success);
-          this.navCtrl.pop();
+          this.commonService.toastMessage("Payment updated successfully", 2500,ToastMessageType.Success);
+          this.navCtrl.pop();                        
         },
         error => {
           // Handle errors
           this.commonService.hideLoader();
           console.error(error);
-          this.commonService.toastMessage("Payment updation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          this.commonService.toastMessage("Payment updation failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
         }
       );
     }
-  }
+}
 
   presentPopover(myEvent) {
     let popover = this.popoverCtrl.create("PopoverPage");
@@ -242,7 +241,7 @@ export class Type2PaymentDetailsForGroup {
   }
 
 
-
+  
 
   goToDashboardMenuPage() {
     this.navCtrl.setRoot("Dashboard");
@@ -303,24 +302,4 @@ export class Type2PaymentDetailsForGroup {
   }
 
 
-}
-
-export class UserPaymentStatusUpdate {
-  enrollementId: string;
-  //@Field((type) => String, { nullable: true })
-  transactionId: string;
-
-  //@Field((type) => Int, { nullable: true }) //don't send if only for payment 
-  payment_mode: PaymentTypes | null;
-  payment_status: PaymentStatus | null;
-  comments: string;
-  amount: string;
-  payment_date: string | null;
-}
-
-export class SessionPaymentUpdateInput {
-  ActionType?: number;
-  orderId?: string;
-  UpdatedBy: string;
-  user_payment: UserPaymentStatusUpdate;
 }

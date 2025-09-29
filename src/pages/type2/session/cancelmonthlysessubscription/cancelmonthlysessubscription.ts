@@ -8,6 +8,7 @@ import { MonthlySessionDets, MonthlySessionMember } from '../monthlysession/mode
 import gql from "graphql-tag";
 import { GraphqlService } from '../../../../services/graphql.service';
 import { MonthlySessionEnrolInput } from '../monthlysession/model/monthly_session_enrol.model';
+import { AppType } from '../../../../shared/constants/module.constants';
 /**
  * Generated class for the FilterbookingsPage page.
  *
@@ -37,7 +38,11 @@ export class CancelMonthlySesSubscription {
     session_postgre_fields: {
       monthly_session_id:""
     },
-    user_device_metadata:{ UserActionType:3 }, //2-cancel,3-cancel subscription
+    user_device_metadata:{ 
+      UserActionType:3,
+      UserAppType:1, 
+      UserDeviceType:1 
+     }, //2-cancel,3-cancel subscription
     enroll_users:[],
     updated_by:""
   };
@@ -63,6 +68,9 @@ export class CancelMonthlySesSubscription {
     })
     this.session_dets = this.navParam.get('session');
     this.enrol_input.session_postgre_fields.monthly_session_id = this.session_dets.id;
+    this.enrol_input.updated_by = this.sharedservice.getLoggedInId();
+    this.enrol_input.user_device_metadata.UserAppType = AppType.ADMIN_NEW;
+    this.enrol_input.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == 'ios' ? 2 : 1; //2-ios,1-android
     this.user_subscription = this.navParam.get('user_subscription');
   }
 

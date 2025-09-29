@@ -2,7 +2,7 @@ export class MonthlySessionEnrolInput{
     session_postgre_fields: {
         monthly_session_id: string;
     }
-    user_device_metadata:{ UserActionType:number } //1
+    user_device_metadata:{ UserActionType:number,UserAppType?:number,UserDeviceType?:number } //1
     enroll_users:enrol_info[]
     updated_by:string
 }

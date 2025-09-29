@@ -5,13 +5,13 @@ import { Storage } from '@ionic/storage';
 import { IonicPage } from 'ionic-angular';
 import gql from 'graphql-tag';
 import * as moment from 'moment';
-// import { SessionPaymentUpdateInput } from '../../school/dto/school_ses_payment.dto';
+import { SessionPaymentUpdateInput } from '../../school/dto/school_ses_payment.dto';
 import { WeeklySessionMember } from './weeklydatedetails.model';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { FirebaseService } from '../../../../services/firebase.service';
 import { SharedServices } from '../../../services/sharedservice';
 import { GraphqlService } from '../../../../services/graphql.service';
-import { PaymentStatus, PaymentStatusText, PaymentTypes } from '../../../../shared/constants/payment.constants';
+import { PaymentStatusText } from '../../../../shared/constants/payment.constants';
 
 @IonicPage()
 @Component({
@@ -23,14 +23,14 @@ export class Type2PaymentDetailsForWeekly {
   TermSessionDets
   parentClubKey: any;
   themeType: number;
-  payment_update_input: SessionPaymentUpdateInput = {
-    orderId: "",
+  payment_update_input:SessionPaymentUpdateInput = {
+    orderId:"",
     UpdatedBy: "",
-    user_payment: {
+    user_payment:{
       enrollementId: "",
-      transactionId: "",
-      payment_mode: null,
-      payment_status: null,
+      transactionId:"",
+      payment_mode:null,
+      payment_status:null,
       comments: "",
       amount: "",
       payment_date: moment().format('YYYY-MM-DD'),
@@ -38,20 +38,20 @@ export class Type2PaymentDetailsForWeekly {
   }
 
   PaymentMethod = {
-    CASH: 0,
-    ONLINE: 1,
-    BACS: 2,
-    CHILDCAREVOUCHER: 3,
-    WALLET: 4,
-    CHEQUE: 5,
+    CASH:0,
+    ONLINE:1,
+    BACS:2,
+    CHILDCAREVOUCHER:3,
+    WALLET:4,
+    CHEQUE:5,
   }
 
   PaymentStatus = {
-    DUE: 0,
-    PAID: 1,
-    PENDINGVERIFICATION: 3,
+    DUE:0,
+    PAID:1,
+    PENDINGVERIFICATION:3,
   }
-
+  
   paymentDetails = {
     PaymentAmount: '',
     PaymentMode: '',
@@ -69,22 +69,22 @@ export class Type2PaymentDetailsForWeekly {
   selectedSessionDetails: WeeklySessionInfo;
 
   constructor(
-    private commonService: CommonService,
+    private commonService: CommonService, 
     public alertCtrl: AlertController, public navParams: NavParams,
-    public storage: Storage,
-    public fb: FirebaseService,
-    public navCtrl: NavController,
-    public sharedservice: SharedServices,
-    public popoverCtrl: PopoverController,
-    private graphqlService: GraphqlService,
-  ) {
+      public storage: Storage,
+      public fb: FirebaseService, 
+      public navCtrl: NavController, 
+      public sharedservice: SharedServices, 
+      public popoverCtrl: PopoverController,
+      private graphqlService: GraphqlService,
+    ) {
     this.themeType = sharedservice.getThemeType();
     this.userData = sharedservice.getUserData();
 
     this.selectedMemberDetails = <WeeklySessionMember>navParams.get('selected_member');
     this.selectedSessionDetails = <WeeklySessionInfo>navParams.get('selectded_session');
 
-    if (this.selectedMemberDetails.amount_pay_status != 0) {
+    if (this.selectedMemberDetails.amount_pay_status!=0) {
       this.payment_update_input.user_payment.amount = parseFloat(this.selectedMemberDetails.paid_amount).toFixed(2);
       this.payment_update_input.user_payment.payment_mode = Number(this.selectedMemberDetails.paid_by);
       this.payment_update_input.user_payment.comments = this.selectedMemberDetails.admin_comments || "";
@@ -95,7 +95,7 @@ export class Type2PaymentDetailsForWeekly {
       this.payment_update_input.user_payment.amount = parseFloat(this.selectedMemberDetails.amount_due).toFixed(2);
     }
     //this.payment_update_input.user_payment.payment_status = this.PaymentStatus[this.selectedMemberDetails.amount_pay_status.toUpperCase()]
-    this.payment_update_input.user_payment.payment_status = this.selectedMemberDetails.amount_pay_status != 0 ? this.selectedMemberDetails.amount_pay_status : null;
+    this.payment_update_input.user_payment.payment_status = this.selectedMemberDetails.amount_pay_status!=0 ? this.selectedMemberDetails.amount_pay_status:null;
     this.payment_update_input.user_payment.enrollementId = this.selectedMemberDetails.id;
 
     this.storage.get("userObj").then((val) => {
@@ -105,16 +105,16 @@ export class Type2PaymentDetailsForWeekly {
         this.payment_update_input.UpdatedBy = this.sharedservice.getLoggedInId();
       }
     });
-
+   
 
     //this.getDeviceTokenOfSelectedMember();
     this.paymentDetails.Comments = "Payment received. Thanks!";
     // this.loading.present();
     this.themeType = sharedservice.getThemeType();
-
+    
   }
 
-  getPaymentStatusText(payment_status: number) {
+  getPaymentStatusText(payment_status:number){
     return PaymentStatusText[payment_status]
   }
 
@@ -130,7 +130,7 @@ export class Type2PaymentDetailsForWeekly {
     console.log(re.test(ev.target.value));
     if (!re.test(ev.target.value)) {
       return false;
-    } else {
+    }else{
       return true;
     }
   }
@@ -158,23 +158,23 @@ export class Type2PaymentDetailsForWeekly {
     confirm.present();
   }
 
-  updatePaymentInfo() {
+  updatePaymentInfo(){
     this.paymentDetails.PaymentAmount = parseFloat(this.paymentDetails.PaymentAmount).toFixed(2);
     let member = this.selectedMemberDetails;
-    if (this.validateInput()) { }
+    if (this.validateInput()) {}      
   }
 
   paymentStatus() {
     if (this.payment_update_input.user_payment.amount == undefined || this.payment_update_input.user_payment.amount == "") {
-      this.commonService.toastMessage("Please enter the amount", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please enter the amount", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     // else if (this.payment_update_input.user_payment.payment_mode == undefined) {
     //   this.commonService.toastMessage("Please select payment mode", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
     //   return false;
     // }
-    else if (this.payment_update_input.user_payment.payment_mode !== null && this.payment_update_input.user_payment.payment_status == null) {
-      this.commonService.toastMessage("Please select payment status", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+    else if (this.payment_update_input.user_payment.payment_mode!==null && this.payment_update_input.user_payment.payment_status == null) {
+      this.commonService.toastMessage("Please select payment status", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     // else if (this.payment_update_input.user_payment.payment_status == PaymentStatus.PENDINGVERIFICATION) {
@@ -182,7 +182,7 @@ export class Type2PaymentDetailsForWeekly {
     //   return false;
     // }
     else if (this.payment_update_input.user_payment.comments == "") {
-      this.commonService.toastMessage("Please enter comments", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage("Please enter comments", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     else {
@@ -193,45 +193,45 @@ export class Type2PaymentDetailsForWeekly {
   validateInput() {
     if (this.paymentDetails.Comments == "") {
       let message = "Please enter comments.";
-      this.commonService.toastMessage(message, 3000, ToastMessageType.Error, ToastPlacement.Bottom);
+      this.commonService.toastMessage(message, 3000,ToastMessageType.Error,ToastPlacement.Bottom);
       return false;
     }
     else {
       return true;
     }
-  }
+ }
 
+ 
 
-
-  //updating the session in postgre
-  updatePaymentInPostgre() {
-    this.payment_update_input.user_payment.payment_mode = this.payment_update_input.user_payment.payment_mode != null ? Number(this.payment_update_input.user_payment.payment_mode) : null;
-    this.payment_update_input.user_payment.payment_status = this.payment_update_input.user_payment.payment_status != null ? Number(this.payment_update_input.user_payment.payment_status) : null;
-    if (this.paymentStatus()) {
+//updating the session in postgre
+updatePaymentInPostgre(){
+    this.payment_update_input.user_payment.payment_mode = this.payment_update_input.user_payment.payment_mode!=null ? Number(this.payment_update_input.user_payment.payment_mode) : null;
+    this.payment_update_input.user_payment.payment_status = this.payment_update_input.user_payment.payment_status!=null ? Number(this.payment_update_input.user_payment.payment_status):null;
+    if(this.paymentStatus()){
       this.commonService.showLoader("Please wait");
       const payment_update_mutation = gql`
       mutation updateWeeklySessionPaymentAdmin($payment_update_input: WeeklySessionPaymentInput_V3!) {
         updateWeeklySessionPaymentAdmin(sessionPaymentUpdateInput: $payment_update_input)
-      }`
-
-      const variables = { payment_update_input: this.payment_update_input }
-
-      this.graphqlService.mutate(payment_update_mutation, variables, 0).subscribe(
+      }` 
+      
+      const variables = {payment_update_input:this.payment_update_input}
+  
+      this.graphqlService.mutate(payment_update_mutation,variables,0).subscribe(
         result => {
           this.commonService.hideLoader();
           // Handle the result
-          this.commonService.toastMessage("Payment updated successfully", 2500, ToastMessageType.Success);
-          this.navCtrl.pop();
+          this.commonService.toastMessage("Payment updated successfully", 2500,ToastMessageType.Success);
+          this.navCtrl.pop();                        
         },
         error => {
           // Handle errors
           this.commonService.hideLoader();
           console.error(error);
-          this.commonService.toastMessage("Payment updation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          this.commonService.toastMessage("Payment updation failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
         }
       );
     }
-  }
+}
 
   presentPopover(myEvent) {
     let popover = this.popoverCtrl.create("PopoverPage");
@@ -241,7 +241,7 @@ export class Type2PaymentDetailsForWeekly {
   }
 
 
-
+  
 
   goToDashboardMenuPage() {
     this.navCtrl.setRoot("Dashboard");
@@ -295,29 +295,9 @@ export class Type2PaymentDetailsForWeekly {
 }
 
 
-export class WeeklySessionInfo {
-  session_id: string;
-  session_name: string;
-  weekly_session_id: string;
-  weekly_session_name: string;
-}
-
-export class UserPaymentStatusUpdate {
-  enrollementId: string;
-  //@Field((type) => String, { nullable: true })
-  transactionId: string;
-
-  //@Field((type) => Int, { nullable: true }) //don't send if only for payment 
-  payment_mode: PaymentTypes | null;
-  payment_status: PaymentStatus | null;
-  comments: string;
-  amount: string;
-  payment_date: string | null;
-}
-
-export class SessionPaymentUpdateInput {
-  ActionType?: number;
-  orderId?: string;
-  UpdatedBy: string;
-  user_payment: UserPaymentStatusUpdate;
+export class WeeklySessionInfo{
+  session_id:string;
+  session_name:string;
+  weekly_session_id:string;
+  weekly_session_name:string;        
 }

@@ -1,25 +1,6 @@
-subadminprofile-page{
-    .prifile-card{
-        color: #ffffff;
-       padding-left: 0px !important; 
-    }
-    .scroll-content {
-        margin-top: 44px !important; 
-        padding: 6px !important;
-        background-image: none !important; // background: white !important;
-        background: #f4efef !important;
-    }
-    .profile-img{
-            border-radius: 70px;
-    }
-    ion-grid {
-        padding: 1px;
-    }
+@import '../../theme/android-sdk35-fixes.scss';
 
-    .item{
-        padding-left: 0px !important; 
-        .item-inner{
-            border-bottom: 0.55px solid #c8c7cc !important;
-        }
-    }
+subadminprofile-page {
+    @include android-sdk35-fixes;
+
 }

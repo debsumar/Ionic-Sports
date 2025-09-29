@@ -1,4 +1,10 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
 page-facilityreport {
+    @include android-sdk35-fixes;
+
+
+
         .social-cards ion-col {
             padding: 8px;
          }

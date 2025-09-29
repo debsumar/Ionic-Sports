@@ -1,28 +1,36 @@
 <ion-content class="modern-competition">
-  <!-- Modern Tab Selector -->
-  <div class="modern-tab-selector">
-    <button class="modern-tab" [class.active]="activeIndex==0" (click)="changeType(0)">
-      <div class="tab-icon-wrapper">
-        <ion-icon name="trophy"></ion-icon>
-      </div>
-      <span>Competitions</span>
-    </button>
-    <button class="modern-tab" [class.active]="activeIndex==1" (click)="changeType(1)">
-      <div class="tab-icon-wrapper">
-        <ion-icon name="people"></ion-icon>
-      </div>
-      <span>Teams</span>
-    </button>
+  <!-- Sticky Header -->
+  <div class="sticky-header">
+    <!-- Modern Tab Selector -->
+    <div class="modern-tab-selector">
+      <button class="modern-tab" [class.active]="activeIndex==0" (click)="changeType(0)">
+        <div class="tab-icon-wrapper">
+          <ion-icon name="trophy"></ion-icon>
+        </div>
+        <span>Competitions</span>
+      </button>
+      <button class="modern-tab" [class.active]="activeIndex==1" (click)="changeType(1)">
+        <div class="tab-icon-wrapper">
+          <ion-icon name="people"></ion-icon>
+        </div>
+        <span>Teams</span>
+      </button>
+    </div>
+    
+    <!-- Modern Search Card -->
+    <div class="modern-search-card">
+      <ion-searchbar class="sleek-searchbar" 
+        [placeholder]="activeIndex==0 ? 'Search competitions, activities, venues...' : 'Search teams, activities...'"
+        [(ngModel)]="searchInput" 
+        (ionInput)="activeIndex==0 ? getLeagueSearch($event) : getTeamItems($event)" 
+        autocorrect="off" showCancelButton="focus"></ion-searchbar>
+    </div>
   </div>
 
-  <!-- Competitions Tab Content -->
-  <div *ngIf="activeIndex==0" class="tab-content">
-    <!-- Modern Search Card -->
-    <!-- <div class="modern-search-card"> -->
-    <ion-searchbar class="sleek-searchbar" placeholder="Search competitions, activities, venues..."
-      [(ngModel)]="searchInput" (ionInput)="getLeagueSearch($event)" autocorrect="off"
-      showCancelButton="focus"></ion-searchbar>
-    <!-- </div> -->
+  <!-- Scrollable Content -->
+  <div class="scrollable-content">
+    <!-- Competitions Tab Content -->
+    <div *ngIf="activeIndex==0" class="tab-content">
 
     <!-- Competitions Grid -->
     <div class="competitions-container" *ngIf="filteredleagues.length > 0">
@@ -48,8 +56,7 @@
                 <span class="detail-text">{{league.start_date}}</span>
               </div>
               <div class="detail-item type-badge">
-                <span class="badge-text" [style.background-color]="getLeagueTypeColor(league.league_type_text)"
-                  style="color: white;">{{league.league_type_text}}</span>
+                <span class="badge-text" [style.background-color]="getLeagueTypeColor(league.league_type_text)" style="color: white;">{{league.league_type_text}}</span>
               </div>
             </div>
             <div class="detail-row">
@@ -79,13 +86,8 @@
     </div>
   </div>
 
-  <!-- Teams Tab Content -->
-  <div *ngIf="activeIndex==1" class="tab-content">
-    <!-- Modern Search Card -->
-    <div class="modern-search-card">
-      <ion-searchbar class="sleek-searchbar" placeholder="Search teams, activities..." (ionInput)="getTeamItems($event)"
-        autocorrect="off" showCancelButton="focus"></ion-searchbar>
-    </div>
+    <!-- Teams Tab Content -->
+    <div *ngIf="activeIndex==1" class="tab-content">
 
     <!-- Teams Grid -->
     <div class="teams-container" *ngIf="filteredteams.length > 0">
@@ -137,6 +139,7 @@
         <p class="empty-description">Create your first team to get started</p>
       </div>
     </div>
+  </div>
   </div>
 
 </ion-content>

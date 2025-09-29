@@ -212,20 +212,23 @@ export class FirebaseService {
 
   uploadPhoto(imgdata: any) {
     return new Promise((resolve, reject) => {
+      console.log(`base64: ${JSON.stringify(imgdata.url)}`);
+      const cleanedBase64 = imgdata.url.startsWith('data:image/jpeg;base64,') ? imgdata.url : `data:image/jpeg;base64,${imgdata.url}`;
+      console.log(`clean base64: ${JSON.stringify(cleanedBase64)}`);
       if (imgdata.upload_type == 'coach') {
         this.storage = firebase.storage().ref("/ActivityPro/AllCoachImages");
-        console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["club_name"] + imgdata["coach_name"] + new Date().getTime()).putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["club_name"] + imgdata["coach_name"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
+            console.log(`profile update in service:${JSON.stringify(err)}`)
             reject(err);
           });
       }
       else if (imgdata.upload_type == 'tips') {
         this.storage = firebase.storage().ref("/Apkids/Tips");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["club_name"] +"-"+ imgdata["ImageTitle"] + new Date().getTime()).putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["club_name"] +"-"+ imgdata["ImageTitle"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
@@ -235,7 +238,7 @@ export class FirebaseService {
       else if (imgdata.upload_type == 'newsandevent') {
         this.storage = firebase.storage().ref("/ActivityPro/AllNewsAndEventPhotos");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
@@ -244,7 +247,7 @@ export class FirebaseService {
       } else if (imgdata.upload_type == 'events') {
         this.storage = firebase.storage().ref("/ActivityPro/Events");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
@@ -253,7 +256,7 @@ export class FirebaseService {
       }else if (imgdata.upload_type == 'apkids') {
         this.storage = firebase.storage().ref("/Apkids/Challenges");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
@@ -264,7 +267,7 @@ export class FirebaseService {
         //this.storage = firebase.storage().ref("gs://activityprouk-b5815") ;
         this.storage = firebase.storage().ref("/AppLandingImages");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["app_name"] + "_LandingImg").putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["app_name"] + "_LandingImg").putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
@@ -274,7 +277,7 @@ export class FirebaseService {
       else if (imgdata.upload_type == "eventpolicy") {
         this.storage = firebase.storage().ref("/ActivityPro/Events");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
@@ -284,7 +287,7 @@ export class FirebaseService {
       else {
         this.storage = firebase.storage().ref("/ActivityPro/AllPromotionImages");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["Parentclub_name"] + new Date().getTime()).putString(imgdata["url"], 'data_url')
+        this.storage.child(imgdata["Parentclub_name"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {

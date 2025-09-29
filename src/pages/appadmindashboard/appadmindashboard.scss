@@ -1,4 +1,9 @@
+@import '../../theme/android-sdk35-fixes.scss';
+
+
 page-appadmindashboard {
+    @include android-sdk35-fixes;
+
     .scroll-content {
         //background-image: url("../assets/images/background/backgroundimg1.png") !important;
         //background-image: none !important;

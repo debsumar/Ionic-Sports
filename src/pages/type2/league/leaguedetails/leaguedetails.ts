@@ -9,6 +9,7 @@ import {
   Platform,
   FabContainer,
   PopoverController,
+  Events,
 } from "ionic-angular";
 import * as moment from "moment";
 import { Storage } from "@ionic/storage";
@@ -26,6 +27,7 @@ import { API } from "../../../../shared/constants/api_constants";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { ParticipantModel } from "../../match/matchdetails/matchdetails";
 import { MatchType } from "../../../../shared/utility/enums";
+import { ThemeService } from "../../../../services/theme.service";
 /**
  * Generated class for the LeaguedetailsPage page.
  *
@@ -109,7 +111,8 @@ export class LeaguedetailsPage {
     public modalCtrl: ModalController,
     private graphqlService: GraphqlService,
     private httpService: HttpService,
-
+    private themeService: ThemeService,
+    public events: Events
   ) {
     // this.league = this.navParams.get("league");
     // console.log(this.league);
@@ -119,22 +122,14 @@ export class LeaguedetailsPage {
   }
 
 
-  ionViewDidLoad() {
-    console.log("ionViewDidLoad LeaguedetailsPage");
-    this.activeIndex = "0";
-  }
-
-  ionViewDidEnter() {
-    this.closeFab();
-  }
-
-  closeFab() {
-    if (this.fab) {
-      this.fab.close();
-    }
-  }
-
   async ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe("theme:changed", (isDark) => {
+      this.applyTheme(isDark);
+    });
     this.league_id = this.navParams.get("league_id");
     console.log("teams are", this.league_id);
     const [userobj, currency] = await Promise.all([
@@ -162,7 +157,58 @@ export class LeaguedetailsPage {
       // this.getLeaguesForParentClub();
       // this.getLeagueMatches();
     });
+  }
 
+  ionViewDidLoad() {
+    console.log("ionViewDidLoad LeaguedetailsPage");
+    this.activeIndex = "0";
+    setTimeout(() => {
+      this.loadTheme();
+    }, 100);
+  }
+
+  ionViewDidEnter() {
+    this.closeFab();
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe("theme:changed");
+  }
+
+  private loadTheme(): void {
+    this.storage.get("dashboardTheme").then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => {
+      this.applyTheme(true);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const applyThemeToElement = () => {
+      const element = document.querySelector("page-leaguedetails");
+      if (element) {
+        if (isDark) {
+          element.classList.remove("light-theme");
+          document.body.classList.remove("light-theme");
+        } else {
+          element.classList.add("light-theme");
+          document.body.classList.add("light-theme");
+        }
+        return true;
+      }
+      return false;
+    };
+
+    if (!applyThemeToElement()) {
+      setTimeout(() => applyThemeToElement(), 100);
+    }
+  }
+
+  closeFab() {
+    if (this.fab) {
+      this.fab.close();
+    }
   }
 
   getLeagueDetails = () => {
@@ -399,19 +445,19 @@ export class LeaguedetailsPage {
             this.removeMatch(match)
           }
         },
-        {
-          text: "Update Result",
-          handler: () => {
+        // {
+        //   text: "Update Result",
+        //   handler: () => {
 
-            //this.updateResult(match);
-            const todays_date = moment().format("YYYY-MM-DD hh:mm A");
-            // if (moment(this.match.MatchStartDate, "YYYY-MM-DD hh:mm A").isAfter(todays_date)) {
-            //   this.commonService.toastMessage("cannot publish future match", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-            //   return false;
-            // }
-            this.getActiveTeams(match);
-          }
-        }
+        //     //this.updateResult(match);
+        //     const todays_date = moment().format("YYYY-MM-DD hh:mm A");
+        //     // if (moment(this.match.MatchStartDate, "YYYY-MM-DD hh:mm A").isAfter(todays_date)) {
+        //     //   this.commonService.toastMessage("cannot publish future match", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+        //     //   return false;
+        //     // }
+        //     this.getActiveTeams(match);
+        //   }
+        // }
       ]
     });
     actionSheet.present();

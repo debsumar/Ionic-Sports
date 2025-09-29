@@ -6,11 +6,9 @@ import { Storage } from '@ionic/storage';
 import $ from "jquery";
 import {IonicPage } from 'ionic-angular';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
+import { AppType } from '../../../../shared/constants/module.constants';
 import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
-import { CommonRestApiDto } from '../../../../shared/model/common.model';
-import { AppType } from '../../../../shared/constants/module.constants';
-
 @IonicPage()
 @Component({
     selector: 'assignactivity-page',
@@ -46,42 +44,46 @@ export class AssignActivityPage {
     ClubName: any;
     activityName: any;
     postgre_parentclub_id:string = "";
-    constructor(public storage: Storage, 
-        public comonService: CommonService, 
-        public navParams: NavParams, public navCtrl: NavController, 
-        public sharedservice: SharedServices, public fb: FirebaseService,
-         public popoverCtrl: PopoverController,
-         private httpService:HttpService,) {
+    constructor(
+        public storage: Storage, 
+        public comonService: CommonService,
+        public navParams: NavParams,
+        public navCtrl: NavController,
+        public sharedservice: SharedServices, 
+        public fb: FirebaseService,
+        public popoverCtrl: PopoverController,
+        private httpService:HttpService,
+        ) {
       
-      this.themeType = sharedservice.getThemeType();
-    //   storage.get('userObj').then((val) => {
-    //     val = JSON.parse(val);
-    //     if(this.selectedVenue = this.navParams.get("venue")){
-    //         this.ClubName = this.selectedVenue.ClubName
-    //         this.update = true
-    //     }
-    //     this.selectedParentClub = val.UserInfo[0].ParentClubKey;  
-    //     this.fb.getAllWithQuery(`ParentClub/Type2/`,{orderByKey:true,equalTo:this.selectedParentClub}).subscribe((data)=>{
+        this.themeType = sharedservice.getThemeType();
+        //   storage.get('userObj').then((val) => {
+        //     val = JSON.parse(val);
+        //     if(this.selectedVenue = this.navParams.get("venue")){
+        //         this.ClubName = this.selectedVenue.ClubName
+        //         this.update = true
+        //     }
+        //     this.selectedParentClub = val.UserInfo[0].ParentClubKey;  
+        //     this.fb.getAllWithQuery(`ParentClub/Type2/`,{orderByKey:true,equalTo:this.selectedParentClub}).subscribe((data)=>{
+               
+        //         this.emailSetupObj.BACSPayment = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.CashPayment = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.CourtBooking = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.HolidaycampBookingPayment = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.HolidaycampQuery = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.MemberForSessionQuery = data[0].ParentClubAdminEmailID;    
+        //         this.emailSetupObj.MemberSessionEnrollment = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.MembertoCoach = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.RoomBooking = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.SchoolSessionBookingPayment = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.SchoolSessionQuery = data[0].ParentClubAdminEmailID;
+        //         this.emailSetupObj.SessionOnlinePayment = data[0].ParentClubAdminEmailID;
+        //     })
+        //     this.getClubList()
+        //     this.getAllActivity()
            
-    //         this.emailSetupObj.BACSPayment = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.CashPayment = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.CourtBooking = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.HolidaycampBookingPayment = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.HolidaycampQuery = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.MemberForSessionQuery = data[0].ParentClubAdminEmailID;    
-    //         this.emailSetupObj.MemberSessionEnrollment = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.MembertoCoach = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.RoomBooking = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.SchoolSessionBookingPayment = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.SchoolSessionQuery = data[0].ParentClubAdminEmailID;
-    //         this.emailSetupObj.SessionOnlinePayment = data[0].ParentClubAdminEmailID;
-    //     })
-    //     this.getClubList()
-    //     this.getAllActivity()
-       
-    //   }).catch(error => {
-    //   });
-        this.getStorageData();
+        //   }).catch(error => {
+        //   });
+            this.getStorageData();
     }
 
     async getStorageData(){
@@ -129,6 +131,7 @@ export class AssignActivityPage {
           this.allClub.forEach(club => {
               club['isSelect'] = false
           })
+          
         });
     }
 
@@ -152,7 +155,7 @@ export class AssignActivityPage {
             })
 
             
-        });
+          });
     }
 
     getAllActivity() {
@@ -252,15 +255,19 @@ export class AssignActivityPage {
 
        }
     
+   
+
    }
 
    Emailsetup(activityKey){
-    this.fb.getAll("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/ActivityEmailSetup/" +activityKey + "/").subscribe((data) => {
-        if(data.length == 0){
-            this.emailSetupObj.EmailSetupName = this.ClubName +" - "+ this.activityName
-            this.fb.saveReturningKey("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/ActivityEmailSetup/" + activityKey + "/", this.emailSetupObj);
-        }
-    })              
+      
+        this.fb.getAll("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/ActivityEmailSetup/" +activityKey + "/").subscribe((data) => {
+            if(data.length == 0){
+                this.emailSetupObj.EmailSetupName = this.ClubName +" - "+ this.activityName
+                this.fb.saveReturningKey("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/ActivityEmailSetup/" + activityKey + "/", this.emailSetupObj);
+            }
+        })
+   
    }
 
     assignActivityInPostgre() {
@@ -281,7 +288,7 @@ export class AssignActivityPage {
             console.table(assign_activity_payload);
             
             this.httpService.post(API.ASSIGN_CLUB_ACTIVITIES,assign_activity_payload).subscribe((res: any) => {
-              //this.navCtrl.pop();
+            //this.navCtrl.pop();
             },
             (error) => {
                 //this.commonService.hideLoader();
@@ -289,10 +296,9 @@ export class AssignActivityPage {
                 //this.comonService.toastMessage("Activity assign failed", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
             })
         }catch(err){
-          this.comonService.toastMessage(err.message, 2500,ToastMessageType.Error,ToastPlacement.Bottom);
+            this.comonService.toastMessage(err.message, 2500,ToastMessageType.Error,ToastPlacement.Bottom);
         }    
     }
-
     cancelVenue() {
         this.navCtrl.pop();
     }
@@ -300,15 +306,4 @@ export class AssignActivityPage {
     goToDashboardMenuPage() {
         this.navCtrl.setRoot("Dashboard");
     }
-}
-
-export class AssignClubActivityDto extends CommonRestApiDto {
-    paentclub_key: string;
-    club_key: string;
-    activities: string[];
-}
-
-export class AssignActivityDto {
-    activity_key: string;
-    postgre_activity_id?: string;
 }

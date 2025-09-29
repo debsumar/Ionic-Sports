@@ -39,19 +39,19 @@ export class Login {
   loading: any;
   isEmailOpen: boolean = false;
   isPasswordOpen: boolean = false;
-
-  sub: Subscription;
-  coach$Obs: Subscription;
-  subAdmin$Obs: Subscription;
-  Apadmin$Obs: Subscription;
-  constructor(public plt: Platform,
+  
+  sub:Subscription;
+  coach$Obs:Subscription;
+  subAdmin$Obs:Subscription;
+  Apadmin$Obs:Subscription;
+  constructor(public plt: Platform, 
     public commonService: CommonService,
     public loadingCtrl: LoadingController,
-    public menuCtrl: MenuController,
-    public toastCtrl: ToastController,
-    public events: Events, public navCtrl: NavController,
-    public fb: FirebaseService,
-    private httpService: HttpService,
+     public menuCtrl: MenuController, 
+     public toastCtrl: ToastController, 
+     public events: Events, public navCtrl: NavController,
+      public fb: FirebaseService, 
+      private httpService: HttpService,
     public sharedservice: SharedServices, public storage: Storage) {
     this.menuCtrl.swipeEnable(false);
     this.themeType = sharedservice.getThemeType();
@@ -63,18 +63,18 @@ export class Login {
   validateUserInputForLogin(): boolean {
     if (this.user.emailID == "") {
       let message = "Please enter email id";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
+      this.commonService.toastMessage(message, 2500,ToastMessageType.Error);
 
       return false;
     }
     else if (!this.validateEmail(this.user.emailID)) {
       let message = "Please enter correct email id";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
+      this.commonService.toastMessage(message, 2500,ToastMessageType.Error);
       return false;
     }
     else if (this.user.password == "") {
       let message = "Please enter password";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
+      this.commonService.toastMessage(message, 2500,ToastMessageType.Error);
       return false;
     }
 
@@ -86,7 +86,7 @@ export class Login {
   }
 
 
-
+  
 
   login() {
 
@@ -130,7 +130,7 @@ export class Login {
     //           this.navCtrl.setRoot("Dashboard");
     //           this.commonService.toastMessage("Logged in successfully...",1000,ToastMessageType.Success,ToastPlacement.Bottom);
     //         }
-
+           
     //       } else {
     //         let message = "Invalid User ID or Password";
     //         this.commonService.toastMessage(message,3000,ToastMessageType.Error,ToastPlacement.Bottom);
@@ -218,7 +218,7 @@ export class Login {
     //                 } 
     //               });
     //             }
-
+                
     //           })
     //         } 
     //       });
@@ -234,46 +234,46 @@ export class Login {
 
     const loading = this.loadingCtrl.create({ content: 'Please wait...' });
     loading.present();
-
+    
     this.user.emailID = this.user.emailID.trim().toLowerCase();
-
+    
     // Check Admin first
     this.sub = this.fb.getAllWithQuery("User/", { orderByChild: 'EmailID', equalTo: this.user.emailID })
       .subscribe(admin => {
         if (admin.length > 0 && this.user.password === admin[0].Password) {
-          loading.dismiss().catch(() => { });
-          this.handleLogin(admin[0], BookingMemberType.ADMIN, "admin");
-          this.getLoggedInUserInfo(admin[0].$key);
+          loading.dismiss().catch(() => {});
+          this.handleLogin(admin[0], BookingMemberType.ADMIN, "admin",admin[0].$key);
+          //this.getLoggedInUserInfo(admin[0].$key);
           return;
         }
-
+        
         // Check Coach
         this.coach$Obs = this.fb.getAllWithQuery("User/Coach/", { orderByChild: 'EmailID', equalTo: this.user.emailID })
           .subscribe(coach => {
-            if (coach.length > 0 && (coach[0].IsActive == undefined || coach[0].IsActive) &&
-              this.user.password === coach[0].Password) {
-              loading.dismiss().catch(() => { });
-              this.handleLogin(coach[0], BookingMemberType.COACH, "coach");
-              this.getLoggedInUserInfo(coach[0].$key);
+            if (coach.length > 0 && (coach[0].IsActive == undefined || coach[0].IsActive) && 
+                this.user.password === coach[0].Password) {
+              loading.dismiss().catch(() => {});
+              this.handleLogin(coach[0], BookingMemberType.COACH, "coach",coach[0].$key);
+              //this.getLoggedInUserInfo();
               return;
             }
-
+            
             // Check SubAdmin
             this.subAdmin$Obs = this.fb.getAllWithQuery("User/SubAdmin/", { orderByChild: 'EmailID', equalTo: this.user.emailID })
               .subscribe(subAdmin => {
-                if (subAdmin.length > 0 && this.user.password === subAdmin[0].Password &&
-                  (subAdmin[0].IsActive == undefined || subAdmin[0].IsActive)) {
-                  loading.dismiss().catch(() => { });
+                if (subAdmin.length > 0 && this.user.password === subAdmin[0].Password && 
+                    (subAdmin[0].IsActive == undefined || subAdmin[0].IsActive)) {
+                  loading.dismiss().catch(() => {});
                   subAdmin[0]["SignedUpUnder"] = 6;
-                  this.handleLogin(subAdmin[0], BookingMemberType.SUBADMIN, "subadmin");
-                  this.getLoggedInUserInfo(subAdmin[0].$key);
+                  this.handleLogin(subAdmin[0], BookingMemberType.SUBADMIN, "subadmin",subAdmin[0].$key);
+                  //this.getLoggedInUserInfo(subAdmin[0].$key);
                   return;
                 }
-
+                
                 // Check AppAdmin
                 this.Apadmin$Obs = this.fb.getAllWithQuery("User/APAdmin/", { orderByChild: 'EmailID', equalTo: this.user.emailID })
                   .subscribe(appAdmin => {
-                    loading.dismiss().catch(() => { });
+                    loading.dismiss().catch(() => {});
                     if (appAdmin.length > 0 && this.user.password === appAdmin[0].Password) {
                       this.storage.set('isAppAdminLogin', true);
                       this.sharedservice.setAdminStatus(true);
@@ -284,19 +284,19 @@ export class Login {
                       this.commonService.toastMessage("Invalid User ID or Password", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
                     }
                   }, error => {
-                    loading.dismiss().catch(() => { });
+                    loading.dismiss().catch(() => {});
                     this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
                   });
               }, error => {
-                loading.dismiss().catch(() => { });
+                loading.dismiss().catch(() => {});
                 this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
               });
           }, error => {
-            loading.dismiss().catch(() => { });
+            loading.dismiss().catch(() => {});
             this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
           });
       }, error => {
-        loading.dismiss().catch(() => { });
+        loading.dismiss().catch(() => {});
         this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
       });
 
@@ -304,52 +304,68 @@ export class Login {
   }
 
 
-  private handleLogin(userData: any, memberType: any, userType: string) {
-    const userinfo = this.commonService.convertFbObjectToArray(userData.UserInfo);
-    userData.UserInfo = userinfo;
-
-    this.storage.set('isLogin', true);
-    this.storage.set('LoginWhen', 'first');
-    this.storage.set('userObj', JSON.stringify(userData));
-    this.storage.set('memberType', memberType);
-    this.storage.set('UserKey', JSON.stringify(userData.$key));
-
-    this.sharedservice.setLoggedInType(memberType);
-    this.sharedservice.setUserData(userData);
-    this.events.publish('user:loginsuccessfully', userData, Date.now());
-
-    if (this.sharedservice.getDeviceToken()) {
-      this.checkAndStoreDeviceToken(this.sharedservice.getDeviceToken(), userinfo[0], userType);
-    }
-
-    if (this.themeType === 2) {
-      this.navCtrl.setRoot("Dashboard");
-      this.commonService.toastMessage("Logged in successfully...", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-    }
-  }
-
-
-  getLoggedInUserInfo(firebase_loggedinkey: string) {
-    this.httpService.get<{ message: string, data: ParentClubUserResponseDto }>(`${API.GET_PARENTCLUB_USER_BY_FIREBASEID}/${firebase_loggedinkey}`)
-      .subscribe({
-        next: (res) => {
-          this.storage.set('loggedin_user', JSON.stringify(res.data));
-        },
-        error: (err) => {
-          console.error("Error fetching events:", err);
-          if (err && err.error && err.error.message) {
-            this.commonService.toastMessage(err.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-          } else {
-            this.commonService.toastMessage("Failed to fetch loggedin user details", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-          }
-        }
-      });
-  }
+  private handleLogin(userData: any, memberType: any, userType: string, firebase_loggedinkey:string) {
+    this.httpService.get<{message: string,data: ParentClubUserResponseDto}>(`${API.GET_PARENTCLUB_USER_BY_FIREBASEID}/${firebase_loggedinkey}`)
+        .subscribe({
+            next: (res) => {
+                const userinfo = this.commonService.convertFbObjectToArray(userData.UserInfo);
+                userData.UserInfo = userinfo;
+                
+                this.storage.set('isLogin', true);
+                this.storage.set('LoginWhen', 'first');
+                this.storage.set('userObj', JSON.stringify(userData));
+                this.storage.set('memberType', memberType);
+                this.storage.set('UserKey', JSON.stringify(userData.$key));
+                
+                this.sharedservice.setLoggedInType(memberType);
+                this.sharedservice.setUserData(userData);
+                this.events.publish('user:loginsuccessfully', userData, Date.now());
+                
+                if (this.sharedservice.getDeviceToken()) {
+                  this.checkAndStoreDeviceToken(this.sharedservice.getDeviceToken(), userinfo[0], userType);
+                }
+                
+                if (this.themeType === 2) {
+                  this.navCtrl.setRoot("Dashboard");
+                  this.commonService.toastMessage("Logged in successfully...", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+                }
+               this.storage.set('loggedin_user', JSON.stringify(res.data));
+            },
+            error: (err) => {
+              console.error("Error fetching events:", err);
+              if(err && err.error && err.error.message){
+                this.commonService.toastMessage(err.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+              }else{
+                this.commonService.toastMessage("Failed to fetch loggedin user details", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+              }
+            }
+    });
 
 
+  }        
 
 
-  checkDeviceToken() { }
+  // getLoggedInUserInfo(firebase_loggedinkey:string){
+  //   this.httpService.get<{message: string,data: ParentClubUserResponseDto}>(`${API.GET_PARENTCLUB_USER_BY_FIREBASEID}/${firebase_loggedinkey}`)
+  //       .subscribe({
+  //           next: (res) => {
+  //              this.storage.set('loggedin_user', JSON.stringify(res.data));
+  //           },
+  //           error: (err) => {
+  //             console.error("Error fetching events:", err);
+  //             if(err && err.error && err.error.message){
+  //               this.commonService.toastMessage(err.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+  //             }else{
+  //               this.commonService.toastMessage("Failed to fetch loggedin user details", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+  //             }
+  //           }
+  //   });
+  // }
+  
+
+
+
+  checkDeviceToken() {}
 
   checkAndStoreDeviceToken(token, userData, type) {
     if (this.sharedservice.getOnesignalPlayerId()) {
@@ -363,23 +379,23 @@ export class Login {
   }
 
 
-  goToContactUs() {
+  goToContactUs(){
     this.navCtrl.push('LoginContactUs')
   }
 
 
   ionViewWillLeave() { //unsbscribe all subscription to avoid all unnecessary data leaks
     //The Subscription object also has a closed property that one can use to check if the stream was already unsubscribed (completed or had an error).
-    if (this.sub && !this.sub.closed) {
+    if(this.sub && !this.sub.closed){
       this.sub.unsubscribe();
     }
-    if (this.subAdmin$Obs && !this.subAdmin$Obs.closed) {
+    if(this.subAdmin$Obs && !this.subAdmin$Obs.closed){
       this.subAdmin$Obs.unsubscribe();
     }
-    if (this.coach$Obs && !this.coach$Obs.closed) {
+    if(this.coach$Obs && !this.coach$Obs.closed){
       this.coach$Obs.unsubscribe();
     }
-    if (this.Apadmin$Obs && !this.Apadmin$Obs.closed) {
+    if(this.Apadmin$Obs && !this.Apadmin$Obs.closed){
       this.Apadmin$Obs.unsubscribe();
     }
   }

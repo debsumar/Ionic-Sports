@@ -1,41 +1,57 @@
 <ion-content class="modern-ladder">
-  <div style="width: 100%; height: 100%">
-    <!-- Modern Tab Selector -->
-    <div class="modern-tab-selector">
-      <button class="modern-tab" [class.active]="isPoints=='Points'" (click)="isPoints='Points'">
-        <div class="tab-icon-wrapper">
-          <ion-icon name="trophy"></ion-icon>
+<div style="width: 100%; height: 100%">
+  <!-- Modern Tab Selector -->
+  <div class="modern-tab-selector">
+    <button class="modern-tab" [class.active]="isPoints=='Points'" (click)="isPoints='Points'">
+      <div class="tab-icon-wrapper">
+        <ion-icon name="trophy"></ion-icon>
+      </div>
+      <span>Points</span>
+    </button>
+    <button class="modern-tab" [class.active]="isPoints=='HeadtoHead'" (click)="isPoints='HeadtoHead'; callheadtohead()">
+      <div class="tab-icon-wrapper">
+        <ion-icon name="people"></ion-icon>
+      </div>
+      <span>Head-to-Head</span>
+    </button>
+  </div>
+  <div>
+
+    <!-- Modern Dropdown Card -->
+    <div class="modern-dropdown-card" *ngIf="isPoints == 'Points'">
+      <div class="dropdown-header">
+        <div class="dropdown-icon">
+          <ion-icon name="funnel"></ion-icon>
         </div>
-        <span>Points</span>
-      </button>
-      <button class="modern-tab" [class.active]="isPoints=='HeadtoHead'"
-        (click)="isPoints='HeadtoHead'; callheadtohead()">
-        <div class="tab-icon-wrapper">
-          <ion-icon name="people"></ion-icon>
+        <span class="dropdown-label">Age Category</span>
+      </div>
+      <div class="dropdown-wrapper">
+        <ion-select class="modern-select" [(ngModel)]="selectedcat" (ionChange)="getLadderList()" interface="popover">
+          <ion-option *ngFor="let cat of ageCategories" value={{cat.Id}}>{{cat.CategoryName}} ({{cat.AgeFrom}} - {{cat.AgeTo}})</ion-option>
+        </ion-select>
+        <div class="dropdown-arrow">
+          <ion-icon name="chevron-down"></ion-icon>
         </div>
-        <span>Head-to-Head</span>
-      </button>
+      </div>
     </div>
-    <div>
 
-      <ion-row *ngIf="isPoints == 'Points'">
-        <ion-col class="dropdownrow" col-12 text-left>
-          <ion-select [(ngModel)]="selectedcat" (ionChange)="getLadderList()">
-            <ion-label>Age Category</ion-label>
-            <ion-option *ngFor="let cat of ageCategories" value={{cat.Id}}>{{cat.CategoryName}}({{cat.AgeFrom}} -
-              {{cat.AgeTo}})</ion-option>
-          </ion-select>
-        </ion-col>
-      </ion-row>
-
-      <!-- Modern Search Card -->
-      <!-- <div class="modern-search-card"> -->
-      <ion-searchbar class="sleek-searchbar" placeholder="Search by Rank, Name..." [(ngModel)]="searchInput"
-        (ionInput)="getFilterItems($event)" autocorrect="off" showCancelButton="focus"></ion-searchbar>
-      <!-- </div> -->
-
+    <!-- Modern Search Card -->
+    <div class="modern-search-card">
+      <div class="search-header">
+        <div class="search-icon">
+          <ion-icon name="search"></ion-icon>
+        </div>
+        <span class="search-label">Search Players</span>
+      </div>
+      <div class="search-wrapper">
+        <ion-searchbar class="sleek-searchbar" placeholder="Search by rank, name..."
+          [(ngModel)]="searchInput" (ionInput)="getFilterItems($event)" autocorrect="off"
+          showCancelButton="never"></ion-searchbar>
+      </div>
     </div>
-    <!-- <div>
+
+  </div>
+  <!-- <div>
     <ion-card>
       <ion-card-content>
         <ion-row>
@@ -52,23 +68,29 @@
         <ion-row>
           <ion-col style="padding-left: 0px; padding-right: 0px">
             <ion-item class="item" *ngFor="let ladder of filteredLadder">
-              <p item-left style="
+              <p
+                item-left
+                style="
                   color: #4b6051;
                   font-weight: 900 !important;
                   font-size: 18px;
                   padding-right: 10px;
-                ">
+                "
+              >
                 {{ladder.rank}}
               </p>
               <p class="name" style="text-transform: capitalize">
                 {{ladder.FirstName}} {{ladder.LastName}}
               </p>
-              <p item-right style="
+              <p
+                item-right
+                style="
                   color: #2292bb;
                   font-size: 18px;
                   padding-left: 20px;
                   padding-right: 10px;
-                ">
+                "
+              >
                 {{ladder.Points}}
               </p>
             </ion-item>
@@ -79,12 +101,15 @@
         <ion-row>
           <ion-col style="padding-left: 0px; padding-right: 0px">
             <ion-item class="item" *ngFor="let ladder of filteredLadderHead">
-              <p item-left style="
+              <p
+                item-left
+                style="
                   color: #4b6051;
                   font-weight: 900 !important;
                   font-size: 18px;
                   padding-right: 10px;
-                ">
+                "
+              >
                 {{ladder.rank}}
               </p>
               <p class="name" style="text-transform: capitalize">
@@ -106,8 +131,8 @@
         </ion-row>
       </div>
     </div>
+   
+     
 
-
-
-  </div>
+</div>
 </ion-content>

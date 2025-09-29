@@ -29,7 +29,6 @@
           <ion-row *ngIf="activeTournament.length > 0">
             <ion-col col-12 style="padding-left: 10px" *ngFor="let tournament of activeTournament">
               <div class="all border-left-style"></div>
-
               <ion-card class="ion-card" (click)="goToDetails(tournament.$key)">
                 <ion-card-header class="Location-head">
                   <ion-row>
@@ -179,7 +178,7 @@
       <!-- <page-leagueteamlisting></page-leagueteamlisting> -->
     </ion-col>
   </ion-row>
-  <ion-fab right bottom style="padding-bottom: 50px" *ngIf="selectedFooterIndex == 0">
+  <ion-fab right bottom style="padding-bottom: 80px !important" *ngIf="selectedFooterIndex == 0">
     <button ion-fab mini style="background-color: #2b92bb !important; color: white !important"
       (click)="createTournament()" style="background-color: #2b92bb !important; color: white !important">
       <ion-icon name="add"></ion-icon>
@@ -209,37 +208,33 @@
   (click)="gotoCreateMatch()" style="background-color:#2b92bb !important; color: white !important">
   <ion-icon name="add"></ion-icon>
 </button>
-<div class="footer_div">
-  <ion-row>
-    <ion-col [class.selected]="selectedFooterIndex==4" (click)="selectedTab(4)">
-      <ion-icon name="trophy"></ion-icon>
-      <p>Competition</p>
-    </ion-col>
-    <!-- <ion-col [class.selected]="selectedFooterIndex==0" (click)="selectedTab(0)">
+
+
+
+
+<ion-footer>
+  <div class="footer_div">
+    <ion-row>
+      <ion-col [class.selected]="selectedFooterIndex==4" (click)="selectedTab(4)">
+        <ion-icon name="trophy"></ion-icon>
+        <p>Competition</p>
+      </ion-col>
+      <!-- <ion-col [class.selected]="selectedFooterIndex==0" (click)="selectedTab(0)">
       <ion-icon name="trophy"></ion-icon>
       <p>Tournament</p>
     </ion-col> -->
-    <ion-col [class.selected]="selectedFooterIndex==1" (click)="selectedTab(1)">
-      <img style="padding-top: 10px" src="assets/icon/match.svg" class="home_btn" />
-      <p>Match</p>
-    </ion-col>
-    <ion-col [class.selected]="selectedFooterIndex==2" (click)="selectedTab(2)">
-      <ion-icon name="stats"></ion-icon>
-      <p>Ladder</p>
-    </ion-col>
-    <ion-col [class.selected]="selectedFooterIndex==3" (click)="selectedTab(3)">
-      <ion-icon name="timer"></ion-icon>
-      <p>History</p>
-    </ion-col>
-  </ion-row>
-  <!-- <ion-row>
-    <ion-col *ngFor="let menu of Tabmenu;let i=index;">
-      <ion-icon
-        *ngIf="menu.Icon!=''"
-        [name]="menu.Icon"
-        [class.selected]="menu.IsSelect"
-      ></ion-icon>
-      <p [class.colorselected]="menu.IsSelect">{{menu.DisplayName}}</p>
-    </ion-col>
-  </ion-row> -->
-</div>
+      <ion-col [class.selected]="selectedFooterIndex==1" (click)="selectedTab(1)">
+        <img style="padding-top: 10px" src="assets/icon/match.svg" class="home_btn" />
+        <p>Match</p>
+      </ion-col>
+      <ion-col [class.selected]="selectedFooterIndex==2" (click)="selectedTab(2)">
+        <ion-icon name="stats"></ion-icon>
+        <p>Ladder</p>
+      </ion-col>
+      <ion-col [class.selected]="selectedFooterIndex==3" (click)="selectedTab(3)">
+        <ion-icon name="timer"></ion-icon>
+        <p>History</p>
+      </ion-col>
+    </ion-row>
+  </div>
+</ion-footer>

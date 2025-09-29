@@ -1,75 +1,73 @@
-import { IActivityDetails } from "../../../../shared/model/activity.model";
-import { ICoachDetails } from "../../../../shared/model/coach.model";
-// import { MembershipSetupList } from "../../membership/dto/membershi.dto";
+import { MembershipSetupList } from "../../membership/dto/membershi.dto";
 
 //@InputType
-export class VenueUsersInput {
-  parentclubkey: string;
-  clubkey: string;
-  searchterm: string;
-  limit: number;
-  offset: number;
+export class VenueUsersInput{
+    parentclubkey:string;
+    clubkey:string;
+    searchterm:string;
+    limit:number;
+    offset:number;
 }
 
-export class UsersListInput {//this one is new for new nextgen backend
-  parentclub_id: string;
-  club_id: string;
-  search_term?: string;
-  limit?: number;
-  offset?: number;
-  member_type?: number
-  action_type?: number
+export class UsersListInput{//this one is new for new nextgen backend
+  parentclub_id:string;
+  club_id:string;
+  search_term?:string;
+  limit?:number;
+  offset?:number;
+  member_type?:number
+  action_type?:number
 }
-
-//@ObjectType()
-export class VenueUsers {
-  venue_users: VenueUser[];
-  total_users: number;
-}
-
-export class VenueUser {
-  Id: string;
-  parent_firstname: string;
-  parent_lastname: string;
-  DOB: string;
-  clubkey: string;
-  parentFirebaseKey: string;
-  email: string;
-  phone_number: string;
-  childcount: number;
-  is_enable: boolean;
-  is_coach: boolean;
-  handicap: number;
-  is_gold_member: boolean;
-  allow_court_booking: boolean;
-  membership_Id: string;
-  vehicleRegNo1: string;
-  vehicleRegNo2: string;
-  Gender: string;
-  medical_condition: string;
-  parent_status: boolean;
-  media_consent: boolean;
-  SignUpUnder?: number;
-  SignedUpType?: number;
-}
-
-//@ObjectType()
-export class Club {
-  Id: string;
-  City: string;
-  ClubContactName: string;
-  ClubName: string;
-  ClubShortName: string;
-  CountryName: string;
-  PostCode: string;
-  ContactPhone: string;
-  ClubDescription: string;
-  sequence: number;
-  FirebaseId: string;
-}
-//@ObjectType()
-export class FamilyMember {
-  Id: string
+  
+  //@ObjectType()
+  export class VenueUsers {
+    venue_users: VenueUser[];
+    total_users:number;
+  }
+  
+  export class VenueUser  {
+    Id: string;
+    parent_firstname: string;
+    parent_lastname: string;
+    DOB: string;
+    clubkey: string;
+    parentFirebaseKey: string;
+    email: string;
+    phone_number:string;
+    childcount: number;
+    is_enable: boolean;
+    is_coach: boolean;
+    handicap: number;
+    is_gold_member: boolean;
+    allow_court_booking: boolean;
+    membership_Id: string;
+    vehicleRegNo1: string;
+    vehicleRegNo2: string;
+    Gender: string;
+    medical_condition: string;
+    parent_status:boolean; 
+    media_consent:boolean;
+    SignUpUnder?: number;
+    SignedUpType?: number;
+  }
+  
+  //@ObjectType()
+  export class Club  {
+    Id: string;
+    City: string;
+    ClubContactName: string;
+    ClubName: string;
+    ClubShortName: string;
+    CountryName: string;
+    PostCode: string;
+    ContactPhone:string;
+    ClubDescription:string;
+    sequence:number;
+    FirebaseId: string;
+  }
+  //@ObjectType()
+export class FamilyMember  {
+  Id:string
   FirstName: string;
   LastName: string;
   EmailID: string;
@@ -89,53 +87,53 @@ export class FamilyMember {
   PromoEmailAllowed: boolean;
   MediaConsent: boolean;
   SpecialNeeds: boolean;
-  SpecialNeedsDesc: string;
+  SpecialNeedsDesc:string;
   ChildSchoolMeals: boolean;
   ChildSchool: string;
   IncludeInLeaderBoard: boolean;
   Handicap: number;
-  SetupName?: string
-  CurrentPayment?: string;
-  Validity?: string;
-  IsSelect?: boolean
+  SetupName?:string
+  CurrentPayment?:string;
+  Validity?:string;
+  IsSelect?:boolean
 }
-export class FamilyMemberInput {
-  ParentClubKey: string;
-  MemberKey: string;
-  AppType: number;
-  DeviceType: number; //Which app {1:Android,2:IOS,3:Web,4:API}
-  ActionType: number //to get from postgre
+export class FamilyMemberInput{
+  ParentClubKey:string;
+  MemberKey:string;
+  AppType:number;
+  DeviceType:number; //Which app {1:Android,2:IOS,3:Web,4:API}
+  ActionType:number //to get from postgre
 }
 
 
-export class AddMemberDTO {
-  ParentClubId: string;
-  MemberType: number; //to know member,holidaycamp or schoolmember
-  VenueId: string;
-  FirstName: string;
-  LastName: string;
-  MiddleName: string;
-  DOB: string;
-  Email: string;
-  Password: string;
-  Phone: string;
-  Gender: string;
-  Emergency_Contact_Name: string;
-  Emergency_Contact_Number: string;
-  Medical_Condition: string;
-
+export class AddMemberDTO{
+  ParentClubId:string;
+  MemberType:number; //to know member,holidaycamp or schoolmember
+  VenueId:string;
+  FirstName:string;
+  LastName:string;
+  MiddleName:string;
+  DOB:string;
+  Email:string;
+  Password:string;
+  Phone:string;
+  Gender:string;
+  Emergency_Contact_Name:string;
+  Emergency_Contact_Number:string;
+  Medical_Condition:string;
+  
   // @Field(type => String,{ nullable: false })
   // Referral:string;
-  Source: string; //ask can we store
-  IsAcceptedTermsAndConditions: boolean;
-  IsEnable: boolean; // to know mwmber or non-member
-  IsChild: boolean;
-  PromoEmailAllowed: boolean;
-  NotificationEmailAllowed: boolean;
-  IsTakenConcentForm: boolean;
-  parent_id: string; //while reg family member
-  vehicle_reg_no1: string; // required while profile update
-  vehicle_reg_no2: string; // required while profile update
+  Source:string; //ask can we store
+  IsAcceptedTermsAndConditions:boolean;
+  IsEnable:boolean; // to know mwmber or non-member
+  IsChild:boolean;
+  PromoEmailAllowed:boolean;
+  NotificationEmailAllowed:boolean;
+  IsTakenConcentForm:boolean;
+  parent_id:string; //while reg family member
+  vehicle_reg_no1:string; // required while profile update
+  vehicle_reg_no2:string; // required while profile update
 
   // @Field(type => Int,{ nullable: true })
   // KidsLoginFlag:number; //can be used when family_member registers
@@ -145,12 +143,12 @@ export class AddMemberDTO {
 
   // @Field(type => String,{ nullable: true })
   // MembershipID:string; // required while profile update
-  is_childspl_needs: boolean;
-  childspl_needs_desc: string;
-  child_schoolmeals_paid: boolean;
-  child_school: string;
-  is_includein_leaderboard: boolean;
-  is_child_had_disability: boolean;
+  is_childspl_needs:boolean;
+  childspl_needs_desc:string;
+  child_schoolmeals_paid:boolean;
+  child_school:string;
+  is_includein_leaderboard:boolean;
+  is_child_had_disability:boolean;
 
   // @Field({ nullable: true})
   // allow_court_booking:boolean;
@@ -160,7 +158,7 @@ export class AddMemberDTO {
 
   // @Field({ nullable: true})
   // is_gold_member:boolean; //requires from admin profile update
-  SignedUpType: number;
+  SignedUpType:number;
 }
 
 
@@ -223,7 +221,7 @@ export class MemberShips {
 }
 
 export class MemberShipData {
-  membership_name: string;
+  membership_name:string;
   id: string
   monthly: boolean
   yearly: boolean
@@ -232,33 +230,15 @@ export class MemberShipData {
   plan: Plan
   membership_package: MembershipPackage
   enrolled_members: EnrolledMember[]
-  membership_setup?: MembershipSetupList;
-}
-
-/////////////////////////////////////////////////////////////////////////////
-
-
-export class MembershipSetupList {
-  id: string;
-  is_active: boolean;
-  setup_type: number;
-  start_date: Date;
-  end_date: Date;
-  admin_fees: string;
-  apply_admin_fees_on_renewal: boolean;
-  membership_disclaimer?: string;
-  add_card: boolean;
-  allow_cash: boolean;
-  allow_bacs: boolean;
-  allow_online: boolean;
+  membership_setup?:MembershipSetupList;
 }
 
 
 export class MembershipPackage {
   id: string;
-  subscription_status: number;
-  membership_expiry_date: string;
-  latest_payment_date: string
+  subscription_status:number;
+  membership_expiry_date:string;
+  latest_payment_date:string
 }
 
 export class Plan {
@@ -307,7 +287,7 @@ export interface MemberShipInput {
   device_id: string;
   updated_by: string;
   membership_id: string;
-  membership_package_id?: string
+  membership_package_id?:string
 
 }
 
@@ -368,7 +348,7 @@ export class BookingDetails {
     total_membership_amount: string,
     total_membership_amount_currency: string,
     discounts: [],
-    one_time_discount_fee: string;
+    one_time_discount_fee:string;
     discount_amount: string,
     discount_amount_currency: string,
     total_discount_amount_currency: string,
@@ -406,46 +386,5 @@ export class FamilyMemberModel {
   FirstName: string
   LastName: string
   member_enrolled: false
-  IsSelect?: boolean
-}
-
-
-export interface SchoolSessions {
-  id: string
-  enrolled_count: number
-  school_session_name: string
-  start_date: string
-  end_date: string
-  start_time: string
-  end_time: string
-  duration: string
-  days: string
-  group_size: number
-  member_fee: string
-  non_member_fee: string
-  capacity_left: number
-  comments: string
-  activity_category_name: string
-  activity_subcategory_name: string
-  coach_names: string;
-  ActivityDetails: IActivityDetails;
-  ClubDetails: {
-    Id: string
-    FirebaseId: string
-    ClubName: string
-  }
-  Images: {
-    id: string
-    image_url: string
-  }
-  CoachDetails: ICoachDetails[],
-  ParentClubSchool: {
-    parentclub: {
-      Id: string
-    }
-    school: {
-      id: string
-      school_name: string
-    }
-  }
+  IsSelect?:boolean
 }

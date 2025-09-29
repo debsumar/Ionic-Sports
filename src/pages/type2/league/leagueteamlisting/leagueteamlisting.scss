@@ -2,9 +2,27 @@ page-leagueteamlisting {
   .scroll-content {
     padding: 0 !important;
   }
+  
+  // Sticky header and scrollable content
+  .sticky-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: #0f172a;
+  }
+  
+  .scrollable-content {
+    margin-top: 120px;
+    padding: 0 4px 20px 4px;
+  }
 
   // Light Theme Styles
   &.light-theme {
+    .sticky-header {
+      background: #f8fafc !important;
+    }
     .modern-competition {
       background: #f8fafc;
       min-height: 100vh;
@@ -27,32 +45,30 @@ page-leagueteamlisting {
       }
     }
 
-    .sleek-searchbar {
-      background: transparent;
-      border-radius: 8px;
+    .modern-search-card {
+      .sleek-searchbar {
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 
-      .searchbar-input {
-        border-radius: 8px;
-        background: #e2e8f0;
-        border: none;
-        color: #1e293b;
-        padding: 8px 12px 8px 32px;
-        font-size: 14px;
+        .searchbar-input {
+          color: #1e293b;
+          padding: 8px 12px 8px 32px;
 
-        &::placeholder {
-          color: #64748b;
+          &::placeholder {
+            color: #64748b;
+          }
         }
-      }
 
-      .searchbar-search-icon {
-        color: #64748b;
-        left: 8px;
-        font-size: 16px;
-      }
+        .searchbar-search-icon {
+          color: #64748b;
+          left: 8px;
+        }
 
-      .searchbar-clear-icon {
-        color: #64748b;
-        right: 8px;
+        .searchbar-clear-icon {
+          color: #64748b;
+          right: 8px;
+        }
       }
     }
 
@@ -182,37 +198,40 @@ page-leagueteamlisting {
   }
 
   .tab-content {
-    padding: 0 4px 20px 4px;
+    padding: 0;
   }
 
-  .sleek-searchbar {
-    background: transparent;
-    border-radius: 8px;
-    // margin: 8px;
-    margin-bottom: 4px;
+  .modern-search-card {
+    margin-bottom: 12px;
 
-    .searchbar-input {
+    .sleek-searchbar {
+      background: #1e293b;
+      border: 1px solid #334155;
       border-radius: 8px;
-      background: #334155;
-      border: none;
-      color: #f1f5f9;
-      padding: 8px 12px 8px 32px;
-      font-size: 14px;
+      margin: 0;
 
-      &::placeholder {
-        color: #94a3b8;
+      .searchbar-input {
+        background: transparent;
+        border: none;
+        color: #f1f5f9;
+        padding: 8px 12px 8px 32px;
+        font-size: 14px;
+
+        &::placeholder {
+          color: #94a3b8;
+        }
       }
-    }
 
-    .searchbar-search-icon {
-      color: #94a3b8;
-      left: 8px;
-      font-size: 16px;
-    }
+      .searchbar-search-icon {
+        color: #94a3b8;
+        left: 8px;
+        font-size: 16px;
+      }
 
-    .searchbar-clear-icon {
-      color: #94a3b8;
-      right: 8px;
+      .searchbar-clear-icon {
+        color: #94a3b8;
+        right: 8px;
+      }
     }
   }
 

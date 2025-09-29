@@ -2,9 +2,14 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
 import { FirebaseService } from '../../../../services/firebase.service';
 import { Storage } from '@ionic/storage';
-import { CommonService } from '../../../../services/common.service';
+import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import * as $ from 'jquery';
 import { InAppBrowser } from '@ionic-native/in-app-browser';
+import { AppType } from '../../../../shared/constants/module.constants';
+import { HttpService } from '../../../../services/http.service';
+import { SharedServices } from '../../../services/sharedservice';
+import { API } from '../../../../shared/constants/api_constants';
+import { ParentclubStripeAccounts } from '../stripeconnectsetuplist/stripeconnectsetuplist';
 
 /**
  * Generated class for the CreatestripeconnectsetupPage page.
@@ -17,9 +22,12 @@ import { InAppBrowser } from '@ionic-native/in-app-browser';
 @Component({
   selector: 'page-createstripeconnectsetup',
   templateUrl: 'createstripeconnectsetup.html',
+  providers:[HttpService]
 })
 export class CreatestripeconnectsetupPage {
-  instructions_arry:Array<any>=[
+  show_selection_view:boolean = true;
+  selected_account_id:string = "";
+  instructions_arry:Array<{text:string}> = [
     {text:"Select Venue(s) and Activity(ies)"},
     {text:"Enter a name for future reference"},
     {text:"Click on the Link Stripe Account"},
@@ -28,9 +36,10 @@ export class CreatestripeconnectsetupPage {
     {text:"Once done successfully your Stripe account is ready for accepting payment for the selected venue(s) and activity(ies)"}
   ];
   setupDetails:any;
+  setup_type:number = 2;
   setupSet: Set<any> = new Set();
   allClub: Array<any>;
-  parentClubKey: any;
+  parentClubKey: string;
   isSelectAll: boolean = false;
   previousParams: any = '';
   activityList: any = [];
@@ -39,19 +48,30 @@ export class CreatestripeconnectsetupPage {
   height: number = 80.8;
   widthofact=0;
   stripeConfigDetails:any = {};
+  state_key:string;
+  uniqueStripeAccounts:ParentclubStripeAccounts[] = [];
   setupObj = {
     setupType:'',
     name:'',
     parentclubKey: '',
     data:[]
   }
-  constructor(private toastCtrl:ToastController,private iab: InAppBrowser,public navCtrl: NavController, public comonService: CommonService, storage: Storage, public fb: FirebaseService, public navParams: NavParams) {
+  constructor(private iab: InAppBrowser,
+    public navCtrl: NavController, 
+    public comonService: CommonService, storage: Storage,
+     public fb: FirebaseService, public navParams: NavParams,
+     public sharedservice: SharedServices,
+     private httpService:HttpService,) {
     this.setupDetails = this.navParams.get('setupDetails')
+    this.setup_type = +this.navParams.get('setup_type');
     storage.get('userObj').then((val) => {
       val = JSON.parse(val);
       for (let club of val.UserInfo)
         if (val.$key != "") {
           this.parentClubKey = club.ParentClubKey;
+          if(this.setup_type === 2){
+            this.getParentClubUniqueStripeAccounts();
+          }
           this.getClubList()
           this.getStripeConfig();
         }
@@ -60,7 +80,6 @@ export class CreatestripeconnectsetupPage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad CreatestripeconnectsetupPage');
-
   }
 
   selectActivity(club, activity) {
@@ -69,10 +88,9 @@ export class CreatestripeconnectsetupPage {
         club.isSelect = !club.isSelect
       }
     });
-
   }
-  selectVenue(event) {
 
+  selectVenue(event) {
     if (this.previousParams == 'All' && event != 'All') {
       this.isSelectAll = false
       this.allClub.forEach(club => {
@@ -90,7 +108,6 @@ export class CreatestripeconnectsetupPage {
         } else {
           club.isSelect = false;
         }
-
       });
 
     } else {
@@ -113,6 +130,7 @@ export class CreatestripeconnectsetupPage {
     this.getActivity(event.$key)
 
   }
+
   getStripeConfig(){
     this.fb.getAllWithQuery('ActivityPro',{orderByKey:true,equalTo:"StripeConfigDetails"}).subscribe((data)=>{
       this.stripeConfigDetails = data[0];
@@ -127,7 +145,6 @@ export class CreatestripeconnectsetupPage {
         this.activityList.forEach(activity => {
           activity['ClubKey'] = clubkey
           activity['isSelect'] = false
-
         });
         this.allClub.forEach(venue => {
           if (venue.$key == clubkey) {
@@ -144,6 +161,34 @@ export class CreatestripeconnectsetupPage {
     })
 
   }
+
+  getParentClubUniqueStripeAccounts(){
+      const stripeacc_payload = {
+        parentclubId:this.parentClubKey,
+        app_type:AppType.ADMIN_NEW,
+        device_id:this.sharedservice.getDeviceId(),
+        device_type:this.sharedservice.getPlatform() == "android" ? 1:2,
+        action_type:1,
+        //module:this.setupDetails.type,
+        //account_type:ParentclubAccountType.SESSION_MANAGEMENT
+      }
+      this.httpService.post(API.GET_PARENTCLUB_STRIPES,stripeacc_payload).subscribe((res: any) => {
+        console.table(res.data);
+        this.uniqueStripeAccounts = res.data as ParentclubStripeAccounts[];
+        if(this.uniqueStripeAccounts.length > 0) this.selected_account_id = this.uniqueStripeAccounts[0].setup_id;
+      },
+     (ex) => {
+          //this.commonService.hideLoader();
+          console.error("Error in fetching:", ex);
+          if(ex.error && ex.error.message){
+            this.comonService.toastMessage(ex.error.message, 2500,ToastMessageType.Error,ToastPlacement.Bottom);
+          }else{
+            this.comonService.toastMessage("failed to fetch stripe account(s) list", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          }
+         // Handle the error here, you can display an error message or take appropriate action.
+     }) 
+  }
+  
 
   divCalculate() {
     this.height = 80.8;
@@ -187,14 +232,8 @@ export class CreatestripeconnectsetupPage {
       this.setupSet.add(setup);
     }
   }
-  showToast(message) {
-    let toast = this.toastCtrl.create({
-      message: message,
-      duration: 3000
-    });
-    toast.present();
-  }
-  addSetup(){
+  
+  async addSetup(){
     this.setupObj.parentclubKey = this.parentClubKey;
     this.setupObj.setupType = this.setupDetails.SetupName;
     let reqObj = [];
@@ -230,31 +269,66 @@ export class CreatestripeconnectsetupPage {
     this.setupObj.data = reqObj;
     if(this.setupObj.name != "" && this.setupObj.name){ 
       if(reqObj.length > 0){
-      // this.stripeConfigDetails.ClientId = "ca_FmNovlkp34sE0FGQ2jQe68tbkywu8kBi";
-        const stateKey = this.fb.saveReturningKey('StripeConnectAccountStates',{data:JSON.stringify(this.setupObj)});
-        const browser = this.iab.create(`${this.stripeConfigDetails.AuthURL}&scope=read_write&client_id=${this.stripeConfigDetails.ClientId}&state=${stateKey}`,'_blank');
-        browser.on('exit').subscribe(() => {
-         this.navCtrl.pop();
-      }, err => {
-        this.navCtrl.pop();
-      });
+        this.state_key = await this.fb.saveReturningKey('StripeConnectAccountStates',{data:JSON.stringify(this.setupObj)});
+        if(this.setup_type === 1){
+          // this.stripeConfigDetails.ClientId = "ca_FmNovlkp34sE0FGQ2jQe68tbkywu8kBi";
+            //const stateKey = this.fb.saveReturningKey('StripeConnectAccountStates',{data:JSON.stringify(this.setupObj)});
+            const browser = this.iab.create(`${this.stripeConfigDetails.AuthURL}&scope=read_write&client_id=${this.stripeConfigDetails.ClientId}&state=${this.state_key}`,'_blank');
+            browser.on('exit').subscribe(() => {
+            this.navCtrl.pop();
+          }, err => {
+            this.navCtrl.pop();
+          });
+        }else{
+          this.show_selection_view = false;
+          //copy
+        }
       }else{
-        this.showToast('Please select atleast a venue and activity')
+        this.comonService.toastMessage('Please select atleast a venue and activity',2500,ToastMessageType.Error,ToastPlacement.Bottom);
       }
     }else{
-      this.showToast("Please enter account name")
+      this.comonService.toastMessage("Please enter account name",2500,ToastMessageType.Error,ToastPlacement.Bottom);
     }
- 
-
   }
+
+  //this is to copy existing stripe account
+  copyStripeAccount(){
+    this.comonService.commonAlert_V5("Copy Stripe Account", "Are you sure you want to copy the existing stripe account?", "Yes", "No", (agreed:boolean) => {
+      if(agreed){
+        const stripeacc_payload = {
+          parentclubId:this.parentClubKey,
+          app_type:AppType.ADMIN_NEW,
+          device_id:this.sharedservice.getDeviceId(),
+          device_type:this.sharedservice.getPlatform() == "android" ? 1:2,
+          action_type:1,
+          state_key:this.state_key,
+          setup_id:this.selected_account_id
+        }
+        this.httpService.post(API.COPY_PARENTCLUB_STRIPE_ACCOUNT,stripeacc_payload).subscribe((res: any) => {
+          console.table(res.data);
+          this.navCtrl.pop();
+        },
+       (ex) => {
+            //this.commonService.hideLoader();
+            console.error("Error in fetching:", ex);
+            if(ex.error && ex.error.message){
+              this.comonService.toastMessage(ex.error.message, 2500,ToastMessageType.Error,ToastPlacement.Bottom);
+            }else{
+              this.comonService.toastMessage("failed to copy stripe account", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+            }
+           // Handle the error here, you can display an error message or take appropriate action.
+       })
+      }
+    });
+     
+  }
+
   accountNameHint() {
     let message = "Please enter a description of the Stripe account for the selected Venue and Activities for future reference";
-    let toast = this.toastCtrl.create({
-      message: message,
-      duration: 5000
-    });
-    toast.present();
+    this.comonService.toastMessage(message, 2500, ToastMessageType.Info, ToastPlacement.Bottom);
   }
+
+
 }
 
 

@@ -226,11 +226,12 @@ export class StripeconnectsetuplistPage {
     return cardno;
   }
 
-  goTocreatepage(setup) {
+  goTocreatepage(index:number) {
     this.navCtrl.push('CreatestripeconnectsetupPage', {
-      setupDetails: this.setupDetails
+      setupDetails: this.setupDetails,setup_type:index
     })
   }
+  
   showalert(messege){
     let alert = this.alertCtrl.create({
       title: 'Setup in Progress',
