@@ -102,6 +102,16 @@
                         <ion-row class="rows">
                                 <ion-col>
                                         <ion-item class="items">
+                                                <ion-label stacked color="primary">Emergency Contact Number</ion-label>
+                                                <ion-input type="number" [(ngModel)]="memberObj.emergency_number"
+                                                        class="text"></ion-input>
+                                        </ion-item>
+                                </ion-col>
+                        </ion-row>
+
+                        <ion-row class="rows">
+                                <ion-col>
+                                        <ion-item class="items">
                                                 <ion-label stacked color="primary">Vehicle RegNo1</ion-label>
                                                 <ion-input type="text" [(ngModel)]="memberObj.vehicleRegNo1"
                                                         class="text"></ion-input>
