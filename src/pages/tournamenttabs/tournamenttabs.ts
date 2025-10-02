@@ -23,7 +23,7 @@ export class TournamenttabsPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams // componentFactoryResolver: ComponentFactoryResolver
-  ) {}
+  ) { }
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad TournamenttabsPage");
