@@ -16,7 +16,7 @@ export class FirebaseService {
   public userProfile: any;
 
   //sizeSubject: Subject<any>;
-  constructor(public _data: AngularFireDatabase, private http: HttpClient, ) {
+  constructor(public _data: AngularFireDatabase, private http: HttpClient,) {
 
     this.db = firebase.database().ref('/');
     this.storage = firebase.storage().ref('/');
@@ -132,12 +132,12 @@ export class FirebaseService {
       const ref = this.db.child(path);
       ref.once(
         'value',
-        function(snapshot:any) {
+        function (snapshot: any) {
           ref.off();
-          const resObj = {$key:snapshot.key,...snapshot.val()}
+          const resObj = { $key: snapshot.key, ...snapshot.val() }
           res(resObj);
         },
-        function(errorObject) {
+        function (errorObject) {
           ref.off();
           rej(errorObject);
         },
@@ -150,7 +150,7 @@ export class FirebaseService {
       const data = [];
       for (let i = 0; i < action.length; i++) {
         const $key = action[i].payload.key;
-        data.push({ $key, ...action[i].payload.val() });
+        data.push({ $key, ...(action[i].payload.val() as any) });
       }
       return data;
     });
@@ -163,17 +163,17 @@ export class FirebaseService {
   //reading a property from a database
   getPropValue(path) {
     return new Promise((res, rej) => {
-        const ref = this.db.child(path);
-        ref.on("value", function(snapshot) {
-            ref.off();
-            res(snapshot.val());
-        }, function(errorObject) {
-            ref.off();
-            res(null); 
-        });
-         
+      const ref = this.db.child(path);
+      ref.on("value", function (snapshot) {
+        ref.off();
+        res(snapshot.val());
+      }, function (errorObject) {
+        ref.off();
+        res(null);
+      });
+
     });
-}
+  }
 
   public saveReturningKey(child: string, data: any): Promise<any> {
     let dbRef = this.db.child(child);
@@ -190,18 +190,18 @@ export class FirebaseService {
       .catch("");
   }
 
-  getActiveData(path: string,property:string) {
+  getActiveData(path: string, property: string) {
     return new Promise((res, rej) => {
-        //const keyNames = Object.keys(queryObj);
-        const today = new Date().toISOString().slice(0, 10); // Get the current date in YYYY-MM-DD format
-        const ref = this.db.child(path).orderByChild('property').startAt(today);
-        ref.once("value", function(snapshot) {
-            ref.off();
-            res(snapshot.val());
-        }, function(errorObject) {
-            ref.off();
-            rej(errorObject.code); 
-        });
+      //const keyNames = Object.keys(queryObj);
+      const today = new Date().toISOString().slice(0, 10); // Get the current date in YYYY-MM-DD format
+      const ref = this.db.child(path).orderByChild('property').startAt(today);
+      ref.once("value", function (snapshot) {
+        ref.off();
+        res(snapshot.val());
+      }, function (errorObject) {
+        ref.off();
+        rej(errorObject.code);
+      });
     });
   }
 
@@ -228,7 +228,7 @@ export class FirebaseService {
       else if (imgdata.upload_type == 'tips') {
         this.storage = firebase.storage().ref("/Apkids/Tips");
         console.log(JSON.stringify(imgdata));
-        this.storage.child(imgdata["club_name"] +"-"+ imgdata["ImageTitle"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
+        this.storage.child(imgdata["club_name"] + "-" + imgdata["ImageTitle"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
           .then((savedPicture) => {
             resolve(savedPicture.downloadURL);
           }).catch((err: any) => {
@@ -253,7 +253,7 @@ export class FirebaseService {
           }).catch((err: any) => {
             reject(err);
           });
-      }else if (imgdata.upload_type == 'apkids') {
+      } else if (imgdata.upload_type == 'apkids') {
         this.storage = firebase.storage().ref("/Apkids/Challenges");
         console.log(JSON.stringify(imgdata));
         this.storage.child(imgdata["club_name"] + new Date().getTime()).putString(cleanedBase64, 'data_url')
@@ -419,11 +419,11 @@ export class FirebaseService {
       const data = [];
       for (let i = 0; i < action.length; i++) {
         const $key = action[i].payload.key;
-        data.push({ $key, ...action[i].payload.val() });
+        data.push({ $key, ...(action[i].payload.val() as any) });
       }
       return data;
     });
-  }  
+  }
 
   // ref.startAt("Brahmaa","FirstName").orderByChild("FirstName")
   getFilterValue(path: string, PropertyName: string): Observable<any[]> {
@@ -431,7 +431,7 @@ export class FirebaseService {
       const data = [];
       for (let i = 0; i < action.length; i++) {
         const $key = action[i].payload.key;
-        data.push({ $key, ...action[i].payload.val() });
+        data.push({ $key, ...(action[i].payload.val() as any) });
       }
       return data;
     });
@@ -507,12 +507,11 @@ export class FirebaseService {
     return options;
   }
 
-  async loginToFirebaseAuth(){
+  async loginToFirebaseAuth() {
     return await firebase.auth().signInAnonymously();
   }
 
-  async getCurrentUser():Promise<User>
-  {
+  async getCurrentUser(): Promise<User> {
     return await firebase.auth().currentUser;
   }
 
