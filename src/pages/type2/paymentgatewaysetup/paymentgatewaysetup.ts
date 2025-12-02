@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component , Input, Output, EventEmitter} from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 /**
@@ -30,21 +30,21 @@ export class PaymentgatewaysetupPage {
     console.log('ionViewDidLoad PaymentgatewaysetupPage');
   }
 
-  ngAfterViewInit() {
-    setTimeout(() => {
+  ngAfterViewInit(){
+    setTimeout(()=>{
       this.text = this.InstructTxt;
-    }, 300);
-  }
-
-  navigateToPayment() {
+    },300);
+   }
+ 
+   navigateToPayment(){
     this.navigate.emit();
-  }
+   }
 
-  skipPayment() {
-    console.log("skip clicked");
+   skipPayment(){
+     console.log("skip clicked");
     this.skip.emit();
-  }
-
+   }
+   
 
 
 }

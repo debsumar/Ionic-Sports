@@ -1,0 +1,366 @@
+<ion-header>
+    <ion-navbar class="modern-navbar">
+        <button ion-button menuToggle class="menu-btn">
+            <ion-icon name="apps"></ion-icon>
+        </button>
+        <ion-title class="navbar-title">
+            {{LangObj.manageSes_manageGp || 'Manage Sessions'}}
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()" class="home-btn">
+                <ion-icon name="home"></ion-icon>
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)" class="more-btn">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-content class="manage-session-content" padding>
+    <!-- Sticky Header Container -->
+    <div class="sticky-header-container">
+        <!-- Modern Filter Cards -->
+        <div class="filters_div">
+        <!-- Compact Filters -->
+        <div class="compact-filter-card" *ngIf="loggedin_type!=4">
+            <ion-row>
+                <ion-col col-6 style="padding: 4px;">
+                    <ion-select class="compact-select" [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()" placeholder="Club">
+                        <ion-option *ngFor="let club of clubs" [value]="club.FirebaseId">{{club.ClubName}}</ion-option>
+                        <ion-option value="All">All Venue</ion-option>
+                    </ion-select>
+                </ion-col>
+                <ion-col col-6 style="padding: 4px;">
+                    <ion-select class="compact-select" [(ngModel)]="selectedCoach" (ionChange)="onChangeOfCoach()" placeholder="Coach">
+                        <ion-option *ngFor="let coach of coaches" value={{coach.coach_firebase_id}}>{{coach.first_name}} {{coach.last_name}}</ion-option>
+                        <ion-option value="All">All Coach</ion-option>
+                    </ion-select>
+                </ion-col>
+            </ion-row>
+        </div>
+        
+        <div class="compact-filter-card" *ngIf="loggedin_type == 4">
+            <ion-select class="compact-select" [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()" placeholder="Club">
+                <ion-option *ngFor="let club of clubs" [value]="club.FirebaseId">{{club.ClubName}}</ion-option>
+                <ion-option value="All">All</ion-option>
+            </ion-select>
+        </div>
+    </div>
+        <!-- Compact Search -->
+        <div class="compact-search-card">
+          <div class="search-content">
+            <ion-searchbar class="sleek-searchbar" placeholder="Search sessions of {{session_count}}"
+              [(ngModel)]="searchInput" (ionInput)="getFilterItems($event)" autocorrect="off"
+              showCancelButton="never"></ion-searchbar>
+            <button class="refresh-btn" (tap)="clearCache()">
+              <ion-icon name="refresh"></ion-icon>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Pending Payments Button -->
+        <div class="pending-payments-container" *ngIf="this.switchfilterpage == 1">
+          <button ion-button clear class="pending-payments-btn" (click)="this.navCtrl.push('PendingTermSessionsPage')">
+            <span>Pending Payments</span>
+            <ion-icon name="ios-arrow-forward"></ion-icon>
+          </button>
+        </div>
+    </div>
+
+    <!-- Scrollable Content Area -->
+    <div class="scrollable-content-area">
+        <!-- the below code for term session_list -->
+    <!-- <div (click)="checkBottomDrawerStat($event)" [ngClass]="{'blur':drawerState==2}"> -->
+    <div *ngIf="filter_term_sessions.length > 0" [ngClass]="{'blur':drawerState==2}" class="session_div">
+        <ion-card *ngIf="this.switchfilterpage == 4" class="history_header">
+            <ion-card-header>
+                <ion-row>
+                    <ion-col col-9 style="font-weight: 500;margin: auto" (click)="canShowTerm=!canShowTerm">Term Sessions</ion-col>
+                    <ion-col col-1 style="margin: auto;"><span>{{filter_term_sessions.length}}</span></ion-col>
+                    <ion-col col-2>
+                        <button ion-button clear class="unenrol_btn" *ngIf="!canShowTerm" (click)="canShowTerm=!canShowTerm">
+                            <ion-icon name="ios-arrow-forward"></ion-icon>
+                        </button>
+                        <button ion-button clear class="unenrol_btn" *ngIf="canShowTerm" (click)="canShowTerm=!canShowTerm">
+                            <ion-icon name="ios-arrow-down"></ion-icon>
+                        </button>
+                    </ion-col>
+                </ion-row>
+            </ion-card-header>
+        </ion-card>
+            <div style="" *ngIf="canShowTerm">
+                <div *ngFor="let session of filter_term_sessions; let i=index" class="session-container">
+                    <div class="modern-card session-card" (click)="goToSessionDetailsPage(session)">
+                        <div class="card-header">
+                            <div class="card-icon-wrapper session-bg">
+                                <ion-icon name="calendar" class="card-icon"></ion-icon>
+                            </div>
+                            <div class="card-info">
+                                <h3 class="card-title">{{session.session_name}}</h3>
+                                <p class="card-subtitle">{{session.ActivityDetails.ActivityName}}/{{session.activity_category_name}}//{{session.activity_subcategory_name}}</p>
+                            </div>
+                            <div class="session-badge" *ngIf="session.group_status=='0'">
+                                <span class="badge-text private">Private</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="session-details">
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <ion-icon name="time" class="detail-icon"></ion-icon>
+                                        <span class="detail-text">{{session.days}} - {{session.start_time}}, {{session.duration}}min</span>
+                                    </div>
+                                    <div class="detail-item enrollment-badge">
+                                        <span class="badge-text">{{session.paid_count}}/{{session.tot_enrol_count}}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item" *ngIf="session.Coach">
+                                        <ion-icon name="person" class="detail-icon"></ion-icon>
+                                        <span class="detail-text">{{session.Coach.first_name}} {{session.Coach.last_name}}</span>
+                                    </div>
+                                    <div class="detail-item price-badge" *ngIf="can_coach_see_revenue">
+                                        <span class="badge-text">
+                                            <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>{{session.session_fee | number: '1.2-2'}}
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <ion-icon name="calendar" class="detail-icon"></ion-icon>
+                                        <span class="detail-text">{{session.start_date}} <ion-icon name="ios-arrow-round-forward-outline"></ion-icon> {{session.end_date}}</span>
+                                    </div>
+                                </div>
+                                <div class="detail-row">
+                                    <div class="detail-item">
+                                        <ion-icon name="pin" class="detail-icon"></ion-icon>
+                                        <span class="detail-text">{{session.ClubDetails.ClubName}}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- <ion-card class="ion_card" *ngIf="isShowMessage4 && coaches.length ==0">
+                <ion-card-content>
+                    <p class="danger_color2">{{LangObj.manageSes_nocoach}}...</p>
+                </ion-card-content>
+            </ion-card>
+            <ion-card class="ion_card" *ngIf="isShowMessage1 && sessionObj.length ==0">
+                <ion-card-content>
+                    <p class="danger_color2">{{LangObj.manageSes_noactsesns}}...</p>
+                </ion-card-content>
+            </ion-card> -->
+    </div>
+
+
+    <!-- the below code for weekly session_list -->
+    <div *ngIf="filter_weekly_sessions.length > 0" [ngClass]="{'blur':drawerState==2}">
+        <ion-card *ngIf="this.switchfilterpage == 4" class="history_header">
+            <ion-card-header>
+                <ion-row>
+                    <ion-col col-9 style="font-weight: 500;margin: auto" (click)="canShowWeekly=!canShowWeekly">Weekly Sessions</ion-col>
+                    <ion-col col-1 style="margin: auto;"><span>{{filter_weekly_sessions.length}}</span></ion-col>
+                    <ion-col col-2>
+                        <button ion-button clear class="unenrol_btn" *ngIf="!canShowWeekly" (click)="canShowWeekly=!canShowWeekly">
+                            <ion-icon name="ios-arrow-forward"></ion-icon>
+                        </button>
+                        <button ion-button clear class="unenrol_btn" *ngIf="canShowWeekly" (click)="canShowWeekly=!canShowWeekly">
+                            <ion-icon name="ios-arrow-down"></ion-icon>
+                        </button>
+                    </ion-col>
+                </ion-row>
+            </ion-card-header>
+        </ion-card>
+        <div style="" *ngIf="canShowWeekly">
+            <div *ngFor="let session of filter_weekly_sessions; let i=index" class="session-container">
+                <div class="modern-card session-card" (click)="goToWeeklySessionDetailsPage(session)">
+                    <div class="card-header">
+                        <div class="card-icon-wrapper weekly-bg">
+                            <ion-icon name="calendar" class="card-icon"></ion-icon>
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">{{session.session_name}}</h3>
+                            <p class="card-subtitle">{{session.ActivityDetails.ActivityName}}/{{session.category_name}}/{{session.sub_category_name}}</p>
+                        </div>
+                        <div class="session-badge" *ngIf="session.private_status=='0'">
+                            <span class="badge-text private">Private</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="session-details">
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <ion-icon name="time" class="detail-icon"></ion-icon>
+                                    <span class="detail-text">{{session.days}} - {{session.start_time}}, {{session.duration}}min</span>
+                                </div>
+                                <div class="detail-item enrollment-badge">
+                                    <span class="badge-text">{{session.booking_count}}/{{session.enrol_count}}</span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <ion-icon name="person" class="detail-icon"></ion-icon>
+                                    <span class="detail-text">{{session.coach_names}}</span>
+                                </div>
+                                <div class="detail-item price-badge" *ngIf="can_coach_see_revenue">
+                                    <span class="badge-text">
+                                        <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>{{session.fee_for_member | number: '1.2-2'}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <ion-icon name="calendar" class="detail-icon"></ion-icon>
+                                    <span class="detail-text">{{session.start_date}} <ion-icon name="ios-arrow-round-forward-outline"></ion-icon> {{session.end_date}}</span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                    <div class="detail-item">
+                                        <ion-icon name="pin" class="detail-icon"></ion-icon>
+                                        <span class="detail-text">{{session.club.ClubName}} </span>
+                                    </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- the below code for weekly session_list -->
+    <div *ngIf="filter_monthly_sessions.length > 0" [ngClass]="{'blur':drawerState==2}">
+        <ion-card *ngIf="this.switchfilterpage == 4" class="history_header">
+            <ion-card-header>
+                <ion-row>
+                    <ion-col col-9 style="font-weight: 500;margin: auto;" (click)="canShowMonthly=!canShowMonthly">Monthly Sessions</ion-col>
+                    <ion-col col-1 style="margin: auto;"><span>{{filter_monthly_sessions.length}}</span></ion-col>
+                    <ion-col col-2>
+                        <button ion-button clear class="unenrol_btn" *ngIf="!canShowMonthly" (click)="canShowMonthly=!canShowMonthly">
+                            <ion-icon name="ios-arrow-forward"></ion-icon>
+                        </button>
+                        <button ion-button clear class="unenrol_btn" *ngIf="canShowMonthly" (click)="canShowMonthly=!canShowMonthly">
+                            <ion-icon name="ios-arrow-down"></ion-icon>
+                        </button>
+                    </ion-col>
+                </ion-row>
+            </ion-card-header>
+        </ion-card>
+        <div style="" *ngIf="canShowMonthly">
+            <div *ngFor="let session of filter_monthly_sessions; let i=index" class="session-container">
+                <div class="modern-card session-card" (click)="goToMonthlySessionDetailsPage(session)">
+                    <div class="card-header">
+                        <div class="card-icon-wrapper monthly-bg">
+                            <ion-icon name="calendar" class="card-icon"></ion-icon>
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">{{session.session_name}}</h3>
+                            <p class="card-subtitle" *ngIf="session.ActivityDetails && session.ActivityDetails.ActivityName">{{session.ActivityDetails.ActivityName}}/{{session.activity_category_name}}/{{session.activity_subcategory_name}}</p>
+                        </div>
+                        <div class="session-badge" *ngIf="session.group_status=='0'">
+                            <span class="badge-text private">Private</span>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="session-details">
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <ion-icon name="time" class="detail-icon"></ion-icon>
+                                    <span class="detail-text">{{session.days}} - {{session.start_time}}, {{session.duration}}min</span>
+                                </div>
+                                <div class="detail-item enrollment-badge">
+                                    <span class="badge-text">{{session.session_stats.paid_count}}/{{session.session_stats.enrolled_member_count}}</span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <ion-icon name="person" class="detail-icon"></ion-icon>
+                                    <span class="detail-text">{{session.coach_names}}</span>
+                                </div>
+                                <div class="detail-item price-badge" *ngIf="can_coach_see_revenue">
+                                    <span class="badge-text">
+                                        <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>{{session.one_day_price | number:'1.2-2'}}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-item">
+                                    <ion-icon name="calendar" class="detail-icon"></ion-icon>
+                                    <span class="detail-text">{{session.start_date}} <ion-icon name="ios-arrow-round-forward-outline"></ion-icon> {{session.end_date}}</span>
+                                </div>
+                            </div>
+                            <!-- <div class="detail-row">
+                                    <div class="detail-item">
+                                        <ion-icon name="pin" class="detail-icon"></ion-icon>
+                                        <span class="detail-text">{{session.club.ClubName}} <ion-icon name="ios-arrow-round-forward-outline"></ion-icon> {{session.end_date}}</span>
+                                    </div>
+                            </div> -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+
+   
+</ion-content>
+
+
+<ion-fab style="bottom:115px !important;" mini right bottom #fab *ngIf="drawerState==1 && loggedin_type!=4">
+    <button ion-fab mini class="fav-ico" style="background-color: #2b92bb;" (click)="isShowPaymentModal=false">
+        <ion-icon name="add"></ion-icon>
+    </button>
+    <ion-fab-list side="top">
+        <p class="fabEmailText" style="margin-left: -158px;" (click)="gotoSession()">
+            {{LangObj.manageSes_createtermgp}}</p>
+        <button style="background-color: #2b92bb; color:white" ion-fab class="fabTop" (click)="gotoSession()">
+            <ion-icon name="ios-create-outline"></ion-icon>
+        </button>
+
+        <p class="fabEmailText" (click)="goToMonthlySession()">{{LangObj.manageSes_createmonthlygp}}</p>
+        <button style="background-color: #2b92bb; color:white" ion-fab class="fabTop" (click)="goToMonthlySession()">
+            <ion-icon name="ios-create-outline"></ion-icon>
+        </button>
+
+        <p class="fabEmailText" (click)="gotoWeeklySession('weekly')" style="margin-left: -170px;">
+            Create Weekly Group</p>
+        <button style="background-color: #2b92bb; color:white" ion-fab class="fabTop"
+            (click)="gotoWeeklySession('weekly')">
+            <ion-icon name="ios-create-outline"></ion-icon>
+        </button>
+
+        <!-- <p class="fabEmailText" (click)="gotoWeeklySession('trial')" style="margin-left: -155px;">
+            Create Trial Group</p>
+        <button style="background-color: #2b92bb; color:white" ion-fab class="fabTop"
+            (click)="gotoWeeklySession('trial')">
+            <ion-icon name="ios-create-outline"></ion-icon>
+        </button> -->
+        <p class="fabEmailText" (click)="gotoCopySession()" style="margin-left: -152px;">
+            Copy Term Group</p>
+        <button style="background-color: #2b92bb; color:white" ion-fab class="fabTop" (click)="gotoCopySession()">
+            <ion-icon name="copy"></ion-icon>
+        </button>
+    </ion-fab-list>
+</ion-fab>
+
+<ion-footer>
+    <div class="footer_div" [ngClass]="{'footer_bottom_pad':isIOS}" *ngIf="footermenu.length > 0">
+        <ion-row>
+            <ion-col *ngFor="let menu of Tempfootermenu;let i=index;" (click)="filterOutSession(menu, menu.Index)">
+                <img [src]="menu.img" class="footer_img" *ngIf="menu.img && menu.img!=''">
+                <ion-icon *ngIf="menu.Icon!=''" [name]="menu.Icon" [class.colorselected]="menu.IsSelect"
+                    [class.last-footer-icon]="i === Tempfootermenu.length - 1"
+                    (click)="filterOutSession(menu, menu.Index)"></ion-icon>
+                <p [class.colorselected]="menu.IsSelect" (click)="filterOutSession(menu, menu.Index)">
+                    {{menu.DisplayName}}</p>
+            </ion-col>
+        </ion-row>
+    </div>
+</ion-footer>
+
+
+<page-paymentgatewaysetup *ngIf="this.isShowPaymentModal" InstructTxt="Please connect to payment gateway for sessions"
+    (skip)="skip()" (navigate)="GotoPaymentSetup()"></page-paymentgatewaysetup>

@@ -5,7 +5,7 @@ import { IonicPage, NavController, NavParams, Slides, AlertController, ActionShe
 import { Storage } from '@ionic/storage';
 import { FirebaseService } from '../../../services/firebase.service';
 import { CommonService } from '../../../services/common.service';
-import { ValidationPath } from '@firebase/database/dist/esm/src/core/util/Path';
+
 
 @IonicPage()
 @Component({
@@ -91,7 +91,7 @@ export class membershipPaymentSetupPage {
     });
   }
 
-  
+
   selectVenue(event) {
     this.selectedClubKey = event.$key;
     this.Venues.forEach(club => {
@@ -127,22 +127,22 @@ export class membershipPaymentSetupPage {
     // console.log(this.selectedClubKey)
     // console.log(this.Venues)
     //this.getSetupByVenue(this.selectedClubKey)
-   
-    
+
+
   }
 
-  
+
   getDetailsfromDB(ClubKey) {
     this.selectedClubDBArr = []
     this.fb.getAllWithQuery("StandardCode/MembershipPaymentSetup/" + this.ParentClubKey + "/", { orderByKey: true, equalTo: ClubKey }).subscribe((data) => {
 
-      if (data.length > 0 ) {
+      if (data.length > 0) {
         console.log("data", data)
         this.comonService.convertFbObjectToArray(data[0]).forEach(eachPayOption => {
           //  this.selectPayment(eachPayOption.PaymentGatewayName)
 
-         // let eachPaymentDetails = this.comonService.convertFbObjectToArray1(eachPayOption)[0]
-         
+          // let eachPaymentDetails = this.comonService.convertFbObjectToArray1(eachPayOption)[0]
+
           // this.Venues.forEach(club => {
           //   if (club.$key == eachPayOption.Key) {
           //     club.IsSelect = true
@@ -152,14 +152,14 @@ export class membershipPaymentSetupPage {
           if (eachPayOption.Properties) {
             this.selectedStripe = eachPayOption.Properties
             this.IsEnable = eachPayOption.IsEnable
-            this.Stripe =  this.selectedStripe
+            this.Stripe = this.selectedStripe
             this.IsAnyPaymentMethodDB = 'Stripe'
             this.IsUpdated = true
           }
 
         })
       }
-      else{
+      else {
         this.Stripe = { Currency: this.Stripe.Currency, PaybuttonIDText: "", MerchantID: "", SharedSecret: "" }
         this.IsAnyPaymentMethodDB = 'Stripe'
         this.IsUpdated = false
@@ -212,7 +212,7 @@ export class membershipPaymentSetupPage {
         SharedSecret: this.Stripe.SharedSecret,
       }
       this.selectedVenue.forEach(club => {
-        let setupkey = this.fb.saveReturningKey("StandardCode/MembershipPaymentSetup/" + this.ParentClubKey + "/" +club.$key, data)
+        let setupkey = this.fb.saveReturningKey("StandardCode/MembershipPaymentSetup/" + this.ParentClubKey + "/" + club.$key, data)
       })
 
       console.log(data)
@@ -220,7 +220,7 @@ export class membershipPaymentSetupPage {
       console.log("not")
     }
   }
-  update(){
+  update() {
     let PaymentGatewayName, data;
     for (let key in this.PaymentMethod) {
       if (this.PaymentMethod[key] == true) {
@@ -252,8 +252,8 @@ export class membershipPaymentSetupPage {
 
   validation() {
     let Venues = this.Venues
-    console.log(Venues.some(club => {return club.IsSelect == true }))
-    if (!Venues.some(club => {return club.IsSelect })) {
+    console.log(Venues.some(club => { return club.IsSelect == true }))
+    if (!Venues.some(club => { return club.IsSelect })) {
       return false;
     }
     else if (!this.Stripe.Currency && !this.Stripe.MerchantID && !this.Stripe.SharedSecret) {
@@ -285,9 +285,9 @@ export class membershipPaymentSetupPage {
   }
   showToast(message) {
     let toast = this.toastCtrl.create({
-        message: message,
-        duration: 3000
+      message: message,
+      duration: 3000
     });
     toast.present();
-}
+  }
 }

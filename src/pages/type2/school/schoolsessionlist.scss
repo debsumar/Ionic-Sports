@@ -1,0 +1,706 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+schoolsessionlist-page {
+    @include android-sdk35-fixes;
+    
+    // Default dark theme for the entire page
+    background: #0f172a !important;
+    
+    &.dark-theme {
+        background: #0f172a !important;
+        
+        .scroll-content {
+            background: #0f172a !important;
+            background-image: none !important;
+        }
+
+        ion-content {
+            --background: #0f172a !important;
+            --ion-background-color: #0f172a !important;
+        }
+
+        ion-card {
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        ion-item {
+            --background: #1e293b !important;
+            --color: #e2e8f0 !important;
+        }
+    }
+
+    &.light-theme {
+        background: #f8fafc !important;
+        
+        .scroll-content {
+            background: #f8fafc !important;
+            background-image: none !important;
+        }
+
+        ion-content {
+            --background: #f8fafc !important;
+            --ion-background-color: #f8fafc !important;
+        }
+
+        ion-card {
+            background: #ffffff !important;
+            color: #1f2937 !important;
+        }
+
+        ion-item {
+            --background: #ffffff !important;
+            --color: #1f2937 !important;
+        }
+        
+        // Light theme sticky header
+        .sticky-header-container {
+            background: #f8fafc;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        // Light theme venue dropdown
+        .venue-dropdown {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            
+            ion-select .select-text {
+                color: #1e293b !important;
+            }
+            
+            ion-label {
+                color: #64748b !important;
+            }
+        }
+        
+        .compact-search-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            
+            .sleek-searchbar {
+                border: none;
+                
+                .searchbar-input {
+                    color: #1e293b !important;
+                    padding-left: 32px !important;
+                    box-shadow: none !important;
+                    -webkit-box-shadow: none !important;
+                    border: none !important;
+                    
+                    &::placeholder {
+                        color: #64748b !important;
+                    }
+                }
+                
+                .searchbar-search-icon,
+                .searchbar-md .searchbar-search-icon,
+                .searchbar-ios .searchbar-search-icon {
+                    color: #64748b !important;
+                    background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 13'><path fill='rgba(100, 116, 139, 0.8)' d='M5,1c2.2,0,4,1.8,4,4S7.2,9,5,9S1,7.2,1,5S2.8,1,5,1 M5,0C2.2,0,0,2.2,0,5s2.2,5,5,5s5-2.2,5-5S7.8,0,5,0 L5,0z'/><line stroke='rgba(100, 116, 139, 0.8)' stroke-miterlimit='10' x1='12.6' y1='12.6' x2='8.2' y2='8.2'/></svg>") !important;
+                    display: block !important;
+                }
+                
+                .searchbar-clear-icon,
+                .searchbar-md .searchbar-clear-icon,
+                .searchbar-ios .searchbar-clear-icon {
+                    color: #64748b !important;
+                    background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='rgba(100, 116, 139, 0.8)' d='M403.1,108.9c-81.2-81.2-212.9-81.2-294.2,0s-81.2,212.9,0,294.2c81.2,81.2,212.9,81.2,294.2,0S484.3,190.1,403.1,108.9z M352,340.2L340.2,352l-84.4-84.2l-84,83.8L160,339.8l84-83.8l-84-83.8l11.8-11.8l84,83.8l84.4-84.2l11.8,11.8L267.6,256L352,340.2z'/></svg>") !important;
+                    display: block !important;
+                }
+            }
+        }
+        
+        // Light theme modern cards
+        .modern-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            
+            .card-header {
+                border-bottom: 1px solid #e2e8f0;
+            }
+            
+            .card-title {
+                color: #1e293b !important;
+            }
+            
+            .card-subtitle {
+                color: #64748b !important;
+            }
+            
+            .detail-text {
+                color: #1e293b !important;
+            }
+            
+            .detail-icon {
+                color: #64748b !important;
+            }
+        }
+        
+        // Light theme no-data
+        .no-data-container {
+            .no-data-content {
+                .no-data-icon {
+                    color: #64748b;
+                }
+                
+                .no-data-text {
+                    color: #64748b;
+                }
+            }
+        }
+    }
+
+    .scroll-content {
+        padding: 5px !important;
+        background: #0f172a !important;
+        background-image: none !important;
+    }
+    .para_overflow{
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .ion_card { 
+        margin: 6px 0px;
+        width: 100%;
+    }
+    .memeber_details_btn {
+        // height: 28px;
+        font-size: 15px;
+        margin-top: 0px;
+    }
+    .ion_col_p {
+        padding: 1px 5px 1px 5px;
+    }
+    .ion_col_p1 {
+        padding: 5px 5px 0px 1px;
+    }
+    .btn-width {
+        width: 70px;
+    }
+    ion-list{
+        ion-card{
+            border-radius: 4px !important;
+        }
+    }
+    .slidingcards {
+        // margin-bottom: 5px;
+        // border-top: 6px solid rgba(94, 199, 130, 0.79);
+        // margin-bottom: 7px;
+        // border-top: 5px solid rgba(25, 92, 170, 0.79);
+        // margin-bottom: 4px;
+        // border-top: 7px solid rgba(236, 117, 21, 0.63);
+        // border-bottom: 2px solid rgba(180, 24, 148, 0.73);
+        //  margin-bottom: 7px;
+        // border-top: 5px solid rgba(25, 92, 170, 0.79);
+        // border-bottom: 2px solid rgba(236, 117, 21, 0.63);
+        // margin-bottom: 7px;
+        // border-bottom: 1px solid #faa928d3 !important;
+        ion-item{
+            border-bottom: 1px solid #faa928d3 !important;
+        }
+       
+    }
+    .margin_bottom {
+        margin-bottom: 5px;
+        ion-item-sliding {
+            ion-item {
+                padding: 0px 9px;
+                div {
+                    padding-right: 0px!important;
+                }
+            }
+        }
+    }
+    .detailsBtn {
+        background-color: #2E64C3;
+    }
+    .member_input {
+        border-bottom: 1px solid #c8c7cc;
+    }
+    .memeber_list {
+        border-top: 1px solid #c8c7cc;
+    }
+    //   }
+    .btn_clr {
+        margin-top: 25px !important;
+        color: $dashoboard-icon-color;
+    }
+    .coach_detials_row {
+        text-align: center;
+        ion-col {
+            border: 1px solid #c8c7cc;
+        }
+    }
+    table,
+    th,
+    td {
+        border: 1px solid #95939c;
+        border-collapse: collapse;
+    }
+    .block_height {
+        height: 100%;
+    }
+    // ion-scroll{
+    //     .scroll-content{
+    //         height: 363px;
+    //         padding: 0px;
+    //         margin-top: 5px;
+    //     }
+    // }
+    .search_add {
+        padding: 0px !important;
+        .item-inner {
+            padding-right: 0px!important;
+        }
+        ion-searchbar {
+            padding: 2px;
+        }
+    }
+    .member_btn_sm {
+        padding: 0px;
+        color:rgba(0, 0, 0, 0.85) !important;
+    }
+    .ion_cl {
+        padding: 0px;
+    }
+    .btn-clr {
+        margin: 0px !important;
+        color: $dashoboard-icon-color;
+    }
+    .ion_card_content {
+        padding-bottom: 5px;
+    }
+    .span_member_details1 {
+        //text-decoration: underline;
+        color: rgba(0, 0, 255, 0.81);
+        font-weight: bold;
+    }
+    .table_prop {
+        width: 100%;
+    }
+    .center_align {
+        text-align: center;
+    }
+    .checkmark_color {
+        color: #3ebad1;
+    }
+    .danger_color {
+        color: red;
+    }
+    .danger_color1 {
+        color: red;
+        text-align: center;
+    }
+    .middle_section {
+        margin-top: 15px;
+    }
+    .padding_class {
+        padding-top: 20px;
+        //font-size: 15px;
+    }
+    .search_add {
+        background-color: transparent;
+        padding-left: 6px;
+    }
+    .danger_color2 {
+        color: red;
+        text-align: center;
+        font-size: 16px;
+    }
+    .danger_color3 {
+        color: red;
+        font-size: 16px;
+    }
+    .member12 {
+        padding-left: 0px;
+    }
+    .nowrap {
+        white-space: pre-line !important;
+        margin-top: -35px;
+    }
+    ion-select {
+        padding: 0px 0px 0px 0px !important;
+    }
+    .label{
+        margin: 7px 4px 0px 0 !important;
+    }
+    .coach-col{
+        //border-bottom: 1px solid #ded8d8 !important;
+        padding: 4px !important;
+        color: #666 !important;
+    }
+    p {
+        margin: 1px 0 -2px !important;
+        overflow: inherit;
+        font-size: 1.4rem;
+        line-height: normal;
+        text-overflow: inherit;
+        color: #8e8e8e;
+       
+    }
+    .session-name{
+        font-size:18px
+    }
+    .session-days{
+        //text-align: -webkit-right;
+        color: #649c64;
+        font-weight: 500;
+        font-size: 22px;
+    }
+    .item-inner{
+        border: none !important;
+    }
+    .school{
+        width: 100% !important;
+        //border-bottom: 1px solid #dedede !important;
+        //margin-left: -2% !important;
+        //border-bottom: 2px solid #faa928d3 !important;
+    }
+    .top-row{
+        margin: 5px 0px;
+        ion-col{
+            padding:5px 0px !important;
+        }
+    }
+    .elipsesdot {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        //width: 170px;
+        display: block;
+        overflow: hidden;
+    }
+    .school-name{
+        color: #fab754 !important;
+        //float: left;
+    }
+    .end-date{
+        //text-align: -webkit-right;
+        font-size: 11px;
+    }
+
+    .all{
+        border-width: 1px;
+    border-style: solid;
+    -webkit-border-image: 
+      -webkit-gradient(linear, 0 0, 0 100%, from(#35adff), to(#7dbce6)) 1 100%;
+    -webkit-border-image: 
+      -webkit-linear-gradient(#35adff, #7dbce6) 1 100%;
+    -moz-border-image:
+      -moz-linear-gradient(#35adff, #7dbce6) 1 100%;    
+    -o-border-image:
+      -o-linear-gradient(#35adff, #7dbce6) 1 100%;
+    border-image:
+      linear-gradient(to bottom, #35adff, #7dbce6) 1 100%;
+    }
+    .border-left-style{
+        height: 51px;
+        position: absolute;
+        top: 30px;
+        right: 12px;
+    }
+    ion-col{
+        padding: 0 !important;
+    }
+    .search_div{
+        padding: 0px 10px;
+        ion-row{
+            border-bottom: 1px solid #34343442;
+        }
+    }
+    .sub-container {
+        ion-icon {
+            width: 90%;
+            height: 46px;
+            background: transparent !important;
+            //margin-top: 4px;
+            //background: linear-gradient(to right, #f3c686, rgba(250, 169, 40, 0.8274509803921568));
+            border-radius: 5px;
+            //color: white;
+            color: rgba(250, 169, 40, 0.827451)
+            //box-shadow: -2px 4px 28px rgba(250, 170, 40, 0.45);
+        }
+
+        .search-bar{
+            padding: 0px 5px;
+        }
+        .searchbar {
+            border: none !important;
+            background: #ffffff !important;
+            border-radius: 5px !important;
+            height: 86% !important;
+            margin-top: 4px !important;
+            padding: 8px 5px;
+        }
+
+        .searchbar-input {
+            padding-left: 4px !important;
+            box-shadow: none !important;
+            -webkit-box-shadow:none !important;
+            border: none !important;
+            border-radius: 0;
+        }
+
+        .searchbar-search-icon {
+            display: none !important;
+        }
+
+        ion-icon {
+            font-size: 30px;
+        }
+    }
+    .no-padd{
+        padding:0px !important
+    }
+
+    // Modern card styles matching holidaycamp
+    .sticky-header-container {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: #0f172a;
+        padding: 8px;
+        border-bottom: 1px solid #334155;
+    }
+
+    // Full width venue dropdown
+    .venue-dropdown {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        
+        .item-inner {
+            padding-right: 16px !important;
+            border-bottom: none !important;
+        }
+        
+        ion-select {
+            width: 100% !important;
+            
+            .select-text {
+                color: #f1f5f9 !important;
+            }
+            
+            .select-icon {
+                color: #f1f5f9 !important;
+                right: 16px !important;
+                position: absolute !important;
+            }
+        }
+        
+        ion-label {
+            color: #94a3b8 !important;
+            font-size: 14px !important;
+        }
+    }
+
+    .compact-search-card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 8px;
+        
+        .search-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            .sleek-searchbar {
+                flex: 1;
+                background: transparent;
+                border: none;
+                border-radius: 6px;
+                margin: 0;
+                padding: 0;
+                
+                .searchbar-input {
+                    background: transparent !important;
+                    color: #f1f5f9 !important;
+                    padding: 8px 12px 8px 32px !important;
+                    font-size: 14px !important;
+                    box-shadow: none !important;
+                    -webkit-box-shadow: none !important;
+                    border: none !important;
+                    
+                    &::placeholder {
+                        color: #94a3b8 !important;
+                    }
+                }
+                
+                .searchbar-search-icon,
+                .searchbar-md .searchbar-search-icon,
+                .searchbar-ios .searchbar-search-icon {
+                    color: #94a3b8 !important;
+                    background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 13 13'><path fill='rgba(148, 163, 184, 0.8)' d='M5,1c2.2,0,4,1.8,4,4S7.2,9,5,9S1,7.2,1,5S2.8,1,5,1 M5,0C2.2,0,0,2.2,0,5s2.2,5,5,5s5-2.2,5-5S7.8,0,5,0 L5,0z'/><line stroke='rgba(148, 163, 184, 0.8)' stroke-miterlimit='10' x1='12.6' y1='12.6' x2='8.2' y2='8.2'/></svg>") !important;
+                    display: block !important;
+                }
+                
+                .searchbar-clear-icon,
+                .searchbar-md .searchbar-clear-icon,
+                .searchbar-ios .searchbar-clear-icon {
+                    color: #94a3b8 !important;
+                    background-image: url("data:image/svg+xml;charset=utf-8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><path fill='rgba(148, 163, 184, 0.8)' d='M403.1,108.9c-81.2-81.2-212.9-81.2-294.2,0s-81.2,212.9,0,294.2c81.2,81.2,212.9,81.2,294.2,0S484.3,190.1,403.1,108.9z M352,340.2L340.2,352l-84.4-84.2l-84,83.8L160,339.8l84-83.8l-84-83.8l11.8-11.8l84,83.8l84.4-84.2l11.8,11.8L267.6,256L352,340.2z'/></svg>") !important;
+                    display: block !important;
+                }
+            }
+        }
+    }
+
+    .scrollable-content-area {
+        padding: 8px;
+    }
+    
+    // No Data Container
+    .no-data-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 200px;
+        
+        .no-data-content {
+            text-align: center;
+            
+            .no-data-icon {
+                font-size: 48px;
+                color: #64748b;
+                margin-bottom: 16px;
+            }
+            
+            .no-data-text {
+                color: #94a3b8;
+                font-size: 16px;
+                margin: 0;
+            }
+        }
+    }
+    
+    ion-content {
+        --background: #0f172a !important;
+        --ion-background-color: #0f172a !important;
+    }
+
+    .session-container {
+        margin-bottom: 12px;
+    }
+
+    .modern-card {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        transition: all 0.2s ease;
+        
+        &:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+        }
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+        padding-bottom: 12px;
+        position: relative;
+        
+        &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: -16px;
+            right: -16px;
+            height: 1px;
+            background: #334155;
+        }
+    }
+
+    .card-icon-wrapper {
+        width: 40px;
+        height: 40px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        
+        &.school-bg {
+            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
+        }
+        
+        .card-icon {
+            font-size: 20px;
+            color: #ffffff;
+        }
+    }
+
+    .card-info {
+        flex: 1;
+        min-width: 0;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #f1f5f9;
+        margin: 0 0 4px 0;
+        line-height: 1.3;
+    }
+
+    .card-subtitle {
+        font-size: 14px;
+        color: #94a3b8;
+        margin: 0;
+        line-height: 1.2;
+    }
+
+    .enrollment-badge {
+        background: #2b92bb;
+        color: #ffffff;
+        padding: 6px 10px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        
+        .badge-text {
+            margin: 0;
+        }
+    }
+
+    .session-details {
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            
+            &:last-child {
+                margin-bottom: 0;
+            }
+        }
+        
+        .detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex: 1;
+            
+            .detail-icon {
+                font-size: 14px;
+                color: #60a5fa;
+                width: 16px;
+                flex-shrink: 0;
+            }
+            
+            .detail-text {
+                font-size: 14px;
+                color: #cbd5e1;
+                margin: 0;
+                line-height: 1.3;
+            }
+        }
+    }
+}

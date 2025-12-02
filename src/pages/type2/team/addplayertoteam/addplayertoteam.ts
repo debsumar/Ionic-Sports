@@ -5,8 +5,10 @@ import {
   NavParams,
   ViewController,
   LoadingController,
-  AlertController
+  AlertController,
+  Events
 } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import {
   CommonService,
   ToastMessageType,
@@ -61,7 +63,7 @@ interface TeamMember {
   templateUrl: "addplayertoteam.html",
 })
 export class Addplayertoteam {
-
+  isDarkTheme: boolean = false;
   themeType: number;
   FetchAPPlusMembers: FetchAPPlusMembers = {
     ParentClubKey: "",
@@ -114,9 +116,15 @@ export class Addplayertoteam {
     public fb: FirebaseService,
     public sharedservice: SharedServices,
     private alertCtrl: AlertController,
-    public viewCtrl: ViewController
+    public viewCtrl: ViewController,
+    private themeService: ThemeService,
+    private events: Events
   ) {
     this.themeType = sharedservice.getThemeType();
+    
+    this.events.subscribe('theme:changed', (theme) => {
+      this.isDarkTheme = theme === 'dark';
+    });
     this.existedPlayer = this.navParams.get("existedPlayer");
     this.teamMembersInput.teamId = this.navParams.get("teamid");
 
@@ -157,7 +165,12 @@ export class Addplayertoteam {
 
 
   ionViewDidLoad() {
-    // Component loaded
+    this.storage.get('dashboardTheme').then((theme) => {
+      this.isDarkTheme = theme === 'dark' || theme === true;
+      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
+      document.body.classList.remove('dark-theme', 'light-theme');
+      document.body.classList.add(themeClass);
+    });
   }
 
   ionViewWillLeave() {

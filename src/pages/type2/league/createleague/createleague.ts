@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import {
   IonicPage,
   LoadingController,
@@ -25,6 +25,7 @@ import { CatandType, Locations } from '../models/location.model';
 import { ClubActivityInput, IClubDetails } from '../../../../shared/model/club.model';
 import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
+import { AppType } from '../../../../shared/constants/module.constants';
 
 
 /**
@@ -142,7 +143,8 @@ export class CreateleaguePage {
   schools: SchoolList[] = [];
   locations: Locations[];
   leagueCategory: CatandType[];
-  leagueType: CatandType[]
+  leagueType: CatandType[];
+  isDarkTheme: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -155,11 +157,13 @@ export class CreateleaguePage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private httpService: HttpService,
-
+    private renderer: Renderer2
   ) {
 
     this.min = new Date().toISOString();
     this.max = "2049-12-31";
+    this.leagueCreationInput.AppType = AppType.ADMIN_NEW;
+    this.leagueCreationInput.league.created_by = this.sharedservice.getLoggedInUserId();
     this.leagueCreationInput.league.start_date = moment().format("YYYY-MM-DD");
     this.leagueCreationInput.league.end_date = moment().add(1, 'M').format("YYYY-MM-DD");
     this.leagueCreationInput.league.last_enrollment_date = moment().format("YYYY-MM-DD");
@@ -169,8 +173,9 @@ export class CreateleaguePage {
 
   }
 
-  ionViewDidLoad() {
+  async ionViewDidLoad() {
     console.log("ionViewDidLoad CreateleaguePage");
+    await this.loadTheme();
   }
 
   ionViewWillEnter() {
@@ -286,13 +291,11 @@ export class CreateleaguePage {
   }
 
   getLeagueCategory() {
-    this.httpService.post(`league/getCategories`, this.commonInput).subscribe((res: any) => {
-
+    this.httpService.post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput).subscribe((res: any) => {
       this.leagueCategory = res["data"]
     }, (error) => {
       this.commonService.toastMessage("category fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    }
-    )
+    })
   }
 
   isTeamType: boolean = false;
@@ -701,6 +704,22 @@ export class CreateleaguePage {
     this.commonService.updateCategory("");
   }
 
+  async loadTheme() {
+    const theme = await this.storage.get('selectedTheme');
+    this.applyTheme(theme || 'dark');
+  }
+
+  applyTheme(theme: string) {
+    this.isDarkTheme = theme === 'dark';
+    const pageElement = document.querySelector('page-createleague');
+    if (pageElement) {
+      if (this.isDarkTheme) {
+        this.renderer.removeClass(pageElement, 'light-theme');
+      } else {
+        this.renderer.addClass(pageElement, 'light-theme');
+      }
+    }
+  }
 
 }
 

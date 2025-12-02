@@ -83,7 +83,7 @@ export class TournamentPage {
       .then((val) => {
         this.currencyDetails = JSON.parse(val);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   }
 
   isDarkTheme: boolean = true;
@@ -394,12 +394,12 @@ export class TournamentPage {
                   this.fb.update(
                     tournamentKey,
                     "Member/" +
-                    member.ParentClubKey +
-                    "/" +
-                    member.ClubKey +
-                    "/" +
-                    member.Key +
-                    "/Tournament",
+                      member.ParentClubKey +
+                      "/" +
+                      member.ClubKey +
+                      "/" +
+                      member.Key +
+                      "/Tournament",
                     { IsActive: false }
                   );
                 });
@@ -466,3 +466,5 @@ export class TournamentPage {
     );
   }
 }
+
+

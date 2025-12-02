@@ -1,4 +1,6 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
 page-leagueteamlisting {
+  @include android-sdk35-fixes;
   .scroll-content {
     padding: 0 !important;
   }
@@ -14,7 +16,7 @@ page-leagueteamlisting {
   }
   
   .scrollable-content {
-    margin-top: 120px;
+    margin-top: 130px;
     padding: 0 4px 20px 4px;
   }
 
@@ -49,7 +51,6 @@ page-leagueteamlisting {
       .sleek-searchbar {
         background: #ffffff;
         border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 
         .searchbar-input {
           color: #1e293b;

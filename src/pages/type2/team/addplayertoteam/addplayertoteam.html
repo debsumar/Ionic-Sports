@@ -10,7 +10,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content padding [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
   <ion-item class="search_add">
     <ion-searchbar placeholder="Search Players by Name" class="search" (ionInput)="getFilterItems($event)"
       autocorrect="off" showCanelButton="shouldShowCancel" animated>
@@ -43,7 +43,7 @@
   <ion-grid>
     <ion-row>
       <ion-col col-12>
-        <button class="foobtn" ion-button block (click)="savePlayers()">Add Player</button>
+        <button class="timekare-primary-btn" ion-button block (click)="savePlayers()">Add Player</button>
       </ion-col>
     </ion-row>
   </ion-grid>

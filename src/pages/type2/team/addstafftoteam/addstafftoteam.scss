@@ -1,5 +1,87 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
 // page-leagueinvitecoach
 page-addstafftoteam {
+  @include android-sdk35-fixes;
+  
+  // Light theme styles
+  &.light-theme,
+  .light-theme & {
+    .scroll-content {
+      background: #f4efef !important;
+    }
+    
+    .searchbar-input {
+      background: white;
+      color: #1e293b;
+      border-bottom: 1px solid #141414;
+    }
+    
+    .session_header {
+      background: white;
+      color: #1e293b;
+    }
+    
+    ion-item {
+      background: white;
+      color: #1e293b;
+      
+      ion-label {
+        color: #1e293b;
+        
+        p {
+          color: #1e293b !important;
+        }
+      }
+    }
+    
+    ion-list {
+      background: white;
+    }
+  }
+  
+  // Dark theme styles
+  &.dark-theme,
+  .dark-theme & {
+    .scroll-content {
+      background: #1e293b !important;
+    }
+    
+    .searchbar-input {
+      background: #334155;
+      color: #f1f5f9;
+      border-bottom: 1px solid #475569;
+    }
+    
+    .session_header {
+      background: #334155;
+      color: #f1f5f9;
+    }
+    
+    ion-item {
+      background: #334155;
+      color: #f1f5f9;
+      
+      ion-label {
+        color: #f1f5f9;
+        
+        p {
+          color: #f1f5f9 !important;
+        }
+      }
+    }
+    
+    ion-list {
+      background: #1e293b;
+    }
+    
+    ion-navbar {
+      background: #1e293b;
+      
+      .toolbar-title {
+        color: #f1f5f9;
+      }
+    }
+  }
   // .timekare-primary-btn {
   //   background-color: #f6ae4d !important;
   // }

@@ -1373,15 +1373,19 @@ export class TennisSummaryTennisPage {
     return name;
   }
 
+  getDefaultTeamLogo(): string {  
+    return 'https://d2ert9om2cv970.cloudfront.net/team/78c25502-a302-4276-9460-2114db73de03/default_team.png';
+  }
+
   get homeTeamLogo(): string {
     if (this.isLeague) {
       return (this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.logo_url)
         ? this.homeTeamObj.parentclubteam.logo_url
-        : 'assets/imgs/default-team-logo.png';
+        : this.getDefaultTeamLogo();
     } else {
       return (this.hometeamMatchObj && this.hometeamMatchObj.logo_url)
         ? this.hometeamMatchObj.logo_url
-        : 'assets/imgs/default-team-logo.png';
+        : this.getDefaultTeamLogo();
     }
   }
 
@@ -1389,11 +1393,11 @@ export class TennisSummaryTennisPage {
     if (this.isLeague) {
       return (this.awayTeamObj && this.awayTeamObj.parentclubteam && this.awayTeamObj.parentclubteam.logo_url)
         ? this.awayTeamObj.parentclubteam.logo_url
-        : 'assets/imgs/default-team-logo.png';
+        : this.getDefaultTeamLogo();
     } else {
       return (this.awayteamMatchObj && this.awayteamMatchObj.logo_url)
         ? this.awayteamMatchObj.logo_url
-        : 'assets/imgs/default-team-logo.png';
+        : this.getDefaultTeamLogo();
     }
   }
 

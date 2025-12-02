@@ -1,0 +1,23 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-editfeesmembership {
+    @include android-sdk35-fixes;
+    .scroll-content {
+        padding: 6px !important;
+        background-image: none !important; // background: white !important;
+        background: #f4efef !important;
+    }
+    .item-inner{
+        border-bottom:none;
+    }
+
+    .admin_fee_input{
+        .text-input{
+            text-align: center;
+            border: 1px solid #808080a8;
+            padding: 5px;
+            border-radius: 5px;                
+        }
+    }
+    
+}

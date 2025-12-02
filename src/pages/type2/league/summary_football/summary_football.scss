@@ -1,8 +1,8 @@
 @import "../_league-theme.scss";
-
+@import '../../../../theme/android-sdk35-fixes.scss';
 page-summary-football {
   @include league-theme-base;
-  
+  @include android-sdk35-fixes;
   // Card theme support
   .match-header,
   .score-section,

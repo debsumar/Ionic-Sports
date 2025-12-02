@@ -9,6 +9,7 @@ import {
   NavParams,
   PopoverController,
   ToastController,
+  Events
 } from "ionic-angular";
 import {
   CommonService,
@@ -30,6 +31,7 @@ import { NgModel } from "@angular/forms";
 import { TeamImageUploadService } from "../team_image_upload/team_image_upload.service";
 import { Camera, CameraOptions, PictureSourceType } from "@ionic-native/camera";
 
+
 /**
  * Generated class for the CreateteamPage page.
  *
@@ -48,6 +50,7 @@ export class CreateteamPage {
   postgre_parentclubId: string;
   publicType: boolean = true;
   privateType: boolean = true;
+
 
   clubs: IClubDetails[];
   club_activities: Activity[] = [];
@@ -107,14 +110,17 @@ export class CreateteamPage {
     private imageUploadService: TeamImageUploadService,
     private camera: Camera,
     public sharedService: SharedServices,
-  ) { }
+    private events: Events
+  ) {
+
+  }
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad CreateteamPage");
   }
 
   ionViewWillEnter() {
-
+    
     console.log("ionViewDidLoad CreateteamPage");
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);

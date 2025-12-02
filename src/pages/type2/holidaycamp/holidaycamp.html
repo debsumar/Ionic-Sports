@@ -1,0 +1,199 @@
+<ion-header *ngIf="themeType == 1">
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-title>{{LangObj.hldycamp_title}}</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-header *ngIf="themeType == 2">
+    <ion-navbar>
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+            <ion-icon name="apps"></ion-icon>
+        </button>
+        <ion-title>
+            {{LangObj.hldycamp_title}}
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()">
+                <img src="assets/images/home.svg" class="home_btn">
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-content [ngClass]="isDarkTheme ? 'dark-theme' : 'light-theme'">
+
+    <!-- Sticky Header Container -->
+    <div class="sticky-header-container">
+        <!-- Full Width Venue Dropdown -->
+        <ion-item class="venue-dropdown">
+            <ion-label>{{LangObj.hldycamp_venue}}</ion-label>
+            <ion-select [(ngModel)]="selectedClub" (ionChange)="onChangeClub()" class="full-width-select">
+                <ion-option value="All">{{LangObj.hldycamp_all}}</ion-option>
+                <ion-option *ngFor="let club of clubVenues" value={{club.Id}}>{{club.ClubName}}</ion-option>
+            </ion-select>
+        </ion-item>
+        
+        <!-- Tabs -->
+        <ion-row class="choose-row">
+            <ion-col col-4>
+                <button ion-button class="select-type" (click)="changeType(0)"
+                    [class.selected]="activeIndex===0">{{LangObj.hldycamp_active}}</button>
+            </ion-col>
+           
+            <ion-col col-4>
+                <button ion-button class="select-type" (click)="changeType(1)" [class.selected]="activeIndex==1">Pending
+                    Payment</button>
+            </ion-col>
+
+            <ion-col col-4>
+                <button ion-button class="select-type" (click)="changeType(2)"
+                    [class.selected]="activeIndex==2">{{LangObj.hldycamp_past}}</button>
+            </ion-col>
+        </ion-row>
+    </div>
+    <!-- <ion-row class="top-row">
+            <ion-col col-12 class="padding-0 allign-center">
+                <label class="toggle">
+                    <input type="checkbox"  [(ngModel)]="sessionType">
+                    <span data-unchecked="Active   : :" data-checked=" : :   Past" ></span>
+                  </label>
+            </ion-col>
+          </ion-row> -->
+    <!-- <ion-row class="choose-row top-row">
+        <ion-col col-6>
+            <button ion-button class="select-type" (click)="changeType(true)"
+                [class.selected]="selectedType">{{LangObj.hldycamp_active}}</button>
+        </ion-col>
+        <ion-col col-6>
+            <button ion-button class="select-type" (click)="changeType(false)"
+                [class.selected]="!selectedType">{{LangObj.hldycamp_past}}</button>
+        </ion-col>
+    </ion-row> -->
+
+
+
+    <ion-row class="sub-container rows-allign2" *ngIf="activeIndex==1">
+        <ion-col col-1 style="text-align:center;margin:auto;">
+            <ion-icon name="ios-search"></ion-icon>
+        </ion-col>
+        <ion-col col-11 class="search-bar">
+            <ion-searchbar placeholder="Search by camp and player name" id="customsearchbar"
+                (ionInput)="getFilteredPlayer($event)" showCanelButton="shouldShowCancel"
+                autocorrect="off"></ion-searchbar>
+        </ion-col>
+    </ion-row>
+
+
+    <!-- Scrollable Content Area -->
+    <div class="scrollable-content-area" *ngIf="activeIndex !== 1">
+        <div *ngIf="HolidayCampList.length > 0">
+            <div *ngFor="let camp of HolidayCampList" class="session-container">
+                <div class="modern-card session-card" (click)="gotoCampDetails(camp)">
+                    <div class="card-header">
+                        <div class="progress-wrapper">
+                            <div *ngIf="can_coach_see_revenue">
+                                <circle-progress class="circlesvg" [titleFontSize]="14"
+                                    [subtitle]=formatCurrency(camp.paidAmount) [titleColor]="'#3ebbd1'"
+                                    [title]=formatCurrency(totalAmount)
+                                    [percent]=calculatePercentComplete(camp.dueAmount,camp.paidAmount) [units]="''"
+                                    [radius]="45" [showUnits]="false" [outerStrokeWidth]="4" [innerStrokeWidth]="3"
+                                    [outerStrokeColor]="'#78C000'" [subtitleColor]="'#78C000'"
+                                    [innerStrokeColor]="'#3ebbd1'" [animation]="true" [animationDuration]="1000">
+                                </circle-progress>
+                            </div>
+                            <div *ngIf="!can_coach_see_revenue">
+                                <circle-progress class="circlesvg" [titleFontSize]="12" [subtitle]=''
+                                    [titleColor]="'#3ebbd1'" [title]=getDays(camp.days) [percent]="100" [units]="''"
+                                    [radius]="45" [showUnits]="false" [outerStrokeWidth]="3" [innerStrokeWidth]="2"
+                                    [outerStrokeColor]="'#78C000'" [subtitleColor]="'#78C000'"
+                                    [innerStrokeColor]="'#3ebbd1'" [animation]="true" [animationDuration]="100">
+                                </circle-progress>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h3 class="card-title">{{camp.camp_name}}</h3>
+                            <p class="card-subtitle">{{camp.venue_name}}</p>
+                            <p class="card-dates">{{camp.start_date}} - {{camp.end_date}}</p>
+                        </div>
+                        <div class="enrollment-info">
+                            <ion-icon name="people" class="people_icon"></ion-icon>
+                            <div class="enrollment-badge">
+                                <span class="badge-text">{{camp.bookingCount || 0}}</span>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+        <!-- Empty State -->
+        <div class="modern-empty-state" *ngIf="HolidayCampList.length === 0">
+            <div class="empty-illustration">
+                <ion-icon name="sunny" class="empty-icon"></ion-icon>
+            </div>
+            <div class="empty-text">
+                <h2 class="empty-title">No Holiday Camps</h2>
+                <p class="empty-description">Add your first holiday camp to get started</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- the below code is for pending payment -->
+    <div *ngIf="activeIndex==1" class="pending-payment-container">
+        <div *ngIf="filteredUsers && filteredUsers.length > 0">
+            <ion-card *ngFor="let camp of filteredUsers;let i=index" class="ion_card " >
+                <ion-card-content class="nopad borderleft" (click)="showPendingActionSheet(i)">
+                    <ion-grid class="nopad">
+                        <ion-row>
+                            <ion-col col-12 class="mid-col">
+                                <p class="campname elipsesdot" style="margin-top: -2px;font-size: 1.2em;">{{camp.username}}</p>
+                                <p class="campname" style="margin-top: -2px;font-weight: 400;">{{camp.campname}}</p>
+                                <p class="campname elipsesdot" style="margin-top: -2px;">{{camp.sessionname}}</p>
+                                <p class="holidaycampcard_p">
+                                    <ion-icon name="calendar"></ion-icon> {{comonService.getdateInDDMMYYYY(camp.sessiondate)}}
+                                </p>
+                                <div>
+                                    <p class="holidaycampcard_p">
+                                        <ion-icon name="pin"></ion-icon> {{camp.venuename}}
+                                    </p>
+                                </div>
+                            </ion-col>
+                        </ion-row>
+                    </ion-grid>
+                </ion-card-content>
+            </ion-card>
+        </div>
+        
+        <!-- Empty State for Pending Payments -->
+        <div class="modern-empty-state" *ngIf="filteredUsers.length === 0">
+            <div class="empty-illustration">
+                <ion-icon name="card" class="empty-icon"></ion-icon>
+            </div>
+            <div class="empty-text">
+                <h2 class="empty-title">No Pending Payments</h2>
+                <p class="empty-description">All payments are up to date</p>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- <page-paymentgatewaysetup *ngIf="this.isShowPaymentModal" InstructTxt="Please connect to payment gateway for sessions" (skip)="skip()" (navigate)="GotoPaymentSetup()"></page-paymentgatewaysetup> -->
+
+    <ion-fab bottom right *ngIf="loggedin_type!=4">
+        <button ion-fab mini style="background-color: #2b92bb;" (click)="gotoCreateHolidayCamp()"
+            style="background-color:#2b92bb !important; color: white !important">
+            <ion-icon name="add"></ion-icon>
+        </button>
+    </ion-fab>
+
+</ion-content>

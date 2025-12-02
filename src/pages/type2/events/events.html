@@ -1,0 +1,131 @@
+<!--
+  Generated template for the EventsPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>Events</ion-title>
+  </ion-navbar>
+  <!-- Modern Tab Section in Header -->
+  <div class="modern-tabs-container">
+    <div class="tab-wrapper">
+      <button 
+        class="modern-tab" 
+        [class.active]="selectedType" 
+        (click)="changeType(true)">
+        <ion-icon name="calendar" class="tab-icon"></ion-icon>
+        <span class="tab-text">Active Events</span>
+        <div class="tab-indicator"></div>
+      </button>
+      <button 
+        class="modern-tab" 
+        [class.active]="!selectedType" 
+        (click)="changeType(false)">
+        <ion-icon name="archive" class="tab-icon"></ion-icon>
+        <span class="tab-text">Past Events</span>
+        <div class="tab-indicator"></div>
+      </button>
+    </div>
+  </div>
+</ion-header>
+
+<ion-content>
+
+  <!-- Enhanced Events List -->
+  <div class="events-container">
+    <div class="modern-event-card" *ngFor="let event of events" (click)="GotoDets(event)">
+      <div class="event-card-content">
+        <div class="event-main-info">
+          <div class="event-header">
+            <div class="event-date-badge">
+              <ion-icon name="calendar-outline" class="date-icon"></ion-icon>
+              <span class="event-date-text">{{event.event_date}}</span>
+            </div>
+          </div>
+          
+          <h3 class="event-title">{{event.event_name}}</h3>
+          
+          <div class="event-details">
+            <div class="price-info">
+              <ion-icon name="pricetags" class="detail-icon"></ion-icon>
+              <span class="price-text" *ngIf="event.is_paid">{{event.min_max_amount}}</span>
+              <span class="price-text free" *ngIf="!event.is_paid">Free</span>
+            </div>
+            
+            <div class="location-info">
+              <ion-icon name="pin" class="detail-icon"></ion-icon>
+              <span class="location-text">{{event.event_location}}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="event-stats">
+          <div class="attendance-circle">
+            <div class="attendance-numbers">
+              <span class="current">{{event.ticket_count}}</span>
+              <span class="separator">/</span>
+              <span class="total">{{event.capacity}}</span>
+            </div>
+            <div class="attendance-label">Registered</div>
+          </div>
+          <div class="draft-status" *ngIf="event.status==0">
+            <span class="draft-badge">Draft</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Enhanced Empty State -->
+  <div class="empty-state" *ngIf="!isEventsFound">
+    <div class="empty-content">
+      <ion-icon name="calendar-outline" class="empty-icon"></ion-icon>
+      <h3 class="empty-title">No Events Found</h3>
+      <p class="empty-description">There are no events to display at the moment</p>
+    </div>
+  </div>
+
+  <!-- <page-paymentgatewaysetup
+    *ngIf="this.isShowPaymentModal"
+    InstructTxt="Please connect to payment gateway for events"
+    (skip)="skip()"
+    (navigate)="GotoPaymentSetup()"
+  ></page-paymentgatewaysetup> -->
+
+  <!-- Enhanced FAB -->
+  <ion-fab right bottom class="modern-fab">
+    <button ion-fab class="gradient-fab">
+      <ion-icon name="add"></ion-icon>
+    </button>
+    <ion-fab-list side="top">
+      <div class="fab-item" (click)="GotoAdd()">
+        <span class="fab-label">Add Event</span>
+        <button ion-fab class="fab-button">
+          <ion-icon name="calendar"></ion-icon>
+        </button>
+      </div>
+      <div class="fab-item" (click)="GotoAddCaption()">
+        <span class="fab-label">Manage Caption</span>
+        <button ion-fab class="fab-button" >
+          <ion-icon name="create"></ion-icon>
+        </button>
+      </div>
+    </ion-fab-list>
+  </ion-fab>
+  
+</ion-content>
+
+<!-- <ion-fab mini right bottom #fab>
+
+  <button ion-fab mini style='background-color: #2b92bb;'(click)="showNewPost()">
+      <ion-icon name="add"></ion-icon>
+  </button>
+  <ion-fab-list side="top"> -->
+<!-- *ngIf="!this.isShowPaymentModal" -->
+
+
+
+
+

@@ -1,0 +1,11 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
+reportbooking-page {
+    @include android-sdk35-fixes;
+.social-cards ion-col {
+        padding: 8px;
+     }
+     .right{
+         float: right;
+     }
+}

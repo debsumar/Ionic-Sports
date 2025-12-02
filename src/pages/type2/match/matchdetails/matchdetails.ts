@@ -1,5 +1,6 @@
 import { Component } from "@angular/core";
-import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController } from "ionic-angular";
+import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, Events } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import { Storage } from "@ionic/storage";
 import { SharedServices } from "../../../services/sharedservice";
 import { FirebaseService } from "../../../../services/firebase.service";
@@ -22,6 +23,7 @@ import { AllMatchData } from "../../../../shared/model/match.model";
   templateUrl: "matchdetails.html",
 })
 export class MatchdetailsPage {
+  isDarkTheme: boolean = false;
   activeType: boolean = true;
   invitedType: boolean = true;
   UserInvitationStatus = {
@@ -62,8 +64,13 @@ export class MatchdetailsPage {
     public sharedservice: SharedServices,
     public actionSheetCtrl: ActionSheetController,
     public modalCtrl: ModalController,
-    private graphqlService: GraphqlService
+    private graphqlService: GraphqlService,
+    private themeService: ThemeService,
+    private events: Events
   ) {
+    this.events.subscribe('theme:changed', (theme) => {
+      this.isDarkTheme = theme === 'dark';
+    });
     console.log(
       `${this.navParams.get("selectedmatchId")}:${this.navParams.get(
         "selectedmemberkey"
@@ -98,7 +105,12 @@ export class MatchdetailsPage {
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad MatchdetailsPage");
-
+    this.storage.get('dashboardTheme').then((theme) => {
+      this.isDarkTheme = theme === 'dark' || theme === true;
+      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
+      document.body.classList.remove('dark-theme', 'light-theme');
+      document.body.classList.add(themeClass);
+    });
   }
 
   getFormattedDate(date: any) {

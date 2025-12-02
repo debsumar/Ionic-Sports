@@ -6,7 +6,9 @@ import {
   NavController,
   NavParams,
   PopoverController,
+  Events
 } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import {
   CommonService,
   ToastMessageType,
@@ -40,6 +42,7 @@ import { CatandType } from "../../league/models/location.model";
   providers: [HttpService]
 })
 export class CreatematchPage {
+  isDarkTheme: boolean = false;
   publicType: boolean = true;
   privateType: boolean = true;
   selectedClub: any;
@@ -131,9 +134,13 @@ export class CreatematchPage {
     public sharedservice: SharedServices,
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
-    private httpService: HttpService
-
+    private httpService: HttpService,
+    private themeService: ThemeService,
+    private events: Events
   ) {
+    this.events.subscribe('theme:changed', (theme) => {
+      this.isDarkTheme = theme === 'dark';
+    });
     this.startDate = moment().format("YYYY-MM-DD");
     this.startTime = "09:00";
     // this.CreateMatchInput.MatchStartDate = moment((moment().add(1, 'days'))).format("YYYY-MM-DD");
@@ -147,7 +154,14 @@ export class CreatematchPage {
     this.createMatchInput.user_device_metadata.UserActionType = 2
   }
 
-  ionViewDidLoad() { }
+  ionViewDidLoad() {
+    this.storage.get('dashboardTheme').then((theme) => {
+      this.isDarkTheme = theme === 'dark' || theme === true;
+      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
+      document.body.classList.remove('dark-theme', 'light-theme');
+      document.body.classList.add(themeClass);
+    });
+  }
 
   ionViewWillEnter() {
     console.log("ionViewDidLoad CreatematchPage");

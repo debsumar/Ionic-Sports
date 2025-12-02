@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
+import { ThemeService } from '../../../../../services/theme.service';
 import { AppType } from '../../../../../shared/constants/module.constants';
 import { HttpService } from '../../../../../services/http.service';
 import { CommonService, ToastMessageType } from '../../../../../services/common.service';
@@ -17,7 +18,7 @@ import { TeamsForParentClubModel } from '../../models/team.model';
 
 @IonicPage()
 @Component({
-  selector: 'page-result_input',
+  selector: 'page-result-input',
   templateUrl: 'result_input.html',
   providers: [HttpService]
 })
@@ -87,11 +88,51 @@ export class ResultInputPage {
   resultDescription: string = '';
   isEditable: boolean = true;
 
+  isDarkTheme: boolean = true;
+
   constructor(public navCtrl: NavController, public navParams: NavParams, public viewCtrl: ViewController,
     public storage: Storage, private httpService: HttpService, public sharedservice: SharedServices,
-    public commonService: CommonService, public alertCtrl: AlertController) {
+    public commonService: CommonService, public alertCtrl: AlertController, public events: Events,
+    public themeService: ThemeService) {
 
     this.initializeComponent();
+  }
+
+  ionViewDidLoad() {
+    this.loadTheme();
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  loadTheme() {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      if (isDarkTheme !== null) {
+        this.isDarkTheme = isDarkTheme;
+      } else {
+        this.isDarkTheme = true;
+      }
+      this.applyTheme();
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme();
+    });
+  }
+
+  applyTheme() {
+    const element = document.querySelector('page-result-input');
+    if (element) {
+      if (this.isDarkTheme) {
+        element.classList.remove('light-theme');
+      } else {
+        element.classList.add('light-theme');
+      }
+    }
   }
 
   private initializeComponent(): void {

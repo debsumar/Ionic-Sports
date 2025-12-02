@@ -6,8 +6,10 @@ import {
   ViewController,
   LoadingController,
   AlertController,
-  PopoverController
+  PopoverController,
+  Events
 } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import {
   CommonService,
   ToastMessageType,
@@ -57,8 +59,7 @@ interface StaffDetails {
   templateUrl: 'addstafftoteam.html',
 })
 export class AddstafftoteamPage {
-
-
+  isDarkTheme: boolean = false;
   themeType: number;
   staff: StaffModel[] = [];
   filteredStaff: StaffModel[] = [];
@@ -98,10 +99,15 @@ export class AddstafftoteamPage {
     public viewCtrl: ViewController,
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
-
+    private themeService: ThemeService,
+    private events: Events
   ) {
     this.existedstaff = this.navParams.get("existedstaff")
     this.themeType = sharedservice.getThemeType();
+    
+    this.events.subscribe('theme:changed', (theme) => {
+      this.isDarkTheme = theme === 'dark';
+    });
     console.log("addstafftoteam");
     this.addStaffInput.parentClubteamId = this.navParams.get("teamid")
 
@@ -138,7 +144,12 @@ export class AddstafftoteamPage {
   }
 
   ionViewDidLoad() {
-    // Component loaded
+    this.storage.get('dashboardTheme').then((theme) => {
+      this.isDarkTheme = theme === 'dark' || theme === true;
+      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
+      document.body.classList.remove('dark-theme', 'light-theme');
+      document.body.classList.add(themeClass);
+    });
   }
 
   ionViewWillLeave() {

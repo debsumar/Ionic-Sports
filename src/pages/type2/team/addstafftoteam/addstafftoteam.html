@@ -9,7 +9,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
+<ion-content padding [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
   <ion-item class="search_add">
 
 <ion-searchbar
@@ -51,14 +51,7 @@
   <ion-grid>
     <ion-row>
       <ion-col col-12>
-        <button
-          (click)="saveStaff()"
-          ion-button
-          block
-         
-        >
-          Add Staff
-        </button>
+        <button (click)="saveStaff()" class="timekare-primary-btn" ion-button block>Add Staff</button>
       </ion-col>
     </ion-row>
   </ion-grid>

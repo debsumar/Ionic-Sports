@@ -1,6 +1,108 @@
 @import "../../_league-theme.scss";
-
+@import '../../../../../theme/android-sdk35-fixes.scss';
 page-tennis-set-input {
+  @include league-theme-base;
+  @include android-sdk35-fixes;
+
+  // Dark theme
+  &:not(.light-theme) {
+    .scroll-content {
+      background: #1e293b !important;
+    }
+
+    .header-section {
+      .team-info h3 {
+        color: #f1f5f9 !important;
+      }
+      .subtitle {
+        color: #94a3b8 !important;
+      }
+    }
+
+    .set-card {
+      background: #334155 !important;
+      border-left-color: #2b92bb !important;
+
+      .set-header .set-number {
+        color: #f1f5f9 !important;
+      }
+
+      .score-inputs .team-score {
+        label {
+          color: #94a3b8 !important;
+        }
+
+        .score-input {
+          background: #475569 !important;
+          border-color: #64748b !important;
+          color: #f1f5f9 !important;
+
+          .text-input {
+            color: #f1f5f9 !important;
+          }
+        }
+      }
+
+      .vs-divider {
+        color: #2b92bb !important;
+      }
+    }
+
+    .custom-footer {
+      background: #1e293b !important;
+      border-top-color: #475569 !important;
+    }
+  }
+
+  // Light theme
+  &.light-theme {
+    .scroll-content {
+      background: #f1f5f9 !important;
+    }
+
+    .header-section {
+      .team-info h3 {
+        color: #2c3e50 !important;
+      }
+      .subtitle {
+        color: #7f8c8d !important;
+      }
+    }
+
+    .set-card {
+      background: white !important;
+      border-left-color: #3498db !important;
+
+      .set-header .set-number {
+        color: #2c3e50 !important;
+      }
+
+      .score-inputs .team-score {
+        label {
+          color: #7f8c8d !important;
+        }
+
+        .score-input {
+          background: #f8f9fa !important;
+          border-color: #e9ecef !important;
+          color: #2c3e50 !important;
+
+          .text-input {
+            color: #2c3e50 !important;
+          }
+        }
+      }
+
+      .vs-divider {
+        color: #3498db !important;
+      }
+    }
+
+    .custom-footer {
+      background: white !important;
+      border-top-color: #e9ecef !important;
+    }
+  }
   .scroll-content {
     background-image: none !important;
     padding: 16px !important;

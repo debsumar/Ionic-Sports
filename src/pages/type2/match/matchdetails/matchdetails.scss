@@ -1,4 +1,84 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
 page-matchdetails {
+  @include android-sdk35-fixes;
+  
+  // Light theme styles
+  &.light-theme,
+  .light-theme & {
+    .scroll-content {
+      background: #f2f5fa;
+    }
+    
+    .largetext {
+      color: #154766;
+    }
+    
+    .smalltext {
+      color: #154766;
+    }
+    
+    ion-item {
+      background: white;
+      color: #1e293b;
+      
+      p {
+        color: #1e293b;
+      }
+    }
+    
+    ion-card {
+      background: white;
+    }
+    
+    .participant_div {
+      background: white;
+    }
+  }
+  
+  // Dark theme styles
+  &.dark-theme,
+  .dark-theme & {
+    .scroll-content {
+      background: #1e293b;
+    }
+    
+    .largetext {
+      color: #f1f5f9;
+    }
+    
+    .smalltext {
+      color: #f1f5f9;
+    }
+    
+    ion-item {
+      background: #334155;
+      color: #f1f5f9;
+      
+      p {
+        color: #f1f5f9;
+      }
+    }
+    
+    ion-card {
+      background: #334155;
+    }
+    
+    .participant_div {
+      background: #334155;
+    }
+    
+    ion-navbar {
+      background: #1e293b;
+      
+      .toolbar-title {
+        color: #f1f5f9;
+      }
+    }
+    
+    .cardrow {
+      background: #334155;
+    }
+  }
   .toolbar-title{
     color:#fff;
   }
