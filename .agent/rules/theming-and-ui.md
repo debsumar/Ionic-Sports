@@ -54,255 +54,90 @@ $colors: (
 
 ## 3. Dynamic Theming (Firebase-based)
 
-The application supports per-ParentClub theming stored in Firebase. Theme configuration is fetched from:
-
-```
-ParentClub/Type2/{ParentClubKey}/Theme
-```
+The application supports per-ParentClub theming stored in Firebase. Theme configuration is fetched from `ParentClub/Type2/{ParentClubKey}/Theme` and applied dynamically.
 
 ### Theme Object Structure
 
 ```typescript
 interface ThemeConfig {
-  HeaderBG: string;      // Header background color (default: "#17445b")
-  HeaderText: string;    // Header text color (default: "#f4f4f4")
-  TabBG: string;         // Tab bar background (default: "#17445b")
-  TabText: string;       // Tab bar text color (default: "#f4f4f4")
-  DashboardBG: string;   // Dashboard background (default: "#17445b")
-  HomepageBG: string;    // Homepage background (default: "#f4f4f4")
+  HeaderBG: string;      // Header background color
+  HeaderText: string;    // Header text color
+  TabBG: string;         // Tab bar background
+  TabText: string;       // Tab bar text color
+  DashboardBG: string;   // Dashboard background
+  HomepageBG: string;    // Homepage background
 }
 ```
-
-### Usage
-
-1. Fetch theme config from Firebase on app initialization
-2. Apply colors dynamically using Angular property binding
-3. Admin users can modify theme via `Theme` page (`src/pages/type2/appuiconfig/theme.ts`)
 
 ---
 
 ## 4. Dark Mode Support
 
-Use `ThemeService` for dark mode toggling:
-
-```typescript
-import { ThemeService } from '../services/theme.service';
-
-constructor(private themeService: ThemeService) {
-  // Subscribe to theme changes
-  this.themeService.isDarkTheme$.subscribe(isDark => {
-    // Apply dark theme styles
-  });
-}
-
-// Toggle theme
-this.themeService.toggleTheme();
-
-// Set specific theme
-this.themeService.setTheme(true);  // Enable dark mode
-this.themeService.setTheme(false); // Enable light mode
-```
-
----
-
-## 5. UI Component Standards
-
-### Status Bar
-
-```typescript
-// Light background with dark content
-this.statusBar.backgroundColorByHexString('#f7f7f7');
-this.statusBar.styleDefault();
-```
-
-### Toast Messages
-
-Use consistent toast styling classes:
-
-| Class | Color | Usage |
-|-------|-------|-------|
-| `.success` | `#32db64` | Success notifications |
-| `.error` | `#f53d3d` | Error notifications |
-| `.info` | `#f76e04` | Informational messages |
-
-```typescript
-this.commonService.toastMessage(
-  "Message text",
-  2500,
-  ToastMessageType.Success,
-  ToastPlacement.Top
-);
-```
-
-### Card Styling
+The app uses a hybrid approach for Dark Mode:
+1.  **Service**: `ThemeService` tracks the state (`isDarkTheme$`).
+2.  **CSS Classes**: Components toggle `.dark-theme` / `.light-theme` classes on the content container.
+3.  **SCSS Nesting**: Styles are nested within these classes.
 
 ```scss
-// iOS/Android consistent card margins
-$card-ios-margin-top: 6px;
-$card-ios-margin-bottom: 6px;
-$card-md-margin-top: 6px;
-$card-md-margin-bottom: 6px;
-```
-
-### Toggle Buttons
-
-Standard toggle sizing:
-
-```scss
-// iOS
-$toggle-ios-height: 20px;
-$toggle-ios-width: 30px;
-
-// Material Design
-$toggle-md-track-width: 30px;
-$toggle-md-track-height: 10px;
-```
-
----
-
-## 6. Utility Classes
-
-### Text Utilities
-
-```scss
-.tk-center { text-align: center; }
-
-.para_overflow {
-  text-overflow: ellipsis;
-  overflow: hidden;
-  white-space: nowrap;
-}
-
-.margin_auto { margin: auto; }
-```
-
-### Custom Toggle Component
-
-Use the `.custom_toggle` class for custom toggle switches:
-
-```html
-<label class="custom_toggle">
-  <input type="checkbox" [(ngModel)]="isEnabled">
-  <span data-checked="ON" data-unchecked="OFF"></span>
-</label>
-```
-
----
-
-## 7. Modal & Popup Styling
-
-### Standard Modal Wrapper
-
-```scss
-.modal_wrapper {
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  left: 0;
-  top: 0;
-  background: rgba(0, 0, 0, 0.6);
-  z-index: 9999;
-  animation: popup 0.9s;
-}
-
-.modal_content {
-  position: relative;
-  width: 90%;
-  left: 50%;
-  top: 50%;
-  height: auto;
-  padding: 10px;
-  transform: translate(-50%, -50%);
-  background-color: #fff;
-}
-```
-
-### Alert Customization
-
-For custom alert widths:
-
-```scss
-.event-alert .alert-wrapper {
-  max-width: 320px !important;
-}
-```
-
----
-
-## 8. Tablet/iPad Support
-
-Ensure modals display full-screen on larger devices:
-
-```scss
-@media only screen and (min-height: 768px) and (min-width: 768px) {
-  .modal-wrapper {
-    left: 0 !important;
-    top: 0 !important;
-    position: absolute;
-    width: 100% !important;
-    height: 100% !important;
+page-matchdetails {
+  .light-theme & {
+    .largetext { color: #154766; }
+  }
+  .dark-theme & {
+    .largetext { color: #f1f5f9; }
   }
 }
 ```
 
 ---
 
-## 9. Loading Spinner
+## 5. Typography
 
-Use the custom bounce spinner for loading states:
+The application uses **Roboto** and **Noto Sans** (imported in `variables.scss`).
 
-```html
-<div class="spinner1">
-  <div class="bounce1"></div>
-  <div class="bounce2"></div>
-  <div class="bounce3"></div>
-</div>
-```
+*   **Primary Font**: Roboto (Ionic default)
+*   **Secondary Font**: Noto Sans
+
+Ensure all text elements inherit these defaults unless a specific override is required for branding.
 
 ---
 
-## 10. Animations
+## 6. UI Component Standards
 
-### Zoom-In Effect (for magnific popup)
+### Status Bar
+*   Light/Default style: `backgroundColorByHexString('#f7f7f7')`
 
-The `.mfp-zoom-in` class provides smooth zoom transitions.
+### Toast Messages
+Use `CommonService.toastMessage()` with standard types:
+*   **Success**: Green (`#32db64`)
+*   **Error**: Red (`#f53d3d`)
+*   **Info**: Orange (`#f76e04`)
 
-### Popup Animation
+### Loading Spinners
+Use the custom CSS-based spinner `.spinner1` (bouncing dots) rather than the default Ionic loading spinner when possible, for a custom brand feel.
 
-The `@keyframes popup` provides a bounce-in effect for modals.
-
----
-
-## 11. Best Practices
-
-1. **Use SCSS variables** - Never hardcode colors; always use defined variables
-2. **Platform-specific styles** - Use `.md`, `.ios`, or `.wp` mode classes for platform-specific styling
-3. **Consistent spacing** - Use the predefined margin/padding values
-4. **Firebase theming** - Always check for Firebase theme overrides before applying defaults
-5. **Accessibility** - Ensure sufficient color contrast (WCAG 2.1 AA minimum)
-6. **Responsive design** - Test on both mobile and tablet viewports
+### Modals & Popups
+*   **Animation**: Custom `@keyframes popup` animation.
+*   **Tablet Support**: Full-screen width on devices > 768px.
+*   **Overlay**: `rgba(0, 0, 0, 0.6)` background opacity.
 
 ---
 
-## 12. Adding New Theme Colors
+## 7. Utility Classes (`app.scss`)
 
-1. Add SCSS variable in `src/theme/variables.scss` or `src/app/app.scss`
-2. If the color should be editable per-club, add it to the `ThemeConfig` interface
-3. Update `theme.ts` to handle the new color in the admin configuration
-4. Update Firebase `Theme` object in `ParentClub/Type2/{key}/Theme`
+| Class | Description |
+|-------|-------------|
+| `.tk-center` | Text align center |
+| `.para_overflow` | Text truncation with ellipsis |
+| `.margin_auto` | `margin: auto` |
+| `.custom_toggle` | Custom styled checkbox toggle |
+| `.HideButton` | Utilities to hide alert buttons dynamically |
 
 ---
 
-## 13. Background Images
+## 8. Best Practices
 
-Default background path:
-
-```scss
-$color1-login-background-image: '../assets/images/background/loginbg.png';
-
-.scroll-content {
-  background-image: url("../assets/images/background/backgroundimg1.png") !important;
-}
-```
-
-Store all background images in `src/assets/images/background/`.
+1.  **Variable Usage**: Always use SCSS variables (`$colors`, `$blue-light`, etc.) instead of hardcoded hex values.
+2.  **Scoped Styling**: Wrap page-specific styles in the page selector (e.g., `page-matchdetails { ... }`).
+3.  **Theme Awareness**: When adding new text or backgrounds, always define both Light and Dark mode variations.
+4.  **Asset Handling**: Store background images in `assets/images/background/` and use variables for their paths.

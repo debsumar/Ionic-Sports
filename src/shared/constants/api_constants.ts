@@ -138,5 +138,9 @@ export const API = {
     CANCEL_RECURRING_BOOKING_V2: 'courtbooking/cancelrecurringbooking_v2',
     BULK_CANCEL_RECURRING_BY_ID: 'courtbooking/bulkcancelrecurringbyid',
     CANCEL_SLOT_WITH_ID: 'courtbooking/cancelslotwithid',
-    ALL_BOOKING_BY_COURT: 'courtbooking/allbookingbycourt'
+    ALL_BOOKING_BY_COURT: 'courtbooking/allbookingbycourt',
+    GET_TEAM_FORMATIONS: 'league/lineup/getTeamFormations',
+    SAVE_TEAM_FORMATION: 'league/lineup/saveTeamFormation',
+    DELETE_TEAM_FORMATION: 'league/lineup/deleteTeamFormation',
+    GET_SAVED_FORMATIONS: 'league/lineup/getSavedFormationsForMatch'
 }

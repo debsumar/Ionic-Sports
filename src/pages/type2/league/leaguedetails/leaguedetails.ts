@@ -421,7 +421,12 @@ export class LeaguedetailsPage {
       );
   }
 
+  goToLineup(match: LeagueMatch) {
+    this.navCtrl.push("LineupPage");
+  }
+
   gotoMatchDetails(match: LeagueMatch) {
+
     // this.navCtrl.push("LeaguematchdetailsPage");
     //this.navCtrl.push("UpdateleaguematchPage", { leagueId: this.individualLeague.id });
     let actionSheet = this.actionSheetCtrl.create({

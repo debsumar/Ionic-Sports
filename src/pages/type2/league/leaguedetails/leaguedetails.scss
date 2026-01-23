@@ -1,8 +1,10 @@
 @import "../_league-theme.scss";
 @import '../../../../theme/android-sdk35-fixes.scss';
+
 page-leaguedetails {
   @include league-theme-base;
   @include android-sdk35-fixes;
+
   // Enhanced theme support for specific elements
   &.light-theme {
     .modern-match-card {
@@ -190,6 +192,7 @@ page-leaguedetails {
     background-color: #334155 !important;
     padding: 16px;
   }
+
   .teamName {
     color: #154766;
     font-size: 18px;
@@ -242,7 +245,7 @@ page-leaguedetails {
     color: #154766;
   }
 
-  .action_btns_div{
+  .action_btns_div {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -251,11 +254,13 @@ page-leaguedetails {
     top: 50%;
     left: 50%;
     transform: translate(-40%, -20%);
-    button{
+
+    button {
       height: 2em;
-      ion-icon{
-       color: #2b92bb !important;
-       font-size: 1.5em !important;
+
+      ion-icon {
+        color: #2b92bb !important;
+        font-size: 1.5em !important;
       }
     }
   }
@@ -938,6 +943,26 @@ page-leaguedetails {
 
       ion-icon {
         font-size: 12px;
+      }
+
+      .lineup-btn {
+        margin: 0 0 0 8px;
+        height: 20px;
+        background: rgba(255, 255, 255, 0.3);
+        color: white;
+        font-size: 9px;
+        font-weight: 700;
+        text-transform: uppercase;
+        border-radius: 4px;
+        padding: 0 6px;
+
+        .button-inner {
+          padding: 0;
+        }
+
+        &:hover {
+          background: rgba(255, 255, 255, 0.4);
+        }
       }
     }
 

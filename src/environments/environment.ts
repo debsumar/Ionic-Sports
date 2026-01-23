@@ -3,8 +3,8 @@ export const environment = {
   email_url: "http://54.84.255.41:8121/",
   //emailUrl: "http://localhost:32683/";
   node_url: "https://activitypro-node.appspot.com",
-  new_http_url: "https://api-dev.activitypro.co.uk:1026/api",
-  // new_http_url: "http://localhost:9000/api",
+  // new_http_url: "https://api-dev.activitypro.co.uk:1026/api",
+  new_http_url: "http://localhost:9000/api",
   nest_url: "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV",
   group_sessionsUrl: "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV",
   group_session_apikey: "",
