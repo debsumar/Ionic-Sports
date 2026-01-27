@@ -18,6 +18,29 @@
 </ion-header>
 
 <ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme" (click)="closeAllDropdowns()">
+    <!-- Match Info Header -->
+    <div class="match-info-header" *ngIf="match">
+        <div class="match-activity-badge">{{ match.ActivityName }}</div>
+        <div class="match-title-text" *ngIf="match.MatchTitle">{{ match.MatchTitle }}</div>
+        <div class="match-main-info">
+            <div class="match-teams-row">
+                <span class="team-name">{{ match.homeUserName }}</span>
+                <span class="vs-label">VS</span>
+                <span class="team-name">{{ match.awayUserName }}</span>
+            </div>
+            <div class="match-meta-info">
+                <div class="meta-item">
+                    <ion-icon name="calendar" class="meta-icon"></ion-icon>
+                    <span>{{ match.Date }} • {{ match.Time }}</span>
+                </div>
+                <div class="meta-item">
+                    <ion-icon name="pin" class="meta-icon"></ion-icon>
+                    <span class="venue-text">{{ match.VenueName }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="lineup-container">
         <!-- Lineup Name Input -->
         <div class="lineup-name-section">
@@ -206,42 +229,43 @@
         </div>
     </div>
 
-    <!-- Modals Overlay Section -->
-    <div class="modals-overlay" *ngIf="showPlayerSelection || showPlayerOptions" (click)="closeAllDropdowns()">
+</ion-content>
 
-        <!-- Player Selection Modal -->
-        <div class="modal-card player-selection-card" *ngIf="showPlayerSelection" (click)="$event.stopPropagation()">
-            <div class="modal-header">
-                <h3>Select Player</h3>
-            </div>
-            <div class="player-list">
-                <div class="player-selection-item" *ngFor="let player of getFilteredPlayers()"
-                    (click)="assignPlayer(player)">
-                    <img [src]="player.image || 'assets/images/user.png'" class="item-avatar">
-                    <span class="item-name">{{ player.name }}</span>
-                </div>
-                <div class="no-players" *ngIf="getFilteredPlayers().length === 0">
-                    No more players available
-                </div>
-            </div>
+<!-- Modals Overlay Section -->
+<div class="modals-overlay" *ngIf="showPlayerSelection || showPlayerOptions" (click)="closeAllDropdowns()">
+
+    <!-- Player Selection Modal -->
+    <div class="modal-card player-selection-card" *ngIf="showPlayerSelection" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+            <h3>Select Player</h3>
         </div>
-
-        <!-- Player Options Menu (From Screenshot) -->
-        <div class="modal-card player-options-card" *ngIf="showPlayerOptions" (click)="$event.stopPropagation()">
-            <div class="options-header">
-                <span class="player-full-name">{{ activePosition?.player?.name }}</span>
+        <div class="player-list">
+            <div class="player-selection-item" *ngFor="let player of getFilteredPlayers()"
+                (click)="assignPlayer(player)">
+                <img [src]="player.image || 'assets/images/user.png'" class="item-avatar">
+                <span class="item-name">{{ player.name }}</span>
             </div>
-            <div class="options-list">
-                <button class="option-btn" (click)="replacePlayer()">
-                    <span>Replace</span>
-                </button>
-                <button class="option-btn" (click)="moveToSubstitutes()">
-                    <span>Move to substitutes</span>
-                </button>
-                <button class="option-btn remove-btn" (click)="removePlayer()">
-                    <span>Remove</span>
-                </button>
+            <div class="no-players" *ngIf="getFilteredPlayers().length === 0">
+                No more players available
             </div>
         </div>
     </div>
-</ion-content>
+
+    <!-- Player Options Menu (From Screenshot) -->
+    <div class="modal-card player-options-card" *ngIf="showPlayerOptions" (click)="$event.stopPropagation()">
+        <div class="options-header">
+            <span class="player-full-name">{{ activePosition?.player?.name }}</span>
+        </div>
+        <div class="options-list">
+            <button class="option-btn" (click)="replacePlayer()">
+                <span>Replace</span>
+            </button>
+            <button class="option-btn" (click)="moveToSubstitutes()">
+                <span>Move to substitutes</span>
+            </button>
+            <button class="option-btn remove-btn" (click)="removePlayer()">
+                <span>Remove</span>
+            </button>
+        </div>
+    </div>
+</div>

@@ -104,6 +104,7 @@ export class LineupPage {
     private activityId: string = '';
     isCreateNew: boolean = false;
     private formationSetupId: string = '';
+    match: any;
 
     // ===========================================
     // API Input Objects
@@ -182,6 +183,28 @@ export class LineupPage {
         this.fetchPlayersForTeam();
     }
 
+    ionViewWillEnter(): void {
+        console.log("Lineup page - ionViewWillEnter");
+        this.loadTheme();
+
+        // Subscribe to theme changes from service
+        this.themeService.isDarkTheme$.subscribe(isDark => {
+            this.isDarkTheme = isDark;
+            this.applyTheme(isDark);
+        });
+
+        // Listen for theme changes from events
+        this.events.subscribe('theme:changed', (isDark) => {
+            this.isDarkTheme = isDark === 'dark' || isDark === true;
+            this.applyTheme(this.isDarkTheme);
+        });
+    }
+
+    ionViewDidEnter(): void {
+        setTimeout(() => this.forceThemeCheck(), 50);
+        setTimeout(() => this.forceThemeCheck(), 200);
+    }
+
     ionViewWillLeave(): void {
         this.events.unsubscribe('theme:changed');
     }
@@ -191,6 +214,7 @@ export class LineupPage {
     // ===========================================
 
     private initializeFromNavParams(): void {
+        this.match = this.navParams.get('match');
         this.matchId = this.navParams.get('matchId') || '';
         this.activityId = this.navParams.get('activityId') || '';
         this.isCreateNew = !!this.navParams.get('isCreateNew');
@@ -281,7 +305,49 @@ export class LineupPage {
 
     private loadTheme(): void {
         this.storage.get('dashboardTheme').then((theme) => {
-            this.isDarkTheme = theme === 'dark' || theme === true;
+            const isDark = theme === 'dark' || theme === true;
+            this.isDarkTheme = isDark;
+            this.applyTheme(isDark);
+        }).catch(() => {
+            this.isDarkTheme = false;
+            this.applyTheme(false);
+        });
+    }
+
+    private applyTheme(isDark: boolean): void {
+        const applyToElement = () => {
+            const el = document.querySelector("page-lineup");
+            if (el) {
+                if (isDark) {
+                    el.classList.add("dark-theme");
+                    el.classList.remove("light-theme");
+                    document.body.classList.add("dark-theme");
+                    document.body.classList.remove("light-theme");
+                } else {
+                    el.classList.remove("dark-theme");
+                    el.classList.add("light-theme");
+                    document.body.classList.remove("dark-theme");
+                    document.body.classList.add("light-theme");
+                }
+                return true;
+            }
+            return false;
+        };
+
+        if (!applyToElement()) {
+            setTimeout(() => applyToElement(), 100);
+        }
+    }
+
+    private forceThemeCheck(): void {
+        this.storage.get("dashboardTheme").then((storageTheme) => {
+            const bodyHasDarkTheme = document.body.classList.contains("dark-theme");
+            let isDark = storageTheme === 'dark' || storageTheme === true;
+            if (storageTheme === null && bodyHasDarkTheme) {
+                isDark = true;
+            }
+            this.isDarkTheme = isDark;
+            this.applyTheme(isDark);
         });
     }
 

@@ -434,6 +434,7 @@ export class MatchPage {
 
   private navigateToLineup(match, lineupName: string = '', isCreateNew: boolean = false, formationSetupId: string = '', teamId: string = '', teamSize: number = 0) {
     this.navCtrl.push("LineupPage", {
+      match: match,
       matchId: match.MatchId,
       activityId: match.activityId,
       homeUserId: match.homeUserId,

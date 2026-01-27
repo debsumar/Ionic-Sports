@@ -42,6 +42,106 @@ page-lineup {
         }
     }
 
+    // Match Info Header (Premium Modern Version)
+    .match-info-header {
+        background: #00796b; // Richer, more vivid teal for light theme
+        padding: 26px 22px;
+        color: #fff;
+        position: relative;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+        .match-activity-badge {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 16px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            margin-bottom: 18px;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .match-title-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.95);
+            margin-bottom: 16px;
+            display: block;
+            letter-spacing: 0.2px;
+            text-transform: capitalize;
+        }
+
+        .match-main-info {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .match-teams-row {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 12px;
+            flex-wrap: wrap;
+
+            .team-name {
+                font-size: 24px; // Slightly larger for impact
+                font-weight: 800;
+                color: #ffffff;
+                white-space: normal;
+                word-wrap: break-word;
+                line-height: 1.1;
+                letter-spacing: -0.4px;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            }
+
+            .vs-label {
+                font-size: 15px;
+                font-weight: 700;
+                color: rgba(255, 255, 255, 0.45);
+                font-style: italic;
+                font-family: "Georgia", serif;
+                padding: 0 6px;
+                position: relative;
+                top: 2px;
+            }
+        }
+
+        .match-meta-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 24px;
+            margin-top: 8px;
+
+            .meta-item {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.9);
+                font-weight: 600;
+
+                .meta-icon {
+                    font-size: 18px;
+                    color: #4db6ac; // Lighter teal for prominence
+                    background: rgba(255, 255, 255, 0.1);
+                    padding: 5px;
+                    border-radius: 6px;
+                }
+
+                .venue-text {
+                    white-space: normal;
+                    word-wrap: break-word;
+                }
+            }
+        }
+    }
+
     // Content container
     .lineup-container {
         background: #f5f5f5;
@@ -535,8 +635,8 @@ page-lineup {
         position: fixed;
         top: 0;
         left: 0;
-        right: 0;
-        bottom: 0;
+        width: 100vw;
+        height: 100vh;
         background: rgba(0, 0, 0, 0.4);
         backdrop-filter: blur(4px);
         z-index: 2000;
@@ -544,6 +644,7 @@ page-lineup {
         align-items: center;
         justify-content: center;
         padding: 20px;
+        box-sizing: border-box;
     }
 
     .modal-card {
@@ -641,17 +742,8 @@ page-lineup {
         padding: 24px;
         max-width: 280px;
         position: relative;
-
-        &::after {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-bottom: 10px solid rgba(220, 240, 210, 0.95);
-        }
+        border-radius: 24px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
 
         .options-header {
             text-align: center;
@@ -698,6 +790,43 @@ page-lineup {
     // Theme support for modals
     &.dark-theme,
     .dark-theme & {
+        .match-info-header {
+            background: #1e293b !important; // Matches the app's modern card background
+            border-bottom: 1px solid #334155;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+
+            .match-activity-badge {
+                background: rgba(0, 181, 160, 0.1); // Low-opacity brand teal
+                border-color: rgba(0, 181, 160, 0.3);
+                color: #00b4a0; // Brand teal for consistency with light mode
+                box-shadow: none;
+            }
+
+            .match-title-text {
+                color: #94a3b8; // Sophisticated slate gray
+                font-weight: 600;
+            }
+
+            .team-name {
+                color: #f1f5f9;
+                text-shadow: none;
+            }
+
+            .vs-label {
+                color: #475569;
+            }
+
+            .meta-item {
+                color: #94a3b8;
+
+                .meta-icon {
+                    color: #00b4a0; // Brand teal icons
+                    background: rgba(0, 181, 160, 0.08);
+                    opacity: 1;
+                }
+            }
+        }
+
         .modal-card {
             background: #1e293b;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -732,10 +861,6 @@ page-lineup {
 
             .player-full-name {
                 color: #fff;
-            }
-
-            &::after {
-                border-bottom-color: rgba(45, 60, 40, 0.95);
             }
 
             .option-btn {
@@ -793,11 +918,11 @@ page-lineup {
     &.dark-theme,
     .dark-theme & {
         .scroll-content {
-            background: #1e293b;
+            background: #0f172a !important;
         }
 
         .lineup-container {
-            background: #1e293b;
+            background: #0f172a !important;
         }
 
         .lineup-name-section {
