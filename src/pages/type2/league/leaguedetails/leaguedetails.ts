@@ -28,6 +28,7 @@ import { AppType } from "../../../../shared/constants/module.constants";
 import { ParticipantModel } from "../../match/matchdetails/matchdetails";
 import { MatchType } from "../../../../shared/utility/enums";
 import { ThemeService } from "../../../../services/theme.service";
+import { SavedFormation } from "../models/lineup.model";
 /**
  * Generated class for the LeaguedetailsPage page.
  *
@@ -320,12 +321,14 @@ export class LeaguedetailsPage {
   };
 
   gotoLeagueMatchInfoPage(mat: LeagueMatch) {
-    // const match_data = {
-    //   ...mat
-    //   formatted_round: mat.formatted_round
-    // };
-    this.navCtrl.push("LeagueMatchInfoPage", { "match": mat, "leagueId": this.individualLeague.id, "activityCode": this.individualLeague.activity.ActivityCode, "activityId": this.individualLeague.activity.Id, "existingteam": this.leagueStanding.map(league_team => league_team.parentclubteam) });
-    // this.navCtrl.push("LeagueMatchInfoPage", { "leagueId": this.individualLeague.id, "activityId": this.individualLeague.activity.Id, "existingteam": this.partcipantData });
+    const existingTeam = this.leagueStanding ? this.leagueStanding.map(league_team => league_team.parentclubteam) : [];
+    this.navCtrl.push("LeagueMatchInfoPage", {
+      "match": mat,
+      "leagueId": this.individualLeague.id,
+      "activityCode": this.individualLeague.activity.ActivityCode,
+      "activityId": this.individualLeague.activity.Id,
+      "existingteam": existingTeam
+    });
   }
 
   goToDashboardMenuPage() {
@@ -422,7 +425,137 @@ export class LeaguedetailsPage {
   }
 
   goToLineup(match: LeagueMatch) {
-    this.navCtrl.push("LineupPage");
+    // Show action sheet with saved formations instead of directly navigating
+    this.fetchSavedFormations(match);
+  }
+
+  private fetchSavedFormations(match: LeagueMatch) {
+    const deviceType = this.sharedservice.getPlatform() === "android" ? 1 : 2;
+    const payload = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId: "",
+      activityId: "d47c2ac4-e571-488f-a895-c1940726900f", // Hardcoded activity ID
+      memberId: this.sharedservice.getLoggedInId(),
+      action_type: 0,
+      device_type: deviceType,
+      app_type: AppType.ADMIN_NEW,
+      device_id: "",
+      updated_by: this.sharedservice.getLoggedInId(),
+      matchId: match.match_id
+    };
+
+    this.httpService.post(API.GET_SAVED_FORMATIONS, payload)
+      .subscribe(
+        (res: any) => {
+          const savedFormations: SavedFormation[] = res.data || [];
+          this.presentLineupActionSheet(match, savedFormations);
+        },
+        (error) => {
+          console.error("Error fetching saved formations:", error);
+          // Still show the action sheet with the "Create New" option even if fetch fails
+          this.presentLineupActionSheet(match, []);
+        }
+      );
+  }
+
+  private presentLineupActionSheet(match: LeagueMatch, savedFormations: SavedFormation[]) {
+    // Team validation - use lowercase property names for LeagueMatch
+    if (!match.homeusername || !match.awayusername) {
+      this.commonService.toastMessage('Please assign teams first', 2500, ToastMessageType.Error);
+      return;
+    }
+
+    const buttons: any[] = [];
+
+    if (savedFormations.length === 0) {
+      buttons.push({
+        text: 'No saved lineups available',
+        icon: 'information-circle',
+        cssClass: 'no-lineups-text',
+        handler: () => {
+          // Do nothing, just informational
+          return false;
+        }
+      });
+    } else {
+      savedFormations.forEach((formation: SavedFormation) => {
+        // Use a separator that we can split later in the injection script
+        const lineupLabel = `${formation.lineup_name || 'Lineup'} (${formation.formation_name})`;
+        const displayText = formation.team_name
+          ? `${lineupLabel}|${formation.team_name}`
+          : lineupLabel;
+
+        buttons.push({
+          text: displayText,
+          icon: 'grid',
+          cssClass: 'saved-formation-row',
+          handler: () => {
+            this.navigateToLineup(match, formation.lineup_name, false, formation.formation_setup_id, formation.team_id, formation.team_size);
+          }
+        });
+      });
+    }
+
+    // Always add Create New Formation button
+    buttons.push({
+      text: 'Create New Formation',
+      icon: 'add-circle',
+      cssClass: 'create-new-button',
+      handler: () => {
+        this.navigateToLineup(match, '', true);
+      }
+    });
+
+    // Add Cancel button
+    buttons.push({
+      text: 'Cancel',
+      role: 'cancel',
+      icon: 'close',
+      cssClass: 'action-sheet-cancel',
+      handler: () => {
+        console.log('Cancel clicked');
+      }
+    });
+
+    const actionSheet = this.actionSheetCtrl.create({
+      title: 'Select Lineup',
+      cssClass: 'lineup-action-sheet',
+      buttons: buttons
+    });
+
+    actionSheet.present().then(() => {
+      // Small delay to ensure the DOM is ready
+      setTimeout(() => {
+        const buttonElements = document.querySelectorAll('.saved-formation-row .button-inner');
+        buttonElements.forEach((btn: any) => {
+          const content = btn.innerHTML;
+          if (content.includes('|')) {
+            const parts = content.split('|');
+            // Reconstruct the HTML with styled spans for different colors
+            btn.innerHTML = `<span class="l-part">${parts[0]}</span><span class="t-part"> - ${parts[1]}</span>`;
+          }
+        });
+      }, 50);
+    });
+  }
+
+  private navigateToLineup(match: LeagueMatch, lineupName: string = '', isCreateNew: boolean = false, formationSetupId: string = '', teamId: string = '', teamSize: number = 0) {
+    this.navCtrl.push("LineupPage", {
+      match: match,
+      matchId: match.match_id,
+      activityId: "d47c2ac4-e571-488f-a895-c1940726900f", // Hardcoded activity ID
+      homeUserId: match.home_team_id,      // Map from LeagueMatch property
+      awayUserId: match.away_team_id,      // Map from LeagueMatch property
+      homeUserName: match.homeusername, // Use lowercase
+      awayUserName: match.awayusername, // Use lowercase
+      lineupName: lineupName || (isCreateNew ? 'New Formation' : 'Starting line-up'),
+      isCreateNew: isCreateNew,
+      formationSetupId: formationSetupId,
+      teamId: teamId,
+      teamSize: teamSize,
+      isLeague: true,           // True when navigating from league details
+      leagueId: this.league_id  // Pass the league ID
+    });
   }
 
   gotoMatchDetails(match: LeagueMatch) {
@@ -1150,17 +1283,7 @@ export class LeaguedetailsPage {
   }
 
   showMatchActionSheet(match: LeagueMatch) {
-    if (this.individualLeague.league_type === 3) {
-      //this.commonService.showMatchActionSheet(match, {
-      //onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
-      //onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
-      // onDelete: () => this.removeMatch(match),
-      // onUpdateResult: () => this.updateResult(match)
-      //});
-      this.gotoLeagueMatchInfoPage(match);
-    } else {
-      this.gotoMatchDetails(match);
-    }
+    this.gotoMatchDetails(match);
   }
 
 

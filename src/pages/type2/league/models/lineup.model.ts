@@ -105,3 +105,166 @@ export interface SavedFormation {
  * Available team sizes
  */
 export const TEAM_SIZES: number[] = [5, 6, 7, 8, 9, 10, 11];
+
+// ===========================================
+// API Input Types
+// ===========================================
+
+/**
+ * Base API input with common fields
+ */
+export interface BaseApiInput {
+    parentclubId: string;
+    clubId: string;
+    memberId: string;
+    action_type: number;
+    device_type: number;
+    app_type: number;
+    device_id: string;
+    updated_by: string;
+}
+
+/**
+ * Input for GetIndividualMatchParticipant API
+ */
+export interface ParticipantApiInput extends BaseApiInput {
+    activityId: string;
+    MatchId: string;
+    TeamId: string;
+    leagueTeamPlayerStatusType: number;
+}
+
+/**
+ * Input for GetLeagueMatchParticipant API
+ */
+export interface LeagueParticipantApiInput extends BaseApiInput {
+    activityId: string;
+    LeagueId: string;
+    MatchId: string;
+    TeamId: string;
+    TeamId2: string;
+    leagueTeamPlayerStatusType: number;
+}
+
+/**
+ * Input for GetTeamFormations API
+ */
+export interface FormationApiInput extends BaseApiInput {
+    activityId: string;
+    teamSize: number;
+    matchId: string;
+    teamId: string;
+}
+
+/**
+ * Input for UpdateLeagueMatchParticipationStatus API
+ */
+export interface UpdateParticipationApiInput extends BaseApiInput {
+    activityId: string;
+    LeagueId: string;
+    MatchId: string;
+    ParticipationId: string;
+    ParticipationStatus: number;
+}
+
+/**
+ * Input for SaveTeamFormation API
+ */
+export interface SaveLineupApiInput extends BaseApiInput {
+    activityId: string;
+    formationSetupId: string;
+    matchId: string;
+    leagueId: string;
+    teamId: string;
+    lineup_name: string;
+    visibility: number;
+    teamSize: number;
+    positions: PositionPayload[];
+    substitutes: SubstitutePayload[];
+    createdBy: string;
+}
+
+/**
+ * Position payload for save API
+ */
+export interface PositionPayload {
+    x: number;
+    y: number;
+    role: string;
+    playerid: string | null;
+    image: string | null;
+}
+
+/**
+ * Substitute payload for save API
+ */
+export interface SubstitutePayload {
+    playerid: string;
+    name: string;
+    image: string | undefined;
+}
+
+/**
+ * Input for DeleteTeamFormation API
+ */
+export interface DeleteLineupApiInput {
+    matchId: string;
+    teamId: string;
+    formationSetupId: string;
+    deletedBy: string;
+}
+
+// ===========================================
+// API Response Types
+// ===========================================
+
+/**
+ * Generic API response structure
+ */
+export interface ApiResponse<T> {
+    status: number;
+    message: string;
+    data: T;
+    type?: string;
+    isArray?: boolean;
+}
+
+/**
+ * Response for save lineup API
+ */
+export interface SaveLineupResponse {
+    id: string;
+    message?: string;
+}
+
+/**
+ * Team option for dropdown
+ */
+export interface TeamOption {
+    id: string;
+    name: string;
+    logo: string;
+}
+
+/**
+ * Visibility option for dropdown
+ */
+export interface VisibilityOption {
+    value: number;
+    label: string;
+}
+
+/**
+ * Lineup data returned when dismissing the page
+ */
+export interface LineupDismissData {
+    name: string;
+    team: string;
+    teamId: string;
+    visibility: number;
+    teamSize: number;
+    formation: string;
+    positions: PlayerPosition[];
+    substitutes: Player[];
+    deleted?: boolean;
+}

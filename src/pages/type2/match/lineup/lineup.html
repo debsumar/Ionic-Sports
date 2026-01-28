@@ -18,8 +18,8 @@
 </ion-header>
 
 <ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme" (click)="closeAllDropdowns()">
-    <!-- Match Info Header -->
-    <div class="match-info-header" *ngIf="match">
+    <!-- Match Info Header (Regular Match - when NOT from league) -->
+    <div class="match-info-header" *ngIf="match && !isLeague">
         <div class="match-activity-badge">{{ match.ActivityName }}</div>
         <div class="match-title-text" *ngIf="match.MatchTitle">{{ match.MatchTitle }}</div>
         <div class="match-main-info">
@@ -36,6 +36,29 @@
                 <div class="meta-item">
                     <ion-icon name="pin" class="meta-icon"></ion-icon>
                     <span class="venue-text">{{ match.VenueName }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- League Match Info Header (when from league) -->
+    <div class="match-info-header" *ngIf="match && isLeague">
+        <div class="match-activity-badge">{{ match.activity_name || 'Activity' }}</div>
+        <div class="match-title-text" *ngIf="match.match_title">{{ match.match_title }}</div>
+        <div class="match-main-info">
+            <div class="match-teams-row">
+                <span class="team-name">{{ match.homeusername || 'Home' }}</span>
+                <span class="vs-label">VS</span>
+                <span class="team-name">{{ match.awayusername || 'Away' }}</span>
+            </div>
+            <div class="match-meta-info">
+                <div class="meta-item">
+                    <ion-icon name="calendar" class="meta-icon"></ion-icon>
+                    <span>{{ match.start_date }}</span>
+                </div>
+                <div class="meta-item" *ngIf="match.league_name">
+                    <ion-icon name="trophy" class="meta-icon"></ion-icon>
+                    <span class="venue-text">{{ match.league_name }}</span>
                 </div>
             </div>
         </div>

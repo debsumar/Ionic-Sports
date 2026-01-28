@@ -359,6 +359,10 @@ export class MatchPage {
   }
 
   private presentLineupActionSheet(match, savedFormations: SavedFormation[]) {
+    if (!match.homeUserName || !match.awayUserName) {
+      this.commonService.toastMessage('Please assign teams first', 2500, ToastMessageType.Error);
+      return;
+    }
     const buttons: any[] = [];
 
     if (savedFormations.length === 0) {
@@ -374,9 +378,10 @@ export class MatchPage {
     } else {
       savedFormations.forEach((formation: SavedFormation) => {
         // Use a separator that we can split later in the injection script
+        const lineupLabel = `${formation.lineup_name || 'Lineup'} (${formation.formation_name})`;
         const displayText = formation.team_name
-          ? `${formation.lineup_name || 'Lineup'}|${formation.team_name}`
-          : formation.lineup_name || 'Lineup';
+          ? `${lineupLabel}|${formation.team_name}`
+          : lineupLabel;
 
         buttons.push({
           text: displayText,
@@ -445,7 +450,9 @@ export class MatchPage {
       isCreateNew: isCreateNew,
       formationSetupId: formationSetupId,
       teamId: teamId,
-      teamSize: teamSize
+      teamSize: teamSize,
+      isLeague: false,  // False when navigating from match page
+      leagueId: ""      // Empty string for non-league context
     });
   }
 

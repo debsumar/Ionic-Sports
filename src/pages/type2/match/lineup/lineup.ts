@@ -14,9 +14,24 @@ import {
     Formation,
     TeamFormation,
     TeamSizeFormation,
+    TeamFormationsApiResponse,
+    ParticipantApiInput,
+    LeagueParticipantApiInput,
+    FormationApiInput,
+    UpdateParticipationApiInput,
+    SaveLineupApiInput,
+    DeleteLineupApiInput,
+    PositionPayload,
+    SubstitutePayload,
+    ApiResponse,
+    SaveLineupResponse,
+    TeamOption,
+    VisibilityOption,
+    LineupDismissData,
 } from "../../league/models/lineup.model";
 import { LineupVisibility, LeagueTeamPlayerStatusType, LeagueMatchActionType, LeagueParticipationStatus } from "../../../../shared/utility/enums";
 import { GetIndividualMatchParticipantModel } from "../../../../shared/model/match.model";
+import { LeagueMatchParticipantModel } from "../../league/models/league.model";
 import { AppType } from "../../../../shared/constants/module.constants";
 
 /**
@@ -65,12 +80,12 @@ export class LineupPage {
     // Data & Options
     // ===========================================
     teamSizes: number[] = TEAM_SIZES;
-    visibilityOptions = [
+    visibilityOptions: VisibilityOption[] = [
         { value: LineupVisibility.ALL_INVITEES, label: 'All invitees' },
         { value: LineupVisibility.TEAM_ONLY, label: 'Team only' },
         { value: LineupVisibility.COACHES_ONLY, label: 'Coaches only' }
     ];
-    teams: any[] = [];
+    teams: TeamOption[] = [];
     availablePlayers: Player[] = [];
     substitutes: Player[] = [];
 
@@ -104,12 +119,14 @@ export class LineupPage {
     private activityId: string = '';
     isCreateNew: boolean = false;
     private formationSetupId: string = '';
-    match: any;
+    match: unknown;
+    isLeague: boolean = false;  // Flag to determine if navigating from league context
+    leagueId: string = '';      // League ID when in league context
 
     // ===========================================
     // API Input Objects
     // ===========================================
-    private participantInput = {
+    private participantInput: ParticipantApiInput = {
         parentclubId: "",
         clubId: "",
         activityId: "",
@@ -124,7 +141,25 @@ export class LineupPage {
         leagueTeamPlayerStatusType: LeagueTeamPlayerStatusType.All
     };
 
-    private formationInput = {
+    // League-specific participant input (used when isLeague is true)
+    private leagueParticipantInput: LeagueParticipantApiInput = {
+        parentclubId: "",
+        clubId: "",
+        activityId: "",
+        memberId: "",
+        action_type: 0,
+        device_type: 0,
+        app_type: AppType.ADMIN_NEW,
+        device_id: "",
+        updated_by: "",
+        LeagueId: "",
+        MatchId: "",
+        TeamId: "",
+        TeamId2: "",
+        leagueTeamPlayerStatusType: LeagueTeamPlayerStatusType.PLAYING
+    };
+
+    private formationInput: FormationApiInput = {
         parentclubId: "",
         clubId: "",
         memberId: "",
@@ -139,7 +174,7 @@ export class LineupPage {
         teamId: ""
     };
 
-    private updateParticipationInput = {
+    private updateParticipationInput: UpdateParticipationApiInput = {
         parentclubId: "",
         clubId: "",
         activityId: "",
@@ -221,6 +256,10 @@ export class LineupPage {
         this.formationSetupId = this.navParams.get('formationSetupId') || '';
         this.lineupName = this.navParams.get('lineupName') || 'Starting line-up';
 
+        // Get league context params
+        this.isLeague = !!this.navParams.get('isLeague');
+        this.leagueId = this.navParams.get('leagueId') || '';
+
         // Set teamSize from navParams if not create new
         if (!this.isCreateNew) {
             const teamSize = this.navParams.get('teamSize');
@@ -268,13 +307,25 @@ export class LineupPage {
         const memberId = this.sharedservice.getLoggedInId();
         const deviceType = this.sharedservice.getPlatform() === "android" ? 1 : 2;
 
-        // Participant API input
-        this.participantInput.parentclubId = parentclubId;
-        this.participantInput.memberId = memberId;
-        this.participantInput.device_type = deviceType;
-        this.participantInput.activityId = this.activityId;
-        this.participantInput.MatchId = this.matchId;
-        this.participantInput.TeamId = this.selectedTeamId;
+
+        // League participant API input (only when isLeague is true)
+        if (this.isLeague) {
+            this.leagueParticipantInput.parentclubId = parentclubId;
+            this.leagueParticipantInput.memberId = memberId;
+            this.leagueParticipantInput.device_type = deviceType;
+            this.leagueParticipantInput.LeagueId = this.leagueId;
+            this.leagueParticipantInput.MatchId = this.matchId;
+            this.leagueParticipantInput.TeamId = this.selectedTeamId;
+        } else {
+            // Participant API input
+            this.participantInput.parentclubId = parentclubId;
+            this.participantInput.memberId = memberId;
+            this.participantInput.device_type = deviceType;
+            this.participantInput.activityId = this.activityId;
+            this.participantInput.MatchId = this.matchId;
+            this.participantInput.TeamId = this.selectedTeamId;
+
+        }
 
         // Formation API input
         this.formationInput.parentclubId = parentclubId;
@@ -295,6 +346,14 @@ export class LineupPage {
         this.updateParticipationInput.device_type = deviceType;
         this.updateParticipationInput.app_type = AppType.ADMIN_NEW;
         this.updateParticipationInput.MatchId = this.matchId;
+        // Set LeagueId and action_type based on context
+        if (this.isLeague) {
+            this.updateParticipationInput.LeagueId = this.leagueId;
+            this.updateParticipationInput.action_type = 0;
+        } else {
+            this.updateParticipationInput.LeagueId = "";
+            this.updateParticipationInput.action_type = LeagueMatchActionType.MATCH;
+        }
     }
 
     private subscribeToThemeEvents(): void {
@@ -356,25 +415,53 @@ export class LineupPage {
     // ===========================================
 
     /**
-     * Fetch players from GetIndividualMatchParticipant API
+     * Fetch players - branches to league or match API based on context
      */
     private fetchPlayersForTeam(): void {
         if (!this.matchId || !this.selectedTeamId) {
             console.warn('Missing matchId or teamId for fetching players');
             return;
         }
-
+        this.leagueParticipantInput.TeamId = this.selectedTeamId;
         this.isLoadingPlayers = true;
+
+        if (this.isLeague) {
+            this.fetchPlayersForLeague();
+        } else {
+            this.fetchPlayersForMatch();
+        }
+    }
+
+    /**
+     * Fetch players from GetIndividualMatchParticipant API (non-league context)
+     */
+    private fetchPlayersForMatch(): void {
         this.participantInput.TeamId = this.selectedTeamId;
 
         this.httpService.post(`${API.GetIndividualMatchParticipant}`, this.participantInput)
             .subscribe(
-                (res: any) => this.handlePlayersResponse(res),
+                (res: ApiResponse<GetIndividualMatchParticipantModel[]>) => this.handlePlayersResponse(res),
                 (error) => this.handlePlayersError(error)
             );
     }
 
-    private handlePlayersResponse(res: any): void {
+    /**
+     * Fetch players from GetLeagueMatchParticipant API (league context)
+     * Uses PLAYINGPLUSBENCH to get both playing and bench players in one call
+     */
+    private fetchPlayersForLeague(): void {
+        this.leagueParticipantInput.TeamId = this.selectedTeamId;
+        this.leagueParticipantInput.MatchId = this.matchId;
+        this.leagueParticipantInput.leagueTeamPlayerStatusType = LeagueTeamPlayerStatusType.PLAYINGPLUSBENCH;
+
+        this.httpService.post(`${API.Get_League_Match_Participant}`, this.leagueParticipantInput)
+            .subscribe(
+                (res: ApiResponse<LeagueMatchParticipantModel[]>) => this.handleLeaguePlayersResponse(res),
+                (error) => this.handlePlayersError(error)
+            );
+    }
+
+    private handlePlayersResponse(res: ApiResponse<GetIndividualMatchParticipantModel[]>): void {
         if (res?.data) {
             const participants: GetIndividualMatchParticipantModel[] = res.data;
 
@@ -409,7 +496,7 @@ export class LineupPage {
         this.isLoadingPlayers = false;
     }
 
-    private handlePlayersError(error: any): void {
+    private handlePlayersError(error: Error): void {
         console.error('Error fetching players:', error);
         this.commonService.toastMessage("Failed to fetch players", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         this.isLoadingPlayers = false;
@@ -427,6 +514,58 @@ export class LineupPage {
     }
 
     /**
+     * Handle response from GetLeagueMatchParticipant API (league context)
+     * Filters PLAYING and BENCH players client-side similar to match context
+     */
+    private handleLeaguePlayersResponse(res: ApiResponse<LeagueMatchParticipantModel[]>): void {
+        if (res?.data) {
+            const participants: LeagueMatchParticipantModel[] = res.data;
+
+            // Map PLAYING players → availablePlayers
+            this.availablePlayers = participants
+                .filter((p: LeagueMatchParticipantModel) => p.participant_status === LeagueParticipationStatus.PARTICIPANT)
+                .map((p: LeagueMatchParticipantModel) => this.mapLeagueParticipantToPlayer(p));
+
+            // Only set substitutes from API if this is a fresh load
+            const hasExistingState = this.currentPositions.some((pos: PlayerPosition) => pos.player !== null) ||
+                this.substitutes.length > 0;
+
+            if (!hasExistingState) {
+                // Map BENCH players → substitutes
+                this.substitutes = participants
+                    .filter((p: LeagueMatchParticipantModel) => p.participant_status === LeagueParticipationStatus.NON_PARTICIPANT)
+                    .map((p: LeagueMatchParticipantModel) => this.mapLeagueParticipantToPlayer(p));
+            }
+
+            // Sync: If positions have playerid but no player object, resolve them
+            this.currentPositions.forEach((pos: PlayerPosition) => {
+                if (pos.playerid && !pos.player) {
+                    const foundPlayer = [...this.availablePlayers, ...this.substitutes].find((p: Player) => p.playerid === pos.playerid);
+                    if (foundPlayer) {
+                        pos.player = foundPlayer;
+                        pos.image = foundPlayer.image;
+                    }
+                }
+            });
+        }
+        this.isLoadingPlayers = false;
+    }
+
+    /**
+     * Map LeagueMatchParticipantModel to Player
+     */
+    private mapLeagueParticipantToPlayer(participant: LeagueMatchParticipantModel): Player {
+        // Note: User model doesn't include ImageURL, using placeholder
+        return {
+            playerid: participant.user.Id,
+            participationId: participant.id,
+            name: `${participant.user.FirstName} ${participant.user.LastName}`,
+            image: 'assets/images/img_placehlder.png',
+            status: participant.participant_status
+        };
+    }
+
+    /**
      * Fetch team formations from API
      */
     private fetchTeamFormations(): void {
@@ -435,12 +574,12 @@ export class LineupPage {
 
         this.httpService.post(`${API.GET_TEAM_FORMATIONS}`, this.formationInput)
             .subscribe(
-                (res: any) => this.handleFormationsResponse(res),
+                (res: TeamFormationsApiResponse) => this.handleFormationsResponse(res),
                 (error) => this.handleFormationsError(error)
             );
     }
 
-    private handleFormationsResponse(res: any): void {
+    private handleFormationsResponse(res: TeamFormationsApiResponse): void {
         const data = res?.data;
         if (data?.length > 0) {
             this.allTeamFormations = data;
@@ -449,6 +588,9 @@ export class LineupPage {
                 // Saved formation flow: preselect from navParams
                 const matchedFormation = data.find((f: TeamFormation) => f.id === this.formationSetupId);
                 this.selectedFormation = matchedFormation ? matchedFormation.id : data[0].id;
+                if (matchedFormation?.visibility !== undefined) {
+                    this.visibility = matchedFormation.visibility;
+                }
             } else {
                 // Create new flow: default to 0th element
                 this.selectedFormation = data[0].id;
@@ -465,7 +607,7 @@ export class LineupPage {
         this.isLoadingFormations = false;
     }
 
-    private handleFormationsError(error: any): void {
+    private handleFormationsError(error: Error): void {
         console.error('Error fetching team formations:', error);
         this.commonService.toastMessage("Formation fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         this.fallbackToHardcodedData();
@@ -607,7 +749,7 @@ export class LineupPage {
         this.updateFormation();
     }
 
-    onTeamChange(team: any): void {
+    onTeamChange(team: TeamOption): void {
         if (team.id === this.selectedTeamId) {
             this.showTeamDropdown = false;
             return;
@@ -784,7 +926,7 @@ export class LineupPage {
             this.commonService.showLoader("Adding to bench...");
             this.httpService.post(`${API.Update_League_Match_Participation_Status}`, this.updateParticipationInput)
                 .subscribe(
-                    (res: any) => {
+                    (res: ApiResponse<unknown>) => {
                         this.commonService.hideLoader();
                         player.status = LeagueParticipationStatus.NON_PARTICIPANT;
                         this.substitutes.push(player);
@@ -792,7 +934,7 @@ export class LineupPage {
                         this.commonService.toastMessage("Player added to bench", 2000, ToastMessageType.Success);
                         this.showPlayerSelection = false;
                     },
-                    (error: any) => {
+                    (error: { error?: { message?: string } }) => {
                         this.commonService.hideLoader();
                         this.commonService.toastMessage(error?.error?.message || "Failed to update", 2500, ToastMessageType.Error);
                     }
@@ -885,7 +1027,7 @@ export class LineupPage {
     }
 
     save(): void {
-        // Basic validation
+        // Basic validation before showing the popup
         if (!this.matchId || !this.selectedTeamId) {
             this.commonService.toastMessage("Missing match or team information", 2500, ToastMessageType.Error);
             return;
@@ -898,6 +1040,29 @@ export class LineupPage {
             return;
         }
 
+        const alert = this.alertCtrl.create({
+            title: 'Save Lineup',
+            message: 'Are you sure you want to save this lineup?',
+            buttons: [
+                {
+                    text: 'Cancel',
+                    role: 'cancel',
+                    handler: () => {
+                        console.log('Save cancelled');
+                    }
+                },
+                {
+                    text: 'Save',
+                    handler: () => {
+                        this.performSave();
+                    }
+                }
+            ]
+        });
+        alert.present();
+    }
+
+    private performSave(): void {
         // Build API payload
         const positionsPayload = this.currentPositions.map((pos: PlayerPosition) => ({
             x: pos.x,
@@ -916,7 +1081,7 @@ export class LineupPage {
         const deviceType = this.sharedservice.getPlatform() === "android" ? 1 : 2;
         const memberId = this.sharedservice.getLoggedInId();
 
-        const payload: any = {
+        const payload: SaveLineupApiInput = {
             parentclubId: this.sharedservice.getPostgreParentClubId(),
             clubId: "",
             activityId: this.activityId,
@@ -943,7 +1108,7 @@ export class LineupPage {
 
         this.httpService.post(`${API.SAVE_TEAM_FORMATION}`, payload)
             .subscribe(
-                (res: any) => {
+                (res: ApiResponse<SaveLineupResponse>) => {
                     this.commonService.hideLoader();
                     console.log('Save lineup response:', res);
                     this.commonService.toastMessage("Lineup saved successfully", 2500, ToastMessageType.Success);
@@ -954,7 +1119,7 @@ export class LineupPage {
                     }
 
                     // Dismiss with the saved data
-                    const lineupData = {
+                    const lineupData: LineupDismissData = {
                         name: this.lineupName,
                         team: this.selectedTeam,
                         teamId: this.selectedTeamId,
@@ -966,7 +1131,7 @@ export class LineupPage {
                     };
                     this.viewCtrl.dismiss(lineupData);
                 },
-                (error: any) => {
+                (error: { error?: { message?: string } }) => {
                     this.commonService.hideLoader();
                     console.error('Error saving lineup:', error);
                     const errorMessage = error?.error?.message || "Failed to save lineup";
@@ -1006,7 +1171,7 @@ export class LineupPage {
             return;
         }
 
-        const payload = {
+        const payload: DeleteLineupApiInput = {
             matchId: this.matchId,
             teamId: this.selectedTeamId,
             formationSetupId: this.selectedFormation,
@@ -1018,13 +1183,13 @@ export class LineupPage {
 
         this.httpService.post(`${API.DELETE_TEAM_FORMATION}`, payload)
             .subscribe(
-                (res: any) => {
+                (res: ApiResponse<unknown>) => {
                     this.commonService.hideLoader();
                     console.log('Delete lineup response:', res);
                     this.commonService.toastMessage("Lineup deleted successfully", 2500, ToastMessageType.Success);
                     this.viewCtrl.dismiss({ deleted: true });
                 },
-                (error: any) => {
+                (error: { error?: { message?: string } }) => {
                     this.commonService.hideLoader();
                     console.error('Error deleting lineup:', error);
                     const errorMessage = error?.error?.message || "Failed to delete lineup";

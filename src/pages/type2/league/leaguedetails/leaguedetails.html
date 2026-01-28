@@ -219,7 +219,7 @@
              'match-pending': mat.ResultStatus != 1,
              'match-paid': mat.payment_type == 1,
              'match-private': mat.match_visibility == 1
-           }" (click)="showMatchActionSheet(mat)" *ngFor="let mat of match">
+           }" (click)="gotoLeagueMatchInfoPage(mat)" *ngFor="let mat of match">
         <!-- Match Header -->
         <div class="match-card-header">
           <div class="match-info">
