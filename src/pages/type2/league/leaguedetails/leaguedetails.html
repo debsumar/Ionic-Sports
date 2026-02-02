@@ -113,7 +113,8 @@
           <tbody class="design">
             <tr *ngFor="let score of leagueStanding">
               <td class="firstcol" style="white-space: nowrap;" (click)="tDetails(score)">
-                {{score.parentclubteam?.teamName}}
+                <span *ngIf="individualLeague.league_type==3">{{score.parentclubteam?.teamName}}</span>
+                <span *ngIf="individualLeague.league_type!=3">{{score.user?.FirstName}} {{score.user?.LastName}}</span>
               </td>
               <td class="otherclumn">{{score.matches}}</td>
               <td class="otherclumn">{{score.wins}}</td>
