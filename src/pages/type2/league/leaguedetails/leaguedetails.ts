@@ -434,7 +434,7 @@ export class LeaguedetailsPage {
     const payload = {
       parentclubId: this.sharedservice.getPostgreParentClubId(),
       clubId: "",
-      activityId: "d47c2ac4-e571-488f-a895-c1940726900f", // Hardcoded activity ID
+      activityId: this.individualLeague.activity.Id,
       memberId: this.sharedservice.getLoggedInId(),
       action_type: 0,
       device_type: deviceType,
@@ -462,6 +462,10 @@ export class LeaguedetailsPage {
     // Team validation - use lowercase property names for LeagueMatch
     if (!match.homeusername || !match.awayusername) {
       this.commonService.toastMessage('Please assign teams first', 2500, ToastMessageType.Error);
+      return;
+    }
+    if (this.individualLeague.activity.Id !== 'd47c2ac4-e571-488f-a895-c1940726900f') {
+      this.commonService.toastMessage('Team lineup data is not available for this activity', 2500, ToastMessageType.Info);
       return;
     }
 
@@ -543,7 +547,7 @@ export class LeaguedetailsPage {
     this.navCtrl.push("LineupPage", {
       match: match,
       matchId: match.match_id,
-      activityId: "d47c2ac4-e571-488f-a895-c1940726900f", // Hardcoded activity ID
+      activityId: this.individualLeague.activity.Id,
       homeUserId: match.home_team_id,      // Map from LeagueMatch property
       awayUserId: match.away_team_id,      // Map from LeagueMatch property
       homeUserName: match.homeusername, // Use lowercase
