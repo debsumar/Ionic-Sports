@@ -67,7 +67,7 @@ export class LineupPage {
     // ===========================================
     // Lineup Configuration
     // ===========================================
-    lineupName: string = 'Starting line-up';
+    lineupName: string = '';
     selectedTeam: string = '';
     selectedTeamLogo: string = '';
     selectedTeamId: string = '';
@@ -108,6 +108,7 @@ export class LineupPage {
     showVisibilityDropdown: boolean = false;
     showPlayerSelection: boolean = false;
     showPlayerOptions: boolean = false;
+    private dropdownSelectionGuard: boolean = false; // 🛡️ Prevents toggle re-fire on mobile touch events
     activePosition: PlayerPosition | null = null;
     selectedSubstitute: Player | null = null;
     recentlyReplacedPlayer: Player | null = null;
@@ -254,7 +255,7 @@ export class LineupPage {
         this.activityId = this.navParams.get('activityId') || '';
         this.isCreateNew = !!this.navParams.get('isCreateNew');
         this.formationSetupId = this.navParams.get('formationSetupId') || '';
-        this.lineupName = this.navParams.get('lineupName') || 'Starting line-up';
+        this.lineupName = this.navParams.get('lineupName') || '';
 
         // Get league context params
         this.isLeague = !!this.navParams.get('isLeague');
@@ -738,18 +739,24 @@ export class LineupPage {
     // ===========================================
 
     onTeamSizeChange(size: number): void {
+        this.dropdownSelectionGuard = true;
+        setTimeout(() => this.dropdownSelectionGuard = false, 0);
         this.selectedTeamSize = size;
         this.showTeamSizeDropdown = false;
         this.fetchTeamFormations();
     }
 
     onFormationChange(formationId: string): void {
+        this.dropdownSelectionGuard = true;
+        setTimeout(() => this.dropdownSelectionGuard = false, 0);
         this.selectedFormation = formationId;
         this.showFormationDropdown = false;
         this.updateFormation();
     }
 
     onTeamChange(team: TeamOption): void {
+        this.dropdownSelectionGuard = true;
+        setTimeout(() => this.dropdownSelectionGuard = false, 0);
         if (team.id === this.selectedTeamId) {
             this.showTeamDropdown = false;
             return;
@@ -793,6 +800,8 @@ export class LineupPage {
     }
 
     onVisibilityChange(visibility: LineupVisibility): void {
+        this.dropdownSelectionGuard = true;
+        setTimeout(() => this.dropdownSelectionGuard = false, 0);
         this.visibility = visibility;
         this.showVisibilityDropdown = false;
     }
@@ -807,21 +816,25 @@ export class LineupPage {
     // ===========================================
 
     toggleTeamDropdown(): void {
+        if (this.dropdownSelectionGuard) return;
         this.closeOtherDropdowns('team');
         this.showTeamDropdown = !this.showTeamDropdown;
     }
 
     toggleTeamSizeDropdown(): void {
+        if (this.dropdownSelectionGuard) return;
         this.closeOtherDropdowns('teamSize');
         this.showTeamSizeDropdown = !this.showTeamSizeDropdown;
     }
 
     toggleFormationDropdown(): void {
+        if (this.dropdownSelectionGuard) return;
         this.closeOtherDropdowns('formation');
         this.showFormationDropdown = !this.showFormationDropdown;
     }
 
     toggleVisibilityDropdown(): void {
+        if (this.dropdownSelectionGuard) return;
         this.closeOtherDropdowns('visibility');
         this.showVisibilityDropdown = !this.showVisibilityDropdown;
     }
@@ -1033,10 +1046,8 @@ export class LineupPage {
             return;
         }
 
-        // Validate that all positions have a player assigned
-        const unassignedPositions = this.currentPositions.filter((pos: PlayerPosition) => !pos.playerid);
-        if (unassignedPositions.length > 0) {
-            this.commonService.toastMessage("Please assign players to all positions in the formation", 2500, ToastMessageType.Error);
+        if (!this.lineupName || !this.lineupName.trim()) {
+            this.commonService.toastMessage("Please enter a lineup name", 2500, ToastMessageType.Error);
             return;
         }
 
