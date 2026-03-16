@@ -7,6 +7,12 @@ page-creatematchleague {
     padding: 0;
   }
 
+  .allign-right {
+    .text-input {
+      text-align: right !important;
+    }
+  }
+
   ion-list {
     background: transparent;
     padding: 8px;
@@ -191,7 +197,7 @@ page-creatematchleague {
 
   .textareastyle {
     .text-input {
-      text-align: right !important;
+      //text-align: right !important;
     }
     
     .text-input::placeholder {
@@ -288,7 +294,8 @@ page-creatematchleague {
   // Footer
   ion-footer {
     --background: #ffffff;
-    
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0;
     .timekare-primary-btn {
       background: #2b92bb;
       color: white;
@@ -300,7 +307,8 @@ page-creatematchleague {
   .dark-theme {
     ion-footer {
       --background: #1e293b;
-      
+      background: #1e293b !important;
+      border-top: 1px solid #475569;
       .timekare-primary-btn {
         background: #2b92bb;
         color: white;

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import {
   IonicPage,
   NavController,
@@ -100,7 +100,8 @@ export class AddstafftoteamPage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private themeService: ThemeService,
-    private events: Events
+    private events: Events,
+    private renderer: Renderer2
   ) {
     this.existedstaff = this.navParams.get("existedstaff")
     this.themeType = sharedservice.getThemeType();
@@ -143,13 +144,25 @@ export class AddstafftoteamPage {
     this.subscriptions.push(searchSubscription);
   }
 
-  ionViewDidLoad() {
-    this.storage.get('dashboardTheme').then((theme) => {
-      this.isDarkTheme = theme === 'dark' || theme === true;
-      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
-      document.body.classList.remove('dark-theme', 'light-theme');
-      document.body.classList.add(themeClass);
-    });
+  async ionViewDidLoad() {
+    await this.loadTheme();
+  }
+
+  async loadTheme() {
+    const theme = await this.storage.get('selectedTheme');
+    this.applyTheme(theme || 'dark');
+  }
+
+  applyTheme(theme: string) {
+    this.isDarkTheme = theme === 'dark';
+    const pageElement = document.querySelector('page-addstafftoteam');
+    if (pageElement) {
+      if (this.isDarkTheme) {
+        this.renderer.removeClass(pageElement, 'light-theme');
+      } else {
+        this.renderer.addClass(pageElement, 'light-theme');
+      }
+    }
   }
 
   ionViewWillLeave() {
@@ -241,7 +254,6 @@ export class AddstafftoteamPage {
     const staffLength = this.addStaffInput.staffDetails.length;
     if (staffLength > 0) {
       try {
-        this.commonService.showLoader("Please wait...");
         console.log(JSON.stringify(this.addStaffInput));
 
         const addStaff = gql`
@@ -262,20 +274,17 @@ export class AddstafftoteamPage {
           .mutate(addStaff, mutationVariables, 0)
           .subscribe(
             (res: any) => {
-              this.commonService.hideLoader();
               const message = "Staff Added Successfully";
               this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
               this.viewCtrl.dismiss({ canRefreshData: true });
             },
             (error) => {
-              this.commonService.hideLoader();
               this.handleError(error, "Failed to save staff");
             }
           );
 
         this.subscriptions.push(saveSubscription);
       } catch (error) {
-        this.commonService.hideLoader();
         this.handleError(error, "Failed to save staff");
       }
     } else {

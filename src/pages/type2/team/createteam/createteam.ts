@@ -1,6 +1,5 @@
 import { Component, ViewChild } from "@angular/core";
 import { Apollo } from "apollo-angular";
-import { HttpLink } from "apollo-angular-link-http";
 import {
   ActionSheetController,
   IonicPage,
@@ -104,13 +103,13 @@ export class CreateteamPage {
     public sharedservice: SharedServices,
     public popoverCtrl: PopoverController,
     private toastCtrl: ToastController,
-    private httpLink: HttpLink,
     private graphqlService: GraphqlService,
     public actionSheetCtrl: ActionSheetController,
     private imageUploadService: TeamImageUploadService,
     private camera: Camera,
     public sharedService: SharedServices,
     private events: Events
+    
   ) {
 
   }
@@ -400,16 +399,9 @@ export class CreateteamPage {
   //shows hint for the age group
   ageGroupHint() {
     let message = "Enter age group separated by comma (,) e.g. 12U, 14U etc.";
-    this.showToast(message, 5000);
+    this.commonService.toastMessage(message, 2500,ToastMessageType.Info);
   }
-  showToast(m: string, dur: number) {
-    let toast = this.toastCtrl.create({
-      message: m,
-      duration: dur,
-      position: "bottom",
-    });
-    toast.present();
-  }
+  
 
   gotoTeamDetails() {
     this.navCtrl.push("TeamdetailsPage");

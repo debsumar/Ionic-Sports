@@ -79,12 +79,12 @@ export class MyApp {
       group_session_apikey = "";
       aws_cloudfrontURL = "https://d2ert9om2cv970.cloudfront.net";
       aws_presignedUrl = "https://i97kakk5tk.execute-api.eu-west-2.amazonaws.com/Dev/generatesignedurl";
-      SuperAdminKey = "-KoGLONcroK1vB02b9Gg";
+      SuperAdminKey = "-KoGLONcroK1vB02b9Gg"; 
       graphql_url = "https://api-dev.activitypro.co.uk/graphql"
     }
 
     //intialize url
-
+    
     this.sharedservice.setEmailUrl(emailUrl);
     this.sharedservice.setnodeURL(nodeURL);
     this.sharedservice.setnestURL(nestURL);
@@ -122,16 +122,16 @@ export class MyApp {
       //   IsEnable: true,
       //   CreatedDate: new Date().getTime()
       // })
-      // }).catch((err)=>{
-      //   console.log(err);
-      // });
-    }).catch((err) => {
-      console.log(err);
-    })
+    // }).catch((err)=>{
+    //   console.log(err);
+    // });
+  }).catch((err)=>{
+    console.log(err);
+  })
   }
 
-  //comparing app version
 
+  //comparing app version
   getAppVersion() {
     if (this.platform.is("android")) {
       this.fb
@@ -144,7 +144,7 @@ export class MyApp {
             this.appVersion.getVersionNumber().then((appversion) => {
               let presentVersion = appversion.toString().split(".").join("0");
               let playstoreVersion = data[0].new_admin_version
-                .toString()
+              .toString()
                 .split(".")
                 .join("0");
               if (appversion) {

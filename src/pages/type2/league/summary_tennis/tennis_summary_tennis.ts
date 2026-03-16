@@ -517,7 +517,22 @@ export class TennisSummaryTennisPage {
     modal.onDidDismiss(data => {
       if (data && data.setScores) {
         this.result_json.SET_SCORES = data.setScores;
-        this.handleSetInputData(data.setScores);
+        
+        // Update calculated values in result_json
+        if (this.result_json.HOME_TEAM) {
+          this.result_json.HOME_TEAM.SETS_WON = data.homeSetsWon.toString();
+          this.result_json.HOME_TEAM.GAMES_WON = data.homeGamesWon.toString();
+        }
+        if (this.result_json.AWAY_TEAM) {
+          this.result_json.AWAY_TEAM.SETS_WON = data.awaySetsWon.toString();
+          this.result_json.AWAY_TEAM.GAMES_WON = data.awayGamesWon.toString();
+        }
+        
+        // Update display scores
+        this.homeScore = data.homeSetsWon.toString();
+        this.awayScore = data.awaySetsWon.toString();
+        
+        this.handleSetInputData(data.setScores, data);
       }
     });
     modal.present();
@@ -936,12 +951,24 @@ export class TennisSummaryTennisPage {
     return true;
   }
 
-  private handleSetInputData(setScores: any[]): void {
+  private handleSetInputData(setScores: any[], calculatedData?: any): void {
     const result_input = {
       ...this.createBaseResultInput(),
       Tennis: {
         LEAGUE_FIXTURE_ID: this.getLeagueFixtureId(),
-        SET_SCORES: setScores
+        SET_SCORES: setScores,
+        HOME_TEAM: {
+          NAME: this.getHomeTeamName(),
+          TEAM_ID: this.getHomeTeamId(),
+          SETS_WON: calculatedData ? calculatedData.homeSetsWon.toString() : '0',
+          GAMES_WON: calculatedData ? calculatedData.homeGamesWon.toString() : '0'
+        },
+        AWAY_TEAM: {
+          NAME: this.getAwayTeamName(),
+          TEAM_ID: this.getAwayTeamId(),
+          SETS_WON: calculatedData ? calculatedData.awaySetsWon.toString() : '0',
+          GAMES_WON: calculatedData ? calculatedData.awayGamesWon.toString() : '0'
+        }
       }
     };
     this.PublishLeagueResult(result_input);

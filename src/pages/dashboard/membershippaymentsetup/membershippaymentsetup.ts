@@ -6,7 +6,6 @@ import { Storage } from '@ionic/storage';
 import { FirebaseService } from '../../../services/firebase.service';
 import { CommonService } from '../../../services/common.service';
 
-
 @IonicPage()
 @Component({
   selector: 'membershippaymentsetup-page',

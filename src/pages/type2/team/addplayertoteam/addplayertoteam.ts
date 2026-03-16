@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Renderer2 } from "@angular/core";
 import {
   IonicPage,
   NavController,
@@ -118,7 +118,8 @@ export class Addplayertoteam {
     private alertCtrl: AlertController,
     public viewCtrl: ViewController,
     private themeService: ThemeService,
-    private events: Events
+    private events: Events,
+    private renderer: Renderer2
   ) {
     this.themeType = sharedservice.getThemeType();
     
@@ -164,13 +165,25 @@ export class Addplayertoteam {
 
 
 
-  ionViewDidLoad() {
-    this.storage.get('dashboardTheme').then((theme) => {
-      this.isDarkTheme = theme === 'dark' || theme === true;
-      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
-      document.body.classList.remove('dark-theme', 'light-theme');
-      document.body.classList.add(themeClass);
-    });
+  async ionViewDidLoad() {
+    await this.loadTheme();
+  }
+
+  async loadTheme() {
+    const theme = await this.storage.get('selectedTheme');
+    this.applyTheme(theme || 'dark');
+  }
+
+  applyTheme(theme: string) {
+    this.isDarkTheme = theme === 'dark';
+    const pageElement = document.querySelector('page-addplayertoteam');
+    if (pageElement) {
+      if (this.isDarkTheme) {
+        this.renderer.removeClass(pageElement, 'light-theme');
+      } else {
+        this.renderer.addClass(pageElement, 'light-theme');
+      }
+    }
   }
 
   ionViewWillLeave() {
@@ -295,7 +308,7 @@ export class Addplayertoteam {
       if (data["getAllMembersByParentClubNMemberType"].length > 0) {
         this.members = data["getAllMembersByParentClubNMemberType"].map((member: UsersModel) => ({
           ...member,
-          isSelected: this.selectedMembersSet.has(member.Id),
+          isSelected: this.selectedMembersSet.has(member.Id) || this.existingPlayersSet.has(member.Id),
           isAlreadyExisted: this.existingPlayersSet.has(member.Id)
         }));
         this.filteredMembers.push(...this.members);
@@ -316,7 +329,7 @@ export class Addplayertoteam {
     if (!this.filteredMembers.length) return;
 
     this.filteredMembers.forEach(member => {
-      member.isSelected = this.selectedMembersSet.has(member.Id);
+      member.isSelected = this.selectedMembersSet.has(member.Id) || this.existingPlayersSet.has(member.Id);
       member.isAlreadyExisted = this.existingPlayersSet.has(member.Id);
     });
   }
@@ -366,8 +379,6 @@ export class Addplayertoteam {
     const memberlength = this.teamMembersInput.members.length;
     if (memberlength > 0) {
       try {
-        this.commonService.showLoader("Please wait...");
-
         const addPlayer = gql`
     mutation addPlayerToTeam($addPlayer: TeamMembersInput!){
       addPlayerToTeam(addPlayer:$addPlayer)
@@ -379,7 +390,6 @@ export class Addplayertoteam {
         const mutationVariables = { addPlayer: this.teamMembersInput }
 
         const saveSubscription = this.graphqlService.mutate(addPlayer, mutationVariables, 0).subscribe((res: any) => {
-          this.commonService.hideLoader();
           const message = "Player Added Successfully";
 
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
@@ -388,7 +398,6 @@ export class Addplayertoteam {
 
         },
           (error) => {
-            this.commonService.hideLoader();
             this.handleError(error, "Failed to save player");
           }
         );
@@ -396,7 +405,6 @@ export class Addplayertoteam {
         this.subscriptions.push(saveSubscription);
 
       } catch (error) {
-        this.commonService.hideLoader();
         this.handleError(error, "Failed to save player");
       }
     }

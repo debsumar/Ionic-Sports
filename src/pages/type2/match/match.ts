@@ -2,13 +2,12 @@ import { Component } from "@angular/core";
 import gql from "graphql-tag";
 import {
   IonicPage,
-  NavController,
-  NavParams,
   LoadingController,
   Events,
-  ActionSheetController
+  ActionSheetController,
+  NavParams,
+  NavController,
 } from "ionic-angular";
-import { type } from "os";
 import {
   CommonService,
   ToastMessageType,
@@ -98,7 +97,7 @@ export class MatchPage {
     public actionSheetCtrl: ActionSheetController
   ) {
     this.commonService.category.pipe(first()).subscribe((data) => {
-      if (data == "matchlist") {
+      if(data == "matchlist") {
         // Force theme application when navigating to this page
         setTimeout(() => {
           this.loadTheme();
@@ -120,22 +119,22 @@ export class MatchPage {
       }
     });
 
-
+    
   }
 
   ionViewWillEnter() {
     console.log("Match page - ionViewWillEnter");
-
+    
     // Load and apply theme immediately
     this.loadTheme();
-
+    
     // Subscribe to theme changes
     this.themeService.isDarkTheme$.subscribe(isDark => {
       console.log("Match page - theme service change:", isDark);
       this.isDarkTheme = isDark;
       this.applyTheme(isDark);
     });
-
+    
     // Listen for theme changes from other pages
     this.events.subscribe('theme:changed', (isDark) => {
       console.log('Match page - received theme change event:', isDark);
@@ -146,20 +145,20 @@ export class MatchPage {
 
   ionViewDidEnter() {
     console.log("Match page - ionViewDidEnter");
-
+    
     // Apply theme again after view is fully loaded with multiple attempts
     setTimeout(() => {
       this.forceThemeCheck();
     }, 50);
-
+    
     setTimeout(() => {
       this.forceThemeCheck();
     }, 200);
-
+    
     setTimeout(() => {
       this.forceThemeCheck();
     }, 500);
-
+    
     setTimeout(() => {
       this.forceThemeCheck();
     }, 1000);
@@ -167,7 +166,7 @@ export class MatchPage {
 
   ionViewDidLoad() {
     console.log("Match page - ionViewDidLoad");
-
+    
     // Force theme application on load
     setTimeout(() => {
       this.loadTheme();
@@ -189,11 +188,11 @@ export class MatchPage {
 
   private applyTheme(isDark: boolean): void {
     console.log("Match page - applying theme:", isDark ? "dark" : "light");
-
+    
     // Force apply theme immediately and with retries
     const applyThemeToElement = () => {
       const matchElement = document.querySelector("page-match");
-
+      
       if (matchElement) {
         if (isDark) {
           matchElement.classList.remove("light-theme");
@@ -207,18 +206,18 @@ export class MatchPage {
       }
       return false;
     };
-
+    
     // Try to apply immediately
     if (!applyThemeToElement()) {
       // If not found, retry multiple times
       let retryCount = 0;
       const maxRetries = 5;
-
+      
       const retryApply = () => {
         if (retryCount < maxRetries) {
           retryCount++;
           console.log(`Match page - retry ${retryCount}/${maxRetries}`);
-
+          
           if (!applyThemeToElement()) {
             setTimeout(retryApply, 100 * retryCount); // Increasing delay
           }
@@ -226,7 +225,7 @@ export class MatchPage {
           console.warn("Match page - failed to apply theme after all retries");
         }
       };
-
+      
       setTimeout(retryApply, 50);
     }
   }
@@ -239,15 +238,15 @@ export class MatchPage {
   // Force theme check method
   private forceThemeCheck(): void {
     console.log("Match page - forcing theme check");
-
+    
     // Check multiple sources for theme
     this.storage.get("dashboardTheme").then((storageTheme) => {
       console.log("Match page - storage theme:", storageTheme);
-
+      
       // Also check if body has light-theme class
       const bodyHasLightTheme = document.body.classList.contains("light-theme");
       console.log("Match page - body has light theme:", bodyHasLightTheme);
-
+      
       // Determine final theme
       let isDark = true;
       if (storageTheme !== null && storageTheme !== undefined) {
@@ -255,7 +254,7 @@ export class MatchPage {
       } else if (bodyHasLightTheme) {
         isDark = false;
       }
-
+      
       console.log("Match page - force applying theme:", isDark ? "dark" : "light");
       this.isDarkTheme = isDark;
       this.applyTheme(isDark);
@@ -279,7 +278,7 @@ export class MatchPage {
   // 🎨 Get color based on match type with theme support
   getMatchTypeColor(matchType: number): string {
     const isDark = this.themeService.getCurrentTheme();
-
+    
     switch (matchType) {
       case MatchType.TEAM:
         return isDark ? '#32db64' : '#28a745'; // Green - darker in light theme
@@ -295,10 +294,10 @@ export class MatchPage {
   // 🎨 Get color based on match type name string with theme support
   getMatchTypeColorByName(matchTypeName: string): string {
     if (!matchTypeName) return '#2b92bb';
-
+    
     const type = matchTypeName.toLowerCase();
     const isDark = this.themeService.getCurrentTheme();
-
+    
     if (type.includes('team')) {
       return isDark ? '#32db64' : '#28a745'; // Green
     }
@@ -308,7 +307,7 @@ export class MatchPage {
     if (type.includes('doubles') || type.includes('double')) {
       return isDark ? '#f76e04' : '#fd7e14'; // Orange
     }
-
+    
     return '#2b92bb'; // Primary blue for unknown types
   }
 
@@ -461,31 +460,27 @@ export class MatchPage {
   }
 
 
-
   fetchAllMatches() {
-    this.commonService.showLoader("Fetching matches...");
-    this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        this.fetchAllMatchesRes = res.data;
-        this.matchlist = this.fetchAllMatchesRes.AllMatches;
-        console.log("FetchAllMatches RESPONSE", JSON.stringify(res.data));
-        this.filteredMatchlist = JSON.parse(JSON.stringify(this.matchlist));
-        let today = moment().format("YYYY-MM-DD");
-        this.Today = this.matchlist.filter((match) => {
-          let match_createdAt = moment(
-            match.MatchStartDate,
-            "YYYY-MM-DD"
-          ).format("YYYY-MM-DD");
+    this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.fetchAllMatchesRes = res.data;
+          this.matchlist = this.fetchAllMatchesRes.AllMatches;
+          console.log("FetchAllMatches RESPONSE", JSON.stringify(res.data));
+          this.filteredMatchlist = JSON.parse(JSON.stringify(this.matchlist));
+          let today = moment().format("YYYY-MM-DD");
+          this.Today = this.matchlist.filter((match) => {
+            let match_createdAt = moment(
+              match.MatchStartDate,
+              "YYYY-MM-DD"
+            ).format("YYYY-MM-DD");
 
-          return moment(today).isSame(match_createdAt);
-        }).length;
-      } else {
-        console.log("error in fetching",)
+            return moment(today).isSame(match_createdAt);
+          }).length;
+        } else {
+          console.log("error in fetching",)
+        }
       }
-    }, error => {
-      this.commonService.hideLoader();
-      this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
     });
   }
 

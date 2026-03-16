@@ -19,6 +19,21 @@ export class TennisSetInputPage {
   isHomeTeam: boolean;
   result_json: any;
   setScores: any[] = [];
+  
+  // DTO for template binding - simplified team data
+  teamData: {
+    homeTeamName: string;
+    awayTeamName: string;
+  } = {
+    homeTeamName: "",
+    awayTeamName: ""
+  };
+  
+  // Auto-calculated values
+  homeSetsWon: number = 0;
+  awaySetsWon: number = 0;
+  homeGamesWon: number = 0;
+  awayGamesWon: number = 0;
 
   isDarkTheme: boolean = true;
 
@@ -38,6 +53,7 @@ export class TennisSetInputPage {
     this.isHomeTeam = this.navParams.get('isHomeTeam');
     this.result_json = this.navParams.get('result_json') || {};
     
+    this.initializeTeamData();
     this.initializeSetScores();
   }
 
@@ -78,24 +94,57 @@ export class TennisSetInputPage {
     }
   }
 
-  initializeSetScores() {
-    if (this.result_json.SET_SCORES && this.result_json.SET_SCORES.length > 0) {
-      this.setScores = this.result_json.SET_SCORES.map(set => {
-        const scores = set.SCORE ? set.SCORE.split('-') : ['', ''];
-        return {
-          SET_NUMBER: set.SET_NUMBER,
-          SCORE1: scores[0] || '',
-          SCORE2: scores[1] || '',
-          WINNER_TEAM_ID: set.WINNER_TEAM_ID
-        };
-      });
-    } else {
-      this.setScores = [
-        { SET_NUMBER: 1, SCORE1: "", SCORE2: "", WINNER_TEAM_ID: "" },
-        { SET_NUMBER: 2, SCORE1: "", SCORE2: "", WINNER_TEAM_ID: "" },
-        { SET_NUMBER: 3, SCORE1: "", SCORE2: "", WINNER_TEAM_ID: "" }
-      ];
+  initializeTeamData() {
+    // Handle home team
+    if (this.homeTeamObj) {
+      if (this.homeTeamObj.parentclubteam) {
+        // Old structure with parentclubteam
+        this.teamData.homeTeamName = this.homeTeamObj.parentclubteam.teamName || "";
+      } else {
+        // New structure - direct properties
+        this.teamData.homeTeamName = this.homeTeamObj.teamName || "";
+      }
     }
+
+    // Handle away team
+    if (this.awayTeamObj) {
+      if (this.awayTeamObj.parentclubteam) {
+        // Old structure with parentclubteam
+        this.teamData.awayTeamName = this.awayTeamObj.parentclubteam.teamName || "";
+      } else {
+        // New structure - direct properties
+        this.teamData.awayTeamName = this.awayTeamObj.teamName || "";
+      }
+    }
+
+    console.log('Initialized team data:', this.teamData);
+  }
+
+  initializeSetScores() {
+    // Always start with exactly 3 sets
+    this.setScores = [
+      { SET_NUMBER: 1, SCORE1: "", SCORE2: "", WINNER_TEAM_ID: "" },
+      { SET_NUMBER: 2, SCORE1: "", SCORE2: "", WINNER_TEAM_ID: "" },
+      { SET_NUMBER: 3, SCORE1: "", SCORE2: "", WINNER_TEAM_ID: "" }
+    ];
+    
+    // If there's existing data, populate it but keep only 3 sets max
+    if (this.result_json.SET_SCORES && this.result_json.SET_SCORES.length > 0) {
+      const existingSets = this.result_json.SET_SCORES.slice(0, 3); // Take only first 3 sets
+      existingSets.forEach((set, index) => {
+        if (index < 3) {
+          const scores = set.SCORE ? set.SCORE.split('-') : ['', ''];
+          this.setScores[index] = {
+            SET_NUMBER: index + 1,
+            SCORE1: scores[0] || '',
+            SCORE2: scores[1] || '',
+            WINNER_TEAM_ID: set.WINNER_TEAM_ID
+          };
+        }
+      });
+    }
+    
+    this.calculateSummary();
   }
 
   addSet() {
@@ -106,12 +155,14 @@ export class TennisSetInputPage {
         SCORE2: "",
         WINNER_TEAM_ID: ""
       });
+      this.calculateSummary();
     }
   }
 
   removeSet() {
     if (this.setScores.length > 1) {
       this.setScores.pop();
+      this.calculateSummary();
     }
   }
 
@@ -126,8 +177,14 @@ export class TennisSetInputPage {
       WINNER_TEAM_ID: set.WINNER_TEAM_ID
     }));
 
-    //this.commonService.toastMessage("Set scores saved successfully", 2500, ToastMessageType.Success);
-    this.viewCtrl.dismiss({ setScores: setScoresData });
+    // Return both set scores and calculated summary
+    this.viewCtrl.dismiss({ 
+      setScores: setScoresData,
+      homeSetsWon: this.homeSetsWon,
+      awaySetsWon: this.awaySetsWon,
+      homeGamesWon: this.homeGamesWon,
+      awayGamesWon: this.awayGamesWon
+    });
   }
 
   private validateSetScores(): boolean {
@@ -168,6 +225,41 @@ export class TennisSetInputPage {
     }
 
     return true;
+  }
+
+  // Auto-calculate sets won and games won based on set scores
+  calculateSummary() {
+    this.homeSetsWon = 0;
+    this.awaySetsWon = 0;
+    this.homeGamesWon = 0;
+    this.awayGamesWon = 0;
+
+    const filledSets = this.setScores.filter(set => 
+      set.SCORE1 && set.SCORE2 && 
+      set.SCORE1.toString().trim() !== '' && 
+      set.SCORE2.toString().trim() !== ''
+    );
+
+    filledSets.forEach(set => {
+      const score1 = parseInt(set.SCORE1) || 0;
+      const score2 = parseInt(set.SCORE2) || 0;
+
+      // Add to games won
+      this.homeGamesWon += score1;
+      this.awayGamesWon += score2;
+
+      // Determine set winner and increment sets won
+      if (score1 > score2) {
+        this.homeSetsWon++;
+      } else if (score2 > score1) {
+        this.awaySetsWon++;
+      }
+    });
+  }
+
+  // Call calculateSummary when scores change
+  onScoreChange() {
+    this.calculateSummary();
   }
 
   cancel() {

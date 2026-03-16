@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Renderer2 } from "@angular/core";
 import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, Events } from "ionic-angular";
 import { ThemeService } from "../../../../services/theme.service";
 import { Storage } from "@ionic/storage";
@@ -66,7 +66,8 @@ export class MatchdetailsPage {
     public modalCtrl: ModalController,
     private graphqlService: GraphqlService,
     private themeService: ThemeService,
-    private events: Events
+    private events: Events,
+    private renderer: Renderer2
   ) {
     this.events.subscribe('theme:changed', (theme) => {
       this.isDarkTheme = theme === 'dark';
@@ -103,14 +104,26 @@ export class MatchdetailsPage {
     });
   }
 
-  ionViewDidLoad() {
+  async ionViewDidLoad() {
     console.log("ionViewDidLoad MatchdetailsPage");
-    this.storage.get('dashboardTheme').then((theme) => {
-      this.isDarkTheme = theme === 'dark' || theme === true;
-      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
-      document.body.classList.remove('dark-theme', 'light-theme');
-      document.body.classList.add(themeClass);
-    });
+    await this.loadTheme();
+  }
+
+  async loadTheme() {
+    const theme = await this.storage.get('selectedTheme');
+    this.applyTheme(theme || 'dark');
+  }
+
+  applyTheme(theme: string) {
+    this.isDarkTheme = theme === 'dark';
+    const pageElement = document.querySelector('page-matchdetails');
+    if (pageElement) {
+      if (this.isDarkTheme) {
+        this.renderer.removeClass(pageElement, 'light-theme');
+      } else {
+        this.renderer.addClass(pageElement, 'light-theme');
+      }
+    }
   }
 
   getFormattedDate(date: any) {
@@ -286,10 +299,7 @@ export class MatchdetailsPage {
       if (error.networkError) {
         console.error("Network Error:", error.networkError);
       }
-    }
-    )
-
-
+    })
   };
 
   canEditTeams() {
@@ -629,11 +639,7 @@ export class MatchdetailsPage {
 
 
   delete() {
-
-    this.commonService.showLoader("Please wait...");
     try {
-
-
       const delete_Match = gql`
        mutation deleteMatch($deleteMatchInput: DeleteMatchInput!) {
         deleteMatch(deleteMatchInput: $deleteMatchInput)
@@ -642,22 +648,18 @@ export class MatchdetailsPage {
       const deleteVariable = { deleteMatchInput: { ParentClubKey: this.parentClubKey, MatchId: this.match.MatchId } }
 
       this.graphqlService.mutate(delete_Match, deleteVariable, 1).subscribe((response) => {
-        this.commonService.hideLoader();
         const message = "match deleted successfully";
         this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
         this.commonService.updateCategory("matchlist");
         this.navCtrl.pop().then(() => this.navCtrl.pop().then());
 
       }, (err) => {
-        this.commonService.hideLoader();
         console.error("GraphQL mutation error:", err);
         this.commonService.toastMessage("match deletion failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
       )
     } catch (error) {
-
       console.error("An error occurred:", error);
-
     }
   }
 

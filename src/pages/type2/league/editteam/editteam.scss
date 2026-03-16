@@ -336,7 +336,8 @@ page-editteam {
   // Footer styling
   ion-footer {
     --background: #ffffff;
-    
+    background: #ffffff !important;
+    border-top: 1px solid #e2e8f0;
     .timekare-primary-btn {
       background: #2b92bb;
       color: white;
@@ -348,7 +349,8 @@ page-editteam {
   .dark-theme {
     ion-footer {
       --background: #1e293b;
-      
+      background: #1e293b !important;
+      border-top: 1px solid #475569;
       .timekare-primary-btn {
         background: #2b92bb;
         color: white;

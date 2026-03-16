@@ -39,7 +39,7 @@
 
         <ion-col col-3 text-right>
           <div style="display: flex; align-items: center;justify-content: space-evenly">
-            <ion-icon style="padding-left: 20px; color: #2b92bb; font-size: 1.5em"
+            <ion-icon style="color: #2b92bb; font-size: 1.5em"
               [name]="team.teamVisibility==0?'ios-globe':'lock'"></ion-icon>
             <p class="smalltext">{{team?.teamVisibility==0 ? "Public" : "Private"}}</p>
           </div>
@@ -98,7 +98,7 @@
     <ion-card class="cardStyle" (click)="presentActionSheet(player)" *ngFor="let player of filteredParticipant">
       <ion-row style="height: 100%;">
         <ion-col col-7 class="team_left_card">
-          <p class="para_overflow" style="font-weight: 500;">{{player.user.FirstName}} {{player.user.LastName}}</p>
+          <p class="para_overflow" style="font-weight: 500;">{{player.user.FirstName}} {{player.user.LastName}}({{player.user.age}})</p>
           <p class="para_overflow">{{player.teamrole.role_name}}</p>
         </ion-col>
         <ion-col col-5 class="status-col team_right_card">

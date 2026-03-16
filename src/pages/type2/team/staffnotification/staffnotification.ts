@@ -140,7 +140,7 @@ export class StaffnotificationPage {
           ToastMessageType.Success,
           ToastPlacement.Bottom
         );
-        console.log("Notification Data:" + data[notifyUser as any]);
+        // console.log("Notification Data:" +data[notifyUser]);
 
         this.navCtrl.pop();
 

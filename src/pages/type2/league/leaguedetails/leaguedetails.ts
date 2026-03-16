@@ -321,6 +321,13 @@ export class LeaguedetailsPage {
   };
 
   gotoLeagueMatchInfoPage(mat: LeagueMatch) {
+    // const match_data = {
+    //   ...mat
+    //   formatted_round: mat.formatted_round
+    // };
+    // this.navCtrl.push("LeagueMatchInfoPage", { "match": mat, "leagueId": this.individualLeague.id, "activityCode": this.individualLeague.activity.ActivityCode, "activityId": this.individualLeague.activity.Id, "existingteam": this.leagueStanding.map(league_team => league_team.parentclubteam) });
+    // this.navCtrl.push("LeagueMatchInfoPage", { "leagueId": this.individualLeague.id, "activityId": this.individualLeague.activity.Id, "existingteam": this.partcipantData });
+
     const existingTeam = this.leagueStanding ? this.leagueStanding.map(league_team => league_team.parentclubteam) : [];
     this.navCtrl.push("LeagueMatchInfoPage", {
       "match": mat,
@@ -434,7 +441,7 @@ export class LeaguedetailsPage {
     const payload = {
       parentclubId: this.sharedservice.getPostgreParentClubId(),
       clubId: "",
-      activityId: this.individualLeague.activity.Id,
+      activityId: this.individualLeague.activity.Id, // Hardcoded activity ID
       memberId: this.sharedservice.getLoggedInId(),
       action_type: 0,
       device_type: deviceType,
@@ -464,6 +471,7 @@ export class LeaguedetailsPage {
       this.commonService.toastMessage('Please assign teams first', 2500, ToastMessageType.Error);
       return;
     }
+
     if (this.individualLeague.activity.Id !== 'd47c2ac4-e571-488f-a895-c1940726900f') {
       this.commonService.toastMessage('Team lineup data is not available for this activity', 2500, ToastMessageType.Info);
       return;
@@ -547,7 +555,7 @@ export class LeaguedetailsPage {
     this.navCtrl.push("LineupPage", {
       match: match,
       matchId: match.match_id,
-      activityId: this.individualLeague.activity.Id,
+      activityId: this.individualLeague.activity.Id, // Hardcoded activity ID
       homeUserId: match.home_team_id,      // Map from LeagueMatch property
       awayUserId: match.away_team_id,      // Map from LeagueMatch property
       homeUserName: match.homeusername, // Use lowercase
@@ -563,7 +571,6 @@ export class LeaguedetailsPage {
   }
 
   gotoMatchDetails(match: LeagueMatch) {
-
     // this.navCtrl.push("LeaguematchdetailsPage");
     //this.navCtrl.push("UpdateleaguematchPage", { leagueId: this.individualLeague.id });
     let actionSheet = this.actionSheetCtrl.create({
@@ -654,15 +661,14 @@ export class LeaguedetailsPage {
       leagueFixtureId: ""
     }
     commonInput.leagueFixtureId = mat.fixture_id;
-    this.httpService.post(API.DELETE_LEAGUE_MATCHES, commonInput).subscribe((res: any) => {
-      const message = "Match deleted successfully";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-      console.log("match deleted", res);
-      this.getLeagueMatches();
-    }, (error) => {
-      this.commonService.toastMessage("Match fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    }
-    )
+    this.httpService.post(API.DELETE_LEAGUE_MATCHES, commonInput).subscribe({
+      next: (res: any) => {
+        const message = "Match deleted successfully";
+        this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+        console.log("match deleted", res);
+        this.getLeagueMatches();
+      }
+    });
   }
 
   updateResult(match: LeagueMatch) {
@@ -1016,7 +1022,7 @@ export class LeaguedetailsPage {
     const participantsStatusQuery = gql`
     query getLeagueORTournamentStanding( $leagueStandingInput: LeagueStandingInput! ) {
       getLeagueORTournamentStanding(leagueStandingInput:$leagueStandingInput) {
-        id
+          id
         parentclubteam{      
                id
                teamName
@@ -1187,10 +1193,23 @@ export class LeaguedetailsPage {
   }
 
   updatePayment(participant: LeagueParticipantModel) {
-
     this.navCtrl.push("LeaguepaymentPage", { SelectedMember: participant, SessionDetails: this.individualLeague })
+  }
 
 
+  sendEmailToGroup(){
+    const member_list = this.partcipantData.map(participant => this.prepareParticipantData(participant));
+    if (member_list.length > 0) {
+      const session = this.prepareSessionDetails();
+      const email_modal = {
+        module_info: session,
+        email_users: member_list,
+        type: 600
+      };
+      this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    }
   }
 
   sendEmailToMember(participant: LeagueParticipantModel) {
@@ -1267,26 +1286,26 @@ export class LeaguedetailsPage {
   getLeagueMatches() {
     this.commonInput.league_id = this.league_id;
 
-    this.httpService.post(API.GET_LEAGUE_MATCHES, this.commonInput).subscribe((res: any) => {
-      // this.match = res["data"];
-      // console.log("match data is:", this.match);
-
-      // for(let i=0;i<this.match.length;i++){
-      //   [this.startDate,this.startTime]=this.match[i].start_date.split(' ');
-      // }
-      this.match = res.data;
-      // this.match = res.data.map(match => ({
-      //   ...match,
-      //   start_date: this.datePipe.transform(match.start_date, 'dd-MMM-yyyy,HH:mm') || 'Invalid date'
-      // }));
-      this.matchesLength = this.match.length;
-    }, (error) => {
-      this.commonService.toastMessage("match fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    }
-    )
+    this.httpService.post(API.GET_LEAGUE_MATCHES, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.match = res.data;
+        this.matchesLength = this.match.length;
+      }
+    });
   }
 
   showMatchActionSheet(match: LeagueMatch) {
+    //if (this.individualLeague.league_type === 3) {
+      //this.commonService.showMatchActionSheet(match, {
+      //onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
+      //onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
+      // onDelete: () => this.removeMatch(match),
+      // onUpdateResult: () => this.updateResult(match)
+      //});
+      this.gotoLeagueMatchInfoPage(match);
+    //} else {
+      this.gotoMatchDetails(match);
+    //}
     this.gotoMatchDetails(match);
   }
 

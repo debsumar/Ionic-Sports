@@ -13,7 +13,7 @@ import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
 import { CatandType } from '../models/location.model';
 import { CommonRestApiDto } from '../../../../shared/model/common.model';
-
+import { Storage } from '@ionic/storage';
 /**
  * Generated class for the AutocreatematchPage page.
  *
@@ -134,30 +134,24 @@ export class AutocreatematchPage {
     commonInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
     commonInput.app_type = AppType.ADMIN_NEW;
     commonInput.device_id = this.sharedservice.getDeviceId() || '';
-    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, commonInput).subscribe((res: any) => {
-      this.leagueType = res["data"];
-    }, (error) => {
-      this.commonService.toastMessage("type fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    })
+    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, commonInput).subscribe({
+      next: (res: any) => {
+        this.leagueType = res["data"];
+      }
+    });
   }
 
 
   getRoundTypes() {
-    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe((res: any) => {
-      if (res) {
-        this.roundTypes = res.data || [];
-        this.selectedRound = this.roundTypes.length > 0 ? this.roundTypes[0].id : 0; // Default to first round type
-        console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
-      } else {
-        this.commonService.hideLoader();
-        console.log("error in fetching",)
-      }
-    }, (error) => {
-      console.error("Error fetching round types:", error);
-      if (error && error.error && error.error.message) {
-        this.commonService.toastMessage(error.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-      } else {
-        this.commonService.toastMessage('Failed to fetch round types', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.roundTypes = res.data || [];
+          this.selectedRound = this.roundTypes.length > 0 ? this.roundTypes[0].id : 0; // Default to first round type
+          console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
+        } else {
+          console.log("error in fetching",)
+        }
       }
     });
   }

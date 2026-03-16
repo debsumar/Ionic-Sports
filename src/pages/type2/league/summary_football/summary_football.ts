@@ -1804,7 +1804,7 @@ export class SummaryFootballPage implements AfterViewInit {
   onHomePossessionChange(): void {
     const homeValue = parseFloat(this.homePoss);
     if (!isNaN(homeValue) && homeValue >= 0 && homeValue <= 100) {
-      this.awayPoss = (100 - homeValue).toFixed(2);
+      this.awayPoss = Math.round(100 - homeValue).toString();
       if (this.result_json && this.result_json.HOME_TEAM && this.result_json.AWAY_TEAM) {
         this.result_json.HOME_TEAM.BALL_POSSESSION = this.homePoss;
         this.result_json.AWAY_TEAM.BALL_POSSESSION = this.awayPoss;
@@ -1818,7 +1818,7 @@ export class SummaryFootballPage implements AfterViewInit {
   onAwayPossessionChange(): void {
     const awayValue = parseFloat(this.awayPoss);
     if (!isNaN(awayValue) && awayValue >= 0 && awayValue <= 100) {
-      this.homePoss = (100 - awayValue).toFixed(2);
+      this.homePoss = Math.round(100 - awayValue).toString();
       if (this.result_json && this.result_json.HOME_TEAM && this.result_json.AWAY_TEAM) {
         this.result_json.HOME_TEAM.BALL_POSSESSION = this.homePoss;
         this.result_json.AWAY_TEAM.BALL_POSSESSION = this.awayPoss;

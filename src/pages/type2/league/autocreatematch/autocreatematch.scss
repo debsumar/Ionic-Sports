@@ -395,8 +395,8 @@ page-autocreatematch {
   // Footer styling
   ion-footer {
     --background: #ffffff;
+    background: #ffffff !important;
     border-top: 1px solid #e2e8f0;
-    
     .timekare-primary-btn {
       background: #2b92bb;
       color: white;

@@ -77,7 +77,6 @@ export class EditteamPage {
     public sharedservice: SharedServices,
     public commonService: CommonService,
     public popoverCtrl: PopoverController,
-    private toastCtrl: ToastController,
     private graphqlService: GraphqlService,
     public actionSheetCtrl: ActionSheetController,
 
@@ -261,9 +260,6 @@ export class EditteamPage {
           this.getActivity();
         }
         console.log("activity", this.clubVenues);
-      }, (error) => {
-        this.commonService.toastMessage("No venues found", 2500, ToastMessageType.Error)
-        console.error("Error in fetching:", error);
       });
   }
 

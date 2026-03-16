@@ -20,7 +20,7 @@ import { Device } from "@ionic-native/device";
 import { ApolloModule } from "apollo-angular";
 import { SharedServices } from "../pages/services/sharedservice";
 import { APOLLO_OPTIONS } from "apollo-angular";
-import { HttpLink, HttpLinkModule } from "apollo-angular-link-http";
+import { HttpLink,HttpLinkModule } from "apollo-angular-link-http";
 import { environment as devEnvironment } from '../environments/environment';
 import { environment as prodEnvironment } from '../environments/environment.prod';
 import { createApollo } from "./apollo.config";
@@ -30,9 +30,9 @@ import { CommonService } from "../services/common.service";
 import { CommonLeagueService } from "../pages/type2/league/commonleague.service";
 import { ThemeService } from "../services/theme.service";
 import { HttpService } from "../services/http.service";
-import { FirebaseService } from "../services/firebase.service";
-
-
+import { ParentClubService } from "../services/parentclub.service";
+  
+       
 
 @NgModule({
   declarations: [
@@ -47,7 +47,7 @@ import { FirebaseService } from "../services/firebase.service";
     ),
     ApolloModule,
     HttpLinkModule,
-    AngularFireModule.initializeApp(prodEnvironment.production ? prodEnvironment.firebaseConfig : devEnvironment.firebaseConfig),
+    AngularFireModule.initializeApp(prodEnvironment.production ? prodEnvironment.firebaseConfig:devEnvironment.firebaseConfig),
     AngularFireDatabaseModule,
     HttpClientModule,
     IonicStorageModule.forRoot(),
@@ -75,7 +75,7 @@ import { FirebaseService } from "../services/firebase.service";
     CommonLeagueService,
     ThemeService,
     HttpService,
-    FirebaseService,
+    ParentClubService,
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,
@@ -84,4 +84,4 @@ import { FirebaseService } from "../services/firebase.service";
     { provide: ErrorHandler, useClass: IonicErrorHandler },
   ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -29,13 +29,17 @@ export class ResultInputPage {
     loser_league_participation_id: ''
   }
 
+  // League flow properties
   homeTeamObj: LeagueParticipationForMatchModel;
   awayTeamObj: LeagueParticipationForMatchModel;
   matchObj: LeagueMatch;
+
+  // Match flow properties
   matchTeamObj: AllMatchData;
   hometeamMatchObj: TeamsForParentClubModel;
   awayteamMatchObj: TeamsForParentClubModel;
 
+  // Common properties
   resultId: string;
   leagueId: string;
   activityId: string;
@@ -53,8 +57,11 @@ export class ResultInputPage {
 
   homeTeamGoals: number;
   awayTeamGoals: number;
+
+  // Result Object from summary page
   resultObject: FootballResultModel;
 
+  // Result Status Properties
   resultStatusList: ResultStatusModel[] = [];
   isLoadingStatuses: boolean = false;
   getResultStatusByActivityInput: GetResultStatusByActivityInput = {
@@ -76,6 +83,7 @@ export class ResultInputPage {
   isEditable: boolean = true;
   isDarkTheme: boolean = true;
   
+  // Custom dropdown state
   showStatusDropdown: boolean = false;
   showWinnerDropdown: boolean = false;
 
@@ -83,6 +91,7 @@ export class ResultInputPage {
     public storage: Storage, private httpService: HttpService, public sharedservice: SharedServices,
     public commonService: CommonService, public alertCtrl: AlertController, public events: Events,
     public themeService: ThemeService) {
+
     this.initializeComponent();
   }
 
@@ -175,13 +184,13 @@ export class ResultInputPage {
       parentclubId: this.sharedservice.getPostgreParentClubId() || '',
       clubId: '',
       activityId: this.activityId || '',
-      memberId: this.sharedservice.getLoggedInUserId() || '',
+      memberId: this.sharedservice.getLoggedInId() || '',
       action_type: 0,
       device_type: this.sharedservice.getPlatform() === "android" ? 1 : 2,
       app_type: AppType.ADMIN_NEW,
       device_id: this.sharedservice.getDeviceId() || '',
-      updated_by: this.sharedservice.getLoggedInUserId() || '',
-      created_by: this.sharedservice.getLoggedInUserId() || '',
+      updated_by: this.sharedservice.getLoggedInId() || '',
+      created_by: this.sharedservice.getLoggedInId() || '',
       activity_code: this.activityCode
     };
   }
@@ -213,7 +222,7 @@ export class ResultInputPage {
             this.resultStatusList = res.data;
             
             if (this.resultObject && this.resultObject.RESULT && this.resultObject.RESULT.RESULT_STATUS) {
-              const existingStatus = this.resultStatusList.find(status => status.id.toString() === this.resultObject.RESULT.RESULT_STATUS.toString());
+              const existingStatus = this.resultStatusList.find(status => status.id === this.resultObject.RESULT.RESULT_STATUS.toString());
               if (existingStatus) {
                 this.selectedResultStatus = existingStatus;
               }
@@ -225,68 +234,9 @@ export class ResultInputPage {
       },
       (error) => {
         this.isLoadingStatuses = false;
-        this.commonService.toastMessage('Failed to load result statuses', ToastMessageType.Error);
+        this.commonService.presentToast('Failed to load result statuses', ToastMessageType.error);
       }
     );
-  }
-
-  dismiss() {
-    this.viewCtrl.dismiss({
-      winnerTeam: {},
-      loserTeam: {},
-      winnerTeamGoals: 0,
-      loserTeamGoals: 0,
-      footballResultStats: null
-    });
-  }
-
-  // Getter methods for unified access to team data
-  get homeTeamName(): string {
-    if (this.isLeague) {
-      return (this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.teamName)
-        ? this.homeTeamObj.parentclubteam.teamName : 'Home Team';
-    } else {
-      return (this.hometeamMatchObj && this.hometeamMatchObj.teamName)
-        ? this.hometeamMatchObj.teamName : 'Home Team';
-    }
-  }
-
-  get awayTeamName(): string {
-    if (this.isLeague) {
-      return (this.awayTeamObj && this.awayTeamObj.parentclubteam && this.awayTeamObj.parentclubteam.teamName)
-        ? this.awayTeamObj.parentclubteam.teamName : 'Away Team';
-    } else {
-      return (this.awayteamMatchObj && this.awayteamMatchObj.teamName)
-        ? this.awayteamMatchObj.teamName : 'Away Team';
-    }
-  }
-
-  get matchTitle(): string {
-    if (this.isLeague) {
-      return (this.matchObj && this.matchObj.match_title) ? this.matchObj.match_title : '';
-    } else {
-      return (this.matchTeamObj && this.matchTeamObj.MatchTitle) ? this.matchTeamObj.MatchTitle : '';
-    }
-  }
-
-  get homeTeamId(): string {
-    if (this.isLeague) {
-      return (this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.id)
-        ? this.homeTeamObj.parentclubteam.id : '';
-    } else {
-      return (this.hometeamMatchObj && this.hometeamMatchObj.id)
-        ? this.hometeamMatchObj.id : '';
-    }
-  }
-
-  get awayTeamId(): string {
-    if (this.isLeague) {
-      return (this.awayTeamObj && this.awayTeamObj.parentclubteam && this.awayTeamObj.parentclubteam.id)
-        ? this.awayTeamObj.parentclubteam.id : '';
-    } else {
-      return (this.awayteamMatchObj && this.awayteamMatchObj.id)
-        ? this.awayteamMatchObj.id : '';
-    }
   }
 
   toggleStatusDropdown() {
@@ -304,22 +254,18 @@ export class ResultInputPage {
     this.showStatusDropdown = false;
   }
 
-  selectStatus(status: ResultStatusModel) {
-    this.selectResultStatus(status);
-  }
-
   selectWinnerTeam(teamId: string) {
     this.selectedWinnerTeamId = teamId;
     this.showWinnerDropdown = false;
   }
 
   getSelectedStatusName(): string {
-    return this.selectedResultStatus && this.selectedResultStatus.status || '';
+    return this.selectedResultStatus?.statusName || '';
   }
 
   getSelectedWinnerName(): string {
-    const selectedTeam = this.TEAMS.find(team => team && team.parentclubteam && team.parentclubteam.id === this.selectedWinnerTeamId);
-    return selectedTeam && selectedTeam.parentclubteam && selectedTeam.parentclubteam.teamName || '';
+    const selectedTeam = this.TEAMS.find(team => team?.parentclubteam?.id === this.selectedWinnerTeamId);
+    return selectedTeam?.parentclubteam?.teamName || '';
   }
 
   closeDropdowns() {
@@ -332,152 +278,33 @@ export class ResultInputPage {
       return;
     }
 
-    // this.updateResultEntityInput.ResultStatus = this.selectedResultStatus && this.selectedResultStatus.id || 0;
+    this.updateResultEntityInput.ResultStatus = this.selectedResultStatus?.id || 0;
     
-    // if (this.selectedWinnerTeamId) {
-    //   const winnerTeam = this.TEAMS.find(team => team && team.parentclubteam && team.parentclubteam.id === this.selectedWinnerTeamId);
-    //   if (winnerTeam) {
-    //     this.updateResultEntityInput.winner_league_participation_id = winnerTeam.id;
-    //     const loserTeam = this.TEAMS.find(team => team && team.parentclubteam && team.parentclubteam.id !== this.selectedWinnerTeamId);
-    //     if (loserTeam) {
-    //       this.updateResultEntityInput.loser_league_participation_id = loserTeam.id;
-    //     }
-    //   }
-    // }
-
-    // this.httpService.post(`${API.UPDATE_RESULT_ENTITY}`, this.updateResultEntityInput).subscribe(
-    //   (response: any) => {
-    //     this.commonService.toastMessage('Result saved successfully', 2500,ToastMessageType.Success);
-    //     this.viewCtrl.dismiss({ saved: true });
-    //   },
-    //   (error) => {
-    //     this.commonService.toastMessage('Failed to save result', 2500, ToastMessageType.Error);
-    //   }
-    // );
-
-
-    // const isDrawn = this.selectedResultStatus.status.toUpperCase() === 'DRAW';
-    // const isWin = this.selectedResultStatus.status.toUpperCase() === 'WIN';
-
-    const isDrawn = this.selectedResultStatus.status.toUpperCase() === 'DRAW';
-    const isWin = this.selectedResultStatus.status.toUpperCase() === 'WIN';
-    
-    // 🏟️ Validate home and away goals for WIN and DRAW statuses
-    if (isWin || isDrawn) {
-      const homeGoals = Number(this.homeTeamGoals);
-      const awayGoals = Number(this.awayTeamGoals);
-
-      if (
-        this.homeTeamGoals === undefined ||
-        this.awayTeamGoals === undefined ||
-        isNaN(homeGoals) ||
-        isNaN(awayGoals) ||
-        homeGoals < 0 ||
-        awayGoals < 0
-      ) {
-        this.commonService.toastMessage('Please enter valid numbers for both team goals.', 3000, ToastMessageType.Info);
-        return;
+    if (this.selectedWinnerTeamId) {
+      const winnerTeam = this.TEAMS.find(team => team?.parentclubteam?.id === this.selectedWinnerTeamId);
+      if (winnerTeam) {
+        this.updateResultEntityInput.winner_league_participation_id = winnerTeam.id;
+        const loserTeam = this.TEAMS.find(team => team?.parentclubteam?.id !== this.selectedWinnerTeamId);
+        if (loserTeam) {
+          this.updateResultEntityInput.loser_league_participation_id = loserTeam.id;
+        }
       }
     }
 
-    // Create FootballResultStatsModel
-    const footballResultStats: FootballResultStatsModel = {
-      DESCRIPTION: this.resultDescription || '',
-      WINNER_ID: '',
-      LOSER_ID: '',
-      RESULT_STATUS: this.selectedResultStatus.status
-    };
-
-    // 🤝 Handle different result types
-    if (isWin) {
-      // Validate winner selection for 'WIN' result type
-      if (!this.selectedWinnerTeamId) {
-        this.commonService.toastMessage('Please select a winner team.', 3000, ToastMessageType.Info);
-        return;
+    this.httpService.post(`${API.UPDATE_RESULT_ENTITY}`, this.updateResultEntityInput).subscribe(
+      (response: any) => {
+        this.commonService.presentToast('Result saved successfully', ToastMessageType.success);
+        this.viewCtrl.dismiss({ saved: true });
+      },
+      (error) => {
+        this.commonService.presentToast('Failed to save result', ToastMessageType.error);
       }
-
-      // 🏆 Find winner and loser teams based on selectedWinnerTeamId
-      const winnerTeam = this.TEAMS.find(team => team.parentclubteam.id === this.selectedWinnerTeamId);
-      const loserTeam = this.TEAMS.find(team => team.parentclubteam.id !== this.selectedWinnerTeamId);
-
-      // 🏟️ Assign goals based on which team is the winner
-      // Convert to numbers to ensure proper comparison
-      const homeGoals = Number(this.homeTeamGoals);
-      const awayGoals = Number(this.awayTeamGoals);
-      let winnerTeamGoals = 0;
-      let loserTeamGoals = 0;
-
-      if (this.selectedWinnerTeamId === this.homeTeamId) {
-        winnerTeamGoals = homeGoals;
-        loserTeamGoals = awayGoals;
-      } else if (this.selectedWinnerTeamId === this.awayTeamId) {
-        winnerTeamGoals = awayGoals;
-        loserTeamGoals = homeGoals;
-      }
-
-      // Validate that winner team has more goals than loser team
-      if (winnerTeamGoals <= loserTeamGoals) {
-        this.commonService.toastMessage('Winner team goals must be greater than losing team goals.', 3000, ToastMessageType.Info);
-        return;
-      }
-
-      // Set winner ID in FootballResultStatsModel
-      footballResultStats.WINNER_ID = this.selectedWinnerTeamId;
-
-      // 🟢 Dismiss modal with winner result data
-      this.viewCtrl.dismiss({
-        homeTeamGoals: homeGoals.toString(),
-        awayTeamGoals: awayGoals.toString(),
-        winnerTeamGoals: winnerTeamGoals.toString(),
-        loserTeamGoals: loserTeamGoals.toString(),
-        resultStatus: this.selectedResultStatus.id,
-        footballResultStats: footballResultStats
-      });
-    } else if (isDrawn) {
-      // For drawn type, check if both teams have the same number of goals
-      // Convert to numbers to ensure proper comparison
-      const homeGoals = Number(this.homeTeamGoals);
-      const awayGoals = Number(this.awayTeamGoals);
-
-      if (homeGoals !== awayGoals) {
-        this.commonService.toastMessage('For drawn matches, both teams must have the same number of goals.', 3000, ToastMessageType.Info);
-        return;
-      }
-
-      // For draw, no specific winner ID
-      footballResultStats.WINNER_ID = '';
-
-      // 🤝 For drawn matches, dismiss modal with drawn match data
-      this.viewCtrl.dismiss({
-        homeTeamGoals: homeGoals.toString(),
-        awayTeamGoals: awayGoals.toString(),
-        winnerTeamGoals: null,
-        loserTeamGoals: null,
-        resultStatus: this.selectedResultStatus.id,
-        footballResultStats: footballResultStats
-      });
-    } else {
-      // For other statuses (POSTPONED, ABANDONED, CANCELLED), no winner ID
-      footballResultStats.WINNER_ID = '';
-
-      // For other statuses, just save the status
-      this.viewCtrl.dismiss({
-        homeTeamGoals: this.homeTeamGoals ? this.homeTeamGoals.toString() : '0',
-        awayTeamGoals: this.awayTeamGoals ? this.awayTeamGoals.toString() : '0',
-        winnerTeamGoals: null,
-        loserTeamGoals: null,
-        resultStatus: this.selectedResultStatus.id,
-        footballResultStats: footballResultStats
-      });
-    }
-
-
-
+    );
   }
 
   private validateForm(): boolean {
     if (!this.selectedResultStatus) {
-      this.commonService.toastMessage('Please select a result status', ToastMessageType.Error);
+      this.commonService.presentToast('Please select a result status', ToastMessageType.error);
       return false;
     }
     return true;

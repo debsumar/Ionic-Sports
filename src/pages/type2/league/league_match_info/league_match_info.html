@@ -104,8 +104,9 @@
 
       <div class="drop-zone" *ngFor="let section of getFilteredSections(); let sectionIndex = index" class="section">
         <h2 class="section-title">{{ section.title }} <span
-            style="float: right; margin-right: 8px; color: #32db64;">Confirmed:
-            {{getAcceptedCount(section.items)}}</span></h2>
+            style="float: right; margin-right: 8px; color: #32db64;"><span *ngIf="sectionIndex==0">Confirmed:</span>
+            <span *ngIf="sectionIndex > 0">Count:</span>
+            {{getAcceptedCount(section.items,sectionIndex)}}</span></h2>
         <div class="itemlist" (dragenter)="onEnterSection(sectionIndex)" (dragleave)="onDragLeaveSection(sectionIndex)"
           (dragover)="$event.preventDefault()" (drop)="onDrop($event, sectionIndex)" [ngStyle]="{
             'max-height': leagueMatchParticipantInput.leagueTeamPlayerStatusType === 0 ? '200px':'none'}">
@@ -151,12 +152,17 @@
                         [style.color]="getInviteStatusIcon(item.invite_status) === 'checkmark-circle' ? '#32db64' : getInviteStatusIcon(item.invite_status) === 'close-circle' ? '#f53d3d' : getInviteStatusIcon(item.invite_status) === 'help-circle' ? '#b8860b' : '#f76e04'">
                       </ion-icon>
                     </div>
-                    <!-- <div *ngIf=isMatchPaid(item?.Match,item?.paid_amount) style="float: right; margin-top: 0px;">
-                      <p class="pending">
-                        <span>{{currencyDetails.CurrencySymbol}}{{item.paid_amount}}</span>
+                    <div style="text-align: right;">
+                      <p [ngClass]="{'paid': item.amount_pay_status=='1','pending': item.amount_pay_status=='0'}" 
+                         [style.color]="item.amount_pay_status=='1' ? '#32db64' : '#f53d3d'"
+                         style="font-weight: 600 !important; margin: 0 !important;">{{item.amount_pay_status_text}}</p>
+                      <p class="paid" *ngIf="item.amount_pay_status==1" style="color: #32db64 !important; font-weight: 600 !important; margin: 0 !important;">
+                        <span style="color: #32db64 !important; font-weight: 600 !important;">{{currencyDetails.CurrencySymbol}}{{item.paid_amount}}</span>
                       </p>
-                      <p class="pending" style="margin-top:-10px">{{item.amount_pay_status_text}}</p>
-                    </div> -->
+                      <p class="pending" *ngIf="item.amount_pay_status==0" style="color: #f53d3d !important; font-weight: 600 !important; margin: 0 !important;">
+                        <span style="color: #f53d3d !important; font-weight: 600 !important;">{{currencyDetails.CurrencySymbol}}{{item.amount_due}}</span>
+                      </p>
+                    </div>
                   </ion-col>
                 </ion-row>
               </ion-grid>

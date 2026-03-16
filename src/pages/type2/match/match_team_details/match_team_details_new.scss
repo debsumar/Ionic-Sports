@@ -192,4 +192,65 @@ page-match-team-details {
     font-weight: 500;
     font-size: 12px;
   }
+  // 💰 Payment status styles - Maximum specificity
+  page-league-match-info ion-content ion-card ion-card-content ion-grid ion-row ion-col.paidBlock p.paid,
+  page-league-match-info ion-content ion-card ion-card-content ion-grid ion-row ion-col .paidBlock p.paid,
+  page-league-match-info .paidBlock .paid,
+  page-league-match-info .paid {
+    color: #32db64 !important; // Green for paid
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+  }
+
+  page-league-match-info ion-content ion-card ion-card-content ion-grid ion-row ion-col.paidBlock p.pending,
+  page-league-match-info ion-content ion-card ion-card-content ion-grid ion-row ion-col .paidBlock p.pending,
+  page-league-match-info .paidBlock .pending,
+  page-league-match-info .pending {
+    color: #f53d3d !important; // Red for pending
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    margin: 0 !important;
+  }
+
+  // Override any existing p tag styles in paidBlock
+  .paidBlock p {
+    &.paid {
+      color: #32db64 !important;
+      font-weight: 600 !important;
+    }
+    
+    &.pending {
+      color: #f53d3d !important;
+      font-weight: 600 !important;
+    }
+  }
+
+  // Even more specific selectors
+  ion-card-content ion-grid ion-row ion-col.paidBlock p.paid,
+  ion-card-content .paidBlock p.paid,
+  .item-card-content .paidBlock p.paid {
+    color: #32db64 !important;
+    font-weight: 600 !important;
+  }
+
+  ion-card-content ion-grid ion-row ion-col.paidBlock p.pending,
+  ion-card-content .paidBlock p.pending,
+  .item-card-content .paidBlock p.pending {
+    color: #f53d3d !important;
+    font-weight: 600 !important;
+  }
+
+  // Target span elements inside paid/pending paragraphs
+  .paid span,
+  .paidBlock .paid span {
+    color: #32db64 !important;
+    font-weight: 600 !important;
+  }
+
+  .pending span,
+  .paidBlock .pending span {
+    color: #f53d3d !important;
+    font-weight: 600 !important;
+  }
 }
