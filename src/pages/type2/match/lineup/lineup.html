@@ -67,8 +67,7 @@
     <div class="lineup-container">
         <!-- Lineup Name Input -->
         <div class="lineup-name-section">
-            <ion-input [(ngModel)]="lineupName" [placeholder]="isCreateNew ? 'Enter lineup name here' : ''"
-                class="lineup-name-input"></ion-input>
+            <ion-input [(ngModel)]="lineupName" [placeholder]="isCreateNew ? 'Enter lineup name here' : ''" class="lineup-name-input"></ion-input>
         </div>
 
         <!-- Settings Section -->
@@ -112,8 +111,7 @@
                 <!-- Inline Dropdown -->
                 <div class="dropdown-menu" *ngIf="showVisibilityDropdown" (click)="$event.stopPropagation()">
                     <div class="dropdown-item" *ngFor="let option of visibilityOptions"
-                        [class.selected]="option.value === visibility"
-                        (click)="onVisibilityChange(option.value); $event.stopPropagation()">
+                        [class.selected]="option.value === visibility" (click)="onVisibilityChange(option.value); $event.stopPropagation()">
                         <ion-icon name="checkmark" class="check-icon"
                             [style.visibility]="option.value === visibility ? 'visible' : 'hidden'"></ion-icon>
                         <span>{{ option.label }}</span>
@@ -134,8 +132,7 @@
                 <!-- Inline Dropdown -->
                 <div class="dropdown-menu" *ngIf="showTeamSizeDropdown" (click)="$event.stopPropagation()">
                     <div class="dropdown-item" *ngFor="let size of teamSizes"
-                        [class.selected]="size === selectedTeamSize"
-                        (click)="onTeamSizeChange(size); $event.stopPropagation()">
+                        [class.selected]="size === selectedTeamSize" (click)="onTeamSizeChange(size); $event.stopPropagation()">
                         <ion-icon name="checkmark" class="check-icon"
                             [style.visibility]="size === selectedTeamSize ? 'visible' : 'hidden'"></ion-icon>
                         <span>{{ size }}</span>
@@ -156,8 +153,7 @@
                 <!-- Inline Dropdown -->
                 <div class="dropdown-menu" *ngIf="showFormationDropdown" (click)="$event.stopPropagation()">
                     <div class="dropdown-item" *ngFor="let formation of getAvailableFormations()"
-                        [class.selected]="formation.id === selectedFormation"
-                        (click)="onFormationChange(formation.id); $event.stopPropagation()">
+                        [class.selected]="formation.id === selectedFormation" (click)="onFormationChange(formation.id); $event.stopPropagation()">
                         <ion-icon name="checkmark" class="check-icon"
                             [style.visibility]="formation.id === selectedFormation ? 'visible' : 'hidden'"></ion-icon>
                         <span>{{ formation.formation_name }}</span>

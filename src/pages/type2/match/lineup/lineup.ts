@@ -6,11 +6,33 @@ import { CommonService, ToastMessageType, ToastPlacement } from "../../../../ser
 import { SharedServices } from "../../../services/sharedservice";
 import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
+import {
+    PlayerPosition,
+    ApiPosition,
+    TEAM_SIZES,
+    Player,
+    Formation,
+    TeamFormation,
+    TeamSizeFormation,
+    TeamFormationsApiResponse,
+    ParticipantApiInput,
+    LeagueParticipantApiInput,
+    FormationApiInput,
+    UpdateParticipationApiInput,
+    SaveLineupApiInput,
+    DeleteLineupApiInput,
+    PositionPayload,
+    SubstitutePayload,
+    ApiResponse,
+    SaveLineupResponse,
+    TeamOption,
+    VisibilityOption,
+    LineupDismissData,
+} from "../../league/models/lineup.model";
 import { LineupVisibility, LeagueTeamPlayerStatusType, LeagueMatchActionType, LeagueParticipationStatus } from "../../../../shared/utility/enums";
 import { GetIndividualMatchParticipantModel } from "../../../../shared/model/match.model";
 import { LeagueMatchParticipantModel } from "../../league/models/league.model";
 import { AppType } from "../../../../shared/constants/module.constants";
-import { ApiPosition, ApiResponse, DeleteLineupApiInput, Formation, FormationApiInput, LeagueParticipantApiInput, LineupDismissData, ParticipantApiInput, Player, PlayerPosition, SaveLineupApiInput, SaveLineupResponse, TEAM_SIZES, TeamFormation, TeamFormationsApiResponse, TeamOption, TeamSizeFormation, UpdateParticipationApiInput, VisibilityOption } from "../../league/models/lineup.model";
 
 /**
  * Interface for storing team lineup state
@@ -61,7 +83,7 @@ export class LineupPage {
     visibilityOptions: VisibilityOption[] = [
         { value: LineupVisibility.ALL_INVITEES, label: 'All invitees' },
         { value: LineupVisibility.TEAM_ONLY, label: 'Team only' },
-        { value: LineupVisibility.ADMIN_COACH, label: 'Coaches only' }
+        { value: LineupVisibility.COACHES_ONLY, label: 'Coaches only' }
     ];
     teams: TeamOption[] = [];
     availablePlayers: Player[] = [];
@@ -85,8 +107,8 @@ export class LineupPage {
     showFormationDropdown: boolean = false;
     showVisibilityDropdown: boolean = false;
     showPlayerSelection: boolean = false;
-    private dropdownSelectionGuard: boolean = false; // 🛡️ Prevents toggle re-fire on mobile touch events
     showPlayerOptions: boolean = false;
+    private dropdownSelectionGuard: boolean = false; // 🛡️ Prevents toggle re-fire on mobile touch events
     activePosition: PlayerPosition | null = null;
     selectedSubstitute: Player | null = null;
     recentlyReplacedPlayer: Player | null = null;
@@ -441,7 +463,7 @@ export class LineupPage {
     }
 
     private handlePlayersResponse(res: ApiResponse<GetIndividualMatchParticipantModel[]>): void {
-        if (res && res.data) {
+        if (res?.data) {
             const participants: GetIndividualMatchParticipantModel[] = res.data;
 
             // Map PLAYING players → availablePlayers (always refresh from API)
@@ -482,7 +504,7 @@ export class LineupPage {
     }
 
     private mapParticipantToPlayer(participant: GetIndividualMatchParticipantModel): Player {
-        const profileImage = participant.user && participant.user.profile_image_url ? participant.user.profile_image_url : null;
+        const profileImage = participant.user?.profile_image_url;
         return {
             playerid: participant.user.Id,
             participationId: participant.id,
@@ -497,7 +519,7 @@ export class LineupPage {
      * Filters PLAYING and BENCH players client-side similar to match context
      */
     private handleLeaguePlayersResponse(res: ApiResponse<LeagueMatchParticipantModel[]>): void {
-        if (res && res.data) {
+        if (res?.data) {
             const participants: LeagueMatchParticipantModel[] = res.data;
 
             // Map PLAYING players → availablePlayers
@@ -559,15 +581,15 @@ export class LineupPage {
     }
 
     private handleFormationsResponse(res: TeamFormationsApiResponse): void {
-        const data = res && res.data ? res.data : null;
-        if (data && data.length > 0) {
+        const data = res?.data;
+        if (data?.length > 0) {
             this.allTeamFormations = data;
 
             if (!this.isCreateNew && this.formationSetupId) {
                 // Saved formation flow: preselect from navParams
                 const matchedFormation = data.find((f: TeamFormation) => f.id === this.formationSetupId);
                 this.selectedFormation = matchedFormation ? matchedFormation.id : data[0].id;
-                if (matchedFormation && matchedFormation.visibility !== undefined) {
+                if (matchedFormation?.visibility !== undefined) {
                     this.visibility = matchedFormation.visibility;
                 }
             } else {
@@ -648,7 +670,7 @@ export class LineupPage {
 
     get selectedFormationName(): string {
         const formations = this.getAvailableFormations();
-        if (!formations || formations.length === 0) return this.selectedFormation;
+        if (!formations?.length) return this.selectedFormation;
 
         const formation = formations.find((f: Formation) => f.id === this.selectedFormation);
         if (formation) return formation.formation_name;
@@ -687,13 +709,13 @@ export class LineupPage {
             // Priority 2: Check if there's an existing player assignment for this role (from cache)
             if (!assignedPlayer) {
                 assignedPlayer = this.findExistingPlayerForRole(pos.role);
-                assignedImage = assignedPlayer && assignedPlayer.image ? assignedPlayer.image : null;
+                assignedImage = assignedPlayer?.image || null;
             }
 
             return {
                 ...pos,
                 player: assignedPlayer,
-                playerid: assignedPlayer && assignedPlayer.playerid ? assignedPlayer.playerid : (pos.playerid || null),
+                playerid: assignedPlayer?.playerid || pos.playerid || null,
                 image: assignedImage || pos.image || null
             };
         });
@@ -701,7 +723,7 @@ export class LineupPage {
 
     private findExistingPlayerForRole(role: string): Player | null {
         const existing = this.currentPositions.find((p: PlayerPosition) => p.role === role);
-        return existing && existing.player ? existing.player : null;
+        return existing?.player || null;
     }
 
     private getFormationData(): PlayerPosition[] {
@@ -786,7 +808,7 @@ export class LineupPage {
 
     get visibilityLabel(): string {
         const option = this.visibilityOptions.find(o => o.value === this.visibility);
-        return option && option.label ? option.label : '';
+        return option?.label || '';
     }
 
     // ===========================================
@@ -873,7 +895,7 @@ export class LineupPage {
     }
 
     isPlayerSelected(player: Player): boolean {
-        const onPitch = this.currentPositions.some(pos => pos.player && pos.player.playerid === player.playerid);
+        const onPitch = this.currentPositions.some(pos => pos.player?.playerid === player.playerid);
         const isSub = this.substitutes.some(sub => sub.playerid === player.playerid);
         return onPitch || isSub;
     }
@@ -927,14 +949,14 @@ export class LineupPage {
                     },
                     (error: { error?: { message?: string } }) => {
                         this.commonService.hideLoader();
-                        this.commonService.toastMessage(error && error.error && error.error.message ? error.error.message : "Failed to update", 2500, ToastMessageType.Error);
+                        this.commonService.toastMessage(error?.error?.message || "Failed to update", 2500, ToastMessageType.Error);
                     }
                 );
         }
     }
 
     removePlayer(): void {
-        if (!this.activePosition || !this.activePosition.player) return;
+        if (!this.activePosition?.player) return;
 
         const removedPlayer = this.activePosition.player;
 
@@ -961,7 +983,7 @@ export class LineupPage {
     replacePlayer(): void {
         this.showPlayerOptions = false;
 
-        if (this.activePosition && this.activePosition.player) {
+        if (this.activePosition?.player) {
             const playerToReplace = this.activePosition.player;
             this.recentlyReplacedPlayer = playerToReplace;
 
@@ -982,7 +1004,7 @@ export class LineupPage {
     onSubstituteClick(player: Player, event: Event): void {
         event.stopPropagation();
 
-        if (this.selectedSubstitute && this.selectedSubstitute.playerid === player.playerid) {
+        if (this.selectedSubstitute?.playerid === player.playerid) {
             this.selectedSubstitute = null;
         } else {
             this.selectedSubstitute = player;
@@ -992,13 +1014,13 @@ export class LineupPage {
 
     removeSubstitute(player: Player): void {
         this.substitutes = this.substitutes.filter(sub => sub.playerid !== player.playerid);
-        if (this.selectedSubstitute && this.selectedSubstitute.playerid === player.playerid) {
+        if (this.selectedSubstitute?.playerid === player.playerid) {
             this.selectedSubstitute = null;
         }
     }
 
     moveToSubstitutes(): void {
-        if (!this.activePosition || !this.activePosition.player) return;
+        if (!this.activePosition?.player) return;
 
         const playerToMove = this.activePosition.player;
         this.substitutes.push(playerToMove);
@@ -1102,7 +1124,7 @@ export class LineupPage {
                     console.log('Save lineup response:', res);
                     this.commonService.toastMessage("Lineup saved successfully", 2500, ToastMessageType.Success);
 
-                    if (res && res.data && res.data.id) {
+                    if (res?.data?.id) {
                         this.isCreateNew = false; // Mark as saved
                         this.selectedFormation = res.data.id; // Sync with returned ID
                     }
@@ -1123,7 +1145,7 @@ export class LineupPage {
                 (error: { error?: { message?: string } }) => {
                     this.commonService.hideLoader();
                     console.error('Error saving lineup:', error);
-                    const errorMessage = error && error.error && error.error.message ? error.error.message : "Failed to save lineup";
+                    const errorMessage = error?.error?.message || "Failed to save lineup";
                     this.commonService.toastMessage(errorMessage, 2500, ToastMessageType.Error);
                 }
             );
@@ -1181,7 +1203,7 @@ export class LineupPage {
                 (error: { error?: { message?: string } }) => {
                     this.commonService.hideLoader();
                     console.error('Error deleting lineup:', error);
-                    const errorMessage = error && error.error && error.error.message ? error.error.message : "Failed to delete lineup";
+                    const errorMessage = error?.error?.message || "Failed to delete lineup";
                     this.commonService.toastMessage(errorMessage, 2500, ToastMessageType.Error);
                 }
             );
