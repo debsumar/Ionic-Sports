@@ -68,10 +68,7 @@
     <ion-item>
       <ion-label>Category</ion-label>
       <ion-select [(ngModel)]="createMatchInput.GameType">
-        <ion-option value="0">Gentleman</ion-option>
-        <ion-option value="1">Ladies</ion-option>
-        <ion-option value="2">Boys</ion-option>
-        <ion-option value="3">Girls</ion-option>
+        <ion-option *ngFor="let cat of leagueCategory" [value]="cat.value">{{cat.key}}</ion-option>
       </ion-select>
     </ion-item>
 

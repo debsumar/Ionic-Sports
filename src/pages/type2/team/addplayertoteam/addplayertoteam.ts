@@ -122,7 +122,7 @@ export class Addplayertoteam {
     private renderer: Renderer2
   ) {
     this.themeType = sharedservice.getThemeType();
-    
+
     this.events.subscribe('theme:changed', (theme) => {
       this.isDarkTheme = theme === 'dark';
     });
@@ -380,13 +380,9 @@ export class Addplayertoteam {
     if (memberlength > 0) {
       try {
         const addPlayer = gql`
-    mutation addPlayerToTeam($addPlayer: TeamMembersInput!){
-      addPlayerToTeam(addPlayer:$addPlayer)
-        
-       
-    
-  }
-`;
+          mutation addPlayerToTeam($addPlayer: TeamMembersInput!){
+             addPlayerToTeam(addPlayer:$addPlayer)
+          }`;
         const mutationVariables = { addPlayer: this.teamMembersInput }
 
         const saveSubscription = this.graphqlService.mutate(addPlayer, mutationVariables, 0).subscribe((res: any) => {

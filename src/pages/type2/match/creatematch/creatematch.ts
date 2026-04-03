@@ -61,6 +61,7 @@ export class CreatematchPage {
     updated_by: ''
   }
   leagueType: CatandType[] = [];
+  leagueCategory: CatandType[] = [];
   ActivityKey: string
   createMatchInput: CreateMatchInput = {
     Round: 0,
@@ -173,12 +174,15 @@ export class CreatematchPage {
       this.roundTypeInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
       this.roundTypeInput.app_type = AppType.ADMIN_NEW;
 
+      this.commonInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+
       // this.getAllActivities();
       // this.getClubVenues();
       // this.saveMatchDetails();
       this.getMatchTypes();
       this.getListOfClub();
       this.getRoundTypes();
+      this.getLeagueCategory();
     });
   }
 
@@ -198,7 +202,17 @@ export class CreatematchPage {
   getMatchTypes() {
     this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, this.commonInput).subscribe({
       next: (res: any) => {
-        this.leagueType = res["data"]
+        this.leagueType = res["data"];
+      }
+    });
+  }
+
+  getLeagueCategory() {
+    this.httpService.post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.leagueCategory = res["data"]
+        console.table(`${this.leagueCategory}`);
+        if(this.leagueCategory.length > 0) this.createMatchInput.GameType = 0;
       }
     });
   }

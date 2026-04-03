@@ -463,7 +463,7 @@ export class LineupPage {
     }
 
     private handlePlayersResponse(res: ApiResponse<GetIndividualMatchParticipantModel[]>): void {
-        if (res?.data) {
+        if (res && res.data) {
             const participants: GetIndividualMatchParticipantModel[] = res.data;
 
             // Map PLAYING players → availablePlayers (always refresh from API)
@@ -504,7 +504,7 @@ export class LineupPage {
     }
 
     private mapParticipantToPlayer(participant: GetIndividualMatchParticipantModel): Player {
-        const profileImage = participant.user?.profile_image_url;
+        const profileImage = participant.user ? participant.user.profile_image_url : null;
         return {
             playerid: participant.user.Id,
             participationId: participant.id,
@@ -519,7 +519,7 @@ export class LineupPage {
      * Filters PLAYING and BENCH players client-side similar to match context
      */
     private handleLeaguePlayersResponse(res: ApiResponse<LeagueMatchParticipantModel[]>): void {
-        if (res?.data) {
+        if (res && res.data) {
             const participants: LeagueMatchParticipantModel[] = res.data;
 
             // Map PLAYING players → availablePlayers
@@ -581,15 +581,15 @@ export class LineupPage {
     }
 
     private handleFormationsResponse(res: TeamFormationsApiResponse): void {
-        const data = res?.data;
-        if (data?.length > 0) {
+        const data = res ? res.data : null;
+        if (data && data.length > 0) {
             this.allTeamFormations = data;
 
             if (!this.isCreateNew && this.formationSetupId) {
                 // Saved formation flow: preselect from navParams
                 const matchedFormation = data.find((f: TeamFormation) => f.id === this.formationSetupId);
                 this.selectedFormation = matchedFormation ? matchedFormation.id : data[0].id;
-                if (matchedFormation?.visibility !== undefined) {
+                if (matchedFormation && matchedFormation.visibility !== undefined) {
                     this.visibility = matchedFormation.visibility;
                 }
             } else {
@@ -670,7 +670,7 @@ export class LineupPage {
 
     get selectedFormationName(): string {
         const formations = this.getAvailableFormations();
-        if (!formations?.length) return this.selectedFormation;
+        if (!formations || !formations.length) return this.selectedFormation;
 
         const formation = formations.find((f: Formation) => f.id === this.selectedFormation);
         if (formation) return formation.formation_name;
@@ -709,13 +709,13 @@ export class LineupPage {
             // Priority 2: Check if there's an existing player assignment for this role (from cache)
             if (!assignedPlayer) {
                 assignedPlayer = this.findExistingPlayerForRole(pos.role);
-                assignedImage = assignedPlayer?.image || null;
+                assignedImage = (assignedPlayer ? assignedPlayer.image : null) || null;
             }
 
             return {
                 ...pos,
                 player: assignedPlayer,
-                playerid: assignedPlayer?.playerid || pos.playerid || null,
+                playerid: (assignedPlayer ? assignedPlayer.playerid : null) || pos.playerid || null,
                 image: assignedImage || pos.image || null
             };
         });
@@ -723,7 +723,7 @@ export class LineupPage {
 
     private findExistingPlayerForRole(role: string): Player | null {
         const existing = this.currentPositions.find((p: PlayerPosition) => p.role === role);
-        return existing?.player || null;
+        return (existing ? existing.player : null) || null;
     }
 
     private getFormationData(): PlayerPosition[] {
@@ -808,7 +808,7 @@ export class LineupPage {
 
     get visibilityLabel(): string {
         const option = this.visibilityOptions.find(o => o.value === this.visibility);
-        return option?.label || '';
+        return (option ? option.label : '') || '';
     }
 
     // ===========================================
@@ -895,7 +895,7 @@ export class LineupPage {
     }
 
     isPlayerSelected(player: Player): boolean {
-        const onPitch = this.currentPositions.some(pos => pos.player?.playerid === player.playerid);
+        const onPitch = this.currentPositions.some(pos => pos.player && pos.player.playerid === player.playerid);
         const isSub = this.substitutes.some(sub => sub.playerid === player.playerid);
         return onPitch || isSub;
     }
@@ -949,14 +949,14 @@ export class LineupPage {
                     },
                     (error: { error?: { message?: string } }) => {
                         this.commonService.hideLoader();
-                        this.commonService.toastMessage(error?.error?.message || "Failed to update", 2500, ToastMessageType.Error);
+                        this.commonService.toastMessage((error && error.error && error.error.message) ? error.error.message : "Failed to update", 2500, ToastMessageType.Error);
                     }
                 );
         }
     }
 
     removePlayer(): void {
-        if (!this.activePosition?.player) return;
+        if (!this.activePosition || !this.activePosition.player) return;
 
         const removedPlayer = this.activePosition.player;
 
@@ -983,7 +983,7 @@ export class LineupPage {
     replacePlayer(): void {
         this.showPlayerOptions = false;
 
-        if (this.activePosition?.player) {
+        if (this.activePosition && this.activePosition.player) {
             const playerToReplace = this.activePosition.player;
             this.recentlyReplacedPlayer = playerToReplace;
 
@@ -1004,7 +1004,7 @@ export class LineupPage {
     onSubstituteClick(player: Player, event: Event): void {
         event.stopPropagation();
 
-        if (this.selectedSubstitute?.playerid === player.playerid) {
+        if (this.selectedSubstitute && this.selectedSubstitute.playerid === player.playerid) {
             this.selectedSubstitute = null;
         } else {
             this.selectedSubstitute = player;
@@ -1014,13 +1014,13 @@ export class LineupPage {
 
     removeSubstitute(player: Player): void {
         this.substitutes = this.substitutes.filter(sub => sub.playerid !== player.playerid);
-        if (this.selectedSubstitute?.playerid === player.playerid) {
+        if (this.selectedSubstitute && this.selectedSubstitute.playerid === player.playerid) {
             this.selectedSubstitute = null;
         }
     }
 
     moveToSubstitutes(): void {
-        if (!this.activePosition?.player) return;
+        if (!this.activePosition || !this.activePosition.player) return;
 
         const playerToMove = this.activePosition.player;
         this.substitutes.push(playerToMove);
@@ -1124,7 +1124,7 @@ export class LineupPage {
                     console.log('Save lineup response:', res);
                     this.commonService.toastMessage("Lineup saved successfully", 2500, ToastMessageType.Success);
 
-                    if (res?.data?.id) {
+                    if (res && res.data && res.data.id) {
                         this.isCreateNew = false; // Mark as saved
                         this.selectedFormation = res.data.id; // Sync with returned ID
                     }
@@ -1145,7 +1145,7 @@ export class LineupPage {
                 (error: { error?: { message?: string } }) => {
                     this.commonService.hideLoader();
                     console.error('Error saving lineup:', error);
-                    const errorMessage = error?.error?.message || "Failed to save lineup";
+                    const errorMessage = (error && error.error && error.error.message) ? error.error.message : "Failed to save lineup";
                     this.commonService.toastMessage(errorMessage, 2500, ToastMessageType.Error);
                 }
             );
@@ -1203,7 +1203,7 @@ export class LineupPage {
                 (error: { error?: { message?: string } }) => {
                     this.commonService.hideLoader();
                     console.error('Error deleting lineup:', error);
-                    const errorMessage = error?.error?.message || "Failed to delete lineup";
+                    const errorMessage = (error && error.error && error.error.message) ? error.error.message : "Failed to delete lineup";
                     this.commonService.toastMessage(errorMessage, 2500, ToastMessageType.Error);
                 }
             );

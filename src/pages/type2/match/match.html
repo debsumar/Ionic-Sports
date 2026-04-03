@@ -35,9 +35,10 @@
           <div class="card-title">{{match.MatchTitle}}</div>
           <div class="card-subtitle">{{formatMatchStartDate(match.MatchStartDate)}}</div>
         </div>
-        <div class="match-type-badge">
+        <div class="match-type-badge" style="display: flex; align-items: center; gap: 6px;">
           <span class="badge-text" [style.background-color]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))"
             style="color: white !important;">{{getMatchTypeName(match.MatchType)}}</span>
+            <ion-icon style="color: #2b92bb; font-size: 1.4em;padding-left: 5px" [name]="match?.MatchVisibility==0?'globe':'lock'"></ion-icon>
         </div>
       </div>
 

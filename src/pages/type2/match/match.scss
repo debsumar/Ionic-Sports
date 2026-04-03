@@ -383,8 +383,10 @@ page-match {
       }
 
       .match-type-badge {
+        display: flex;
+        align-items: center;
         .badge-text {
-          padding: 2px 6px;
+          padding: 4px 5px;
           border-radius: 4px;
           font-size: 10px;
           font-weight: 500;

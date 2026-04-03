@@ -171,7 +171,7 @@ export class CreatematchleaguePage {
     this.inputObj.user_device_metadata.UserActionType = 0;
     this.inputObj.user_device_metadata.UserAppType = 0;
     this.inputObj.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2;
-    this.inputObj.CreatedBy = this.sharedservice.getLoggedInUserId();
+    this.inputObj.CreatedBy = this.sharedservice.getLoggedInUserId() || this.sharedService.getPostgreParentClubId();
     this.inputObj.LeagueId = this.leagueId;
     this.inputObj.match_type = +this.navParams.get("league_type");
     const inputFormat = 'DD-MMM-YYYY, ddd';
@@ -204,7 +204,7 @@ export class CreatematchleaguePage {
       this.parentClubKey = JSON.parse(login_obj).UserInfo[0].ParentClubKey;
       const val = JSON.parse(login_obj);
       this.roundTypeInput = new RoundTypeInput();
-      this.roundTypeInput.updated_by = this.sharedservice.getLoggedInUserId();
+      this.roundTypeInput.updated_by = this.sharedservice.getLoggedInUserId() || this.sharedService.getPostgreParentClubId();
       this.roundTypeInput.device_id = this.sharedservice.getDeviceId() || "";
       this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
       this.roundTypeInput.clubId = val.$key;
@@ -255,7 +255,7 @@ export class CreatematchleaguePage {
     const clubs_input = {
       parentclub_id: this.postgre_parentclub_id,
       user_postgre_metadata: {
-        UserMemberId: this.sharedservice.getLoggedInUserId()
+        UserMemberId: this.sharedservice.getLoggedInUserId() || this.sharedService.getPostgreParentClubId()
       },
       user_device_metadata: {
         UserAppType: 0,
@@ -559,6 +559,7 @@ export class CreatematchleaguePage {
         }
 
         this.inputObj.match_type = +this.inputObj.match_type;
+        this.inputObj.CreatedBy = this.sharedService.getLoggedInUserId() || this.sharedService.getPostgreParentClubId();
         if (this.inputObj.MatchPaymentType != 1) {
           this.inputObj.Member_Fee = "0.00";
           this.inputObj.Non_Member_Fee = "0.00";
