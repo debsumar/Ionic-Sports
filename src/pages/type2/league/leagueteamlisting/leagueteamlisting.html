@@ -1,24 +1,17 @@
 <ion-content class="modern-competition">
-    <div class="tab-pill">
-      <div class="tab-pill-slider" [class.slide-right]="activeIndex==1"></div>
-      <button class="tab-pill-btn" [class.active]="activeIndex==0" (click)="changeType(0)">
-        <ion-icon name="trophy"></ion-icon>
-        Competitions
-      </button>
-      <button class="tab-pill-btn" [class.active]="activeIndex==1" (click)="changeType(1)">
-        <ion-icon name="people"></ion-icon>
-        Teams
-      </button>
-    </div>
+    <app-pill-tabs
+      leftLabel="Competitions" rightLabel="Teams"
+      leftIcon="trophy" rightIcon="people"
+      [(activeIndex)]="activeIndex"
+      (activeIndexChange)="changeType($event)">
+    </app-pill-tabs>
     
-    <div class="search-wrapper">
-      <ion-icon name="search" class="search-icon"></ion-icon>
-      <input type="text" class="search-input"
-        [placeholder]="activeIndex==0 ? 'Search competitions...' : 'Search teams...'"
-        [(ngModel)]="searchInput"
-        (input)="activeIndex==0 ? getLeagueSearch($event) : getTeamItems($event)">
-      <span class="search-count">{{activeIndex==0 ? filteredleagues.length : filteredteams.length}}</span>
-    </div>
+    <app-search-bar
+      [placeholder]="activeIndex==0 ? 'Search competitions...' : 'Search teams...'"
+      [(value)]="searchInput"
+      [count]="activeIndex==0 ? filteredleagues.length : filteredteams.length"
+      (search)="activeIndex==0 ? getLeagueSearch($event) : getTeamItems($event)">
+    </app-search-bar>
 
     <!-- Competitions Tab Content -->
     <div *ngIf="activeIndex==0" class="tab-content">

@@ -72,34 +72,11 @@
         [(ngModel)]="startTime"></ion-datetime>
     </ion-item>
 
-    <ion-item class="access-toggle-item">
-      <ion-row>
-        <ion-col col-5 no-padding style="margin: auto;">
-          <p class="toggle_para">Match Access</p>
-        </ion-col>
-        <ion-col col-7 no-padding>
-          <div class="access-pill">
-            <div class="access-pill-slider" [class.slide-right]="!publicType"></div>
-            <button class="access-pill-btn" [class.active]="publicType" (click)="changeType('public')">
-              <ion-icon name="globe"></ion-icon> Public
-            </button>
-            <button class="access-pill-btn" [class.active]="!publicType" (click)="changeType('private')">
-              <ion-icon name="ios-lock-outline"></ion-icon> Private
-            </button>
-          </div>
-        </ion-col>
-      </ion-row>
-    </ion-item>
+    <app-access-toggle [(isPublic)]="publicType"
+      (isPublicChange)="changeType($event ? 'public' : 'private')" label="Match Access">
+    </app-access-toggle>
 
-    <ion-item class="paid-compact-item">
-      <ion-label>FEE</ion-label>
-      <label class="toggle sleed-toggle" item-end>
-        <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
-        <span data-unchecked="No" data-checked="Yes"></span>
-      </label>
-    </ion-item>
-
-    <div class="fee-sub-fields" [class.expanded]="this.createMatchInput.MatchPaymentType==1">
+    <app-expandable-section label="FEE" [(expanded)]="isChecked" (expandedChange)="updateMatchPaymentType($event)">
       <ion-item>
         <ion-label fixed>Member Fee
           <span *ngIf="currency != undefined">({{currency}})</span>
@@ -107,14 +84,13 @@
         <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
           [(ngModel)]="createMatchInput.MemberFees"></ion-input>
       </ion-item>
-
       <ion-item>
         <ion-label>Non Member Fee
           <span *ngIf="currency != undefined">({{currency}})</span>
         </ion-label>
         <ion-input type="number" class="textareastyle" [(ngModel)]="createMatchInput.NonMemberFees"></ion-input>
       </ion-item>
-    </div>
+    </app-expandable-section>
 
     <ion-item class="description-item">
       <ion-label stacked>Description</ion-label>

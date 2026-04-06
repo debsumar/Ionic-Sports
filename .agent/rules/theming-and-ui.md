@@ -319,37 +319,96 @@ Use the custom CSS-based spinner `.spinner1` (bouncing dots) rather than the def
 - Animated shine sweep (`@keyframes shine-sweep`, 3s loop)
 - Height: 48px, border-radius: 8px
 
-**Fee Sub-Fields Dropdown (`.fee-sub-fields`)**:
-- Used in both Create Match and Create League for conditional fee fields
-- Uses CSS `[class.expanded]` binding instead of `*ngIf` to keep DOM present for animation
-- Indented with `margin-left: 12px` + `padding-left: 12px`
-- Left accent border: `3px solid #2b92bb` (shows parent-child relationship)
-- Collapsed: `max-height: 0`, `overflow: hidden`, `opacity: 0`
-- Expanded: `max-height: 600px`, `opacity: 1`
-- Transition: `max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)`, `opacity 0.3s ease 0.1s`
-- Child items: `border-radius: 0 12px 12px 0` (flat left edge against accent border)
+**Fee Sub-Fields Dropdown (`.fee-sub-fields`)** — now replaced by `<app-expandable-section>` shared component (see Section 8.3).
 
-```scss
-.fee-sub-fields {
-  max-height: 0;
-  overflow: hidden;
-  opacity: 0;
-  margin-left: 12px;
-  padding-left: 12px;
-  border-left: 3px solid #2b92bb;
-  transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              opacity 0.3s ease 0.1s;
+### 8.3 Shared Reusable Components (`src/shared/components/`)
 
-  &.expanded {
-    max-height: 600px;
-    opacity: 1;
-  }
+All shared components use `ViewEncapsulation.None` with dark theme as default and `.light-theme` as the only override. Registered in `SharedComponentsModule` — must be imported in any module that uses them.
 
-  ion-item {
-    margin-left: 0 !important;
-    border-radius: 0 12px 12px 0 !important;
-  }
-}
+**Module**: `src/shared/components/shared-components.module.ts`
+**Important**: If a page is declared in `SharedmoduleModule` (`src/pages/sharedmodule/sharedmodule.module.ts`), `SharedComponentsModule` must be imported there too — not just in the page's own module.
+
+#### `<app-expandable-section>` — Generic Toggle Dropdown
+
+Replaces the old `.fee-sub-fields` + `.paid-compact-item` pattern. Uses `ng-content` projection for any child content.
+
+| Input/Output | Type | Description |
+|---|---|---|
+| `[(expanded)]` | `boolean` | Two-way binding for toggle state |
+| `label` | `string` | Header label text (e.g., "FEE", "ADVANCED") |
+| `(expandedChange)` | `EventEmitter<boolean>` | Fires when toggle changes |
+
+**Animation**: `max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1)`, `opacity 0.3s ease 0.1s`
+**Visual**: Left accent border `3px solid #2b92bb`, child items `border-radius: 0 12px 12px 0`
+
+```html
+<app-expandable-section label="FEE" [(expanded)]="isPaid" (expandedChange)="onFeeToggle($event)">
+  <ion-item><!-- any content --></ion-item>
+</app-expandable-section>
+```
+
+#### `<app-access-toggle>` — Public/Private Sliding Pill
+
+Modern sliding pill toggle replacing the old `.select-type` button pair.
+
+| Input/Output | Type | Description |
+|---|---|---|
+| `[(isPublic)]` | `boolean` | Two-way binding for public/private state |
+| `label` | `string` | Label text (e.g., "Status", "Team Access") |
+| `(isPublicChange)` | `EventEmitter<boolean>` | Fires when selection changes |
+
+**Visual**: Sliding blue pill (`#2b92bb`) on dark track (`#334155`) / light track (`#e2e8f0`)
+**Animation**: `transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)`
+
+```html
+<app-access-toggle [(isPublic)]="publicType"
+  (isPublicChange)="changeType($event ? 'public' : 'private')" label="Status">
+</app-access-toggle>
+```
+
+#### `<app-pill-tabs>` — Sliding Tab Toggle
+
+Two-tab sliding pill selector (e.g., Competitions / Teams).
+
+| Input/Output | Type | Description |
+|---|---|---|
+| `[(activeIndex)]` | `number` | Two-way binding (0 = left, 1 = right) |
+| `leftLabel` / `rightLabel` | `string` | Tab labels |
+| `leftIcon` / `rightIcon` | `string` | Optional Ionic icon names |
+| `(activeIndexChange)` | `EventEmitter<number>` | Fires when tab changes |
+
+**Dark**: `#1e293b` track, `#2b92bb` slider, `#64748b` inactive text
+**Light**: `#e2e8f0` track
+
+```html
+<app-pill-tabs leftLabel="Competitions" rightLabel="Teams"
+  leftIcon="trophy" rightIcon="people"
+  [(activeIndex)]="activeIndex" (activeIndexChange)="changeType($event)">
+</app-pill-tabs>
+```
+
+#### `<app-search-bar>` — Rounded Search Input with Count Badge
+
+Pill-shaped search input with icon, placeholder, and result count badge.
+
+| Input/Output | Type | Description |
+|---|---|---|
+| `[(value)]` | `string` | Two-way binding for search text |
+| `placeholder` | `string` | Placeholder text |
+| `count` | `number` | Result count shown in badge (null to hide) |
+| `(search)` | `EventEmitter<any>` | Fires on input event (passes native event) |
+
+**Dark**: `#1e293b` bg, `#334155` border, `#f1f5f9` text, `#2b92bb` count badge
+**Light**: `#ffffff` bg, `#e2e8f0` border, `#1e293b` text
+**Focus**: Border changes to `#2b92bb`
+
+```html
+<app-search-bar
+  [placeholder]="'Search competitions...'"
+  [(value)]="searchInput"
+  [count]="filteredItems.length"
+  (search)="onSearch($event)">
+</app-search-bar>
 ```
 
 ---
@@ -365,3 +424,6 @@ Use the custom CSS-based spinner `.spinner1` (bouncing dots) rather than the def
 7.  **Form Pages**: Use SCSS-only styling changes. Never modify HTML structure for visual changes on form pages to avoid breaking `ngModel` bindings and `*ngIf` conditions.
 8.  **Glassmorphism**: Use `backdrop-filter: blur(16px)` with semi-transparent backgrounds. Add `-webkit-backdrop-filter` for iOS support.
 9.  **Responsive**: Use `min-width: 0` on flex children and `text-overflow: ellipsis` to prevent layout breaks on narrow screens. Exception: age group text should never truncate.
+10. **Shared Components**: Use `<app-expandable-section>`, `<app-access-toggle>`, `<app-pill-tabs>`, and `<app-search-bar>` from `SharedComponentsModule` instead of duplicating markup. Import the module in both the page module AND `SharedmoduleModule` if the page is declared there.
+11. **Component Theming**: Shared components use `ViewEncapsulation.None` with dark as default. Only add `.light-theme` overrides — never use `:not(.light-theme)` selectors.
+12. **CUSTOM_ELEMENTS_SCHEMA**: If a module uses this schema, Angular treats unknown elements as pass-through HTML. Ensure `SharedComponentsModule` is imported so `app-*` components are recognized as Angular components, not inert elements.

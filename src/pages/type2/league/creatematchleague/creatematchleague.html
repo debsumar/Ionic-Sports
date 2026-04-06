@@ -109,15 +109,7 @@
       <ion-input type="text" [(ngModel)]="inputObj.MatchName"></ion-input>
     </ion-item>
 
-    <ion-item class="paid-compact-item">
-      <ion-label>FEE</ion-label>
-      <label class="toggle sleed-toggle" item-end>
-        <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
-        <span data-unchecked="No" data-checked="Yes"></span>
-      </label>
-    </ion-item>
-
-    <div class="fee-sub-fields" [class.expanded]="this.inputObj.MatchPaymentType==1">
+    <app-expandable-section label="FEE" [(expanded)]="isChecked" (expandedChange)="updateMatchPaymentType($event)">
       <ion-item class="allign-right">
         <ion-label fixed>Member Fee
           <span *ngIf="currency != undefined">({{currency}})</span>
@@ -125,7 +117,6 @@
         <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
           [(ngModel)]="inputObj.Member_Fee"></ion-input>
       </ion-item>
-
       <ion-item class="allign-right">
         <ion-label>Non Member Fee
           <span *ngIf="currency != undefined">({{currency}})</span>
@@ -133,27 +124,11 @@
         <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
           [(ngModel)]="inputObj.Non_Member_Fee"></ion-input>
       </ion-item>
-    </div>
+    </app-expandable-section>
 
-    <ion-item>
-      <ion-row>
-        <ion-col col-6 style="margin: auto;" no-padding>
-          <p class="toggle_para">Status</p>
-        </ion-col>
-        <ion-col col-3>
-          <button ion-button class="select-type" (click)="changeType('public')" [class.selected]="publicType">
-            <ion-icon style="padding-right: 10px" name="globe"></ion-icon>
-            Public
-          </button>
-        </ion-col>
-        <ion-col col-3>
-          <button ion-button class="select-type" (click)="changeType('private')" [class.selected]="!publicType">
-            <ion-icon style="padding-right: 10px" name="ios-lock-outline"></ion-icon>
-            Private
-          </button>
-        </ion-col>
-      </ion-row>
-    </ion-item>
+    <app-access-toggle [(isPublic)]="publicType"
+      (isPublicChange)="changeType($event ? 'public' : 'private')" label="Status">
+    </app-access-toggle>
 
     <!-- <ion-item>
         <ion-label>Stage</ion-label>

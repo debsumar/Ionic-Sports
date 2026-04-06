@@ -14,14 +14,12 @@
     </div>
   </div>
 
-  <!-- Search Card -->
-  <div class="compact-search-card">
-    <div class="search-content">
-      <ion-searchbar class="sleek-searchbar" placeholder="Search by Title, Activity, Players" [(ngModel)]="searchInput"
-        (ionInput)="getFilterEvents($event)" autocorrect="off" showCancelButton="never">
-      </ion-searchbar>
-    </div>
-  </div>
+  <app-search-bar
+    placeholder="Search by Title, Activity, Players"
+    [(value)]="searchInput"
+    [count]="filteredMatchlist.length"
+    (search)="getFilterEvents($event)">
+  </app-search-bar>
 
   <!-- Matches Container -->
   <div class="matches-container" *ngIf="filteredMatchlist.length > 0">
