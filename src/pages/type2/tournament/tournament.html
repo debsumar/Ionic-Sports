@@ -11,8 +11,9 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content padding>
-  <ion-row style="margin-bottom: 15px" *ngIf="selectedFooterIndex == 0">
+<ion-content>
+  <div class="tournament-scroll" *ngIf="selectedFooterIndex == 0">
+  <ion-row style="margin-bottom: 15px; padding: 0 16px;" *ngIf="selectedFooterIndex == 0">
     <ion-segment [(ngModel)]="IsActiveTournament">
       <ion-segment-button value="Active">
         {{LangObj.tournment_active}}
@@ -161,29 +162,14 @@
       </div>
     </ion-list>
   </ion-row>
-  <ion-row *ngIf="selectedFooterIndex == 1">
-    <ion-col col-12><page-match></page-match></ion-col>
-  </ion-row>
-  <ion-row *ngIf="selectedFooterIndex == 2">
-    <ion-col col-12><page-matchladder></page-matchladder></ion-col>
-  </ion-row>
-  <ion-row *ngIf="selectedFooterIndex == 3">
-    <ion-col col-12>
-      <page-matchhistory></page-matchhistory>
-    </ion-col>
-  </ion-row>
-  <ion-row *ngIf="selectedFooterIndex == 4">
-    <ion-col col-12>
-      <page-leagueteamlisting #leagueTeamListingRef></page-leagueteamlisting>
-      <!-- <page-leagueteamlisting></page-leagueteamlisting> -->
-    </ion-col>
-  </ion-row>
-  <ion-fab right bottom style="padding-bottom: 120px !important" *ngIf="selectedFooterIndex == 0">
-    <button ion-fab mini style="background-color: #2b92bb !important; color: white !important"
-      (click)="createTournament()" style="background-color: #2b92bb !important; color: white !important">
-      <ion-icon name="add"></ion-icon>
-    </button>
-  </ion-fab>
+  </div>
+  <page-match *ngIf="selectedFooterIndex == 1"></page-match>
+  <page-matchladder *ngIf="selectedFooterIndex == 2"></page-matchladder>
+  <page-matchhistory *ngIf="selectedFooterIndex == 3"></page-matchhistory>
+  <page-leagueteamlisting *ngIf="selectedFooterIndex == 4" #leagueTeamListingRef></page-leagueteamlisting>
+  <button class="glass-fab" *ngIf="selectedFooterIndex == 0" (click)="createTournament()"><ion-icon name="add"></ion-icon></button>
+  <button class="glass-fab" *ngIf="selectedFooterIndex == 1" (click)="gotoCreateMatch()"><ion-icon name="add"></ion-icon></button>
+  <button class="glass-fab" *ngIf="selectedFooterIndex == 4" (click)="gotoDifferentTab()"><ion-icon name="add"></ion-icon></button>
 </ion-content>
 
 <!-- <ion-footer>
@@ -200,14 +186,6 @@
     <ion-icon name="add"></ion-icon>
   </button>
 </ion-fab> -->
-<button class="fabs fab_btn" style="padding-bottom: 120px !important" *ngIf="selectedFooterIndex == 4" ion-fab mini style="background-color: #2b92bb"
-  (click)="gotoDifferentTab()" style="background-color: #2b92bb !important; color: white !important">
-  <ion-icon name="add"></ion-icon>
-</button>
-<button class="fabs fab_btn" style="padding-bottom: 120px !important" *ngIf="selectedFooterIndex == 1" ion-fab mini style="background-color: #2b92bb;"
-  (click)="gotoCreateMatch()" style="background-color:#2b92bb !important; color: white !important">
-  <ion-icon name="add"></ion-icon>
-</button>
 
 
 

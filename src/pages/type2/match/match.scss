@@ -3,13 +3,33 @@
 page-match {
   @include android-sdk35-fixes;
 
-  .scroll-content { padding: 0 !important; }
+  .scroll-content { padding: 0 !important; overflow: hidden !important; }
+
+  .match-layout {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .match-fixed-header {
+    flex-shrink: 0;
+    background: #0f172a;
+    z-index: 10;
+    padding-bottom: 4px;
+  }
+
+  .match-scroll-area {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
 
   // ── Light Theme ──
-  &.light-theme {
+  &.light-theme, .light-theme & {
     .modern-matches { background: #f8fafc; }
     ion-content, .scroll-content { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important; }
     .context-line { color: #94a3b8; }
+    .match-fixed-header { background: #f8fafc; }
 
     .revamp-card {
       background: rgba(255, 255, 255, 0.55);
@@ -138,6 +158,7 @@ page-match {
     .player-name {
       font-size: 12px; font-weight: 700; color: #3fbcd3; letter-spacing: 0.1px;
       flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      &.tbd { color: #64748b; font-style: italic; font-weight: 500; }
     }
     .winner-icon { color: #ffd700 !important; font-size: 13px; margin-left: 2px; }
     .vs-badge {
@@ -205,36 +226,49 @@ page-match {
     .detail-row .detail-text { font-size: 14px; }
     .tag { font-size: 11px; padding: 4px 12px; }
   }
-}
-
-// Global ActionSheet Styles for Lineup Selection
-.lineup-action-sheet {
-  .action-sheet-title {
-    text-align: left !important; font-weight: 700 !important;
-    color: #1e293b !important; font-size: 16px !important;
-    border-bottom: 1px solid #f1f5f9; padding-bottom: 15px !important;
+  // ── Lineup Bottom Sheet Content ──
+  .sheet-empty {
+    display: flex; align-items: center; gap: 8px;
+    padding: 16px 20px; color: #64748b; font-size: 14px;
+    ion-icon { font-size: 18px; }
   }
-  .action-sheet-button {
-    color: #475569 !important; font-size: 15px !important; padding-left: 16px !important;
-    .button-inner { justify-content: flex-start !important; }
-    .action-sheet-icon { margin-right: 12px !important; color: #64748b !important; font-size: 22px !important; }
 
-    &.create-new-button {
-      background-color: #f8fafc !important; color: #2b92bb !important;
-      font-weight: 700 !important; text-transform: uppercase !important; letter-spacing: 0.5px !important;
-      margin-top: 10px !important; border-top: 2px dashed #e2e8f0 !important;
-      .action-sheet-icon { color: #2b92bb !important; font-size: 26px !important; transform: scale(1.1); }
-    }
+  .sheet-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 20px; cursor: pointer;
+    transition: background 0.15s ease;
+    border-bottom: 1px solid rgba(71, 85, 105, 0.15);
+    &:active { background: rgba(255, 255, 255, 0.05); }
+  }
 
-    &.saved-formation-row .button-inner {
-      display: block !important; text-align: left !important; width: 100% !important;
-      overflow: hidden !important; text-overflow: ellipsis !important; white-space: nowrap !important;
-      .l-part { color: #f59e0b !important; font-weight: 700 !important; font-size: 15px !important; }
-      .t-part { color: #1e293b !important; font-weight: 500 !important; font-size: 14px !important; opacity: 0.7; }
-    }
+  .sheet-item-icon { font-size: 20px; color: #f59e0b; flex-shrink: 0; }
 
-    &.action-sheet-cancel { color: #ef4444 !important;
-      .action-sheet-icon { color: #ef4444 !important; }
+  .sheet-item-info {
+    flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px;
+    .sheet-item-name { font-size: 15px; font-weight: 600; color: #f1f5f9; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .sheet-item-team { font-size: 12px; color: #94a3b8; font-weight: 500; }
+  }
+
+  .sheet-item-chevron { font-size: 14px; color: #475569; flex-shrink: 0; }
+
+  .sheet-create-btn {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    margin: 8px 16px; padding: 14px;
+    margin-bottom: 80px;
+    background: linear-gradient(135deg, #2b92bb, #35adff);
+    color: #fff; font-size: 15px; font-weight: 700; letter-spacing: 0.3px;
+    border: none; border-radius: 12px; cursor: pointer;
+    ion-icon { font-size: 18px; }
+    &:active { transform: scale(0.98); }
+  }
+
+  // Light theme overrides for sheet content
+  &.light-theme, .light-theme & {
+    .sheet-item { border-bottom-color: rgba(226, 232, 240, 0.4);
+      &:active { background: rgba(0, 0, 0, 0.03); }
     }
+    .sheet-item-info .sheet-item-name { color: #1e293b; }
+    .sheet-item-info .sheet-item-team { color: #64748b; }
+    .sheet-item-chevron { color: #cbd5e1; }
   }
 }

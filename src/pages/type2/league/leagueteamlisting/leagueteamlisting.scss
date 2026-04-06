@@ -7,7 +7,7 @@ page-leagueteamlisting {
   }
 
   // Light Theme Styles
-  &.light-theme {
+  &.light-theme, .light-theme & {
     .scroll-content {
       background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
     }
@@ -15,6 +15,7 @@ page-leagueteamlisting {
       background: #f8fafc;
       min-height: 100vh;
     }
+    .page-fixed-header { background: #f8fafc; }
 
     .tab-pill {
       background: #e2e8f0;
@@ -107,10 +108,13 @@ page-leagueteamlisting {
   .scroll-content {
     background: #0f172a !important;
     padding: 0px !important;
+    overflow: hidden !important;
   }
 
   ion-content {
     background: #0f172a !important;
+  }
+  .page-fixed-header { background: #0f172a; }
   }
 
 

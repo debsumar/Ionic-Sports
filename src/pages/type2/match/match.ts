@@ -4,7 +4,6 @@ import {
   IonicPage,
   LoadingController,
   Events,
-  ActionSheetController,
   NavParams,
   NavController,
 } from "ionic-angular";
@@ -78,6 +77,9 @@ export class MatchPage {
   isPublish: boolean = true;
   isPending: boolean = true;
   isDarkTheme: boolean = false;
+  showLineupSheet: boolean = false;
+  lineupFormations: SavedFormation[] = [];
+  selectedLineupMatch: any = null;
 
   // sum: number = 0;
   // totalMatches = this.matches.filter((element) => {
@@ -94,8 +96,7 @@ export class MatchPage {
     private graphqlService: GraphqlService,
     private httpService: HttpService,
     private themeService: ThemeService,
-    public events: Events,
-    public actionSheetCtrl: ActionSheetController
+    public events: Events
   ) {
     this.commonService.category.pipe(first()).subscribe((data) => {
       if(data == "matchlist") {
@@ -366,78 +367,19 @@ export class MatchPage {
       this.commonService.toastMessage('Team lineup data is not available for this activity', 2500, ToastMessageType.Info);
       return;
     }
-    const buttons: any[] = [];
+    this.selectedLineupMatch = match;
+    this.lineupFormations = savedFormations;
+    this.showLineupSheet = true;
+  }
 
-    if (savedFormations.length === 0) {
-      buttons.push({
-        text: 'No saved lineups available',
-        icon: 'information-circle',
-        cssClass: 'no-lineups-text',
-        handler: () => {
-          // Do nothing, just informational
-          return false;
-        }
-      });
-    } else {
-      savedFormations.forEach((formation: SavedFormation) => {
-        // Use a separator that we can split later in the injection script
-        const lineupLabel = `${formation.lineup_name || 'Lineup'} (${formation.formation_name})`;
-        const displayText = formation.team_name
-          ? `${lineupLabel}|${formation.team_name}`
-          : lineupLabel;
+  selectFormation(f: SavedFormation) {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, f.lineup_name, false, f.formation_setup_id, f.team_id, f.team_size);
+  }
 
-        buttons.push({
-          text: displayText,
-          icon: 'grid',
-          cssClass: 'saved-formation-row',
-          handler: () => {
-            this.navigateToLineup(match, formation.lineup_name, false, formation.formation_setup_id, formation.team_id, formation.team_size);
-          }
-        });
-      });
-    }
-
-    // Always add Create New Formation button
-    buttons.push({
-      text: 'Create New Lineup',
-      icon: 'add-circle',
-      cssClass: 'create-new-button',
-      handler: () => {
-        this.navigateToLineup(match, '', true);
-      }
-    });
-
-    // Add Cancel button
-    // buttons.push({
-    //   text: 'Cancel',
-    //   role: 'cancel',
-    //   icon: 'close',
-    //   cssClass: 'action-sheet-cancel',
-    //   handler: () => {
-    //     console.log('Cancel clicked');
-    //   }
-    // });
-
-    const actionSheet = this.actionSheetCtrl.create({
-      title: 'Select Lineup',
-      cssClass: 'lineup-action-sheet',
-      buttons: buttons
-    });
-
-    actionSheet.present().then(() => {
-      // Small delay to ensure the DOM is ready
-      setTimeout(() => {
-        const buttonElements = document.querySelectorAll('.saved-formation-row .button-inner');
-        buttonElements.forEach((btn: any) => {
-          const content = btn.innerHTML;
-          if (content.includes('|')) {
-            const parts = content.split('|');
-            // Reconstruct the HTML with styled spans for different colors
-            btn.innerHTML = `<span class="l-part">${parts[0]}</span><span class="t-part"> - ${parts[1]}</span>`;
-          }
-        });
-      }, 50);
-    });
+  createNewLineup() {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, '', true);
   }
 
   private navigateToLineup(match, lineupName: string = '', isCreateNew: boolean = false, formationSetupId: string = '', teamId: string = '', teamSize: number = 0) {
@@ -461,8 +403,10 @@ export class MatchPage {
 
 
   fetchAllMatches() {
+    this.commonService.showLoader("Fetching Matches...");
     this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe({
       next: (res: any) => {
+        this.commonService.hideLoader();
         if (res) {
           this.fetchAllMatchesRes = res.data;
           this.matchlist = this.fetchAllMatchesRes.AllMatches;
@@ -478,6 +422,7 @@ export class MatchPage {
             return moment(today).isSame(match_createdAt);
           }).length;
         } else {
+          this.commonService.hideLoader();
           console.log("error in fetching",)
         }
       }

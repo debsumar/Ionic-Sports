@@ -6,7 +6,7 @@ page-matchladder {
   }
 
   // Light Theme Styles
-  &.light-theme {
+  &.light-theme, .light-theme & {
     .modern-ladder {
       background: #f8fafc;
       min-height: 100vh;
@@ -204,6 +204,7 @@ page-matchladder {
   .scroll-content {
     background: #0f172a !important;
     padding: 0px !important;
+    overflow: hidden !important;
   }
 
   ion-content {
