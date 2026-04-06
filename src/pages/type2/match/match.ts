@@ -73,6 +73,7 @@ export class MatchPage {
   //   ParticipationStatus: 0,
   // };
   today = moment().format("DD-MM-YYYY");
+  todayLabel = moment().format("dddd, D MMM");
   Today: number = 0;
   isPublish: boolean = true;
   isPending: boolean = true;
@@ -293,22 +294,21 @@ export class MatchPage {
 
   // 🎨 Get color based on match type name string with theme support
   getMatchTypeColorByName(matchTypeName: string): string {
-    if (!matchTypeName) return '#2b92bb';
+    if (!matchTypeName) return 'linear-gradient(180deg, #2b92bb, #1e6c8c)';
     
     const type = matchTypeName.toLowerCase();
-    const isDark = this.themeService.getCurrentTheme();
     
     if (type.includes('team')) {
-      return isDark ? '#32db64' : '#28a745'; // Green
+      return 'linear-gradient(180deg, #8b5cf6, #7c3aed)';
     }
     if (type.includes('singles') || type.includes('single')) {
-      return isDark ? '#35adff' : '#007bff'; // Blue
+      return 'linear-gradient(180deg, #35adff, #007bff)';
     }
     if (type.includes('doubles') || type.includes('double')) {
-      return isDark ? '#f76e04' : '#fd7e14'; // Orange
+      return 'linear-gradient(180deg, #f76e04, #e85d00)';
     }
     
-    return '#2b92bb'; // Primary blue for unknown types
+    return 'linear-gradient(180deg, #2b92bb, #1e6c8c)';
   }
 
   gotoDashboard() {
@@ -641,6 +641,21 @@ export class MatchPage {
 
   initializeItems() {
     this.filteredMatches = this.matches;
+  }
+
+  getActivityIcon(activityName: string): string {
+    if (!activityName) return 'trophy';
+    const name = activityName.toLowerCase();
+    const map: { [key: string]: string } = {
+      'tennis': 'tennisball', 'padel tennis': 'tennisball', 'table tennis': 'tennisball',
+      'football': 'football', 'badminton': 'tennisball', 'basketball': 'basketball',
+      'cricket': 'baseball', 'golf': 'golf', 'swimming': 'water', 'fitness': 'fitness',
+      'gymnastics': 'body', 'boxing': 'hand', 'dance': 'musical-notes', 'sing': 'mic',
+      'education': 'school', 'netball': 'basketball', 'dodgeball': 'baseball',
+      'squash': 'tennisball', 'bar n restaurant': 'restaurant', 'act': 'film',
+      'private coaching': 'person'
+    };
+    return map[name] || 'trophy';
   }
 }
 

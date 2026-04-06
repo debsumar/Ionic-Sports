@@ -20,7 +20,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
     app-pill-tabs { display: block; }
     app-pill-tabs .pill-tabs {
       display: flex; position: relative;
-      margin: 10px 4px 4px; padding: 3px;
+      margin: 0 4px 4px; padding: 3px;
       background: #1e293b; border-radius: 12px;
     }
     app-pill-tabs .pill-tabs-slider {
