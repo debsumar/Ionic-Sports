@@ -139,8 +139,9 @@ export class CreatematchPage {
     private themeService: ThemeService,
     private events: Events
   ) {
-    this.events.subscribe('theme:changed', (theme) => {
-      this.isDarkTheme = theme === 'dark';
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
     });
     this.startDate = moment().format("YYYY-MM-DD");
     this.startTime = "09:00";
@@ -156,15 +157,38 @@ export class CreatematchPage {
   }
 
   ionViewDidLoad() {
-    this.storage.get('dashboardTheme').then((theme) => {
-      this.isDarkTheme = theme === 'dark' || theme === true;
-      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
-      document.body.classList.remove('dark-theme', 'light-theme');
-      document.body.classList.add(themeClass);
+    this.loadTheme();
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme() {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
     });
   }
 
+  private applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const pageElement = document.querySelector('page-creatematch');
+    if (pageElement) {
+      if (isDark) {
+        pageElement.classList.remove('light-theme');
+      } else {
+        pageElement.classList.add('light-theme');
+      }
+    }
+  }
+
   ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
     console.log("ionViewDidLoad CreatematchPage");
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
@@ -212,11 +236,11 @@ export class CreatematchPage {
       next: (res: any) => {
         this.leagueCategory = res["data"]
         console.table(`${this.leagueCategory}`);
-        if(this.leagueCategory.length > 0) this.createMatchInput.GameType = 0;
+        if (this.leagueCategory.length > 0) this.createMatchInput.GameType = 0;
       }
     });
   }
-  
+
   getRoundTypes() {
     this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe({
       next: (res: any) => {

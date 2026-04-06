@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import {
   AlertController,
   IonicPage,
@@ -6,6 +6,7 @@ import {
   NavController,
   NavParams,
   PopoverController,
+  Events
 } from 'ionic-angular';
 import {
   CommonService,
@@ -25,6 +26,7 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
 import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
+import { ThemeService } from '../../../../services/theme.service';
 
 
 /**
@@ -44,6 +46,7 @@ export class CreatematchleaguePage {
   min: any;
   max: any;
   publicType: boolean = true;
+  isDarkTheme: boolean = true;
   privateType: boolean = true;
   parentClubKey: string = "";
   // saveLeagues: LeaguesForParentClubModel[] = [];
@@ -146,6 +149,9 @@ export class CreatematchleaguePage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private sharedService: SharedServices,
+    private themeService: ThemeService,
+    private events: Events,
+    private renderer: Renderer2
   ) {
 
     this.leagueId = this.navParams.get("leagueId");
@@ -239,6 +245,32 @@ export class CreatematchleaguePage {
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad CreatematchleaguePage");
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-creatematchleague');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme')
+             : this.renderer.addClass(el, 'light-theme');
+    }
   }
   saveLeagueDetails() {
     this.navCtrl.push("LeaguelistingPage");

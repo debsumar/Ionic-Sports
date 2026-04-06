@@ -54,6 +54,13 @@
     </ion-item>
 
     <ion-item>
+      <ion-label>Category</ion-label>
+      <ion-select [(ngModel)]="createMatchInput.GameType">
+        <ion-option *ngFor="let cat of leagueCategory" [value]="cat.value">{{cat.key}}</ion-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
       <ion-label>Date</ion-label>
       <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="startDate"
         [max]="maxDate"></ion-datetime>
@@ -65,80 +72,61 @@
         [(ngModel)]="startTime"></ion-datetime>
     </ion-item>
 
-    <ion-item>
-      <ion-label>Category</ion-label>
-      <ion-select [(ngModel)]="createMatchInput.GameType">
-        <ion-option *ngFor="let cat of leagueCategory" [value]="cat.value">{{cat.key}}</ion-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
+    <ion-item class="access-toggle-item">
       <ion-row>
-        <ion-col col-6 style="margin: auto;" no-padding>
+        <ion-col col-5 no-padding style="margin: auto;">
           <p class="toggle_para">Match Access</p>
         </ion-col>
-        <ion-col col-3>
-          <button ion-button class="select-type" (click)="changeType('public')" [class.selected]="publicType">
-            <ion-icon style="padding-right: 10px" name="globe"></ion-icon>
-            Public
-          </button>
-        </ion-col>
-        <ion-col col-3>
-          <button ion-button class="select-type" (click)="changeType('private')" [class.selected]="!publicType">
-            <ion-icon style="padding-right: 10px" name="ios-lock-outline"></ion-icon>
-            Private
-          </button>
-        </ion-col>
-      </ion-row>
-    </ion-item>
-
-    <ion-item>
-      <ion-row>
-        <ion-col col-12 no-padding class="flex_col">
-          <p class="toggle_para">Paid</p>
-          <label class="toggle">
-            <input type="checkbox" 
-            [(ngModel)]="isChecked" 
-            (ngModelChange)="updateMatchPaymentType($event)"
-            >
-            <span data-unchecked="No" data-checked="Yes"></span>
-          </label>
+        <ion-col col-7 no-padding>
+          <div class="access-pill">
+            <div class="access-pill-slider" [class.slide-right]="!publicType"></div>
+            <button class="access-pill-btn" [class.active]="publicType" (click)="changeType('public')">
+              <ion-icon name="globe"></ion-icon> Public
+            </button>
+            <button class="access-pill-btn" [class.active]="!publicType" (click)="changeType('private')">
+              <ion-icon name="ios-lock-outline"></ion-icon> Private
+            </button>
+          </div>
         </ion-col>
       </ion-row>
     </ion-item>
 
-    <ion-item *ngIf="this.createMatchInput.MatchPaymentType==1">
-      <ion-label fixed>Member Fee
-        <span *ngIf="currency != undefined">({{currency}})</span>
-      </ion-label>
-      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
-        [(ngModel)]="createMatchInput.MemberFees"></ion-input>
+    <ion-item class="paid-compact-item">
+      <ion-label>FEE</ion-label>
+      <label class="toggle sleed-toggle" item-end>
+        <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
+        <span data-unchecked="No" data-checked="Yes"></span>
+      </label>
     </ion-item>
 
-    <ion-item *ngIf="this.createMatchInput.MatchPaymentType==1">
-      <ion-label>Non Member Fee
-        <span *ngIf="currency != undefined">({{currency}})</span>
-      </ion-label>
-      <ion-input type="number" class="textareastyle" 
-        [(ngModel)]="createMatchInput.NonMemberFees"></ion-input>
-    </ion-item>
+    <div class="fee-sub-fields" [class.expanded]="this.createMatchInput.MatchPaymentType==1">
+      <ion-item>
+        <ion-label fixed>Member Fee
+          <span *ngIf="currency != undefined">({{currency}})</span>
+        </ion-label>
+        <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+          [(ngModel)]="createMatchInput.MemberFees"></ion-input>
+      </ion-item>
 
-    <ion-item>
+      <ion-item>
+        <ion-label>Non Member Fee
+          <span *ngIf="currency != undefined">({{currency}})</span>
+        </ion-label>
+        <ion-input type="number" class="textareastyle" [(ngModel)]="createMatchInput.NonMemberFees"></ion-input>
+      </ion-item>
+    </div>
+
+    <ion-item class="description-item">
+      <ion-label stacked>Description</ion-label>
       <ion-textarea type="text" rows="5" [(ngModel)]="createMatchInput.MatchDetails"
-        placeholder="Description"></ion-textarea>
+        placeholder="Match instructions, rules, or notes..."></ion-textarea>
     </ion-item>
   </ion-list>
 
-</ion-content>
+  <div class="create-btn-wrap">
+    <button ion-button block class="btn-gradient-shine" (click)="saveMatchDetails()">
+      Create
+    </button>
+  </div>
 
-<ion-footer [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
-  <ion-grid>
-    <ion-row>
-      <ion-col col-12>
-        <button ion-button block class="timekare-primary-btn" (click)="saveMatchDetails()">
-          Create
-        </button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-footer>
+</ion-content>

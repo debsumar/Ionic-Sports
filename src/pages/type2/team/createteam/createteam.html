@@ -38,20 +38,12 @@
     </ion-item> -->
 
     <ion-item>
-      <ion-row>
-        <ion-col col-7 style="margin:auto">
-          <p style="color:#ffffff">Team Logo</p>
-        </ion-col>
-        <ion-col col-3 style="margin:auto">
-          <img *ngIf="parentClubTeamCreationInput.teamDetails.logoUrl"
-            [src]="parentClubTeamCreationInput.teamDetails.logoUrl" class="team-logo">
-        </ion-col>
-        <ion-col col-2 style="margin:auto">
-          <button ion-button icon-only clear (click)="selectTeamLogo()" class="upload-btn">
-            <img src="assets/images/upload.svg" class="add_icon">
-          </button>
-        </ion-col>
-      </ion-row>
+      <ion-label>Team Logo</ion-label>
+      <img *ngIf="parentClubTeamCreationInput.teamDetails.logoUrl"
+        [src]="parentClubTeamCreationInput.teamDetails.logoUrl" class="team-logo" item-end>
+      <button ion-button icon-only clear (click)="selectTeamLogo()" class="upload-btn" item-end>
+        <img src="assets/images/upload.svg" class="add_icon">
+      </button>
     </ion-item>
     
     <ion-item>
@@ -100,19 +92,15 @@
       </ion-row>
     </ion-item>
 
-    <ion-item>
-      <ion-textarea type="text" rows="5" maxLength="500" placeholder="Team Description (optional)"
+    <ion-item class="description-item">
+      <ion-label stacked>Description</ion-label>
+      <ion-textarea type="text" rows="5" maxLength="500" placeholder="Team description, notes..."
         [(ngModel)]="parentClubTeamCreationInput.teamDetails.teamDescription"></ion-textarea>
     </ion-item>
   </ion-list>
-</ion-content>
 
-<ion-footer>
-  <ion-grid>
-    <ion-row>
-      <ion-col col-12>
-        <button ion-button block class="timekare-primary-btn" (click)="createTeamConfirm()">Create</button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-footer>
+  <div class="create-btn-wrap">
+    <button ion-button block class="btn-gradient-shine" (click)="createTeamConfirm()">Create</button>
+  </div>
+
+</ion-content>

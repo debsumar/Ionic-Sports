@@ -1,4 +1,4 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, Renderer2 } from "@angular/core";
 import { Apollo } from "apollo-angular";
 import {
   ActionSheetController,
@@ -29,6 +29,7 @@ import { ClubActivityInput, IClubDetails } from "../../../../shared/model/club.m
 import { NgModel } from "@angular/forms";
 import { TeamImageUploadService } from "../team_image_upload/team_image_upload.service";
 import { Camera, CameraOptions, PictureSourceType } from "@ionic-native/camera";
+import { ThemeService } from "../../../../services/theme.service";
 
 
 /**
@@ -48,6 +49,7 @@ export class CreateteamPage {
   img_url: string = "";
   postgre_parentclubId: string;
   publicType: boolean = true;
+  isDarkTheme: boolean = true;
   privateType: boolean = true;
 
 
@@ -108,7 +110,9 @@ export class CreateteamPage {
     private imageUploadService: TeamImageUploadService,
     private camera: Camera,
     public sharedService: SharedServices,
-    private events: Events
+    private events: Events,
+    private themeService: ThemeService,
+    private renderer: Renderer2
     
   ) {
 
@@ -118,7 +122,30 @@ export class CreateteamPage {
     console.log("ionViewDidLoad CreateteamPage");
   }
 
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-createteam');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme')
+             : this.renderer.addClass(el, 'light-theme');
+    }
+  }
+
   ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
     
     console.log("ionViewDidLoad CreateteamPage");
     this.storage.get("userObj").then((val) => {

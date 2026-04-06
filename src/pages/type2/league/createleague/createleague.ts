@@ -4,7 +4,8 @@ import {
   LoadingController,
   NavController,
   NavParams,
-  PopoverController
+  PopoverController,
+  Events
 } from 'ionic-angular';
 import {
   CommonService,
@@ -26,6 +27,7 @@ import { ClubActivityInput, IClubDetails } from '../../../../shared/model/club.m
 import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
 
 
 /**
@@ -157,7 +159,9 @@ export class CreateleaguePage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private httpService: HttpService,
-    private renderer: Renderer2
+    private renderer: Renderer2,
+    private themeService: ThemeService,
+    public events: Events
   ) {
 
     this.min = new Date().toISOString();
@@ -180,6 +184,13 @@ export class CreateleaguePage {
 
   ionViewWillEnter() {
     console.log("ionViewDidLoad CreateleaguePage");
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.applyTheme(isDark);
+    });
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
       if (val.$key != "") {
@@ -702,18 +713,21 @@ export class CreateleaguePage {
 
   ionViewWillLeave() {
     this.commonService.updateCategory("");
+    this.events.unsubscribe('theme:changed');
   }
 
   async loadTheme() {
-    const theme = await this.storage.get('selectedTheme');
-    this.applyTheme(theme || 'dark');
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
   }
 
-  applyTheme(theme: string) {
-    this.isDarkTheme = theme === 'dark';
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
     const pageElement = document.querySelector('page-createleague');
     if (pageElement) {
-      if (this.isDarkTheme) {
+      if (isDark) {
         this.renderer.removeClass(pageElement, 'light-theme');
       } else {
         this.renderer.addClass(pageElement, 'light-theme');

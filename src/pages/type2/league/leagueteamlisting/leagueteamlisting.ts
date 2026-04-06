@@ -72,6 +72,7 @@ export class LeagueteamlistingPage {
   filteredleagues: LeaguesForParentClubModel[] = [];
   leagueType: boolean = true;
   teamType: boolean = true;
+  isExternalTeams: boolean = false;
   today = moment().format("DD-MM-YYYY");
   Today: number = 0;
   searchInput: "";
@@ -648,6 +649,7 @@ export class LeagueteamlistingPage {
           end_date
           league_visibility
           league_type_text
+          grade
           club {
             Id
             ClubName
@@ -776,7 +778,7 @@ export class LeagueteamlistingPage {
     const isDark = this.themeService.getCurrentTheme();
 
     if (type.includes("teams") || type.includes("team")) {
-      return isDark ? "#32db64" : "#28a745"; // Green - darker in light theme
+      return isDark ? "#8b5cf6" : "#7c3aed"; // Violet - matching team accent
     }
     if (type.includes("singles") || type.includes("single")) {
       return isDark ? "#35adff" : "#007bff"; // Blue - darker in light theme
@@ -786,6 +788,35 @@ export class LeagueteamlistingPage {
     }
 
     return "#2b92bb"; // Primary blue stays consistent
+  }
+
+  getActivityIcon(activityName: string): string {
+    if (!activityName) return 'trophy';
+    const name = activityName.toLowerCase();
+    const map: { [key: string]: string } = {
+      'tennis': 'tennisball',
+      'padel tennis': 'tennisball',
+      'table tennis': 'tennisball',
+      'football': 'football',
+      'badminton': 'tennisball',
+      'basketball': 'basketball',
+      'cricket': 'baseball',
+      'golf': 'golf',
+      'swimming': 'water',
+      'fitness': 'fitness',
+      'gymnastics': 'body',
+      'boxing': 'hand',
+      'dance': 'musical-notes',
+      'sing': 'mic',
+      'education': 'school',
+      'netball': 'basketball',
+      'dodgeball': 'baseball',
+      'squash': 'tennisball',
+      'bar n restaurant': 'restaurant',
+      'act': 'film',
+      'private coaching': 'person',
+    };
+    return map[name] || 'trophy';
   }
 }
 

@@ -109,33 +109,31 @@
       <ion-input type="text" [(ngModel)]="inputObj.MatchName"></ion-input>
     </ion-item>
 
-    <ion-item>
-      <ion-row>
-        <ion-col col-12 no-padding class="flex_col">
-          <p class="toggle_para">Paid</p>
-          <label class="toggle">
-            <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
-            <span data-unchecked="No" data-checked="Yes"></span>
-          </label>
-        </ion-col>
-      </ion-row>
+    <ion-item class="paid-compact-item">
+      <ion-label>FEE</ion-label>
+      <label class="toggle sleed-toggle" item-end>
+        <input type="checkbox" [(ngModel)]="isChecked" (ngModelChange)="updateMatchPaymentType($event)">
+        <span data-unchecked="No" data-checked="Yes"></span>
+      </label>
     </ion-item>
 
-    <ion-item *ngIf="this.inputObj.MatchPaymentType==1" class="allign-right">
-      <ion-label fixed>Member Fee
-        <span *ngIf="currency != undefined">({{currency}})</span>
-      </ion-label>
-      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
-        [(ngModel)]="inputObj.Member_Fee"></ion-input>
-    </ion-item>
+    <div class="fee-sub-fields" [class.expanded]="this.inputObj.MatchPaymentType==1">
+      <ion-item class="allign-right">
+        <ion-label fixed>Member Fee
+          <span *ngIf="currency != undefined">({{currency}})</span>
+        </ion-label>
+        <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+          [(ngModel)]="inputObj.Member_Fee"></ion-input>
+      </ion-item>
 
-    <ion-item *ngIf="this.inputObj.MatchPaymentType==1" class="allign-right">
-      <ion-label>Non Member Fee
-        <span *ngIf="currency != undefined">({{currency}})</span>
-      </ion-label>
-      <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
-        [(ngModel)]="inputObj.Non_Member_Fee"></ion-input>
-    </ion-item>
+      <ion-item class="allign-right">
+        <ion-label>Non Member Fee
+          <span *ngIf="currency != undefined">({{currency}})</span>
+        </ion-label>
+        <ion-input type="number" class="textareastyle" placeholder="Please enter fee"
+          [(ngModel)]="inputObj.Non_Member_Fee"></ion-input>
+      </ion-item>
+    </div>
 
     <ion-item>
       <ion-row>
@@ -178,25 +176,17 @@
 
 
 
-    <ion-item class="comments">
+    <ion-item class="description-item">
+      <ion-label stacked>Description</ion-label>
       <ion-textarea type="text" rows="5" class="textareastyle" [(ngModel)]="inputObj.MatchDetails"
-        placeholder="Description"></ion-textarea>
+        placeholder="Match instructions, rules, or notes..."></ion-textarea>
     </ion-item>
-
-
-
-
   </ion-list>
-</ion-content>
 
-<ion-footer [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
-  <ion-grid>
-    <ion-row>
-      <ion-col col-12>
-        <button ion-button block class="timekare-primary-btn" (click)="createMatchConfirm()">
-          Create
-        </button>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-</ion-footer>
+  <div class="create-btn-wrap">
+    <button ion-button block class="btn-gradient-shine" (click)="createMatchConfirm()">
+      Create
+    </button>
+  </div>
+
+</ion-content>

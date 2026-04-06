@@ -1,74 +1,61 @@
 <ion-content class="modern-competition">
-  <!-- Sticky Header -->
-  <div class="sticky-header">
-    <!-- Modern Tab Selector -->
-    <div class="modern-tab-selector">
-      <button class="modern-tab" [class.active]="activeIndex==0" (click)="changeType(0)">
-        <div class="tab-icon-wrapper">
-          <ion-icon name="trophy"></ion-icon>
-        </div>
-        <span>Competitions</span>
+    <div class="tab-pill">
+      <div class="tab-pill-slider" [class.slide-right]="activeIndex==1"></div>
+      <button class="tab-pill-btn" [class.active]="activeIndex==0" (click)="changeType(0)">
+        <ion-icon name="trophy"></ion-icon>
+        Competitions
       </button>
-      <button class="modern-tab" [class.active]="activeIndex==1" (click)="changeType(1)">
-        <div class="tab-icon-wrapper">
-          <ion-icon name="people"></ion-icon>
-        </div>
-        <span>Teams</span>
+      <button class="tab-pill-btn" [class.active]="activeIndex==1" (click)="changeType(1)">
+        <ion-icon name="people"></ion-icon>
+        Teams
       </button>
     </div>
     
-    <!-- Modern Search Card -->
-    <div class="modern-search-card">
-      <ion-searchbar class="sleek-searchbar" 
-        [placeholder]="activeIndex==0 ? 'Search competitions, activities, venues...' : 'Search teams, activities...'"
-        [(ngModel)]="searchInput" 
-        (ionInput)="activeIndex==0 ? getLeagueSearch($event) : getTeamItems($event)" 
-        autocorrect="off" showCancelButton="focus"></ion-searchbar>
+    <div class="search-wrapper">
+      <ion-icon name="search" class="search-icon"></ion-icon>
+      <input type="text" class="search-input"
+        [placeholder]="activeIndex==0 ? 'Search competitions...' : 'Search teams...'"
+        [(ngModel)]="searchInput"
+        (input)="activeIndex==0 ? getLeagueSearch($event) : getTeamItems($event)">
+      <span class="search-count">{{activeIndex==0 ? filteredleagues.length : filteredteams.length}}</span>
     </div>
-  </div>
 
-  <!-- Scrollable Content -->
-  <div class="scrollable-content">
     <!-- Competitions Tab Content -->
     <div *ngIf="activeIndex==0" class="tab-content">
 
     <!-- Competitions Grid -->
     <div class="competitions-container" *ngIf="filteredleagues.length > 0">
-      <div class="modern-card competition-card" *ngFor="let league of filteredleagues"
+      <div class="revamp-card" *ngFor="let league of filteredleagues"
         (click)="gotoLeaguedetailsPage(league)">
-        <div class="card-header">
-          <div class="card-icon-wrapper competition-bg">
-            <ion-icon name="trophy" class="card-icon"></ion-icon>
-          </div>
-          <div class="card-info">
-            <h3 class="card-title">{{league.league_name | titlecase}}</h3>
-            <p class="card-subtitle">{{league.activity.ActivityName}}</p>
-          </div>
-          <div class="visibility-badge" [class.private]="league.league_visibility==1">
-            <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="competition-details">
-            <div class="detail-row">
-              <div class="detail-item">
-                <ion-icon name="calendar" class="detail-icon"></ion-icon>
-                <span class="detail-text">{{league.start_date}}</span>
-              </div>
-              <div class="detail-item type-badge">
-                <span class="badge-text" [style.background-color]="getLeagueTypeColor(league.league_type_text)" style="color: white;">{{league.league_type_text}}</span>
-              </div>
+        <div class="card-accent" [class.team-accent]="league.league_type_text?.toLowerCase().includes('team')" [style.background]="league.league_type_text?.toLowerCase().includes('team') ? null : getLeagueTypeColor(league.league_type_text)"></div>
+        <div class="card-content">
+          <div class="card-top-row">
+            <div class="card-icon-wrapper competition-bg">
+              <ion-icon [name]="getActivityIcon(league.activity.ActivityName)" class="card-icon"></ion-icon>
             </div>
-            <div class="detail-row">
-              <div class="detail-item">
-                <ion-icon name="pin" class="detail-icon"></ion-icon>
-                <span class="detail-text">{{league.club.ClubName}}</span>
-              </div>
-              <div class="detail-item category-badge" *ngIf="league.league_category_text">
-                <span class="badge-text">{{league.league_category_text}}<span
-                    *ngIf="league.league_age_group">/{{league.league_age_group}}</span></span>
-              </div>
+            <div class="card-info">
+              <h3 class="card-title">{{league.league_name | titlecase}}</h3>
+              <p class="card-subtitle">{{league.activity.ActivityName}}</p>
             </div>
+            <ion-icon name="arrow-forward" class="card-chevron"></ion-icon>
+          </div>
+          <div class="card-divider"></div>
+          <div class="card-details">
+            <div class="detail-row">
+              <ion-icon name="calendar" class="detail-icon"></ion-icon>
+              <span class="detail-text">{{league.start_date}}</span>
+              <span class="detail-dot">·</span>
+              <ion-icon name="pin" class="detail-icon"></ion-icon>
+              <span class="detail-text">{{league.club.ClubName}}</span>
+            </div>
+            <div class="corner-ribbon" [class.private]="league.league_visibility==1">
+              <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
+            </div>
+          </div>
+          <div class="card-tags">
+            <span class="tag type-tag" [style.background-color]="getLeagueTypeColor(league.league_type_text)">{{league.league_type_text}}</span>
+            <span class="tag category-tag" *ngIf="league.league_category_text">{{league.league_category_text}}<span *ngIf="league.league_age_group">/{{league.league_age_group}}</span></span>
+            <span class="tag grade-tag" *ngIf="league.grade">Grade {{league.grade}}</span>
           </div>
         </div>
       </div>
@@ -89,42 +76,48 @@
     <!-- Teams Tab Content -->
     <div *ngIf="activeIndex==1" class="tab-content">
 
+    <div class="external-toggle">
+      <span class="external-label">External</span>
+      <label class="toggle-switch">
+        <input type="checkbox" [(ngModel)]="isExternalTeams">
+        <span class="toggle-slider"></span>
+      </label>
+    </div>
+
     <!-- Teams Grid -->
     <div class="teams-container" *ngIf="filteredteams.length > 0">
-      <div class="modern-card team-card" *ngFor="let team of filteredteams" (click)="gotoTeamdetailsPage(team)">
-        <div class="card-header">
-          <div class="team-avatar" *ngIf="team.logo_url">
-            <img [src]="team.logo_url" alt="{{team.teamName}} Logo" class="team-logo">
+      <div class="revamp-card" *ngFor="let team of filteredteams" (click)="gotoTeamdetailsPage(team)">
+        <div class="card-accent team-accent"></div>
+        <div class="card-content">
+          <div class="card-top-row">
+            <div class="team-avatar" *ngIf="team.logo_url">
+              <img [src]="team.logo_url" alt="{{team.teamName}} Logo" class="team-logo">
+            </div>
+            <div class="card-icon-wrapper teams-bg" *ngIf="!team.logo_url">
+              <ion-icon name="people" class="card-icon"></ion-icon>
+            </div>
+            <div class="card-info">
+              <h3 class="card-title">{{team.teamName | titlecase}}</h3>
+              <p class="card-subtitle">{{team.activity.ActivityName}}</p>
+            </div>
+            <ion-icon name="arrow-forward" class="card-chevron"></ion-icon>
           </div>
-          <div class="card-icon-wrapper teams-bg" *ngIf="!team.logo_url">
-            <ion-icon name="people" class="card-icon"></ion-icon>
-          </div>
-          <div class="card-info">
-            <h3 class="card-title">{{team.teamName | titlecase}}</h3>
-            <p class="card-subtitle">{{team.activity.ActivityName}}</p>
-          </div>
-          <div class="visibility-badge" [class.private]="team.teamVisibility==1">
-            <ion-icon [name]="team.teamVisibility==0 ? 'globe' : 'lock'"></ion-icon>
-          </div>
-        </div>
-        <div class="card-body">
-          <div class="team-details">
+          <div class="card-divider"></div>
+          <div class="card-details">
             <div class="detail-row">
-              <div class="detail-item" *ngIf="team.ageGroup">
-                <ion-icon name="people" class="detail-icon"></ion-icon>
-                <span class="detail-text">{{team.ageGroup}}</span>
-              </div>
-              <div class="detail-item club-name-right">
-                <ion-icon name="pin" class="detail-icon"></ion-icon>
-                <span class="detail-text">{{team.club.ClubName}}</span>
-              </div>
+              <ion-icon name="people" class="detail-icon" *ngIf="team.ageGroup"></ion-icon>
+              <span class="detail-text no-truncate" *ngIf="team.ageGroup">{{team.ageGroup}}</span>
+              <span class="detail-dot" *ngIf="team.ageGroup">·</span>
+              <ion-icon name="pin" class="detail-icon"></ion-icon>
+              <span class="detail-text">{{team.club.ClubName}}</span>
+              <span class="detail-dot">·</span>
+              <span class="player-count">10<ion-icon name="people"></ion-icon></span>
             </div>
-            <div class="detail-row" *ngIf="team.teamDescription">
-              <div class="detail-item description">
-                <span class="detail-text">{{team.teamDescription}}</span>
-              </div>
+            <div class="corner-ribbon" [class.private]="team.teamVisibility==1">
+              <ion-icon [name]="team.teamVisibility==0 ? 'globe' : 'lock'"></ion-icon>
             </div>
           </div>
+          <p class="card-description" *ngIf="team.teamDescription">{{team.teamDescription}}</p>
         </div>
       </div>
     </div>
@@ -139,7 +132,6 @@
         <p class="empty-description">Create your first team to get started</p>
       </div>
     </div>
-  </div>
   </div>
 
 </ion-content>
