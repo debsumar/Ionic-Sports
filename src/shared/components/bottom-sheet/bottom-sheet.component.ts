@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewEncapsulation, OnChanges } from '@angular/core';
 
 @Component({
   selector: 'app-bottom-sheet',
@@ -66,14 +66,19 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
     .light-theme .bs-title { color: #1e293b; border-bottom-color: rgba(226, 232, 240, 0.6); }
   `]
 })
-export class BottomSheetComponent {
+export class BottomSheetComponent implements OnChanges {
   @Input() visible: boolean = false;
   @Input() title: string = '';
   @Input() bottomOffset: number = 70;
   @Output() visibleChange = new EventEmitter<boolean>();
 
+  ngOnChanges() {
+    this.visible ? document.body.classList.add('sheet-open') : document.body.classList.remove('sheet-open');
+  }
+
   close() {
     this.visible = false;
     this.visibleChange.emit(false);
+    document.body.classList.remove('sheet-open');
   }
 }

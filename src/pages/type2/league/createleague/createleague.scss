@@ -307,33 +307,4 @@ page-createleague {
     z-index: 10;
   }
 
-  .btn-gradient-shine {
-    font-weight: 700;
-    font-size: 16px;
-    letter-spacing: 0.5px;
-    border-radius: 8px;
-    height: 48px;
-    color: white !important;
-    position: relative;
-    overflow: hidden;
-    background: linear-gradient(135deg, #2b92bb, #35adff) !important;
-    box-shadow: 0 4px 12px rgba(43, 146, 187, 0.3);
-
-    &::after {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 60%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-      animation: shine-sweep 3s ease-in-out infinite;
-    }
-  }
-
-  @keyframes shine-sweep {
-    0%   { left: -100%; }
-    50%  { left: 150%; }
-    100% { left: 150%; }
-  }
 }

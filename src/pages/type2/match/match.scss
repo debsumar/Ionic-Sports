@@ -22,6 +22,10 @@ page-match {
     flex: 1;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
+    padding: 0 4px;
+    padding-bottom: 0;
+
+    .revamp-card { margin-bottom: 10px; }
   }
 
   // ── Light Theme ──
