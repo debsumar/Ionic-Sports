@@ -68,7 +68,7 @@
         <div class="external-toggle">
           <span class="external-label">External</span>
           <label class="toggle-switch">
-            <input type="checkbox" [(ngModel)]="isExternalTeams">
+            <input type="checkbox" [(ngModel)]="isExternalTeams" (ngModelChange)="filterTeamsByType()">
             <span class="toggle-slider"></span>
           </label>
         </div>
@@ -78,14 +78,14 @@
             <div class="card-content">
               <div class="card-top-row">
                 <div class="team-avatar" *ngIf="team.logo_url">
-                  <img [src]="team.logo_url" alt="{{team.teamName}} Logo" class="team-logo">
+                  <img [src]="team.logo_url" alt="{{team.TeamName}} Logo" class="team-logo">
                 </div>
                 <div class="card-icon-wrapper teams-bg" *ngIf="!team.logo_url">
                   <ion-icon name="people" class="card-icon"></ion-icon>
                 </div>
                 <div class="card-info">
-                  <h3 class="card-title">{{team.teamName | titlecase}}</h3>
-                  <p class="card-subtitle">{{team.activity.ActivityName}}</p>
+                  <h3 class="card-title">{{team.TeamName | titlecase}}</h3>
+                  <p class="card-subtitle">{{team.ActivityName}}</p>
                 </div>
                 <ion-icon name="arrow-forward" class="card-chevron"></ion-icon>
               </div>
@@ -96,16 +96,15 @@
                   <span class="detail-text no-truncate" *ngIf="team.ageGroup">{{team.ageGroup}}</span>
                   <span class="detail-dot" *ngIf="team.ageGroup">·</span>
                   <ion-icon name="pin" class="detail-icon"></ion-icon>
-                  <span class="detail-text">{{team.club.ClubName}}</span>
+                  <span class="detail-text">{{team.club?.ClubName}}</span>
                   <span class="detail-dot">·</span>
-                  <span class="player-count">10<ion-icon name="people"></ion-icon></span>
+                  <span class="player-count">{{team.NoOfPlayers}}<ion-icon name="people"></ion-icon></span>
                 </div>
                 <div class="corner-ribbon" [class.private]="team.teamVisibility==1">
                   <ion-icon [name]="team.teamVisibility==0 ? 'globe' : 'lock'"></ion-icon>
                 </div>
               </div>
-              <p class="card-description" *ngIf="team.teamDescription">{{team.teamDescription}}</p>
-            </div>
+              </div>
           </div>
         </div>
         <div class="modern-empty-state" *ngIf="filteredteams.length === 0">

@@ -414,6 +414,7 @@ page-tournament {
       height: 100% !important;
       overflow-y: auto !important;
       -webkit-overflow-scrolling: touch;
+      padding: 0 16px !important;
     }
 
     .page-scroll-area, .match-scroll-area { padding-bottom: 140px; }

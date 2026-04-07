@@ -18,7 +18,7 @@ import {
 } from "../../../../services/common.service";
 import { FirebaseService } from "../../../../services/firebase.service";
 import { SharedServices } from "../../../services/sharedservice";
-import { TeamsForParentClubModel } from "../models/team.model";
+import { TeamsForParentClubModel, TeamDetail } from "../models/team.model";
 import {
   FetchMatchesInput,
   LeagueFetchInput,
@@ -31,6 +31,9 @@ import { MatchModel } from "../../match/models/match.model";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { CommonLeagueService } from "../commonleague.service";
 import { ThemeService } from "../../../../services/theme.service";
+import { HttpService } from "../../../../services/http.service";
+import { API } from "../../../../shared/constants/api_constants";
+import { AppType } from "../../../../shared/constants/module.constants";
 
 /**
  * Generated class for the PkPage page.
@@ -43,7 +46,7 @@ import { ThemeService } from "../../../../services/theme.service";
 @Component({
   selector: "page-leagueteamlisting",
   templateUrl: "leagueteamlisting.html",
-  providers: [CommonLeagueService],
+  providers: [CommonLeagueService, HttpService],
 })
 export class LeagueteamlistingPage {
   activeIndex: number = 0;
@@ -66,8 +69,8 @@ export class LeagueteamlistingPage {
   matches: MatchModel[] = [];
   filteredMatches: MatchModel[] = [];
   ParentClubTeam: TeamsForParentClubModel[] = [];
-  teamsForParentClub: TeamsForParentClubModel[] = [];
-  filteredteams: TeamsForParentClubModel[] = [];
+  teamsForParentClub: TeamDetail[] = [];
+  filteredteams: TeamDetail[] = [];
   leaguesForParentClub: LeaguesForParentClubModel[] = [];
   filteredleagues: LeaguesForParentClubModel[] = [];
   leagueType: boolean = true;
@@ -90,6 +93,7 @@ export class LeagueteamlistingPage {
     public sharedservice: SharedServices,
     public modalCtrl: ModalController,
     private graphqlService: GraphqlService,
+    private httpService: HttpService,
     private leagueService: CommonLeagueService,
     private themeService: ThemeService,
     public events: Events
@@ -121,6 +125,10 @@ export class LeagueteamlistingPage {
           this.getLeaguesForParentClub();
         });
       }
+    });
+
+    this.events.subscribe('team:refresh', () => {
+      this.getTeamsForParentClub();
     });
   }
 
@@ -266,6 +274,7 @@ export class LeagueteamlistingPage {
   ionViewWillLeave() {
     // Clean up theme event subscription
     this.events.unsubscribe("theme:changed");
+    this.events.unsubscribe("team:refresh");
 
     // Clean up other subscriptions if needed
     if (this.subscription) {
@@ -548,77 +557,29 @@ export class LeagueteamlistingPage {
   //function to get the list of team
   getTeamsForParentClub = () => {
     this.commonService.showLoader("Fetching Teams...");
-    this.ParentClubTeamFetchInput.user_postgre_metadata.UserParentClubId =
-      this.sharedservice.getPostgreParentClubId();
-    this.ParentClubTeamFetchInput.user_device_metadata.UserAppType = 0;
-    this.ParentClubTeamFetchInput.user_device_metadata.UserDeviceType =
-      this.sharedservice.getPlatform() == "android" ? 1 : 2;
-
-    const teamsforparentclubQuery = gql`
-      query getTeamsForParentClub($TeamDetails: ParentClubTeamFetchInput!) {
-        getTeamsForParentClub(TeamDetails: $TeamDetails) {
-          id
-          created_at
-          created_by
-          updated_at
-          is_active
-          activity {
-            ActivityName
-            ActivityCode
-          }
-          venueKey
-          venueType
-          ageGroup
-          teamName
-          teamStatus
-          teamVisibility
-          parentClub {
-            FireBaseId
-          }
-          club {
-            Id
-            ClubName
-            FirebaseId
-          }
-          logo_url
-        }
+    const payload = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId: '',
+      activityId: '',
+      memberId: '',
+      action_type: 0,
+      device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
+      app_type: AppType.ADMIN_NEW,
+      device_id: '',
+      updated_by: ''
+    };
+    this.httpService.post(`${API.GET_TEAMS_FOR_PARENT_CLUB}`, payload).subscribe({
+      next: (res: any) => {
+        this.commonService.hideLoader();
+        this.teamsForParentClub = res.data || [];
+        this.filterTeamsByType();
+      },
+      error: (error) => {
+        this.commonService.hideLoader();
+        this.commonService.toastMessage("Fetching failed for teams", 2500, ToastMessageType.Error);
+        console.error("Error in fetching:", error);
       }
-    `;
-    this.graphqlService
-      .query(
-        teamsforparentclubQuery,
-        { TeamDetails: this.ParentClubTeamFetchInput },
-        0
-      )
-      .subscribe(
-        (data) => {
-          this.commonService.hideLoader();
-          this.teamsForParentClub = data.data.getTeamsForParentClub;
-          this.filteredteams = JSON.parse(
-            JSON.stringify(this.teamsForParentClub)
-          );
-          //data.data.getTeamsForParentClub
-        },
-        (error) => {
-          this.commonService.hideLoader();
-          this.commonService.toastMessage(
-            "Fetching failed for teams",
-            2500,
-            ToastMessageType.Error
-          );
-          console.error("Error in fetching:", error);
-          if (error.graphQLErrors) {
-            console.error("GraphQL Errors:", error.graphQLErrors);
-            for (const gqlError of error.graphQLErrors) {
-              console.error("Error Message:", gqlError.message);
-              console.error("Error Extensions:", gqlError.extensions);
-            }
-          }
-          if (error.networkError) {
-            console.error("Network Error:", error.networkError);
-          }
-        }
-      );
+    });
   };
 
   //function to get the list of league
@@ -752,12 +713,12 @@ export class LeagueteamlistingPage {
     // if the value is an empty string don't filter the items
     if (val && val.trim() != "") {
       this.filteredteams = this.teamsForParentClub.filter((item) => {
-        if (item.teamName != undefined) {
-          return item.teamName.toLowerCase().indexOf(val.toLowerCase()) > -1;
+        if (item.TeamName != undefined) {
+          return item.TeamName.toLowerCase().indexOf(val.toLowerCase()) > -1;
         }
-        if (item.activity.ActivityName != undefined) {
+        if (item.ActivityName != undefined) {
           return (
-            item.activity.ActivityName.toLowerCase().indexOf(
+            item.ActivityName.toLowerCase().indexOf(
               val.toLowerCase()
             ) > -1
           );
@@ -767,7 +728,13 @@ export class LeagueteamlistingPage {
   }
 
   resetTeamItems() {
-    this.filteredteams = this.teamsForParentClub;
+    this.filterTeamsByType();
+  }
+
+  filterTeamsByType() {
+    this.filteredteams = this.isExternalTeams
+      ? this.teamsForParentClub.filter(t => !t.is_club_team)
+      : this.teamsForParentClub;
   }
 
   // 🎨 Get color based on league type text with theme support

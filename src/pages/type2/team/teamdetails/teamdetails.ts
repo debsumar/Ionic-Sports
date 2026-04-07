@@ -22,6 +22,7 @@ import { FirebaseService } from "../../../../services/firebase.service";
 import gql from "graphql-tag";
 import { SharedServices } from "../../../services/sharedservice";
 import { GetPlayerModel, GetStaffModel, MembersModel, TeamsForParentClubModel } from "../models/team.model";
+import { TeamDetail } from "../../league/models/team.model";
 // import { teaminLeagueModel } from "../../league/models/league.model";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { HttpService } from "../../../../services/http.service";
@@ -53,7 +54,7 @@ export class TeamdetailsPage {
   playerType: boolean = true;
   staffType: boolean = true;
   isDarkTheme: boolean = false;
-  team: TeamsForParentClubModel;
+  team: TeamDetail;
   // team:any;
   parentClubKey: string;
   teamRoles: GetRoles[];
@@ -166,7 +167,7 @@ export class TeamdetailsPage {
         this.getStaffInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
         this.getStaffInput.MemberKey = val.$key;
 
-        this.getStaffInput.parentClubteamId = String(this.team.id);
+        this.getStaffInput.parentClubteamId = String(this.team.Id);
         console.log("team id is:", this.getStaffInput.parentClubteamId)
 
         // Initialize updateTeamMemberFieldsInput
@@ -222,7 +223,7 @@ export class TeamdetailsPage {
         }
       }
     `;
-    this.graphqlService.query(leaguesforparentclubQuery, { teamId: this.team.id }, 0).subscribe((res: any) => {
+    this.graphqlService.query(leaguesforparentclubQuery, { teamId: this.team.Id }, 0).subscribe((res: any) => {
       this.commonService.hideLoader();
       this.teamsForParentClub = res.data.getTeamsById;
     },
@@ -362,7 +363,7 @@ export class TeamdetailsPage {
         }
       }
     `;
-    this.graphqlService.query(participantsStatusQuery, { teamId: this.team.id, roleType: 1 }, 0).subscribe((res: any) => {
+    this.graphqlService.query(participantsStatusQuery, { teamId: this.team.Id, roleType: 1 }, 0).subscribe((res: any) => {
       this.participants = res.data["getParentClubTeamMembers"] as GetPlayerModel[];
 
       if (this.participants != null) this.participantCount = this.participants.length;
@@ -393,7 +394,7 @@ export class TeamdetailsPage {
   //a.this will goto (Add Players to team) Page
 
   gotoAddPlayer() {
-    this.navCtrl.push("Addplayertoteam", { "teamid": this.team.id, "existedPlayer": this.participants });
+    this.navCtrl.push("Addplayertoteam", { "teamid": this.team.Id, "existedPlayer": this.participants });
   }
 
   sendMailToPlayer(member) {
@@ -491,7 +492,7 @@ export class TeamdetailsPage {
   }
 
   gotoDeleteteam() {
-    this.navCtrl.push("DeleteteamPage", { "teamid": this.team.id });
+    this.navCtrl.push("DeleteteamPage", { "teamid": this.team.Id });
   }
 
   //this function is for deleting the team
@@ -531,7 +532,7 @@ export class TeamdetailsPage {
             
         }`;
 
-      const delete_team_variable = { teamEditInput: this.team.id };
+      const delete_team_variable = { teamEditInput: this.team.Id };
 
       this.graphqlService.mutate(
         delete_Team,
@@ -540,6 +541,7 @@ export class TeamdetailsPage {
       ).subscribe((response) => {
         const message = "team deleted successfully";
         this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+        this.events.publish('team:refresh');
         this.navCtrl.pop();
         // this.navCtrl.pop().then(() => this.navCtrl.pop().then());
       }, (err) => {
@@ -670,8 +672,8 @@ export class TeamdetailsPage {
 
   //**a.Add Staff */
   gotoAddStaff() {
-    this.navCtrl.push("AddstafftoteamPage", { "teamid": this.team.id, "existedstaff": this.staffs });
-    console.log("id is:", this.team.id)
+    this.navCtrl.push("AddstafftoteamPage", { "teamid": this.team.Id, "existedstaff": this.staffs });
+    console.log("id is:", this.team.Id)
   }
 
   FilterStaffs(ev: any) {
@@ -764,7 +766,7 @@ export class TeamdetailsPage {
 
   updateroleforstaffPage(staff) {
     this.navCtrl.push("UpdateroleforstaffPage", {
-      "team": this.team,
+      "team": this.teamsForParentClub,
       "staffId": staff.id,
       "currentRole": staff.role
     });
@@ -861,7 +863,7 @@ export class TeamdetailsPage {
 
   //mail to staff
   sendMailToStaff(staff) {
-    this.navCtrl.push("SenmailtostaffPage", { "staff": staff, "teamid": this.team.id });
+    this.navCtrl.push("SenmailtostaffPage", { "staff": staff, "teamid": this.team.Id });
     console.log(staff)
   }
 

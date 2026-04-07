@@ -25,6 +25,8 @@ import { TeamsForParentClubModel } from "../models/team.model";
 import { Activity } from "../../league/models/activity.model";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { HttpService } from "../../../../services/http.service";
+import { API } from "../../../../shared/constants/api_constants";
+import { AppType } from "../../../../shared/constants/module.constants";
 import { ClubActivityInput, IClubDetails } from "../../../../shared/model/club.model";
 import { NgModel } from "@angular/forms";
 import { TeamImageUploadService } from "../team_image_upload/team_image_upload.service";
@@ -70,7 +72,8 @@ export class CreateteamPage {
       teamVisibility: 0,
       teamDescription: "",
       venueType: 0,
-      logoUrl: ""
+      logoUrl: "",
+      is_club_team: true
     }
   };
 
@@ -106,6 +109,7 @@ export class CreateteamPage {
     public popoverCtrl: PopoverController,
     private toastCtrl: ToastController,
     private graphqlService: GraphqlService,
+    private httpService: HttpService,
     public actionSheetCtrl: ActionSheetController,
     private imageUploadService: TeamImageUploadService,
     private camera: Camera,
@@ -502,48 +506,43 @@ export class CreateteamPage {
         this.parentClubTeamCreationInput.teamDetails.venueKey = this.selectedClub;
         const club = this.clubs.find(club => club.FirebaseId === this.selectedClub)
         this.parentClubTeamCreationInput.teamDetails.clubId = club.Id;
-        const createTeam = gql`
-      mutation createTeamForParentClub(
-        $teamInput: ParentClubTeamCreationInput!
-      ) {
-        createTeamForParentClub(teamInput: $teamInput) {
-          id
-          created_at
-          created_by
-          updated_at
-          is_active
-          activity {
-            ActivityCode
-            ActivityName
-          }
-          venueKey
-          venueType
-         
-          ageGroup
-          teamName
-          teamStatus
-          teamVisibility
-          teamDescription
-          parentClub{
-            FireBaseId
-          }
-          
-        }
-      }
-    `;
-        const mutationVariable = { teamInput: this.parentClubTeamCreationInput };
-        this.graphqlService.mutate(createTeam, mutationVariable, 0).subscribe((res: any) => {
+
+        const restPayload = {
+          parentclubId: this.parentClubTeamCreationInput.user_postgre_metadata.UserParentClubId,
+          clubId: club.Id,
+          activityId: '',
+          memberId: '',
+          action_type: 0,
+          device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
+          app_type: AppType.ADMIN_NEW,
+          device_id: '',
+          updated_by: '',
+          activityCode: this.parentClubTeamCreationInput.teamDetails.activityCode,
+          venueKey: this.selectedClub,
+          venueType: this.parentClubTeamCreationInput.teamDetails.venueType,
+          ageGroup: this.parentClubTeamCreationInput.teamDetails.ageGroup,
+          teamName: this.parentClubTeamCreationInput.teamDetails.teamName,
+          shortName: this.parentClubTeamCreationInput.teamDetails.shortName,
+          teamStatus: this.parentClubTeamCreationInput.teamDetails.teamStatus,
+          teamVisibility: this.parentClubTeamCreationInput.teamDetails.teamVisibility,
+          teamDescription: this.parentClubTeamCreationInput.teamDetails.teamDescription,
+          logoUrl: this.parentClubTeamCreationInput.teamDetails.logoUrl,
+          is_club_team: this.parentClubTeamCreationInput.teamDetails.is_club_team
+        };
+
+        this.httpService.post(`${API.CREATE_TEAM}`, restPayload).subscribe((res: any) => {
           this.commonService.hideLoader();
-          const message = "Team created successfully"
+          const message = "Team created successfully";
           this.commonService.updateCategory("leagueteamlisting");
+          this.events.publish('team:refresh');
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
           this.navCtrl.pop();
         }, (error) => {
           this.commonService.hideLoader();
-          this.commonService.toastMessage("Team created successfully", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          const msg = (error.error && error.error.message) ? error.error.message : "Team creation failed";
+          this.commonService.toastMessage(msg, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
           console.error("error in fetching", error);
-        }
-        )
+        });
 
       }
     } catch (error) {
@@ -601,6 +600,7 @@ export class ParentClubTeamCreationInput {
     teamDescription: string;
     venueType: number;
     logoUrl: string;
+    is_club_team: boolean;
   };
 }
 
