@@ -99,6 +99,10 @@ export class LeaguedetailsPage {
   showLineupSheet: boolean = false;
   lineupFormations: SavedFormation[] = [];
   selectedLineupMatch: LeagueMatch = null;
+  showParticipantSheet: boolean = false;
+  selectedParticipant: LeagueParticipantModel = null;
+  showTeamSheet: boolean = false;
+  selectedTeam: LeagueStandingModel = null;
 
   constructor(
     public navCtrl: NavController,
@@ -684,47 +688,23 @@ export class LeaguedetailsPage {
   }
 
   ActionSheet(participant: LeagueParticipantModel) {
-    const actionType = participant.amount_pay_status === 0 ? 1 : 2;
-    const actionText = participant.amount_pay_status === 0 ? 'Remove' : 'Withdraw';
+    this.selectedParticipant = participant;
+    this.showParticipantSheet = true;
+  }
 
-    let buttons = [
-      {
-        text: 'Update Payment',
-        handler: () => {
-          this.updatePayment(participant);
-        }
-      },
-      {
-        text: 'Profile',
-        handler: () => {
-          this.getProfile(participant);
-        }
-      },
-      {
-        text: 'Send Email',
-        handler: () => {
-          this.sendEmailToMember(participant);
-        }
-      }
-    ];
-
-    // Conditionally add the "Withdraw" button
-    if (participant.participant_status_text !== 'Withdrawn') {
-      buttons.push({
-        text: actionText,
-        handler: () => {
-          this.removeTeam(participant, actionType);
-        }
-      });
+  onParticipantAction(action: string) {
+    this.showParticipantSheet = false;
+    const participant = this.selectedParticipant;
+    if (!participant) return;
+    switch (action) {
+      case 'payment': this.updatePayment(participant); break;
+      case 'profile': this.getProfile(participant); break;
+      case 'email': this.sendEmailToMember(participant); break;
+      case 'remove':
+        const actionType = participant.amount_pay_status === 0 ? 1 : 2;
+        this.removeTeam(participant, actionType);
+        break;
     }
-
-    // Create the ActionSheet with the dynamic buttons array
-    let actionSheet = this.actionSheetCtrl.create({
-      buttons: buttons
-    });
-
-    // Present the ActionSheet
-    actionSheet.present();
   }
 
   gotoTeamDetails(team) {
@@ -1023,30 +1003,18 @@ export class LeaguedetailsPage {
   }
 
   openTeamActions(team: LeagueStandingModel) {
-    //this.navCtrl.push("LeaguematchdetailsPage");
-    //this.navCtrl.push("UpdateleaguematchPage", { leagueId: this.individualLeague.id });
+    this.selectedTeam = team;
+    this.showTeamSheet = true;
+  }
 
-    let actionSheet = this.actionSheetCtrl.create({
-
-      buttons: [
-        {
-          text: "View Team",
-          handler: () => {
-            this.navCtrl.push("TeamdetailsPage", {
-              "team": team.parentclubteam
-            })
-          }
-        },
-        {
-          text: "Remove Team",
-          handler: () => {
-            this.removeTeam(team, 1)
-          }
-        }
-      ]
-    });
-    actionSheet.present();
-
+  onTeamAction(action: string) {
+    this.showTeamSheet = false;
+    const team = this.selectedTeam;
+    if (!team) return;
+    switch (action) {
+      case 'view': this.navCtrl.push("TeamdetailsPage", { "team": team.parentclubteam }); break;
+      case 'remove': this.removeTeam(team, 1); break;
+    }
   }
 
   //Get teams for a league

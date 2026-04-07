@@ -264,9 +264,48 @@
       <ion-icon name="add-circle"></ion-icon> Create New Lineup
     </button>
   </app-bottom-sheet>
+
+  <app-bottom-sheet [(visible)]="showParticipantSheet" [title]="selectedParticipant?.participant_name" [bottomOffset]="0">
+    <div class="sheet-item" (click)="onParticipantAction('payment')">
+      <ion-icon name="card" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Update Payment</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item" (click)="onParticipantAction('profile')">
+      <ion-icon name="person" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Profile</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item" (click)="onParticipantAction('email')">
+      <ion-icon name="mail" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Send Email</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item danger-item" (click)="onParticipantAction('remove')"
+      *ngIf="selectedParticipant?.participant_status_text !== 'Withdrawn'">
+      <ion-icon [name]="selectedParticipant?.amount_pay_status === 0 ? 'remove-circle' : 'log-out'" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info">
+        <span class="sheet-item-name">{{selectedParticipant?.amount_pay_status === 0 ? 'Remove' : 'Withdraw'}}</span>
+      </div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+  </app-bottom-sheet>
+
+  <app-bottom-sheet [(visible)]="showTeamSheet" [title]="selectedTeam?.parentclubteam?.teamName" [bottomOffset]="0">
+    <div class="sheet-item" (click)="onTeamAction('view')">
+      <ion-icon name="eye" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">View Team</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item danger-item" (click)="onTeamAction('remove')">
+      <ion-icon name="remove-circle" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Remove Team</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+  </app-bottom-sheet>
 </ion-content>
 
-<ion-fab mini right bottom #fab *ngIf="!showLineupSheet">
+<ion-fab mini right bottom #fab *ngIf="!showLineupSheet && !showParticipantSheet && !showTeamSheet">
   <button class="fab-main" ion-fab mini>
     <ion-icon name="add"></ion-icon>
   </button>
