@@ -650,8 +650,9 @@ export class MatchdetailsPage {
       this.graphqlService.mutate(delete_Match, deleteVariable, 1).subscribe((response) => {
         const message = "match deleted successfully";
         this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-        this.commonService.updateCategory("matchlist");
-        this.navCtrl.pop().then(() => this.navCtrl.pop().then());
+        this.commonService.updateCategory("match");
+        this.events.publish('match:refresh');
+        this.navCtrl.pop();
 
       }, (err) => {
         console.error("GraphQL mutation error:", err);

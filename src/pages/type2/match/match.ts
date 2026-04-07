@@ -104,12 +104,6 @@ export class MatchPage {
         setTimeout(() => {
           this.loadTheme();
         }, 100);
-        // this.storage.get("userObj").then((val) => {
-        //   val = JSON.parse(val);
-        //   if (val.$key != "") {
-        //     // this.FetchUserInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
-        //   }
-        // });
         this.fetchMatchesInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
         this.fetchAllMatchesInput.parentclubId = this.sharedservice.getPostgreParentClubId();
         this.fetchAllMatchesInput.memberId = this.sharedservice.getLoggedInId();
@@ -121,11 +115,20 @@ export class MatchPage {
       }
     });
 
-    
+    this.events.subscribe('match:refresh', () => {
+      if (this.fetchAllMatchesInput.parentclubId) {
+        this.fetchAllMatches(false);
+      }
+    });
   }
 
   ionViewWillEnter() {
     console.log("Match page - ionViewWillEnter");
+
+    // Re-fetch matches if inputs are already initialized (e.g. returning from CreatematchPage)
+    if (this.fetchAllMatchesInput.parentclubId) {
+      this.fetchAllMatches(false);
+    }
     
     // Load and apply theme immediately
     this.loadTheme();
@@ -235,6 +238,7 @@ export class MatchPage {
   ionViewWillLeave() {
     // Clean up theme event subscription
     this.events.unsubscribe('theme:changed');
+    this.events.unsubscribe('match:refresh');
   }
 
   // Force theme check method
@@ -402,11 +406,11 @@ export class MatchPage {
   }
 
 
-  fetchAllMatches() {
-    this.commonService.showLoader("Fetching Matches...");
+  fetchAllMatches(showLoader: boolean = true) {
+    if (showLoader) this.commonService.showLoader("Fetching Matches...");
     this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe({
       next: (res: any) => {
-        this.commonService.hideLoader();
+        if (showLoader) this.commonService.hideLoader();
         if (res) {
           this.fetchAllMatchesRes = res.data;
           this.matchlist = this.fetchAllMatchesRes.AllMatches;
@@ -421,11 +425,9 @@ export class MatchPage {
 
             return moment(today).isSame(match_createdAt);
           }).length;
-        } else {
-          this.commonService.hideLoader();
-          console.log("error in fetching",)
         }
-      }
+      },
+      error: () => { if (showLoader) this.commonService.hideLoader(); }
     });
   }
 

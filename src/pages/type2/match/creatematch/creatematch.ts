@@ -18,9 +18,11 @@ import { FirebaseService } from "../../../../services/firebase.service";
 import { SharedServices } from "../../../services/sharedservice";
 import { Storage } from "@ionic/storage";
 import { MatchModel } from "../models/match.model";
+import { MatchDuration } from "../../../../shared/model/utility.model";
 import moment from "moment";
 import { ClubVenue, SchoolVenue } from "../models/venue.model";
 import { GraphqlService } from "../../../../services/graphql.service";
+import { CoachList } from "../../league/leaguemodels/creatematchforleague.dto";
 import { Activities, Activity, ClubActivityInput, IClubDetails } from "../../../../shared/model/club.model";
 import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
@@ -48,6 +50,11 @@ export class CreatematchPage {
   selectedClub: any;
   clubs: IClubDetails[];
   roundTypes: RoundTypesModel[] = [];
+  durations: MatchDuration[] = [];
+  selectedDuration: number;
+  currency: string;
+  coaches: CoachList[];
+  selectedCoaches: string[] = [];
 
   roundTypeInput: RoundTypeInput = {
     parentclubId: '',
@@ -89,7 +96,8 @@ export class CreatematchPage {
     user_postgre_metadata: new UserPostgreMetadataField,
     user_device_metadata: new UserDeviceMetadataField,
     location_id: '',
-    location_type: 0
+    location_type: 0,
+    MatchDuration: ''
   };
   saveMatches: MatchModel[] = [];
   clubVenues: ClubVenue[] = [];
@@ -207,6 +215,11 @@ export class CreatematchPage {
       this.getListOfClub();
       this.getRoundTypes();
       this.getLeagueCategory();
+      this.getDurations();
+      this.getCoachList();
+    });
+    this.storage.get('Currency').then((currency) => {
+      if (currency) { const c = JSON.parse(currency); this.currency = c.CurrencySymbol; }
     });
   }
 
@@ -250,6 +263,29 @@ export class CreatematchPage {
         } else {
           console.log("error in fetching")
         }
+      }
+    });
+  }
+
+  getDurations() {
+    const input = { ...this.commonInput, app_type: AppType.ADMIN_NEW };
+    this.httpService.post(`${API.GET_DURATIONS}`, input).subscribe({
+      next: (res: any) => { this.durations = res.data || []; if (this.durations.length > 0) this.selectedDuration = this.durations[0].id; }
+    });
+  }
+
+  getCoachList() {
+    const payload = {
+      ...this.commonInput,
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      id: '',
+      email_id: '',
+      fetch_from: 1
+    };
+    this.httpService.post(`${API.FETCH_COACHES}`, payload).subscribe({
+      next: (res: any) => {
+        this.coaches = res.data || [];
+        if (this.coaches.length > 0) this.selectedCoaches = [this.coaches[0].Id];
       }
     });
   }
@@ -309,6 +345,42 @@ export class CreatematchPage {
   onChangeOfClub() {
     this.club_activities = [];
     this.getClubActivity();
+    this.autoFillLocation();
+  }
+
+  autoFillLocation() {
+    const club = this.clubs.find(c => c.Id === this.selectedClub);
+    if (!club || !club.ClubName) { this.mapLocationAddress = ''; return; }
+    const query = club.ClubName;
+    fetch('https://places.googleapis.com/v1/places:searchText', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': 'AIzaSyDpcFMCrpkNA_WXypfOPcBqEgqAr6_DRbE',
+        'X-Goog-FieldMask': 'places.formattedAddress,places.displayName'
+      },
+      body: JSON.stringify({ textQuery: query })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.places && data.places[0]) {
+        const name = (data.places[0].displayName?.text || '').toLowerCase();
+        const q = query.toLowerCase();
+        // Check if result name shares at least one word with the club name
+        const queryWords = q.split(/\s+/).filter(w => w.length > 2);
+        const match = queryWords.some(w => name.includes(w));
+        this.mapLocationAddress = match ? data.places[0].formattedAddress : '';
+      } else {
+        this.mapLocationAddress = '';
+      }
+    })
+    .catch(() => { this.mapLocationAddress = ''; });
+  }
+
+  mapLocationAddress: string = '';
+
+  onMapLocationSelected(location: any) {
+    this.mapLocationAddress = location.address || '';
   }
 
 
@@ -383,55 +455,60 @@ export class CreatematchPage {
         console.log(new Date(this.startDate + " " + 'this.startTime').getTime());
         this.createMatchInput.GameType = Number(this.createMatchInput.GameType);
         this.createMatchInput.MatchType = +this.createMatchInput.MatchType;
+        const selectedDur = this.durations.find(d => d.id === this.selectedDuration);
+        this.createMatchInput.MatchDuration = selectedDur ? String(selectedDur.duration) : '';
         console.log("MATCH Input", JSON.stringify(this.createMatchInput));
 
-        const createMatch = gql`
-              mutation saveMatchDeatils($matchInput: CreateMatchInput!) {
-                saveMatchDeatils(matchInput: $matchInput) {
-                  Id
-                  IsActive
-                  IsEnable
-                  Activity {
-                    ActivityName
-                    ActivityCode
-                  }
-                  Hosts {
-                    Name
-                  }
-                  MatchVisibility
-                  GameType
-                  MatchType
-                  PaymentType
-                  ResultStatus
-                  MatchStatus
-                  VenueName
-                  Details
-                  MatchStartDate
-                  Result {
-                    ResultStatus
-                    ResultDetails
-                  }
-                  Capacity
-                  MatchTitle
-                }
-              }
-            `;
-        const mutationVaribale = { matchInput: this.createMatchInput };
-        this.graphqlService.mutate(createMatch, mutationVaribale, 0).subscribe((res: any) => {
+        const restPayload = {
+          parentclubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
+          clubId: '',
+          activityId: '',
+          memberId: this.createMatchInput.CreatedBy,
+          action_type: 0,
+          device_type: this.createMatchInput.user_device_metadata.UserDeviceType,
+          app_type: AppType.ADMIN_NEW,
+          device_id: '',
+          updated_by: this.createMatchInput.CreatedBy,
+          parentclubTeamId: '',
+          Round: this.createMatchInput.Round,
+          MatchType: this.createMatchInput.MatchType,
+          MatchVenueName: this.createMatchInput.MatchVenueName,
+          MatchVenueId: this.createMatchInput.MatchVenueId,
+          MatchVenueKey: this.createMatchInput.MatchVenueKey,
+          GameType: this.createMatchInput.GameType,
+          MatchTitle: this.createMatchInput.MatchTitle,
+          CreatedBy: this.createMatchInput.CreatedBy,
+          MatchCreator: this.createMatchInput.MatchCreator,
+          MatchStartDate: this.createMatchInput.MatchStartDate,
+          MatchEndDate: this.createMatchInput.MatchEndDate,
+          MatchVisibility: this.createMatchInput.MatchVisibility,
+          Hosts: [this.createMatchInput.Hosts],
+          MatchStatus: this.createMatchInput.MatchStatus,
+          MatchDetails: this.createMatchInput.MatchDetails,
+          MatchPaymentType: this.createMatchInput.MatchPaymentType,
+          MemberFees: Number(this.createMatchInput.MemberFees) || 0,
+          NonMemberFees: Number(this.createMatchInput.NonMemberFees) || 0,
+          location_type: this.createMatchInput.location_type,
+          location_id: this.createMatchInput.location_id,
+          location: this.mapLocationAddress || '',
+          MatchDuration: this.createMatchInput.MatchDuration,
+          coach_ids: this.selectedCoaches || [],
+          UserParentClubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
+          UserActivityId: this.createMatchInput.user_postgre_metadata.UserActivityId,
+          UserActionType: 0
+        };
+
+        this.httpService.post(`${API.CREATE_MATCH}`, restPayload).subscribe((res: any) => {
           this.commonService.hideLoader();
-          const message = "Match created successfully";
           this.commonService.updateCategory("match");
-          this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+          this.events.publish('match:refresh');
+          this.commonService.toastMessage("Match created successfully", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
           this.navCtrl.pop();
-          //this.navCtrl.pop().then(() => this.navCtrl.pop());
         }, (err) => {
           this.commonService.hideLoader();
-          if (err.errors && err.errors.length > 0) {
-            this.commonService.toastMessage(err.errors[0].message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-          } else {
-            this.commonService.toastMessage("Match creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-          }
-          console.error("Error in fetching:", err);
+          const msg = (err.error && err.error.message) ? err.error.message : "Match creation failed";
+          this.commonService.toastMessage(msg, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          console.error("Error:", err);
         })
       } catch (e) {
         this.commonService.hideLoader();
@@ -480,6 +557,7 @@ export class CreateMatchInput {
   user_device_metadata: UserDeviceMetadataField;
   location_id: string;
   location_type: number;
+  MatchDuration: string;
 }
 
 

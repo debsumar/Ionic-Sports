@@ -20,61 +20,99 @@
 
 <ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
   <ion-list>
-    <ion-item>
-      <ion-label>Match Title</ion-label>
-      <ion-input type="text" [(ngModel)]="createMatchInput.MatchTitle"></ion-input>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Match Title</ion-label>
+        <ion-input type="text" [(ngModel)]="createMatchInput.MatchTitle"></ion-input>
+      </ion-item>
+    </app-form-field>
 
-    <ion-item>
-      <ion-label>Venue</ion-label>
-      <ion-select (ionChange)="onChangeOfClub()" [(ngModel)]="selectedClub">
-        <ion-option *ngFor="let club of clubs" value="{{club.Id}}">{{club.ClubName}}</ion-option>
-      </ion-select>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Hosted By</ion-label>
+        <ion-select (ionChange)="onChangeOfClub()" [(ngModel)]="selectedClub">
+          <ion-option *ngFor="let club of clubs" value="{{club.Id}}">{{club.ClubName}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
 
-    <ion-item>
-      <ion-label>Activity</ion-label>
-      <ion-select [(ngModel)]="activityId">
-        <ion-option *ngFor="let type of activities" value="{{type.id}}">{{type.activity_name}}</ion-option>
-      </ion-select>
-    </ion-item>
+    <app-map-picker [address]="mapLocationAddress" (locationSelected)="onMapLocationSelected($event)"></app-map-picker>
 
-    <ion-item>
-      <ion-label>Match Type</ion-label>
-      <ion-select [(ngModel)]="createMatchInput.MatchType">
-        <ion-option *ngFor="let type of leagueType" [value]="type.value">{{type.key}}</ion-option>
-      </ion-select>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Activity</ion-label>
+        <ion-select [(ngModel)]="activityId">
+          <ion-option *ngFor="let type of activities" value="{{type.id}}">{{type.activity_name}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
 
-    <ion-item>
-      <ion-label>Round/Stage/Type</ion-label>
-      <ion-select [(ngModel)]="createMatchInput.Round">
-        <ion-option *ngFor="let roundType of roundTypes" [value]="roundType.id">{{roundType.name}}</ion-option>
-      </ion-select>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Match Type</ion-label>
+        <ion-select [(ngModel)]="createMatchInput.MatchType">
+          <ion-option *ngFor="let type of leagueType" [value]="type.value">{{type.key}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
 
-    <ion-item>
-      <ion-label>Category</ion-label>
-      <ion-select [(ngModel)]="createMatchInput.GameType">
-        <ion-option *ngFor="let cat of leagueCategory" [value]="cat.value">{{cat.key}}</ion-option>
-      </ion-select>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Round/Stage/Type</ion-label>
+        <ion-select [(ngModel)]="createMatchInput.Round">
+          <ion-option *ngFor="let roundType of roundTypes" [value]="roundType.id">{{roundType.name}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
 
-    <ion-item>
-      <ion-label>Date</ion-label>
-      <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="startDate"
-        [max]="maxDate"></ion-datetime>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Category</ion-label>
+        <ion-select [(ngModel)]="createMatchInput.GameType">
+          <ion-option *ngFor="let cat of leagueCategory" [value]="cat.value">{{cat.key}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
 
-    <ion-item>
-      <ion-label>Time</ion-label>
-      <ion-datetime displayFormat="hh mm A" pickerFormat="hh mm A" minuteValues="0,10,20,30,40,50,60"
-        [(ngModel)]="startTime"></ion-datetime>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Coach</ion-label>
+        <ion-select multiple="true" [(ngModel)]="selectedCoaches">
+          <ion-option *ngFor="let coach of coaches" [value]="coach.Id">{{coach.first_name}} {{coach.last_name}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
 
-    <app-access-toggle [(isPublic)]="publicType"
-      (isPublicChange)="changeType($event ? 'public' : 'private')" label="Match Access">
-    </app-access-toggle>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Date</ion-label>
+        <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="startDate"
+          [max]="maxDate"></ion-datetime>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Time</ion-label>
+        <ion-datetime displayFormat="hh mm A" pickerFormat="hh mm A" minuteValues="0,10,20,30,40,50,60"
+          [(ngModel)]="startTime"></ion-datetime>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Duration</ion-label>
+        <ion-select [(ngModel)]="selectedDuration" placeholder="Select duration">
+          <ion-option *ngFor="let d of durations" [value]="d.id">{{d.duration}} mins</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event ? 'public' : 'private')"
+        label="Match Access">
+      </app-access-toggle>
+    </app-form-field>
 
     <app-expandable-section label="FEE" [(expanded)]="isChecked" (expandedChange)="updateMatchPaymentType($event)">
       <ion-item>
@@ -92,17 +130,15 @@
       </ion-item>
     </app-expandable-section>
 
-    <ion-item class="description-item">
-      <ion-label stacked>Description</ion-label>
-      <ion-textarea type="text" rows="5" [(ngModel)]="createMatchInput.MatchDetails"
-        placeholder="Match instructions, rules, or notes..."></ion-textarea>
-    </ion-item>
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item class="description-item">
+        <ion-label stacked>Description</ion-label>
+        <ion-textarea type="text" rows="5" [(ngModel)]="createMatchInput.MatchDetails"
+          placeholder="Match instructions, rules, or notes..."></ion-textarea>
+      </ion-item>
+    </app-form-field>
   </ion-list>
 
-  <div class="create-btn-wrap">
-    <button ion-button block class="btn-gradient-shine" (click)="saveMatchDetails()">
-      Create
-    </button>
-  </div>
+  <app-glass-button label="Create" (btnClick)="saveMatchDetails()"></app-glass-button>
 
 </ion-content>

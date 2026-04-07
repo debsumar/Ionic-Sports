@@ -48,6 +48,18 @@ page-creatematch {
       margin-right: 12px;
     }
 
+    .select-text {
+      max-width: none !important;
+    }
+
+    ion-select {
+      max-width: 70% !important;
+    }
+
+    ion-select .select-icon {
+      margin-left: 2px !important;
+    }
+
     // ITEM VALUE - Large, Bold, Dark
     ion-input,
     ion-select,

@@ -878,8 +878,9 @@ export class MatchTeamDetailsPage {
         this.commonService.hideLoader();
         const message = "match deleted successfully";
         this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-        this.commonService.updateCategory("matchlist");
-        this.navCtrl.pop().then(() => this.navCtrl.pop().then());
+        this.commonService.updateCategory("match");
+        this.events.publish('match:refresh');
+        this.navCtrl.pop();
 
       }, (err) => {
         this.commonService.hideLoader();

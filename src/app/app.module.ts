@@ -34,9 +34,12 @@ import { ParentClubService } from "../services/parentclub.service";
   
        
 
+import { MapPickerModalComponent } from '../shared/components/map-picker/map-picker-modal.component';
+
 @NgModule({
   declarations: [
     MyApp,
+    MapPickerModalComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,6 +59,7 @@ import { ParentClubService } from "../services/parentclub.service";
 
   entryComponents: [
     MyApp,
+    MapPickerModalComponent,
     // HomePage
   ],
   providers: [

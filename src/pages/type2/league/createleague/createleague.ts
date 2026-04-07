@@ -379,34 +379,26 @@ export class CreateleaguePage {
 
   //Coach List Api Binding
   getCoachList() {
-    //this.commonService.showLoader("fetching Coach");
-    const CoachFetchInput = {
-      parentclub: this.sharedservice.getPostgreParentClubId()
-    }
-    const getCoaches = gql`
-    query fetchCoaches($coachFetchInput: CoachFetchInput!){
-      fetchCoaches(coachFetchInput:$coachFetchInput){
-        Id
-       first_name
-       last_name
-       phone_no
-       email_id
-      }
-    }
-    `;
-    this.graphqlService.query(getCoaches, { coachFetchInput: CoachFetchInput }, 0)
-      .subscribe((res: any) => {
-        //  this.commonService.hideLoader();
-        this.coaches = res.data.fetchCoaches;
+    const payload = {
+      ...this.commonInput,
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      id: '',
+      email_id: '',
+      fetch_from: 1
+    };
+    this.httpService.post(`${API.FETCH_COACHES}`, payload).subscribe({
+      next: (res: any) => {
+        this.coaches = res.data || [];
         if (this.coaches.length > 0) {
           this.leagueCreationInput.league.coachId = this.coaches[0].Id;
-          this.updateContactInfo(); // Set initial contact info
+          this.updateContactInfo();
         }
       },
-        (error) => {
-          this.commonService.toastMessage("Coach fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-          console.error("Error in fetching:", error);
-        })
+      error: (error) => {
+        this.commonService.toastMessage("Coach fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+        console.error("Error in fetching:", error);
+      }
+    });
   }
 
   updateContactInfo() {
