@@ -50,7 +50,7 @@ export class LeaguedetailsPage {
   MatchesType: boolean = true;
   league: LeaguesForParentClubModel;
   parentClubKey: string;
-  activeIndex: any;
+  activeIndex: number = 0;
   currencyDetails: any;
   match: LeagueMatch[];
   leagueStandingInput: LeagueStandingInput = {
@@ -96,6 +96,9 @@ export class LeaguedetailsPage {
   startTime: string;
   matchesLength: number;
   partcipantDataCount: number;
+  showLineupSheet: boolean = false;
+  lineupFormations: SavedFormation[] = [];
+  selectedLineupMatch: LeagueMatch = null;
 
   constructor(
     public navCtrl: NavController,
@@ -162,7 +165,7 @@ export class LeaguedetailsPage {
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad LeaguedetailsPage");
-    this.activeIndex = "0";
+    this.activeIndex = 0;
     setTimeout(() => {
       this.loadTheme();
     }, 100);
@@ -466,89 +469,27 @@ export class LeaguedetailsPage {
   }
 
   private presentLineupActionSheet(match: LeagueMatch, savedFormations: SavedFormation[]) {
-    // Team validation - use lowercase property names for LeagueMatch
     if (!match.homeusername || !match.awayusername) {
       this.commonService.toastMessage('Please assign teams first', 2500, ToastMessageType.Error);
       return;
     }
-
     if (this.individualLeague.activity.Id !== 'd47c2ac4-e571-488f-a895-c1940726900f') {
       this.commonService.toastMessage('Team lineup data is not available for this activity', 2500, ToastMessageType.Info);
       return;
     }
+    this.selectedLineupMatch = match;
+    this.lineupFormations = savedFormations;
+    this.showLineupSheet = true;
+  }
 
-    const buttons: any[] = [];
+  selectFormation(f: SavedFormation) {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, f.lineup_name, false, f.formation_setup_id, f.team_id, f.team_size);
+  }
 
-    if (savedFormations.length === 0) {
-      buttons.push({
-        text: 'No saved lineups available',
-        icon: 'information-circle',
-        cssClass: 'no-lineups-text',
-        handler: () => {
-          // Do nothing, just informational
-          return false;
-        }
-      });
-    } else {
-      savedFormations.forEach((formation: SavedFormation) => {
-        // Use a separator that we can split later in the injection script
-        const lineupLabel = `${formation.lineup_name || 'Lineup'} (${formation.formation_name})`;
-        const displayText = formation.team_name
-          ? `${lineupLabel}|${formation.team_name}`
-          : lineupLabel;
-
-        buttons.push({
-          text: displayText,
-          icon: 'grid',
-          cssClass: 'saved-formation-row',
-          handler: () => {
-            this.navigateToLineup(match, formation.lineup_name, false, formation.formation_setup_id, formation.team_id, formation.team_size);
-          }
-        });
-      });
-    }
-
-    // Always add Create New Formation button
-    buttons.push({
-      text: 'Create New Lineup',
-      icon: 'add-circle',
-      cssClass: 'create-new-button',
-      handler: () => {
-        this.navigateToLineup(match, '', true);
-      }
-    });
-
-    // Add Cancel button
-    // buttons.push({
-    //   text: 'Cancel',
-    //   role: 'cancel',
-    //   icon: 'close',
-    //   cssClass: 'action-sheet-cancel',
-    //   handler: () => {
-    //     console.log('Cancel clicked');
-    //   }
-    // });
-
-    const actionSheet = this.actionSheetCtrl.create({
-      title: 'Select Lineup',
-      cssClass: 'lineup-action-sheet',
-      buttons: buttons
-    });
-
-    actionSheet.present().then(() => {
-      // Small delay to ensure the DOM is ready
-      setTimeout(() => {
-        const buttonElements = document.querySelectorAll('.saved-formation-row .button-inner');
-        buttonElements.forEach((btn: any) => {
-          const content = btn.innerHTML;
-          if (content.includes('|')) {
-            const parts = content.split('|');
-            // Reconstruct the HTML with styled spans for different colors
-            btn.innerHTML = `<span class="l-part">${parts[0]}</span><span class="t-part"> - ${parts[1]}</span>`;
-          }
-        });
-      }, 50);
-    });
+  createNewLineup() {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, '', true);
   }
 
   private navigateToLineup(match: LeagueMatch, lineupName: string = '', isCreateNew: boolean = false, formationSetupId: string = '', teamId: string = '', teamSize: number = 0) {
@@ -1292,6 +1233,21 @@ export class LeaguedetailsPage {
         this.matchesLength = this.match.length;
       }
     });
+  }
+
+  getActivityIcon(activityName: string): string {
+    if (!activityName) return 'trophy';
+    const name = activityName.toLowerCase();
+    const map: { [key: string]: string } = {
+      'tennis': 'tennisball', 'padel tennis': 'tennisball', 'table tennis': 'tennisball',
+      'football': 'football', 'badminton': 'tennisball', 'basketball': 'basketball',
+      'cricket': 'baseball', 'golf': 'golf', 'swimming': 'water', 'fitness': 'fitness',
+      'gymnastics': 'body', 'boxing': 'hand', 'dance': 'musical-notes', 'sing': 'mic',
+      'education': 'school', 'netball': 'basketball', 'dodgeball': 'baseball',
+      'squash': 'tennisball', 'bar n restaurant': 'restaurant', 'act': 'film',
+      'private coaching': 'person'
+    };
+    return map[name] || 'trophy';
   }
 
   showMatchActionSheet(match: LeagueMatch) {
