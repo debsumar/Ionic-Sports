@@ -123,9 +123,6 @@ export class Addplayertoteam {
   ) {
     this.themeType = sharedservice.getThemeType();
 
-    this.events.subscribe('theme:changed', (theme) => {
-      this.isDarkTheme = theme === 'dark';
-    });
     this.existedPlayer = this.navParams.get("existedPlayer");
     this.teamMembersInput.teamId = this.navParams.get("teamid");
 
@@ -169,25 +166,38 @@ export class Addplayertoteam {
     await this.loadTheme();
   }
 
-  async loadTheme() {
-    const theme = await this.storage.get('selectedTheme');
-    this.applyTheme(theme || 'dark');
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.applyTheme(isDark);
+    });
   }
 
-  applyTheme(theme: string) {
-    this.isDarkTheme = theme === 'dark';
-    const pageElement = document.querySelector('page-addplayertoteam');
-    if (pageElement) {
-      if (this.isDarkTheme) {
-        this.renderer.removeClass(pageElement, 'light-theme');
-      } else {
-        this.renderer.addClass(pageElement, 'light-theme');
-      }
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-addplayertoteam');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme') : this.renderer.addClass(el, 'light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-addplayertoteam');
+        if (el2) { isDark ? this.renderer.removeClass(el2, 'light-theme') : this.renderer.addClass(el2, 'light-theme'); }
+      }, 100);
     }
   }
 
   ionViewWillLeave() {
-    // 🧹 Always cleanup subscriptions
+    this.events.unsubscribe('theme:changed');
     this.subscriptions.forEach(sub => {
       if (sub && !sub.closed) {
         sub.unsubscribe();

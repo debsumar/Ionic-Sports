@@ -138,6 +138,10 @@ export class LeaguedetailsPage {
     this.events.subscribe("theme:changed", (isDark) => {
       this.applyTheme(isDark);
     });
+    this.events.subscribe("league:refresh", () => {
+      this.getLeagueDetails();
+      this.getLeagueMatches();
+    });
     this.league_id = this.navParams.get("league_id");
     console.log("teams are", this.league_id);
     const [userobj, currency] = await Promise.all([
@@ -181,6 +185,7 @@ export class LeaguedetailsPage {
 
   ionViewWillLeave() {
     this.events.unsubscribe("theme:changed");
+    this.events.unsubscribe("league:refresh");
   }
 
   private loadTheme(): void {

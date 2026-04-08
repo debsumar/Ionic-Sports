@@ -69,9 +69,6 @@ export class MatchdetailsPage {
     private events: Events,
     private renderer: Renderer2
   ) {
-    this.events.subscribe('theme:changed', (theme) => {
-      this.isDarkTheme = theme === 'dark';
-    });
     console.log(
       `${this.navParams.get("selectedmatchId")}:${this.navParams.get(
         "selectedmemberkey"
@@ -105,26 +102,41 @@ export class MatchdetailsPage {
   }
 
   async ionViewDidLoad() {
-    console.log("ionViewDidLoad MatchdetailsPage");
-    await this.loadTheme();
+    this.loadTheme();
   }
 
-  async loadTheme() {
-    const theme = await this.storage.get('selectedTheme');
-    this.applyTheme(theme || 'dark');
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
   }
 
-  applyTheme(theme: string) {
-    this.isDarkTheme = theme === 'dark';
-    const pageElement = document.querySelector('page-matchdetails');
-    if (pageElement) {
-      if (this.isDarkTheme) {
-        this.renderer.removeClass(pageElement, 'light-theme');
-      } else {
-        this.renderer.addClass(pageElement, 'light-theme');
-      }
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-matchdetails');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme') : this.renderer.addClass(el, 'light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-matchdetails');
+        if (el2) { isDark ? this.renderer.removeClass(el2, 'light-theme') : this.renderer.addClass(el2, 'light-theme'); }
+      }, 100);
     }
   }
+
+  get activeTabIndex(): number { return this.activeType ? 0 : 1; }
+  onTabChange(index: number) { this.changeType(index === 0); }
 
   getFormattedDate(date: any) {
     return moment(+date).format("DD MMM YYYY, hh:mm A");

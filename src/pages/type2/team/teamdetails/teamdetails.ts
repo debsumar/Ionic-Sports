@@ -54,6 +54,10 @@ export class TeamdetailsPage {
   playerType: boolean = true;
   staffType: boolean = true;
   isDarkTheme: boolean = false;
+  showPlayerSheet: boolean = false;
+  selectedPlayer: GetPlayerModel = null;
+  showStaffSheet: boolean = false;
+  selectedStaff: GetStaffModel = null;
   team: TeamDetail;
   // team:any;
   parentClubKey: string;
@@ -137,8 +141,8 @@ export class TeamdetailsPage {
       )}`
     );
     
-    this.events.subscribe('theme:changed', (theme) => {
-      this.isDarkTheme = theme === 'dark';
+    this.events.subscribe('theme:changed', () => {
+      // handled in ionViewWillEnter
     });
   }
 
@@ -148,15 +152,13 @@ export class TeamdetailsPage {
   }
 
   ionViewWillEnter() {
-    // Load theme
-    this.storage.get('dashboardTheme').then((theme) => {
-      this.isDarkTheme = theme === 'dark' || theme === true;
-      const themeClass = this.isDarkTheme ? 'dark-theme' : 'light-theme';
-      document.body.classList.remove('dark-theme', 'light-theme');
-      document.body.classList.add(themeClass);
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
     });
-    
-    // this.teams=this.navParams.get("team");
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.applyTheme(isDark);
+    });
 
     this.team = this.navParams.get("team");
     console.log("team are", this.team);
@@ -187,6 +189,30 @@ export class TeamdetailsPage {
       this.getTeamDetails();
     });
 
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-teamdetails');
+    if (el) {
+      isDark ? el.classList.remove('light-theme') : el.classList.add('light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-teamdetails');
+        if (el2) { isDark ? el2.classList.remove('light-theme') : el2.classList.add('light-theme'); }
+      }, 100);
+    }
   }
 
   getTeamDetails() {
@@ -260,6 +286,10 @@ export class TeamdetailsPage {
     this.navCtrl.push("MultiplayeremailPage", { "players": this.participants })
   }
 
+  get activeTabIndex(): number { return this.playerType ? 0 : 1; }
+
+  onTabChange(index: number) { this.changeType(index === 0); }
+
   //Change Type for selecting the tab
 
   changeType(val) {
@@ -273,59 +303,22 @@ export class TeamdetailsPage {
 
   //ActionSheet Controller
   presentActionSheet(member: GetPlayerModel) {
-    let actionSheet = this.actionSheetCtrl.create({
-      title: `${member.user.FirstName} ${member.user.LastName}`,
-      buttons: [
+    this.selectedPlayer = member;
+    this.showPlayerSheet = true;
+  }
 
-        {
-          text: 'Confirmed',
-          icon: 'checkmark-circle',
-          cssClass: 'action-sheet-confirmed',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted);
-          }
-        },
-        {
-          text: 'Maybe',
-          icon: 'help-circle',
-          cssClass: 'action-sheet-maybe',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe);
-          }
-        },
-        {
-          text: 'Declined',
-          icon: 'close-circle',
-          cssClass: 'action-sheet-declined',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined);
-          }
-        },
-        {
-          text: 'Update Role',
-          icon: 'people',
-          handler: () => {
-            //for updating roles
-            this.addRoleforPlayerandStaff(member)
-          }
-        },
-        {
-          text: 'Send Notification',
-          icon: 'notifications',
-          handler: () => {
-            this.sendNotificationToPlayer(member)
-          }
-        },
-        {
-          text: 'Remove Player',
-          icon: 'ios-trash',
-          handler: () => {
-            this.removePlayer(member);
-          }
-        },
-      ]
-    });
-    actionSheet.present();
+  onPlayerAction(action: string) {
+    this.showPlayerSheet = false;
+    const member = this.selectedPlayer;
+    if (!member) return;
+    switch (action) {
+      case 'confirmed': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted); break;
+      case 'maybe': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe); break;
+      case 'declined': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined); break;
+      case 'role': this.addRoleforPlayerandStaff(member); break;
+      case 'notify': this.sendNotificationToPlayer(member); break;
+      case 'remove': this.removePlayer(member); break;
+    }
   }
 
 
@@ -564,48 +557,19 @@ export class TeamdetailsPage {
   //*** 2.Here started Staff Part  ***/
 
   actionSheetforStaff(staff) {
-    let actionSheet = this.actionSheetCtrl.create({
-      buttons: [
-        {
-          text: 'Update Role',
-          icon: 'female',
-          handler: () => {
-            //for updating roles
-            this.updateroleforstaffPage(staff)
-          }
-        },
-        // {
-        //   text: 'Profile',
-        //   icon: 'ios-contact',
-        //   handler: () => {
-        //     this.getProfile();
-        //   }
-        // },
+    this.selectedStaff = staff;
+    this.showStaffSheet = true;
+  }
 
-        {
-          text: 'Send Email',
-          icon: 'md-mail',
-          handler: () => {
-            this.sendMailToStaff(staff)
-          }
-        },
-        // {
-        //   text: 'Send Notification',
-        //   icon: 'notifications',
-        //   handler: () => {
-        //     this.sendNotificationToStaff(staff)
-        //   }
-        // },
-        {
-          text: 'Remove Staff',
-          icon: 'ios-trash',
-          handler: () => {
-            this.removeStaff(staff.id);
-          }
-        },
-      ]
-    });
-    actionSheet.present();
+  onStaffAction(action: string) {
+    this.showStaffSheet = false;
+    const staff = this.selectedStaff;
+    if (!staff) return;
+    switch (action) {
+      case 'role': this.updateroleforstaffPage(staff); break;
+      case 'email': this.sendMailToStaff(staff); break;
+      case 'remove': this.removeStaff(staff.id); break;
+    }
   }
 
   sendNotificationToStaff(staff) {
