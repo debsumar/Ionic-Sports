@@ -167,6 +167,8 @@ export class LeagueMatchInfoPage {
     }
   ];
   parentClubKey: string;
+  showPlayerSheet: boolean = false;
+  selectedPlayer: LeagueMatchParticipantModel = null;
 
   constructor(
     public navCtrl: NavController,
@@ -266,6 +268,10 @@ export class LeagueMatchInfoPage {
       }
     });
   }
+
+  get activeTabIndex(): number { return this.activeType ? 0 : 1; }
+
+  onTabChange(index: number) { this.changeType(index === 0); }
 
   closeFab() {
     if (this.fab) {
@@ -497,48 +503,20 @@ export class LeagueMatchInfoPage {
 
   //ActionSheet Controller
   presentActionSheet(member: LeagueMatchParticipantModel) {
-    // if (this.leagueMatchParticipantInput.leagueTeamPlayerStatusType !== LeagueTeamPlayerStatusType.All) {
-    //   this.commonService.toastMessage('Please select "All" filter to perform actions', 3000, ToastMessageType.Info);
-    //   return;
-    // }
+    this.selectedPlayer = member;
+    this.showPlayerSheet = true;
+  }
 
-    let actionSheet = this.actionSheetCtrl.create({
-      title: `${member.user.FirstName} ${member.user.LastName}`,
-      buttons: [
-        {
-          text: 'Confirmed',
-          icon: 'checkmark-circle',
-          cssClass: 'action-sheet-confirmed',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted);
-          }
-        },
-        {
-          text: 'Maybe',
-          icon: 'help-circle',
-          cssClass: 'action-sheet-maybe',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe);
-          }
-        },
-        {
-          text: 'Declined',
-          icon: 'close-circle',
-          cssClass: 'action-sheet-declined',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined);
-          }
-        },
-        {
-          text: 'Update Role',
-          icon: 'people',
-          handler: () => {
-            this.showRoles(member);
-          }
-        },
-      ]
-    });
-    actionSheet.present();
+  onPlayerAction(action: string) {
+    this.showPlayerSheet = false;
+    const member = this.selectedPlayer;
+    if (!member) return;
+    switch (action) {
+      case 'confirmed': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted); break;
+      case 'maybe': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe); break;
+      case 'declined': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined); break;
+      case 'role': this.showRoles(member); break;
+    }
   }
   showRoles(member: LeagueMatchParticipantModel): void {
     this.closeFab();

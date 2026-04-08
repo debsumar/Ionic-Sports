@@ -54,6 +54,18 @@ export class MatchladderPage {
   filteredLadderHead: any;
   parentclubKey: string;
   isDarkTheme: boolean = false;
+  searchInput = "";
+
+  get activeTabIndex(): number { return this.isPoints === 'Points' ? 0 : 1; }
+
+  get searchCount(): number {
+    return this.isPoints === 'Points' ? (this.filteredLadder?.length || 0) : (this.filteredLadderHead?.length || 0);
+  }
+
+  onTabChange(index: number) {
+    this.isPoints = index === 0 ? 'Points' : 'HeadtoHead';
+    if (index === 1) this.callheadtohead();
+  }
 
   constructor(
     public navCtrl: NavController,

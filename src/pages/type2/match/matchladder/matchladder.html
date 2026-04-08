@@ -1,65 +1,70 @@
-<ion-content class="modern-ladder">
+<ion-content>
   <div class="page-layout">
     <div class="page-fixed-header">
-      <div class="modern-tab-selector">
-        <button class="modern-tab" [class.active]="isPoints=='Points'" (click)="isPoints='Points'">
-          <div class="tab-icon-wrapper"><ion-icon name="trophy"></ion-icon></div>
-          <span>Points</span>
-        </button>
-        <button class="modern-tab" [class.active]="isPoints=='HeadtoHead'" (click)="isPoints='HeadtoHead'; callheadtohead()">
-          <div class="tab-icon-wrapper"><ion-icon name="people"></ion-icon></div>
-          <span>Head-to-Head</span>
-        </button>
-      </div>
+      <!-- Points / Head-to-Head Tabs -->
+      <app-pill-tabs
+        leftLabel="Points" rightLabel="Head-to-Head"
+        leftIcon="trophy" rightIcon="people"
+        [activeIndex]="activeTabIndex"
+        (activeIndexChange)="onTabChange($event)">
+      </app-pill-tabs>
 
-      <div class="modern-dropdown-card" *ngIf="isPoints == 'Points'">
-        <div class="dropdown-header">
-          <div class="dropdown-icon"><ion-icon name="funnel"></ion-icon></div>
-          <span class="dropdown-label">Age Category</span>
+      <!-- Age Category Dropdown (Points tab only) -->
+      <div class="filter-card" *ngIf="isPoints == 'Points'">
+        <div class="filter-label">
+          <ion-icon name="funnel" class="filter-icon"></ion-icon>
+          <span>Age Category</span>
         </div>
-        <div class="dropdown-wrapper">
-          <ion-select class="modern-select" [(ngModel)]="selectedcat" (ionChange)="getLadderList()" interface="popover">
+        <div class="filter-select-wrap">
+          <ion-select class="filter-select" [(ngModel)]="selectedcat" (ionChange)="getLadderList()" interface="popover">
             <ion-option *ngFor="let cat of ageCategories" value={{cat.Id}}>{{cat.CategoryName}} ({{cat.AgeFrom}} - {{cat.AgeTo}})</ion-option>
           </ion-select>
-          <div class="dropdown-arrow"><ion-icon name="chevron-down"></ion-icon></div>
+          <ion-icon name="chevron-down" class="select-arrow"></ion-icon>
         </div>
       </div>
 
-      <div class="modern-search-card">
-        <div class="search-header">
-          <div class="search-icon"><ion-icon name="search"></ion-icon></div>
-          <span class="search-label">Search Players</span>
-        </div>
-        <div class="search-wrapper">
-          <ion-searchbar class="sleek-searchbar" placeholder="Search by rank, name..."
-            [(ngModel)]="searchInput" (ionInput)="getFilterItems($event)" autocorrect="off"
-            showCancelButton="never"></ion-searchbar>
-        </div>
-      </div>
+      <!-- Search Bar -->
+      <app-search-bar
+        [placeholder]="'Search by rank, name...'"
+        [(value)]="searchInput"
+        [count]="searchCount"
+        (search)="getFilterItems($event)">
+      </app-search-bar>
     </div>
 
     <div class="page-scroll-area">
-      <div [ngSwitch]="isPoints">
-        <div ng-if *ngSwitchCase="'Points'">
-          <ion-row>
-            <ion-col style="padding-left: 0px; padding-right: 0px">
-              <ion-item class="item" *ngFor="let ladder of filteredLadder">
-                <p item-left style="color: #4b6051; font-weight: 900 !important; font-size: 18px; padding-right: 10px;">{{ladder.rank}}</p>
-                <p class="name" style="text-transform: capitalize">{{ladder.FirstName}} {{ladder.LastName}}</p>
-                <p item-right style="color: #2292bb; font-size: 18px; padding-left: 20px; padding-right: 10px;">{{ladder.Points}}</p>
-              </ion-item>
-            </ion-col>
-          </ion-row>
+      <!-- Points List -->
+      <div *ngIf="isPoints == 'Points'">
+        <app-list-card *ngFor="let ladder of filteredLadder"
+          [accentColor]="'#2b92bb'">
+          <div class="ladder-row">
+            <div class="rank-badge">{{ladder.rank}}</div>
+            <div class="ladder-info">
+              <p class="ladder-name">{{ladder.FirstName}} {{ladder.LastName}}</p>
+            </div>
+            <div class="points-badge">{{ladder.Points}} <span class="pts-label">pts</span></div>
+          </div>
+        </app-list-card>
+        <div class="empty-state" *ngIf="filteredLadder?.length === 0">
+          <ion-icon name="trophy" class="empty-icon"></ion-icon>
+          <p class="empty-text">No ladder data available</p>
         </div>
-        <div ng-if *ngSwitchCase="'HeadtoHead'">
-          <ion-row>
-            <ion-col style="padding-left: 0px; padding-right: 0px">
-              <ion-item class="item" *ngFor="let ladder of filteredLadderHead">
-                <p item-left style="color: #4b6051; font-weight: 900 !important; font-size: 18px; padding-right: 10px;">{{ladder.rank}}</p>
-                <p class="name" style="text-transform: capitalize">{{ladder.FirstName}} {{ladder.LastName}}</p>
-              </ion-item>
-            </ion-col>
-          </ion-row>
+      </div>
+
+      <!-- Head-to-Head List -->
+      <div *ngIf="isPoints == 'HeadtoHead'">
+        <app-list-card *ngFor="let ladder of filteredLadderHead"
+          [accentColor]="'#35adff'">
+          <div class="ladder-row">
+            <div class="rank-badge h2h">{{ladder.rank}}</div>
+            <div class="ladder-info">
+              <p class="ladder-name">{{ladder.FirstName}} {{ladder.LastName}}</p>
+            </div>
+          </div>
+        </app-list-card>
+        <div class="empty-state" *ngIf="filteredLadderHead?.length === 0">
+          <ion-icon name="people" class="empty-icon"></ion-icon>
+          <p class="empty-text">No head-to-head data available</p>
         </div>
       </div>
     </div>

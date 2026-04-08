@@ -1,8 +1,6 @@
-@import "../_league-theme.scss";
 @import '../../../../theme/android-sdk35-fixes.scss';
 
-page-league-match-info {
-  @include league-theme-base;
+page-match-team-details {
   @include android-sdk35-fixes;
 
   .scroll-content { padding: 0 !important; overflow: hidden !important; }
@@ -14,6 +12,8 @@ page-league-match-info {
     flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
     padding: 0 8px 80px;
   }
+  .scroll-content { background: #0f172a !important; }
+  ion-content { background: #0f172a !important; }
 
   // ── Header ──
   .match-header { padding: 16px 16px 12px; }
@@ -21,15 +21,19 @@ page-league-match-info {
   .header-info { flex: 1; min-width: 0; }
   .header-title {
     font-size: 18px; font-weight: 700; color: #f1f5f9;
-    margin: 0 0 4px; line-height: 1.3; letter-spacing: -0.2px;
-    word-break: break-word;
+    margin: 0 0 4px; line-height: 1.3; letter-spacing: -0.2px; word-break: break-word;
   }
   .header-subtitle { font-size: 13px; font-weight: 500; color: #94a3b8; margin: 0 0 8px; letter-spacing: 0.1px; }
   .header-detail-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
   .header-detail-icon { font-size: 14px; color: #3fbcd3; flex-shrink: 0; }
   .header-detail-text { font-size: 13px; font-weight: 600; color: #cbd5e1; letter-spacing: 0.1px; }
-  .header-actions {
-    display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0;
+  .header-actions { display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; }
+  .header-badge {
+    display: flex; align-items: center; justify-content: center;
+    width: 26px; height: 26px; border-radius: 50%;
+    background: rgba(16, 185, 129, 0.15); color: #10b981;
+    ion-icon { font-size: 13px; }
+    &.private { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
   }
   .action-btn {
     display: flex; align-items: center; justify-content: center;
@@ -38,9 +42,7 @@ page-league-match-info {
     cursor: pointer; transition: background 0.2s ease;
     ion-icon { font-size: 14px; }
     &:active { background: rgba(43, 146, 187, 0.25); }
-    &.danger { background: rgba(239, 68, 68, 0.12); color: #ef4444;
-      &:active { background: rgba(239, 68, 68, 0.25); }
-    }
+    &.danger { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
     &.publish-btn { background: rgba(16, 185, 129, 0.12); color: #10b981; }
   }
 
@@ -73,10 +75,7 @@ page-league-match-info {
   }
 
   // ── Filter Pills ──
-  .filter-row {
-    display: flex; align-items: center; gap: 6px;
-    padding: 8px 4px 12px;
-  }
+  .filter-row { display: flex; align-items: center; gap: 6px; padding: 8px 4px 12px; }
   .filter-pill {
     padding: 6px 14px; border-radius: 20px; border: none;
     font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
@@ -94,10 +93,7 @@ page-league-match-info {
 
   // ── Sections ──
   .section-block { margin-bottom: 8px; }
-  .section-header {
-    display: flex; justify-content: space-between; align-items: center;
-    padding: 8px 4px 6px;
-  }
+  .section-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 4px 6px; }
   .section-title { font-size: 13px; font-weight: 600; color: #94a3b8; letter-spacing: 0.1px; }
   .section-count { font-size: 12px; font-weight: 700; color: #10b981; }
 
@@ -107,10 +103,7 @@ page-league-match-info {
     padding: 4px; min-height: 60px;
     transition: background-color 0.3s ease, border-color 0.3s ease;
     overflow-y: auto;
-    &.drag-over {
-      background: rgba(43, 146, 187, 0.08);
-      border-color: rgba(43, 146, 187, 0.5);
-    }
+    &.drag-over { background: rgba(43, 146, 187, 0.08); border-color: rgba(43, 146, 187, 0.5); }
   }
 
   // ── Empty State ──
@@ -142,7 +135,6 @@ page-league-match-info {
   .player-icons { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
   .medical-icon { width: 16px; height: 16px; }
   .media-icon { width: 16px; height: 16px; }
-
   .player-detail-row {
     display: flex; align-items: center; justify-content: space-between;
     padding-top: 6px; border-top: 1px solid rgba(71, 85, 105, 0.2);
@@ -218,44 +210,29 @@ page-league-match-info {
   &.light-theme {
     .page-fixed-header { background: #f8fafc; }
     .scroll-content { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important; }
-
+    ion-content { background: #f8fafc !important; }
     .header-title { color: #1e293b; }
     .header-subtitle { color: #64748b; }
     .header-detail-text { color: #334155; }
-
+    .header-badge { background: rgba(16, 185, 129, 0.1); &.private { background: rgba(239, 68, 68, 0.1); } }
     .publish-banner { background: linear-gradient(135deg, #10b981, #0d9488, #059669, #2b92bb); }
-
     .filter-pill {
-      &.playing { background: rgba(16, 185, 129, 0.1); color: #059669;
-        &.active { background: #10b981; color: #fff; }
-      }
-      &.bench { background: rgba(245, 158, 11, 0.1); color: #d97706;
-        &.active { background: #f59e0b; color: #fff; }
-      }
-      &.all { background: rgba(43, 146, 187, 0.1); color: #2b92bb;
-        &.active { background: #2b92bb; color: #fff; }
-      }
+      &.playing { background: rgba(16, 185, 129, 0.1); color: #059669; &.active { background: #10b981; color: #fff; } }
+      &.bench { background: rgba(245, 158, 11, 0.1); color: #d97706; &.active { background: #f59e0b; color: #fff; } }
+      &.all { background: rgba(43, 146, 187, 0.1); color: #2b92bb; &.active { background: #2b92bb; color: #fff; } }
     }
-
     .section-title { color: #64748b; }
     .drop-zone { border-color: rgba(43, 146, 187, 0.15);
       &.drag-over { background: rgba(43, 146, 187, 0.05); border-color: rgba(43, 146, 187, 0.3); }
     }
-
-    .player-card {
-      background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%);
-    }
+    .player-card { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
     .player-name { color: #1e293b; }
     .player-role { color: #64748b; }
     .player-detail-row { border-top-color: rgba(226, 232, 240, 0.6); }
     .empty-card { color: #94a3b8; }
-
-    .sheet-item { border-bottom-color: rgba(226, 232, 240, 0.4);
-      &:active { background: rgba(0, 0, 0, 0.03); }
-    }
+    .sheet-item { border-bottom-color: rgba(226, 232, 240, 0.4); &:active { background: rgba(0, 0, 0, 0.03); } }
     .sheet-item-info .sheet-item-name { color: #1e293b; }
     .sheet-item-chevron { color: #cbd5e1; }
-
     ion-fab {
       .fab-main, [ion-fab] { background: rgba(43, 146, 187, 0.3) !important; border-color: rgba(255, 255, 255, 0.25); }
       .fab-label { background: rgba(43, 146, 187, 0.9); }
@@ -263,8 +240,6 @@ page-league-match-info {
   }
 
   // ── Responsive ──
-
-  // Small phones (320px - SE, 5s)
   @media (max-width: 359px) {
     .match-header { padding: 12px 12px 8px; }
     .header-title { font-size: 16px; }
@@ -284,21 +259,14 @@ page-league-match-info {
     .medical-icon, .media-icon { width: 14px; height: 14px; }
     .empty-card { font-size: 12px; padding: 12px; }
   }
-
-  // Regular phones (360px - 399px)
   @media (min-width: 360px) and (max-width: 399px) {
     .player-card { padding: 10px 12px; }
     .player-name { font-size: 13px; }
     .filter-pill { font-size: 11px; padding: 5px 10px; }
   }
-
-  // Large phones (400px+)
   @media (min-width: 400px) {
     .match-header { padding: 16px 16px 12px; }
-    .player-card { padding: 10px 12px; }
   }
-
-  // Tablets (768px+)
   @media (min-width: 768px) {
     .match-header { padding: 20px 24px 14px; }
     .header-title { font-size: 22px; }
@@ -306,6 +274,7 @@ page-league-match-info {
     .header-detail-text { font-size: 14px; }
     .header-actions { gap: 5px; }
     .action-btn { width: 32px; height: 32px; ion-icon { font-size: 16px; } }
+    .header-badge { width: 32px; height: 32px; ion-icon { font-size: 16px; } }
     .page-scroll-area { padding: 0 16px 80px; }
     .filter-pill { font-size: 13px; padding: 8px 18px; }
     .filter-row { gap: 8px; padding: 10px 8px 14px; }
@@ -318,8 +287,6 @@ page-league-match-info {
     .medical-icon, .media-icon { width: 18px; height: 18px; }
     .drop-zone { padding: 6px; }
   }
-
-  // Desktop (1024px+)
   @media (min-width: 1024px) {
     .page-scroll-area { padding: 0 24px 80px; }
   }

@@ -36,6 +36,8 @@ export class MatchTeamDetailsPage {
   selectedHomeTeamText: string;
   selectedAwayTeamText: string;
   isDarkTheme: boolean = true;
+  showPlayerSheet: boolean = false;
+  selectedPlayer: GetIndividualMatchParticipantModel = null;
 
   getIndividualMatchParticipantRes: GetIndividualMatchParticipantModel[] = [];
   allParticipants: GetIndividualMatchParticipantModel[] = []; // 📊 Store all participants for counting
@@ -301,6 +303,10 @@ export class MatchTeamDetailsPage {
     }
   }
 
+  get activeTabIndex(): number { return this.activeType ? 0 : 1; }
+
+  onTabChange(index: number) { this.changeType(index === 0); }
+
   closeFab() {
     if (this.fab) {
       this.fab.close();
@@ -338,7 +344,7 @@ export class MatchTeamDetailsPage {
   private applyTheme(isDark: boolean): void {
     this.isDarkTheme = isDark;
     const applyThemeToElement = () => {
-      const element = document.querySelector("page-match_team_details");
+      const element = document.querySelector("page-match-team-details");
       if (element) {
         if (isDark) {
           element.classList.remove("light-theme");
@@ -436,55 +442,20 @@ export class MatchTeamDetailsPage {
 
   //ActionSheet Controller
   presentActionSheet(member: GetIndividualMatchParticipantModel) {
-    // if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType !== LeagueTeamPlayerStatusType.All) {
-    //   this.commonService.toastMessage('Please select "All" filter to perform actions', 3000, ToastMessageType.Info);
-    //   return;
-    // }
-    let actionSheet = this.actionSheetCtrl.create({
-      title: `${member.user.FirstName} ${member.user.LastName}`,
-      buttons: [
-        {
-          text: 'Confirmed',
-          icon: 'checkmark-circle',
-          cssClass: 'action-sheet-confirmed',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted);
-          }
-        },
-        {
-          text: 'Maybe',
-          icon: 'help-circle',
-          cssClass: 'action-sheet-maybe',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe);
-          }
-        },
-        {
-          text: 'Declined',
-          icon: 'close-circle',
-          cssClass: 'action-sheet-declined',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined);
-            // Handle declined status
-          }
-        },
-        {
-          text: 'Update Role',
-          icon: 'people',
-          handler: () => {
-            //for updating roles
-            this.showRoles(member);
-            if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
-              //   this.showRoles(member);
-              // } else {
-              //   this.commonService.toastMessage('Please select "All" filter to update role', 3000, ToastMessageType.Info);
-              //   // event.preventDefault(); // Prevent the action from starting 
-            }
-          }
-        },
-      ]
-    });
-    actionSheet.present();
+    this.selectedPlayer = member;
+    this.showPlayerSheet = true;
+  }
+
+  onPlayerAction(action: string) {
+    this.showPlayerSheet = false;
+    const member = this.selectedPlayer;
+    if (!member) return;
+    switch (action) {
+      case 'confirmed': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted); break;
+      case 'maybe': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe); break;
+      case 'declined': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined); break;
+      case 'role': this.showRoles(member); break;
+    }
   }
 
   showRoles(member: GetIndividualMatchParticipantModel): void {
