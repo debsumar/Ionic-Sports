@@ -12,59 +12,57 @@
 
 <ion-content class="football-summary-content">
   <!-- Match Header -->
-  <div class="match-header">
-    <div class="match-title">
-      <h2>{{matchTitle}}</h2>
-    </div>
-    <div class="match-details">
-      <div class="detail-item">
-        <ion-icon name="calendar" color=""></ion-icon>
-        <span>{{matchDate}}</span>
-      </div>
-      <div class="detail-item" *ngIf="matchLocation">
-        <ion-icon name="pin" color=""></ion-icon>
-        <span>{{matchLocation}}</span>
-      </div>
+  <div class="match-hero">
+    <div class="hero-icon"><ion-icon name="football"></ion-icon></div>
+    <h2 class="hero-title">{{matchTitle}}</h2>
+    <div class="hero-details">
+      <span class="hero-tag"><ion-icon name="calendar"></ion-icon> {{matchDate}}</span>
+      <span class="hero-tag" *ngIf="matchLocation"><ion-icon name="pin"></ion-icon> {{matchLocation}}</span>
     </div>
   </div>
 
   <!-- Score Section -->
-  <div class="score-section">
-    <!-- Home Team -->
-    <div class="team-card" (click)="gotoScoreInputPage(true)">
-      <div class="team-logo-container">
-        <img class="team-logo" [src]="homeTeamLogo" [alt]="homeTeamName + ' logo'">
-      </div>
-      <div class="team-details">
-        <div class="team-name">{{homeTeamName}}</div>
-        <div class="team-score">{{homeScore}}</div>
-        <div class="scorers" *ngIf="scorerObjectsHome && scorerObjectsHome.length > 0">
-          <div class="scorer-info" *ngFor="let scorer of scorerObjectsHome">
-            {{scorer?.PLAYER}}<span *ngIf="scorer?.TIME">({{scorer?.TIME}}')</span>
-          </div>
+  <div class="scorecard">
+    <div class="scorecard-top">
+      <div class="sc-team home">
+        <div class="sc-logo-wrap" (click)="gotoScoreInputPage(true)">
+          <img class="sc-logo" [src]="homeTeamLogo" [alt]="homeTeamName">
         </div>
+        <span class="sc-team-name">{{homeTeamName}}</span>
+      </div>
+      <div class="sc-score-block" (click)="gotoResultInputPage()">
+        <div class="sc-scores">
+          <span class="sc-score home">{{homeScore}}</span>
+          <span class="sc-dash">-</span>
+          <span class="sc-score away">{{awayScore}}</span>
+        </div>
+        <div class="sc-edit-hint"><ion-icon name="create"></ion-icon> Edit</div>
+      </div>
+      <div class="sc-team away">
+        <div class="sc-logo-wrap" (click)="gotoScoreInputPage(false)">
+          <img class="sc-logo" [src]="awayTeamLogo" [alt]="awayTeamName">
+        </div>
+        <span class="sc-team-name">{{awayTeamName}}</span>
       </div>
     </div>
 
-    <!-- VS Section -->
-    <div class="vs-container" (click)="gotoResultInputPage()">
-      <div class="vs-text">VS</div>
-      <ion-icon name="create" class="vs-edit-icon"></ion-icon>
-    </div>
+    <div class="sc-divider" *ngIf="(scorerObjectsHome?.length > 0) || (scorerObjectsAway?.length > 0)"></div>
 
-    <!-- Away Team -->
-    <div class="team-card" (click)="gotoScoreInputPage(false)">
-      <div class="team-details away">
-        <div class="team-name">{{awayTeamName}}</div>
-        <div class="team-score">{{awayScore}}</div>
-        <div class="scorers" *ngIf="scorerObjectsAway && scorerObjectsAway.length > 0">
-          <div class="scorer-info" *ngFor="let scorer of scorerObjectsAway">
-            {{scorer?.PLAYER}}<span *ngIf="scorer?.TIME">({{scorer?.TIME}}')</span>
-          </div>
+    <div class="sc-scorers" *ngIf="(scorerObjectsHome?.length > 0) || (scorerObjectsAway?.length > 0)">
+      <div class="sc-scorers-col home" (click)="gotoScoreInputPage(true)">
+        <div class="sc-scorer" *ngFor="let scorer of scorerObjectsHome">
+          <ion-icon name="football" class="sc-goal-icon"></ion-icon>
+          <span class="sc-scorer-name">{{scorer?.PLAYER}}</span>
+          <span class="sc-scorer-time" *ngIf="scorer?.TIME">{{scorer?.TIME}}'</span>
         </div>
       </div>
-      <div class="team-logo-container">
-        <img class="team-logo" [src]="awayTeamLogo" [alt]="awayTeamName + ' logo'">
+      <div class="sc-center-line"></div>
+      <div class="sc-scorers-col away" (click)="gotoScoreInputPage(false)">
+        <div class="sc-scorer" *ngFor="let scorer of scorerObjectsAway">
+          <span class="sc-scorer-time" *ngIf="scorer?.TIME">{{scorer?.TIME}}'</span>
+          <span class="sc-scorer-name">{{scorer?.PLAYER}}</span>
+          <ion-icon name="football" class="sc-goal-icon"></ion-icon>
+        </div>
       </div>
     </div>
   </div>

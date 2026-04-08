@@ -4,8 +4,8 @@ page-summary-football {
   @include league-theme-base;
   @include android-sdk35-fixes;
   // Card theme support
-  .match-header,
-  .score-section,
+  .match-hero,
+  .scorecard,
   .potm-section,
   .stats-section {
     background: #1e293b !important;
@@ -22,8 +22,8 @@ page-summary-football {
   }
   
   &.light-theme {
-    .match-header,
-    .score-section,
+    .match-hero,
+    .scorecard,
     .potm-section,
     .stats-section {
       background: white !important;
@@ -48,147 +48,130 @@ page-summary-football {
   }
 
   
-  .match-header {
-    background: rgba(255, 255, 255, 0.95);
-    backdrop-filter: blur(10px);
-    padding: 20px;
-    margin: 16px;
-    border-radius: 16px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-
-    .match-title {
-      text-align: center;
-      margin-bottom: 16px;
-
-      h2 {
-        margin: 0;
-        color: #2c3e50;
-        font-weight: 700;
-        font-size: 20px;
-      }
-    }
-
-    .match-details {
-      display: flex;
-      justify-content: center;
-      gap: 24px;
-
-      .detail-item {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-
-        span {
-          color: #7f8c8d;
-          font-weight: 500;
-          font-size: 14px;
-        }
-      }
+  // ── Match Hero ──
+  .match-hero {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 24px 16px 16px; margin: 16px; border-radius: 16px;
+    background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(30, 41, 59, 0.6) 60%, rgba(30, 41, 59, 0.8) 100%);
+    border: 1px solid rgba(43, 146, 187, 0.2);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    position: relative; overflow: hidden;
+    &::before {
+      content: ''; position: absolute; top: -40%; right: -20%; width: 200px; height: 200px;
+      background: radial-gradient(circle, rgba(43, 146, 187, 0.15) 0%, transparent 70%);
+      pointer-events: none;
     }
   }
-
-  .score-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    background: white;
-    margin: 16px;
-    border-radius: 20px;
-    padding: 20px 2px;
-    box-shadow: 0 6px 25px rgba(0, 0, 0, 0.15);
+  .hero-icon {
+    width: 44px; height: 44px; border-radius: 14px; margin-bottom: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(43, 146, 187, 0.15); border: 1px solid rgba(43, 146, 187, 0.25);
+    ion-icon { font-size: 22px; color: #3fbcd3; }
+  }
+  .hero-title {
+    font-size: 18px; font-weight: 800; color: #f1f5f9; margin: 0 0 10px;
+    text-align: center; letter-spacing: -0.3px; line-height: 1.3;
+  }
+  .hero-details { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 11px; font-weight: 600; color: #94a3b8;
+    padding: 4px 10px; border-radius: 20px;
+    background: rgba(71, 85, 105, 0.25); border: 1px solid rgba(71, 85, 105, 0.3);
+    ion-icon { font-size: 12px; color: #3fbcd3; }
   }
 
-  .team-card {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: transform 0.2s ease;
-    width: 42%;
-    min-width: 0;
-
-    &:hover {
-      transform: scale(1.02);
+  &.light-theme {
+    .match-hero {
+      background: linear-gradient(145deg, rgba(43, 146, 187, 0.15) 0%, rgba(255, 255, 255, 0.6) 60%, rgba(255, 255, 255, 0.8) 100%);
+      border-color: rgba(43, 146, 187, 0.12);
     }
+    .hero-title { color: #1e293b; }
+    .hero-tag { background: rgba(226, 232, 240, 0.5); border-color: rgba(226, 232, 240, 0.6); color: #64748b; }
   }
 
-  .team-logo-container {
-    position: relative;
-    margin: 0 5px;
-    width: 60px;
-    height: 60px;
-    flex-shrink: 0;
-
-    .team-logo {
-      width: 60px;
-      height: 60px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #e9ecef;
-    }
+  // ── Scorecard ──
+  .scorecard {
+    margin: 16px; border-radius: 16px; overflow: hidden;
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(71, 85, 105, 0.4);
+    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  }
+  .scorecard-top {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 12px 16px;
+  }
+  .sc-team {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    width: 30%; min-width: 0; cursor: pointer;
+  }
+  .sc-logo-wrap {
+    width: 52px; height: 52px; border-radius: 50%; overflow: hidden;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  .sc-logo { width: 100%; height: 100%; object-fit: cover; }
+  .sc-team-name {
+    font-size: 12px; font-weight: 700; color: #f1f5f9; text-align: center;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+  }
+  .sc-score-block {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    width: 40%; cursor: pointer;
+  }
+  .sc-scores { display: flex; align-items: baseline; gap: 8px; }
+  .sc-score {
+    font-size: 36px; font-weight: 900; line-height: 1; letter-spacing: -1px;
+    &.home { color: #10b981; }
+    &.away { color: #ef4444; }
+  }
+  .sc-dash { font-size: 24px; font-weight: 300; color: #64748b; }
+  .sc-edit-hint {
+    display: flex; align-items: center; gap: 4px;
+    font-size: 10px; font-weight: 600; color: #64748b;
+    padding: 3px 10px; border-radius: 20px;
+    background: rgba(43, 146, 187, 0.1); border: 1px solid rgba(43, 146, 187, 0.2);
+    ion-icon { font-size: 11px; color: #2b92bb; }
   }
 
-  .team-details {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    min-height: 60px;
-    flex: 1;
-    min-width: 0;
-    &.away {
-      text-align: right;
-    }
+  .sc-divider { height: 1px; background: rgba(71, 85, 105, 0.3); margin: 0 16px; }
 
-    .team-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #2c3e50;
-      margin-bottom: 4px;
-      line-height: 1.2;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
-    }
-
-    .team-score {
-      font-size: 25px;
-      font-weight: 600;
-      color: #27ae60;
-      line-height: 1;
-      text-align: center;
-    }
-
-    .scorers {
-      margin-top: 8px;
-
-      .scorer-info {
-        font-size: 10px;
-        color: #7f8c8d;
-        margin: 2px 0;
-        line-height: 1.2;
-      }
-    }
+  .sc-scorers {
+    display: flex; padding: 12px 8px 16px; min-height: 40px;
+  }
+  .sc-scorers-col {
+    flex: 1; display: flex; flex-direction: column; gap: 6px; cursor: pointer;
+    &.home { align-items: flex-start; padding-left: 8px; }
+    &.away { align-items: flex-end; padding-right: 8px; }
+  }
+  .sc-center-line { width: 1px; background: rgba(71, 85, 105, 0.2); margin: 0 4px; flex-shrink: 0; }
+  .sc-scorer {
+    display: flex; align-items: center; gap: 5px;
+  }
+  .sc-goal-icon { font-size: 12px; color: #2b92bb; flex-shrink: 0; }
+  .sc-scorer-name { font-size: 11px; font-weight: 600; color: #cbd5e1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100px; }
+  .sc-scorer-time {
+    font-size: 10px; font-weight: 800; color: #2b92bb;
+    padding: 1px 6px; border-radius: 4px;
+    background: rgba(43, 146, 187, 0.1); flex-shrink: 0;
   }
 
-  .vs-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    cursor: pointer;
-    padding: 0 5px;
-    width: 15%;
-    flex-shrink: 0;
-
-    .vs-text {
-      font-size: 18px;
-      font-weight: 700;
-      color: #7f8c8d;
-      margin-bottom: 4px;
+  // Light theme scorecard
+  &.light-theme {
+    .scorecard {
+      background: rgba(255, 255, 255, 0.7); border-color: rgba(226, 232, 240, 0.6);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
     }
-
-    .vs-edit-icon {
-      color: #27ae60;
-      font-size: 14px;
-    }
+    .sc-team-name { color: #1e293b; }
+    .sc-logo-wrap { border-color: rgba(0, 0, 0, 0.08); background: rgba(255, 255, 255, 0.5); }
+    .sc-dash { color: #94a3b8; }
+    .sc-edit-hint { background: rgba(43, 146, 187, 0.06); border-color: rgba(43, 146, 187, 0.12); }
+    .sc-divider { background: rgba(226, 232, 240, 0.6); }
+    .sc-center-line { background: rgba(226, 232, 240, 0.4); }
+    .sc-scorer-name { color: #334155; }
+    .sc-scorer-time { background: rgba(43, 146, 187, 0.06); }
   }
 
   .potm-section {
