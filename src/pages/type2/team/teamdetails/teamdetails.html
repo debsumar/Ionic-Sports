@@ -11,7 +11,8 @@
       <app-detail-header *ngIf="teamsForParentClub"
         [title]="teamsForParentClub.teamName"
         [subtitle]="teamsForParentClub?.activity?.ActivityName"
-        [detailRows]="headerDetailRows">
+        [detailRows]="headerDetailRows"
+        [accentColor]="'#a78bfa'">
         <div header-actions>
           <div class="header-badge" [class.private]="team?.teamVisibility==1">
             <ion-icon [name]="team?.teamVisibility==0?'globe':'lock'"></ion-icon>

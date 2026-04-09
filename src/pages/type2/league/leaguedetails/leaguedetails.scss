@@ -22,7 +22,7 @@ page-leaguedetails {
     width: 26px; height: 26px; border-radius: 50%;
     background: rgba(16, 185, 129, 0.15); color: #10b981;
     ion-icon { font-size: 13px; }
-    &.private { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    &.private { background: rgba(247, 110, 4, 0.15); color: #f76e04; }
   }
   .action-btn {
     display: flex; align-items: center; justify-content: center;
@@ -75,7 +75,7 @@ page-leaguedetails {
       border-color: transparent #10b981 transparent transparent;
     }
     ion-icon { position: absolute; top: 5px; right: 5px; font-size: 10px; color: #fff; }
-    &.private::before { border-color: transparent #ef4444 transparent transparent; }
+    &.private::before { border-color: transparent #f76e04 transparent transparent; }
   }
 
   // ── Standings Table (inside revamp-card) ──
@@ -266,7 +266,7 @@ page-leaguedetails {
     .scroll-content { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important; }
 
     .header-badge { background: rgba(16, 185, 129, 0.1);
-      &.private { background: rgba(239, 68, 68, 0.1); }
+      &.private { background: rgba(247, 110, 4, 0.1); }
     }
     .action-btn { background: rgba(43, 146, 187, 0.08); color: #2b92bb;
       &.danger { background: rgba(239, 68, 68, 0.08); color: #ef4444; }

@@ -161,6 +161,10 @@ export class MatchdetailsPage {
     return moment(date, "YYYY-MM-DD HH:mm").local().format("DD-MMM-YYYY hh:mm A");
   }
 
+  get headerAccentColor(): string {
+    return this.commonService.getTypeAccentColor(this.match?.MatchType);
+  }
+
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });

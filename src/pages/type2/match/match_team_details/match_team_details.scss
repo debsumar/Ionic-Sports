@@ -21,7 +21,7 @@ page-match-team-details {
     width: 26px; height: 26px; border-radius: 50%;
     background: rgba(16, 185, 129, 0.15); color: #10b981;
     ion-icon { font-size: 13px; }
-    &.private { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
+    &.private { background: rgba(247, 110, 4, 0.15); color: #f76e04; }
   }
   .action-btn {
     display: flex; align-items: center; justify-content: center;
@@ -199,7 +199,7 @@ page-match-team-details {
     .page-fixed-header { background: #f8fafc; }
     .scroll-content { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important; }
     ion-content { background: #f8fafc !important; }
-    .header-badge { background: rgba(16, 185, 129, 0.1); &.private { background: rgba(239, 68, 68, 0.1); } }
+    .header-badge { background: rgba(16, 185, 129, 0.1); &.private { background: rgba(247, 110, 4, 0.1); } }
     .publish-banner { background: linear-gradient(135deg, #10b981, #0d9488, #059669, #2b92bb); }
     .filter-pill {
       &.playing { background: rgba(16, 185, 129, 0.1); color: #059669; &.active { background: #10b981; color: #fff; } }

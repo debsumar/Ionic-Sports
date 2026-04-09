@@ -376,6 +376,10 @@ export class LeagueMatchInfoPage {
     return this.allParticipants.length;
   }
 
+  get headerAccentColor(): string {
+    return this.commonService.getTypeAccentColor(this.matchObj?.league_type);
+  }
+
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     if (this.matchObj?.start_date) rows.push({ icon: 'calendar', text: this.matchObj.start_date });

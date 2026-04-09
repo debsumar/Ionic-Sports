@@ -827,6 +827,12 @@ export class LineupPage {
         return (activity || 'Activity') + ' · Lineup';
     }
 
+    get headerAccentColor(): string {
+        if (!this.match) return '#2b92bb';
+        const m = this.match as any;
+        return this.commonService.getTypeAccentColor(this.isLeague ? m.league_type : m.MatchType);
+    }
+
     get headerDetailRows(): DetailHeaderRow[] {
         if (!this.match) return [];
         const m = this.match as any;

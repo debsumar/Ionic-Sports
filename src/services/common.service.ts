@@ -1108,6 +1108,15 @@ export class CommonService {
 
 
 
+  getTypeAccentColor(type: number): string {
+    switch (type) {
+      case 1: return '#35adff';
+      case 2: return '#f76e04';
+      case 3: return '#a78bfa';
+      default: return '#2b92bb';
+    }
+  }
+
 }
 export enum ToastMessageType {
   Success,

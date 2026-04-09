@@ -180,6 +180,10 @@ export class LeaguedetailsPage {
     }, 100);
   }
 
+  get headerAccentColor(): string {
+    return this.commonService.getTypeAccentColor(this.individualLeague?.league_type);
+  }
+
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     const l = this.individualLeague;

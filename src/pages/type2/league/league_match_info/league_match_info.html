@@ -11,7 +11,8 @@
       <app-detail-header
         [title]="matchObj?.match_title"
         [subtitle]="(matchObj?.activity_name || '') + ' · Team'"
-        [detailRows]="headerDetailRows">
+        [detailRows]="headerDetailRows"
+        [accentColor]="headerAccentColor">
         <div header-actions>
           <button class="action-btn danger" (click)="deleteConfirm()">
             <ion-icon name="trash"></ion-icon>

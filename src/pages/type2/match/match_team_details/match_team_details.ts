@@ -608,6 +608,10 @@ export class MatchTeamDetailsPage {
     return this.allParticipants.length;
   }
 
+  get headerAccentColor(): string {
+    return this.commonService.getTypeAccentColor(this.match?.MatchType);
+  }
+
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });

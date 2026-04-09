@@ -19,20 +19,15 @@
       <app-detail-header *ngIf="individualLeague"
         [title]="individualLeague?.league_name"
         [subtitle]="(individualLeague?.activity?.ActivityName || '') + ' · ' + (individualLeague?.league_type_text || '')"
-        [detailRows]="headerDetailRows">
+        [detailRows]="headerDetailRows"
+        [accentColor]="headerAccentColor">
         <div header-actions>
           <div class="header-badge" [class.private]="individualLeague?.league_visibility==1">
             <ion-icon [name]="individualLeague?.league_visibility==0?'globe':'lock'"></ion-icon>
           </div>
-          <button class="action-btn" (tap)="sendEmailToGroup()">
-            <ion-icon name="md-mail"></ion-icon>
-          </button>
-          <button class="action-btn" (click)="gotoEditLeague()">
-            <ion-icon name="create"></ion-icon>
-          </button>
-          <button class="action-btn danger" (click)="removeLeague()">
-            <ion-icon name="trash"></ion-icon>
-          </button>
+          <button class="action-btn" (tap)="sendEmailToGroup()"><ion-icon name="md-mail"></ion-icon></button>
+          <button class="action-btn" (click)="gotoEditLeague()"><ion-icon name="create"></ion-icon></button>
+          <button class="action-btn danger" (click)="removeLeague()"><ion-icon name="trash"></ion-icon></button>
         </div>
       </app-detail-header>
 

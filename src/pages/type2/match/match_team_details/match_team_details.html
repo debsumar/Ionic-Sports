@@ -11,7 +11,8 @@
       <app-detail-header
         [title]="match?.MatchTitle"
         [subtitle]="(match?.ActivityName || '') + ' · Teams'"
-        [detailRows]="headerDetailRows">
+        [detailRows]="headerDetailRows"
+        [accentColor]="headerAccentColor">
         <div header-actions>
           <div class="header-badge" [class.private]="match?.MatchVisibility==1">
             <ion-icon [name]="match?.MatchVisibility==0?'globe':'lock'"></ion-icon>
