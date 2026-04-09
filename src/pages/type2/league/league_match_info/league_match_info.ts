@@ -17,6 +17,7 @@ import gql from "graphql-tag";
 import { Role } from "../../team/team.model";
 import { ModuleTypeForEmail } from "../../mailtomemberbyadmin/mailtomemberbyadmin";
 import { ThemeService } from "../../../../services/theme.service";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
 /**
  * Generated class for the LeagueMatchInfoPage page.
  *
@@ -373,6 +374,14 @@ export class LeagueMatchInfoPage {
 
   getAllCount(): number {
     return this.allParticipants.length;
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    if (this.matchObj?.start_date) rows.push({ icon: 'calendar', text: this.matchObj.start_date });
+    if (this.matchObj?.formatted_round) rows.push({ icon: 'flag', text: 'Round: ' + this.matchObj.formatted_round });
+    if (this.matchObj?.location_name) rows.push({ icon: 'pin', text: this.matchObj.location_name });
+    return rows;
   }
 
   getAcceptedCount(sectionItems: LeagueMatchParticipantModel[],section_index:number): number {

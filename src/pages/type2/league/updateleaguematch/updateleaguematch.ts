@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { AlertController, IonicPage, LoadingController, NavController, NavParams, PopoverController } from 'ionic-angular';
+import { Component, Renderer2 } from '@angular/core';
+import { AlertController, IonicPage, LoadingController, NavController, NavParams, PopoverController, Events } from 'ionic-angular';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { SharedServices } from '../../../services/sharedservice';
 import { GraphqlService } from '../../../../services/graphql.service';
@@ -11,6 +11,7 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
 import { AppType } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
 
 import moment from 'moment';
 /**
@@ -41,6 +42,7 @@ export class UpdateleaguematchPage {
   data: LeagueMatch;
   start_date: string;
   start_time: string;
+  isDarkTheme: boolean = true;
   roundTypes: RoundTypesModel[] = [];
   roundTypeInput: RoundTypeInput = {
     parentclubId: '',
@@ -80,7 +82,10 @@ export class UpdateleaguematchPage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private sharedService: SharedServices,
-    private httpService: HttpService
+    private httpService: HttpService,
+    private renderer: Renderer2,
+    private themeService: ThemeService,
+    private events: Events
   ) {
     this.min = new Date().toISOString();
     this.max = "2049-12-31";
@@ -129,6 +134,37 @@ export class UpdateleaguematchPage {
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad UpdateleaguematchPage');
+    this.loadTheme();
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.applyTheme(isDark);
+    });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  private applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-updateleaguematch');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme')
+             : this.renderer.addClass(el, 'light-theme');
+    }
   }
 
   getRoundTypes() {

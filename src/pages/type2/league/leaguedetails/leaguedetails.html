@@ -16,38 +16,25 @@
   <div class="page-layout">
     <div class="page-fixed-header">
       <!-- League Header -->
-      <div class="league-header" *ngIf="individualLeague">
-        <div class="header-main">
-          <div class="header-info">
-            <h2 class="header-title">{{individualLeague?.league_name}}</h2>
-            <p class="header-subtitle">{{individualLeague?.activity?.ActivityName}} · {{individualLeague?.league_type_text}}</p>
-            <div class="header-detail-row">
-              <ion-icon name="calendar" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">{{individualLeague?.start_date}}</span>
-              <span class="header-dot">→</span>
-              <span class="header-detail-text">{{individualLeague?.end_date}}</span>
-            </div>
-            <div class="header-detail-row">
-              <ion-icon name="pin" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">{{individualLeague?.club?.ClubName}}</span>
-            </div>
+      <app-detail-header *ngIf="individualLeague"
+        [title]="individualLeague?.league_name"
+        [subtitle]="(individualLeague?.activity?.ActivityName || '') + ' · ' + (individualLeague?.league_type_text || '')"
+        [detailRows]="headerDetailRows">
+        <div header-actions>
+          <div class="header-badge" [class.private]="individualLeague?.league_visibility==1">
+            <ion-icon [name]="individualLeague?.league_visibility==0?'globe':'lock'"></ion-icon>
           </div>
-          <div class="header-actions">
-            <div class="header-badge" [class.private]="individualLeague?.league_visibility==1">
-              <ion-icon [name]="individualLeague?.league_visibility==0?'globe':'lock'"></ion-icon>
-            </div>
-            <button class="action-btn" (tap)="sendEmailToGroup()">
-              <ion-icon name="md-mail"></ion-icon>
-            </button>
-            <button class="action-btn" (click)="gotoEditLeague()">
-              <ion-icon name="create"></ion-icon>
-            </button>
-            <button class="action-btn danger" (click)="removeLeague()">
-              <ion-icon name="trash"></ion-icon>
-            </button>
-          </div>
+          <button class="action-btn" (tap)="sendEmailToGroup()">
+            <ion-icon name="md-mail"></ion-icon>
+          </button>
+          <button class="action-btn" (click)="gotoEditLeague()">
+            <ion-icon name="create"></ion-icon>
+          </button>
+          <button class="action-btn danger" (click)="removeLeague()">
+            <ion-icon name="trash"></ion-icon>
+          </button>
         </div>
-      </div>
+      </app-detail-header>
 
       <!-- Pill Tabs -->
       <app-pill-tabs *ngIf="individualLeague?.league_type_text === 'Team'"

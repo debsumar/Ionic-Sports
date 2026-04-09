@@ -33,6 +33,7 @@ import { LineupVisibility, LeagueTeamPlayerStatusType, LeagueMatchActionType, Le
 import { GetIndividualMatchParticipantModel } from "../../../../shared/model/match.model";
 import { LeagueMatchParticipantModel } from "../../league/models/league.model";
 import { AppType } from "../../../../shared/constants/module.constants";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
 
 /**
  * Interface for storing team lineup state
@@ -809,6 +810,37 @@ export class LineupPage {
     get visibilityLabel(): string {
         const option = this.visibilityOptions.find(o => o.value === this.visibility);
         return (option ? option.label : '') || '';
+    }
+
+    // ===========================================
+    // Detail Header Computed Properties
+    // ===========================================
+
+    get headerTitle(): string {
+        if (!this.match) return '';
+        return (this.isLeague ? (this.match as any).match_title : (this.match as any).MatchTitle) || '';
+    }
+
+    get headerSubtitle(): string {
+        if (!this.match) return '';
+        const activity = this.isLeague ? (this.match as any).activity_name : (this.match as any).ActivityName;
+        return (activity || 'Activity') + ' · Lineup';
+    }
+
+    get headerDetailRows(): DetailHeaderRow[] {
+        if (!this.match) return [];
+        const m = this.match as any;
+        const rows: DetailHeaderRow[] = [];
+        if (this.isLeague) {
+            if (m.homeusername || m.awayusername) rows.push({ icon: 'people', text: `${m.homeusername || 'Home'} vs ${m.awayusername || 'Away'}` });
+            if (m.start_date) rows.push({ icon: 'calendar', text: m.start_date });
+            if (m.league_name) rows.push({ icon: 'trophy', text: m.league_name });
+        } else {
+            if (m.homeUserName || m.awayUserName) rows.push({ icon: 'people', text: `${m.homeUserName} vs ${m.awayUserName}` });
+            if (m.Date) rows.push({ icon: 'calendar', text: `${m.Date}${m.Time ? ' · ' + m.Time : ''}` });
+            if (m.VenueName) rows.push({ icon: 'pin', text: m.VenueName });
+        }
+        return rows;
     }
 
     // ===========================================

@@ -15,19 +15,7 @@ page-match-team-details {
   .scroll-content { background: #0f172a !important; }
   ion-content { background: #0f172a !important; }
 
-  // ── Header ──
-  .match-header { padding: 16px 16px 12px; }
-  .header-main { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-  .header-info { flex: 1; min-width: 0; }
-  .header-title {
-    font-size: 18px; font-weight: 700; color: #f1f5f9;
-    margin: 0 0 4px; line-height: 1.3; letter-spacing: -0.2px; word-break: break-word;
-  }
-  .header-subtitle { font-size: 13px; font-weight: 500; color: #94a3b8; margin: 0 0 8px; letter-spacing: 0.1px; }
-  .header-detail-row { display: flex; align-items: center; gap: 6px; margin-bottom: 4px; }
-  .header-detail-icon { font-size: 14px; color: #3fbcd3; flex-shrink: 0; }
-  .header-detail-text { font-size: 13px; font-weight: 600; color: #cbd5e1; letter-spacing: 0.1px; }
-  .header-actions { display: flex; flex-direction: column; align-items: center; gap: 3px; flex-shrink: 0; }
+  // ── Header (uses app-detail-header) ──
   .header-badge {
     display: flex; align-items: center; justify-content: center;
     width: 26px; height: 26px; border-radius: 50%;
@@ -211,9 +199,6 @@ page-match-team-details {
     .page-fixed-header { background: #f8fafc; }
     .scroll-content { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important; }
     ion-content { background: #f8fafc !important; }
-    .header-title { color: #1e293b; }
-    .header-subtitle { color: #64748b; }
-    .header-detail-text { color: #334155; }
     .header-badge { background: rgba(16, 185, 129, 0.1); &.private { background: rgba(239, 68, 68, 0.1); } }
     .publish-banner { background: linear-gradient(135deg, #10b981, #0d9488, #059669, #2b92bb); }
     .filter-pill {
@@ -241,10 +226,6 @@ page-match-team-details {
 
   // ── Responsive ──
   @media (max-width: 359px) {
-    .match-header { padding: 12px 12px 8px; }
-    .header-title { font-size: 16px; }
-    .header-subtitle { font-size: 12px; }
-    .header-detail-text { font-size: 12px; }
     .player-name { font-size: 12px; }
     .player-role { font-size: 10px; }
     .player-avatar { width: 28px; height: 28px; font-size: 12px; border-radius: 6px; }
@@ -264,15 +245,7 @@ page-match-team-details {
     .player-name { font-size: 13px; }
     .filter-pill { font-size: 11px; padding: 5px 10px; }
   }
-  @media (min-width: 400px) {
-    .match-header { padding: 16px 16px 12px; }
-  }
   @media (min-width: 768px) {
-    .match-header { padding: 20px 24px 14px; }
-    .header-title { font-size: 22px; }
-    .header-subtitle { font-size: 14px; }
-    .header-detail-text { font-size: 14px; }
-    .header-actions { gap: 5px; }
     .action-btn { width: 32px; height: 32px; ion-icon { font-size: 16px; } }
     .header-badge { width: 32px; height: 32px; ion-icon { font-size: 16px; } }
     .page-scroll-area { padding: 0 16px 80px; }

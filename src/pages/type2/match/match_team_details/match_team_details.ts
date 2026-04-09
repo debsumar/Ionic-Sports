@@ -15,6 +15,7 @@ import { AppType } from "../../../../shared/constants/module.constants";
 import { TeamsForParentClubModel } from "../../league/models/team.model";
 import { Role } from "../../team/team.model";
 import { ThemeService } from "../../../../services/theme.service";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
 /**
  * Generated class for the MatchTeamDetailsPage page.
  *
@@ -605,6 +606,13 @@ export class MatchTeamDetailsPage {
 
   getAllCount(): number {
     return this.allParticipants.length;
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
+    if (this.match?.VenueName) rows.push({ icon: 'pin', text: this.match.VenueName });
+    return rows;
   }
 
   getAcceptedCount(sectionItems: GetIndividualMatchParticipantModel[]): number {

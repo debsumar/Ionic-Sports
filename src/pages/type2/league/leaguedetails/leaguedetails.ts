@@ -28,6 +28,7 @@ import { AppType } from "../../../../shared/constants/module.constants";
 import { ParticipantModel } from "../../match/matchdetails/matchdetails";
 import { MatchType } from "../../../../shared/utility/enums";
 import { ThemeService } from "../../../../services/theme.service";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
 import { SavedFormation } from "../models/lineup.model";
 /**
  * Generated class for the LeaguedetailsPage page.
@@ -177,6 +178,14 @@ export class LeaguedetailsPage {
     setTimeout(() => {
       this.loadTheme();
     }, 100);
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    const l = this.individualLeague;
+    if (l?.start_date) rows.push({ icon: 'calendar', text: l.start_date + (l.end_date ? ' → ' + l.end_date : '') });
+    if (l?.club?.ClubName) rows.push({ icon: 'pin', text: l.club.ClubName });
+    return rows;
   }
 
   ionViewDidEnter() {

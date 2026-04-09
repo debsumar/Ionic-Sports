@@ -12,6 +12,7 @@ import {
   Events
 } from "ionic-angular";
 import { ThemeService } from "../../../../services/theme.service";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
 import {
   CommonService,
   ToastMessageType,
@@ -149,6 +150,14 @@ export class TeamdetailsPage {
   ionViewDidLoad() {
     console.log("ionViewDidLoad TeamdetailsPage");
     // this.getInvitedStaff();
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    const t = this.teamsForParentClub;
+    if (t?.ageGroup) rows.push({ icon: 'people', text: 'Age Group: ' + t.ageGroup });
+    if (t?.club?.ClubName) rows.push({ icon: 'pin', text: t.club.ClubName });
+    return rows;
   }
 
   ionViewWillEnter() {

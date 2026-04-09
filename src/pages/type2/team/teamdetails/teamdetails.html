@@ -8,36 +8,25 @@
   <div class="page-layout">
     <div class="page-fixed-header">
       <!-- Team Header -->
-      <div class="team-header" *ngIf="teamsForParentClub">
-        <div class="header-main">
-          <div class="header-info">
-            <h2 class="header-title">{{teamsForParentClub.teamName}}</h2>
-            <p class="header-subtitle" *ngIf="teamsForParentClub?.activity">{{teamsForParentClub?.activity?.ActivityName}}</p>
-            <div class="header-detail-row">
-              <ion-icon name="people" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">Age Group: {{teamsForParentClub.ageGroup}}</span>
-            </div>
-            <div class="header-detail-row">
-              <ion-icon name="pin" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">{{teamsForParentClub.club?.ClubName}}</span>
-            </div>
+      <app-detail-header *ngIf="teamsForParentClub"
+        [title]="teamsForParentClub.teamName"
+        [subtitle]="teamsForParentClub?.activity?.ActivityName"
+        [detailRows]="headerDetailRows">
+        <div header-actions>
+          <div class="header-badge" [class.private]="team?.teamVisibility==1">
+            <ion-icon [name]="team?.teamVisibility==0?'globe':'lock'"></ion-icon>
           </div>
-          <div class="header-actions">
-            <div class="header-badge" [class.private]="team?.teamVisibility==1">
-              <ion-icon [name]="team?.teamVisibility==0?'globe':'lock'"></ion-icon>
-            </div>
-            <button class="action-btn" (click)="gotoEditTeam()">
-              <ion-icon name="create"></ion-icon>
-            </button>
-            <button class="action-btn" (click)="!playerType ? gotoMemberemailPage():gotoMultiplayeremailPage()">
-              <ion-icon name="mail"></ion-icon>
-            </button>
-            <button class="action-btn danger" (click)="removeteam()">
-              <ion-icon name="trash"></ion-icon>
-            </button>
-          </div>
+          <button class="action-btn" (click)="gotoEditTeam()">
+            <ion-icon name="create"></ion-icon>
+          </button>
+          <button class="action-btn" (click)="!playerType ? gotoMemberemailPage():gotoMultiplayeremailPage()">
+            <ion-icon name="mail"></ion-icon>
+          </button>
+          <button class="action-btn danger" (click)="removeteam()">
+            <ion-icon name="trash"></ion-icon>
+          </button>
         </div>
-      </div>
+      </app-detail-header>
 
       <!-- Players / Staff Tabs -->
       <app-pill-tabs

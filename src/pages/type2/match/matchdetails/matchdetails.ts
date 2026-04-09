@@ -10,6 +10,7 @@ import moment from "moment";
 import gql from "graphql-tag";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { AllMatchData } from "../../../../shared/model/match.model";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
 /**
  * Generated class for the MatchdetailsPage page.
  *
@@ -158,6 +159,13 @@ export class MatchdetailsPage {
 
   formatMatchStartDate(date) {
     return moment(date, "YYYY-MM-DD HH:mm").local().format("DD-MMM-YYYY hh:mm A");
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
+    if (this.match?.VenueName) rows.push({ icon: 'pin', text: this.match.VenueName });
+    return rows;
   }
 
   getColor(index: number) {

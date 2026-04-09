@@ -8,37 +8,22 @@
   <div class="page-layout">
     <div class="page-fixed-header">
       <!-- Match Header -->
-      <div class="match-header">
-        <div class="header-main">
-          <div class="header-info">
-            <h2 class="header-title">{{matchObj?.match_title}}</h2>
-            <p class="header-subtitle">{{matchObj?.activity_name}} · Team</p>
-            <div class="header-detail-row">
-              <ion-icon name="calendar" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">{{matchObj?.start_date}}</span>
-            </div>
-            <div class="header-detail-row" *ngIf="matchObj?.formatted_round">
-              <ion-icon name="flag" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">Round: {{matchObj?.formatted_round}}</span>
-            </div>
-            <div class="header-detail-row">
-              <ion-icon name="pin" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">{{matchObj?.location_name}}</span>
-            </div>
-          </div>
-          <div class="header-actions">
-            <button class="action-btn danger" (click)="deleteConfirm()">
-              <ion-icon name="trash"></ion-icon>
-            </button>
-            <button class="action-btn" (click)="EditLeague()">
-              <ion-icon name="create"></ion-icon>
-            </button>
-            <button class="action-btn" (click)="selectTeamForEmail()">
-              <ion-icon name="mail"></ion-icon>
-            </button>
-          </div>
+      <app-detail-header
+        [title]="matchObj?.match_title"
+        [subtitle]="(matchObj?.activity_name || '') + ' · Team'"
+        [detailRows]="headerDetailRows">
+        <div header-actions>
+          <button class="action-btn danger" (click)="deleteConfirm()">
+            <ion-icon name="trash"></ion-icon>
+          </button>
+          <button class="action-btn" (click)="EditLeague()">
+            <ion-icon name="create"></ion-icon>
+          </button>
+          <button class="action-btn" (click)="selectTeamForEmail()">
+            <ion-icon name="mail"></ion-icon>
+          </button>
         </div>
-      </div>
+      </app-detail-header>
 
       <!-- Publish Result Banner -->
       <div class="publish-banner" (tap)="gotoSummary()">

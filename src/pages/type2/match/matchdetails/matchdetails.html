@@ -8,30 +8,19 @@
   <div class="page-layout">
     <div class="page-fixed-header">
       <!-- Match Header -->
-      <div class="match-header">
-        <div class="header-main">
-          <div class="header-info">
-            <h2 class="header-title">{{match.MatchTitle}}</h2>
-            <p class="header-subtitle">{{match.ActivityName}} · {{match.MatchType==1?"Singles":"Doubles"}}</p>
-            <div class="header-detail-row">
-              <ion-icon name="calendar" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">{{formatMatchStartDate(match.MatchStartDate)}}</span>
-            </div>
-            <div class="header-detail-row">
-              <ion-icon name="pin" class="header-detail-icon"></ion-icon>
-              <span class="header-detail-text">{{match.VenueName}}</span>
-            </div>
+      <app-detail-header
+        [title]="match.MatchTitle"
+        [subtitle]="match.ActivityName + ' · ' + (match.MatchType==1?'Singles':'Doubles')"
+        [detailRows]="headerDetailRows">
+        <div header-actions>
+          <div class="header-badge" [class.private]="match?.MatchVisibility==1">
+            <ion-icon [name]="match?.MatchVisibility==0?'globe':'lock'"></ion-icon>
           </div>
-          <div class="header-actions">
-            <div class="header-badge" [class.private]="match?.MatchVisibility==1">
-              <ion-icon [name]="match?.MatchVisibility==0?'globe':'lock'"></ion-icon>
-            </div>
-            <button class="action-btn danger" (click)="deleteConfirm()">
-              <ion-icon name="trash"></ion-icon>
-            </button>
-          </div>
+          <button class="action-btn danger" (click)="deleteConfirm()">
+            <ion-icon name="trash"></ion-icon>
+          </button>
         </div>
-      </div>
+      </app-detail-header>
 
       <!-- Publish Banner -->
       <div class="publish-banner" (tap)="goto_publishresult()"
