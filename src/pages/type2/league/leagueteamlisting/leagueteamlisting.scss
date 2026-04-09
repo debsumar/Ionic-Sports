@@ -7,6 +7,7 @@ page-leagueteamlisting {
     padding: 0 !important;
     background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
   }
+  ion-content { margin-bottom: 56px !important; }
 
   // Light Theme Styles
   &.light-theme,

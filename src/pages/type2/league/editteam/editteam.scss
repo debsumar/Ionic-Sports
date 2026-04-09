@@ -4,6 +4,7 @@ page-editteam {
   @include android-sdk35-fixes;
 
   .scroll-content { background-color: #0f172a !important; padding: 0 !important; }
+  ion-content { margin-bottom: 56px !important; }
   ion-list { margin: 12px !important; background: transparent !important; }
   .item, .item-inner, .item-block { background-color: transparent !important; border: none !important; }
 

@@ -4,7 +4,7 @@ page-updateroleforstaff {
   @include android-sdk35-fixes;
 
   .scroll-content { padding: 0 !important; overflow: hidden !important; background: #0f172a !important; }
-  ion-content { background: #0f172a !important; }
+  ion-content { background: #0f172a !important; margin-bottom: 56px !important; }
 
   .page-layout { display: flex; flex-direction: column; height: 100%; }
   .page-fixed-header { flex-shrink: 0; background: #0f172a; z-index: 10; }

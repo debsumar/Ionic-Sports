@@ -4,7 +4,7 @@ page-matchladder {
   @include android-sdk35-fixes;
 
   .scroll-content { padding: 0 !important; overflow: hidden !important; background: #0f172a !important; }
-  ion-content { background: #0f172a !important; }
+  ion-content { background: #0f172a !important; margin-bottom: 56px !important; }
 
   // ── Layout ──
   .page-layout { display: flex; flex-direction: column; height: 100%; }

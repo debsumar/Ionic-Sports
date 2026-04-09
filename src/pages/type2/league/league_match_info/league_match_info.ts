@@ -384,11 +384,11 @@ export class LeagueMatchInfoPage {
     const rows: DetailHeaderRow[] = [];
     if (this.matchObj?.start_date) rows.push({ icon: 'calendar', text: this.matchObj.start_date });
     if (this.matchObj?.formatted_round) rows.push({ icon: 'flag', text: 'Round: ' + this.matchObj.formatted_round });
-    if (this.matchObj?.location_name) rows.push({ icon: 'pin', text: this.matchObj.location_name });
+    if (this.matchObj?.club_name) rows.push({ icon: 'pin', text: this.matchObj.club_name });
     return rows;
   }
 
-  getAcceptedCount(sectionItems: LeagueMatchParticipantModel[],section_index:number): number {
+  getAcceptedCount(sectionItems: LeagueMatchParticipantModel[], section_index: number): number {
     return sectionItems.filter(item =>
       item.invite_status === LeaguePlayerInviteStatus.Accepted ||
       item.invite_status === LeaguePlayerInviteStatus.AdminAccepted
