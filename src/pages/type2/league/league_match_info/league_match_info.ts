@@ -425,8 +425,13 @@ export class LeagueMatchInfoPage {
     });
   }
 
+  gotoViewCoaches() {
+    this.navCtrl.push('ViewCoachesPage', { match_id: this.matchObj.match_id });
+  }
+
   gotoSummary() {
     this.closeFab();
+
     const homeTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedHomeTeamText);
     const awayTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedAwayTeamText);
 

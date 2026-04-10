@@ -268,8 +268,14 @@ export class MatchTeamDetailsPage {
     });
   }
 
+  gotoViewCoaches() {
+    this.closeFab();
+    this.navCtrl.push('ViewCoachesPage', { match_id: this.match.MatchId });
+  }
+
   publish() {
     this.closeFab();
+
 
     // Debug: Check available team properties
     console.log("Available teams:", this.activitySpecificTeamsRes);

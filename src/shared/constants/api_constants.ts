@@ -118,6 +118,8 @@ export const API = {
     GetIndividualMatchParticipant: `match/GetIndividualMatchParticipant`,
     FetchAllMatches: `match/FetchAllMatches`,
     FETCH_COACHES: `coach/FetchCoaches`,
+    UPDATE_LEAGUE_COACH: `league/updateLeagueCoach`,
+    GET_MATCH_COACHES: `league/getMatchCoaches`,
     UPDATE_RESULT_ENTITY: `LeagueResult/updateResultEntity`,
     GET_RESULT_STATUS_BY_ACTIVITY: `LeagueResult/getResultStatusByActivity`,
     UpdateLeagueMatchInviteStatus: `league/UpdateLeagueMatchInviteStatus`,
