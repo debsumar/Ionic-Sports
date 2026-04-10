@@ -635,6 +635,10 @@ export class MatchdetailsPage {
   }
 
 
+  gotoEditMatch() {
+    this.navCtrl.push('EditmatchPage', { match: this.match });
+  }
+
   deleteConfirm() {
     let match_delete_alert = this.alertCtrl.create({
       title: "Do you want to delete the match?",

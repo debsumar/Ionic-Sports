@@ -76,15 +76,6 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Coach</ion-label>
-        <ion-select multiple="true" [(ngModel)]="selectedCoaches">
-          <ion-option *ngFor="let coach of coaches" [value]="coach.Id">{{coach.first_name}} {{coach.last_name}}</ion-option>
-        </ion-select>
-      </ion-item>
-    </app-form-field>
-
-    <app-form-field [isDark]="isDarkTheme">
-      <ion-item>
         <ion-label>Date</ion-label>
         <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="startDate"
           [max]="maxDate"></ion-datetime>

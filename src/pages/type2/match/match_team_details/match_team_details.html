@@ -17,6 +17,9 @@
           <div class="header-badge" [class.private]="match?.MatchVisibility==1">
             <ion-icon [name]="match?.MatchVisibility==0?'globe':'lock'"></ion-icon>
           </div>
+          <button class="action-btn" (click)="gotoEditMatch()">
+            <ion-icon name="create"></ion-icon>
+          </button>
           <button class="action-btn danger" (click)="deleteConfirm()"
             *ngIf="(match) && (!match.Result || !match.Result.CreatedAt)">
             <ion-icon name="trash"></ion-icon>

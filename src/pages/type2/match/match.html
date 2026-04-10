@@ -32,7 +32,7 @@
               <span class="detail-text">{{formatMatchStartDate(match.MatchStartDate)}}</span>
               <span class="detail-dot">·</span>
               <ion-icon name="pin" class="detail-icon"></ion-icon>
-              <span class="detail-text venue-text">{{match.VenueName}}</span>
+              <span class="detail-text venue-text">{{match.location && match.location !== '' ? match.location : match.VenueName}}</span>
             </div>
             <div class="corner-ribbon" [class.private]="match.MatchVisibility==1">
               <ion-icon [name]="match.MatchVisibility==0 ? 'globe' : 'lock'"></ion-icon>

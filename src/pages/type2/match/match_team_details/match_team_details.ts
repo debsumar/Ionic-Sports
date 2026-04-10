@@ -268,6 +268,10 @@ export class MatchTeamDetailsPage {
     });
   }
 
+  gotoEditMatch() {
+    this.navCtrl.push('EditmatchPage', { match: this.match });
+  }
+
   gotoViewCoaches() {
     this.closeFab();
     this.navCtrl.push('ViewCoachesPage', { match_id: this.match.MatchId });

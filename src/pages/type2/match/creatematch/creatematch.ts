@@ -22,7 +22,6 @@ import { MatchDuration } from "../../../../shared/model/utility.model";
 import moment from "moment";
 import { ClubVenue, SchoolVenue } from "../models/venue.model";
 import { GraphqlService } from "../../../../services/graphql.service";
-import { CoachList } from "../../league/leaguemodels/creatematchforleague.dto";
 import { Activities, Activity, ClubActivityInput, IClubDetails } from "../../../../shared/model/club.model";
 import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
@@ -53,8 +52,6 @@ export class CreatematchPage {
   durations: MatchDuration[] = [];
   selectedDuration: number;
   currency: string;
-  coaches: CoachList[];
-  selectedCoaches: string[] = [];
 
   roundTypeInput: RoundTypeInput = {
     parentclubId: '',
@@ -216,7 +213,6 @@ export class CreatematchPage {
       this.getRoundTypes();
       this.getLeagueCategory();
       this.getDurations();
-      this.getCoachList();
     });
     this.storage.get('Currency').then((currency) => {
       if (currency) { const c = JSON.parse(currency); this.currency = c.CurrencySymbol; }
@@ -271,22 +267,6 @@ export class CreatematchPage {
     const input = { ...this.commonInput, app_type: AppType.ADMIN_NEW };
     this.httpService.post(`${API.GET_DURATIONS}`, input).subscribe({
       next: (res: any) => { this.durations = res.data || []; if (this.durations.length > 0) this.selectedDuration = this.durations[0].id; }
-    });
-  }
-
-  getCoachList() {
-    const payload = {
-      ...this.commonInput,
-      parentclubId: this.sharedservice.getPostgreParentClubId(),
-      id: '',
-      email_id: '',
-      fetch_from: 1
-    };
-    this.httpService.post(`${API.FETCH_COACHES}`, payload).subscribe({
-      next: (res: any) => {
-        this.coaches = res.data || [];
-        if (this.coaches.length > 0) this.selectedCoaches = [this.coaches[0].Id];
-      }
     });
   }
 
@@ -492,7 +472,6 @@ export class CreatematchPage {
           location_id: this.createMatchInput.location_id,
           location: this.mapLocationAddress || '',
           MatchDuration: this.createMatchInput.MatchDuration,
-          coach_ids: this.selectedCoaches || [],
           UserParentClubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
           UserActivityId: this.createMatchInput.user_postgre_metadata.UserActivityId,
           UserActionType: 0

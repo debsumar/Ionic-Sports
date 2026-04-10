@@ -100,6 +100,7 @@ export const API = {
     Get_Round_Types: `league/getRoundTypes`,
     GET_DURATIONS: `utility/getDurations`,
     CREATE_MATCH: `match/CreateMatch`,
+    EDIT_MATCH: `match/EditMatch`,
     GENERATE_MATCHES: `league/generate-matches`,
     Get_League_Match_Result: `LeagueResult/getLeagueMatchResult`,
     Publish_League_Result_For_Activities: `LeagueResult/publishLeagueResultForActivities`,
