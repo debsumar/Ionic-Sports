@@ -4,6 +4,8 @@ page-view-coaches {
   // ── Light Theme ──
   &.light-theme {
     .coaches-listing { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%); }
+    .scroll-content { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important; }
+    ion-content { background: #f8fafc !important; }
     .page-fixed-header { background: #f8fafc; }
     .header-title { color: #1e293b; }
     .back-btn ion-icon { color: #1e293b !important; }
@@ -11,19 +13,22 @@ page-view-coaches {
       background: rgba(255, 255, 255, 0.55); border-color: rgba(226, 232, 240, 0.6);
       box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
       &.selected { border-color: #2b92bb; }
+      &.removing { border-color: #ef4444; }
     }
     .card-content { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, transparent 75%); }
     .card-title { color: #1e293b !important; }
     .card-subtitle { color: #64748b !important; }
-    .card-icon-wrapper { background: rgba(0, 0, 0, 0.06) !important; border-color: rgba(0, 0, 0, 0.08) !important;
-      .card-icon { color: #475569 !important; }
-    }
+    .coach-avatar { background: rgba(43, 146, 187, 0.12); color: #2b92bb; }
+    .coach-avatar-img { border-color: rgba(43, 146, 187, 0.2); }
     .card-divider { background: rgba(226, 232, 240, 0.6); }
     .detail-text { color: #0f172a !important; }
     .detail-icon { color: #2b92bb !important; }
     .check-circle { border-color: #cbd5e1; &.checked { background: #2b92bb; border-color: #2b92bb; } }
     .existing-badge { background: rgba(16, 185, 129, 0.1); color: #059669; &.remove { background: rgba(239, 68, 68, 0.1); color: #dc2626; } }
-    .revamp-card.removing { border-color: #ef4444; }
+    .summary-bar { background: transparent; border: none; }
+    .coach-chip { background: rgba(0, 0, 0, 0.06); color: #475569; &.qual { background: rgba(43, 146, 187, 0.1); color: #2b92bb; } }
+    .hint-text { color: #94a3b8; }
+    .btn-gradient-shine.btn-disabled { background: #e2e8f0; color: #94a3b8; }
     .modern-empty-state {
       .empty-icon { color: #cbd5e1; }
       .empty-title { color: #1e293b; }
@@ -48,6 +53,20 @@ page-view-coaches {
   }
   .header-title { font-size: 18px; font-weight: 700; color: #f1f5f9; letter-spacing: -0.3px; }
 
+  // ── Summary Bar ──
+  .summary-bar {
+    display: flex; align-items: center; gap: 12px; padding: 8px 12px;
+    background: transparent; border-radius: 8px; margin-top: 6px;
+  }
+  .summary-item {
+    display: flex; align-items: center; gap: 5px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.2px; color: #94a3b8;
+    &.added { color: #10b981; .summary-dot { background: #10b981; } }
+    &.new { color: #35adff; .summary-dot { background: #35adff; } }
+    &.removed { color: #ef4444; .summary-dot { background: #ef4444; } }
+  }
+  .summary-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+
   .page-scroll-area { flex: 1; padding: 0 12px 80px; overflow-y: auto; }
 
   .items-container {
@@ -63,7 +82,7 @@ page-view-coaches {
     backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
     cursor: pointer; overflow: hidden;
-    transition: transform 0.2s ease, border-color 0.2s ease;
+    transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
     &:active { transform: scale(0.98); }
     &.selected { border-color: #2b92bb; }
     &.removing { border-color: #ef4444; opacity: 0.6; }
@@ -79,13 +98,16 @@ page-view-coaches {
 
   .card-top-row { display: flex; align-items: center; gap: 10px; }
 
-  .card-icon-wrapper {
-    width: 40px; height: 40px; border-radius: 10px;
-    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    .card-icon { font-size: 18px; color: #fff; }
+  // ── Avatar ──
+  .coach-avatar {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(43, 146, 187, 0.2); color: #3fbcd3;
+    font-size: 14px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .coach-avatar-img {
+    width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0;
+    object-fit: cover; border: 2px solid rgba(43, 146, 187, 0.3);
   }
 
   .card-info {
@@ -108,6 +130,16 @@ page-view-coaches {
     &.remove { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
   }
 
+  // ── Coach Chips ──
+  .coach-chips { display: flex; flex-wrap: wrap; gap: 5px; }
+  .coach-chip {
+    padding: 2px 8px; border-radius: 20px;
+    font-size: 10px; font-weight: 600; letter-spacing: 0.2px;
+    background: rgba(255, 255, 255, 0.08); color: #94a3b8;
+    max-width: 160px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    &.qual { background: rgba(43, 146, 187, 0.15); color: #3fbcd3; }
+  }
+
   .card-divider { height: 1px; background: rgba(71, 85, 105, 0.3); }
 
   .detail-row {
@@ -116,19 +148,31 @@ page-view-coaches {
     .detail-text { font-size: 13px; font-weight: 600; color: #f1f5f9; }
   }
 
+  // ── Hint Text ──
+  .hint-text {
+    text-align: center; padding: 16px 0 0;
+    font-size: 12px; font-weight: 500; color: #64748b; letter-spacing: 0.1px;
+  }
+
+  // ── CTA Button ──
   .btn-gradient-shine {
     position: sticky; bottom: 16px;
     width: calc(100% - 32px); margin: 0 auto; display: block;
     height: 48px; border-radius: 8px; border: none;
-    background: linear-gradient(135deg, #2b92bb, #35adff);
     color: #fff; font-size: 16px; font-weight: 700; letter-spacing: 0.5px;
     cursor: pointer; z-index: 20;
     overflow: hidden; position: relative;
+    transition: background 0.3s ease;
     &::after {
       content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
       animation: shine-sweep 3s infinite;
     }
+    // Color variants
+    &.btn-add { background: linear-gradient(135deg, #2b92bb, #35adff); }
+    &.btn-remove { background: linear-gradient(135deg, #dc2626, #ef4444); }
+    &.btn-update { background: linear-gradient(135deg, #2b92bb, #35adff); }
+    &.btn-disabled { background: #334155; color: #64748b; opacity: 0.7; &::after { display: none; } }
   }
 
   @keyframes shine-sweep {
@@ -146,12 +190,16 @@ page-view-coaches {
 
   @media (max-width: 359px) {
     .card-content { padding: 10px; gap: 8px; }
-    .card-icon-wrapper { width: 34px; height: 34px; .card-icon { font-size: 15px; } }
+    .coach-avatar, .coach-avatar-img { width: 34px; height: 34px; font-size: 12px; }
     .card-info .card-title { font-size: 13px; }
+    .coach-chip { font-size: 9px; max-width: 120px; }
+    .summary-bar { gap: 8px; padding: 6px 10px; }
+    .summary-item { font-size: 10px; }
   }
   @media (min-width: 768px) {
     .card-content { padding: 16px; gap: 12px; }
-    .card-icon-wrapper { width: 44px; height: 44px; .card-icon { font-size: 20px; } }
+    .coach-avatar, .coach-avatar-img { width: 44px; height: 44px; font-size: 16px; }
     .card-info .card-title { font-size: 16px; }
+    .coach-chip { font-size: 11px; max-width: 200px; }
   }
 }

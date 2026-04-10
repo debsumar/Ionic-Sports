@@ -31,8 +31,7 @@ export interface DetailHeaderRow {
     app-detail-header .detail-header {
       --accent: #2b92bb;
       position: relative; padding: 22px 18px 16px 22px; overflow: hidden;
-      background: linear-gradient(135deg, #1e293b 60%, var(--accent));
-    }
+      background: linear-gradient(135deg, #1e293b 70%, var(--accent));
     }
 
     /* Left accent strip */
@@ -46,7 +45,7 @@ export interface DetailHeaderRow {
     app-detail-header .detail-header-glow {
       position: absolute; top: -30px; right: -30px; width: 120px; height: 120px;
       background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-      opacity: 0.2; pointer-events: none;
+      opacity: 0.12; pointer-events: none;
     }
 
     /* Title */
@@ -104,7 +103,7 @@ export interface DetailHeaderRow {
 
     /* ── Light theme ── */
     .light-theme app-detail-header .detail-header {
-      background: linear-gradient(135deg, #f8fafc 60%, var(--accent));
+      background: linear-gradient(135deg, #f8fafc 70%, var(--accent));
     }
     .light-theme app-detail-header .detail-header-title { color: #0f172a; }
     .light-theme app-detail-header .detail-header-subtitle { color: #1e293b; background: rgba(0, 0, 0, 0.08); }
@@ -142,7 +141,7 @@ export class DetailHeaderComponent implements OnChanges {
   @Input() detailRows: DetailHeaderRow[] = [];
   @Input() accentColor: string = '#2b92bb';
 
-  constructor(private el: ElementRef) {}
+  constructor(private el: ElementRef) { }
 
   ngOnChanges(changes: SimpleChanges) {
     if (changes.accentColor) {

@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, Events } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Events, AlertController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { ThemeService } from '../../../../services/theme.service';
@@ -45,19 +45,26 @@ export class ViewCoachesPage {
     public sharedservice: SharedServices,
     private httpService: HttpService,
     private themeService: ThemeService,
-    private events: Events
+    private events: Events,
+    private alertCtrl: AlertController
   ) {
     this.matchId = this.navParams.get('match_id') || '';
   }
 
   ionViewDidLoad() {
-    this.loadTheme();
+    setTimeout(() => this.loadTheme(), 100);
   }
 
   ionViewWillEnter() {
     this.loadTheme();
-    this.themeService.isDarkTheme$.subscribe(isDark => this.applyTheme(isDark));
-    this.events.subscribe('theme:changed', isDark => this.applyTheme(isDark));
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
 
     this.commonInput.parentclubId = this.sharedservice.getPostgreParentClubId();
     this.commonInput.memberId = this.sharedservice.getLoggedInUserId();
@@ -68,24 +75,67 @@ export class ViewCoachesPage {
     this.fetchCoaches();
   }
 
+  ionViewDidEnter() {
+    setTimeout(() => this.forceThemeCheck(), 50);
+    setTimeout(() => this.forceThemeCheck(), 200);
+    setTimeout(() => this.forceThemeCheck(), 500);
+  }
+
   ionViewWillLeave() {
     this.events.unsubscribe('theme:changed');
   }
 
-  private loadTheme() {
+  private loadTheme(): void {
     this.storage.get('dashboardTheme').then(isDarkTheme => {
-      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
       this.isDarkTheme = isDark;
       this.applyTheme(isDark);
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme(true);
     });
   }
 
-  private applyTheme(isDark: boolean) {
+  private applyTheme(isDark: boolean): void {
     this.isDarkTheme = isDark;
-    const el = document.querySelector('page-view-coaches');
-    if (el) {
-      isDark ? el.classList.remove('light-theme') : el.classList.add('light-theme');
+    const applyThemeToElement = () => {
+      const el = document.querySelector('page-view-coaches');
+      if (el) {
+        if (isDark) {
+          el.classList.remove('light-theme');
+          document.body.classList.remove('light-theme');
+        } else {
+          el.classList.add('light-theme');
+          document.body.classList.add('light-theme');
+        }
+        return true;
+      }
+      return false;
+    };
+    if (!applyThemeToElement()) {
+      let retryCount = 0;
+      const retryApply = () => {
+        if (retryCount < 5 && !applyThemeToElement()) {
+          retryCount++;
+          setTimeout(retryApply, 100 * retryCount);
+        }
+      };
+      setTimeout(retryApply, 50);
     }
+  }
+
+  private forceThemeCheck(): void {
+    this.storage.get('dashboardTheme').then(storageTheme => {
+      const bodyHasLightTheme = document.body.classList.contains('light-theme');
+      let isDark = true;
+      if (storageTheme !== null && storageTheme !== undefined) {
+        isDark = storageTheme;
+      } else if (bodyHasLightTheme) {
+        isDark = false;
+      }
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
   }
 
   fetchCoaches() {
@@ -132,6 +182,28 @@ export class ViewCoachesPage {
     }
   }
 
+  // 🎨 Avatar helpers
+  getInitials(coach: any): string {
+    return ((coach.first_name?.charAt(0) || '') + (coach.last_name?.charAt(0) || '')).toUpperCase();
+  }
+
+  hasProfileImage(coach: any): boolean {
+    return coach.profile_image && coach.profile_image.trim() !== '';
+  }
+
+  // 📊 Summary counts
+  getAddedCount(): number {
+    return this.existingCoachIds.filter(id => this.selectedCoachIds.indexOf(id) > -1).length;
+  }
+
+  getNewCount(): number {
+    return this.selectedCoachIds.filter(id => this.existingCoachIds.indexOf(id) === -1).length;
+  }
+
+  getRemovedCount(): number {
+    return this.existingCoachIds.filter(id => this.selectedCoachIds.indexOf(id) === -1).length;
+  }
+
   toggleCoach(coachId: string) {
     const idx = this.selectedCoachIds.indexOf(coachId);
     idx > -1 ? this.selectedCoachIds.splice(idx, 1) : this.selectedCoachIds.push(coachId);
@@ -160,6 +232,30 @@ export class ViewCoachesPage {
     if (hasNew && !hasRemoved) return 'Add Coaches';
     if (hasRemoved && !hasNew) return 'Remove Coaches';
     return 'Update Coaches';
+  }
+
+  getButtonClass(): string {
+    const label = this.getButtonLabel();
+    if (label === 'Add Coaches') return 'btn-add';
+    if (label === 'Remove Coaches') return 'btn-remove';
+    return 'btn-update';
+  }
+
+  onButtonClick() {
+    if (this.getButtonLabel() === 'Remove Coaches') {
+      const count = this.getRemovedCount();
+      const alert = this.alertCtrl.create({
+        title: 'Remove Coaches',
+        message: `Are you sure you want to remove ${count} coach${count > 1 ? 'es' : ''} from this match?`,
+        buttons: [
+          { text: 'Cancel', role: 'cancel' },
+          { text: 'Remove', handler: () => this.updateCoachAssignment() }
+        ]
+      });
+      alert.present();
+    } else {
+      this.updateCoachAssignment();
+    }
   }
 
   updateCoachAssignment() {

@@ -13,6 +13,19 @@
         [count]="filteredCoaches.length"
         (search)="onSearch($event)">
       </app-search-bar>
+
+      <!-- Summary Bar -->
+      <div class="summary-bar" *ngIf="existingCoachIds.length > 0 || hasChanges()">
+        <span class="summary-item added" *ngIf="getAddedCount() > 0">
+          <span class="summary-dot"></span> {{getAddedCount()}} Added
+        </span>
+        <span class="summary-item new" *ngIf="getNewCount() > 0">
+          <span class="summary-dot"></span> {{getNewCount()}} New
+        </span>
+        <span class="summary-item removed" *ngIf="getRemovedCount() > 0">
+          <span class="summary-dot"></span> {{getRemovedCount()}} Will Remove
+        </span>
+      </div>
     </div>
 
     <div class="page-scroll-area">
@@ -24,9 +37,8 @@
           <div class="card-accent"></div>
           <div class="card-content">
             <div class="card-top-row">
-              <div class="card-icon-wrapper">
-                <ion-icon name="person" class="card-icon"></ion-icon>
-              </div>
+              <div class="coach-avatar" *ngIf="!hasProfileImage(coach)">{{getInitials(coach)}}</div>
+              <img class="coach-avatar-img" *ngIf="hasProfileImage(coach)" [src]="coach.profile_image">
               <div class="card-info">
                 <h3 class="card-title">{{coach.first_name}} {{coach.last_name}}</h3>
                 <p class="card-subtitle">{{coach.email_id}}</p>
@@ -36,6 +48,11 @@
               <div class="check-circle" [class.checked]="isSelected(coach.Id)">
                 <ion-icon name="checkmark" *ngIf="isSelected(coach.Id)"></ion-icon>
               </div>
+            </div>
+            <!-- Coach Detail Chips -->
+            <div class="coach-chips" *ngIf="coach.title || coach.qualification">
+              <span class="coach-chip" *ngIf="coach.title">{{coach.title}}</span>
+              <span class="coach-chip qual" *ngIf="coach.qualification">{{coach.qualification}}</span>
             </div>
             <div class="card-divider"></div>
             <div class="card-details">
@@ -53,11 +70,14 @@
         <div class="empty-title">No Coaches Found</div>
         <div class="empty-description">No coaches available at the moment</div>
       </div>
+
+      <!-- Hint text when no changes -->
     </div>
 
-    <button class="btn-gradient-shine" *ngIf="hasChanges()"
-      (click)="updateCoachAssignment()">
-      {{getButtonLabel()}}
+    <button class="btn-gradient-shine" [ngClass]="hasChanges() ? getButtonClass() : 'btn-disabled'"
+      [disabled]="!hasChanges()"
+      (click)="onButtonClick()">
+      {{hasChanges() ? getButtonLabel() : 'Tap to select or deselect coaches'}}
     </button>
   </div>
 </ion-content>
