@@ -11,6 +11,9 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
         <ion-icon *ngIf="leftIcon" [name]="leftIcon"></ion-icon>
         {{leftLabel}}
         <span class="pill-count" *ngIf="leftCount !== null && leftCount !== undefined">{{leftCount}}</span>
+        <span class="pill-action" *ngIf="leftActionIcon" (click)="onAction($event, 'left')">
+          <ion-icon [name]="leftActionIcon"></ion-icon>
+        </span>
       </button>
       <button *ngIf="centerLabel" class="pill-tabs-btn" [class.active]="activeIndex===1" (click)="select(1)">
         <ion-icon *ngIf="centerIcon" [name]="centerIcon"></ion-icon>
@@ -22,6 +25,9 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
         <ion-icon *ngIf="rightIcon" [name]="rightIcon"></ion-icon>
         {{rightLabel}}
         <span class="pill-count" *ngIf="rightCount !== null && rightCount !== undefined">{{rightCount}}</span>
+        <span class="pill-action" *ngIf="rightActionIcon" (click)="onAction($event, 'right')">
+          <ion-icon [name]="rightActionIcon"></ion-icon>
+        </span>
       </button>
     </div>
   `,
@@ -56,6 +62,22 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
     app-pill-tabs .pill-tabs-btn.active .pill-count {
       background: rgba(255, 255, 255, 0.25);
     }
+    app-pill-tabs .pill-action {
+      display: flex; align-items: center; justify-content: center;
+      width: 20px; height: 20px; border-radius: 50%;
+      background: rgba(255, 255, 255, 0.15); margin-left: 4px;
+      cursor: pointer; transition: background 0.2s ease;
+    }
+    app-pill-tabs .pill-action ion-icon { font-size: 12px; color: #94a3b8; }
+    app-pill-tabs .pill-action:active { background: rgba(255, 255, 255, 0.3); }
+    app-pill-tabs .pill-tabs-btn.active .pill-action { background: rgba(255, 255, 255, 0.2); }
+    app-pill-tabs .pill-tabs-btn.active .pill-action ion-icon { color: #ffffff; }
+
+    .light-theme app-pill-tabs .pill-action { background: rgba(0, 0, 0, 0.08); }
+    .light-theme app-pill-tabs .pill-action ion-icon { color: #64748b; }
+    .light-theme app-pill-tabs .pill-action:active { background: rgba(0, 0, 0, 0.15); }
+    .light-theme app-pill-tabs .pill-tabs-btn.active .pill-action { background: rgba(255, 255, 255, 0.25); }
+    .light-theme app-pill-tabs .pill-tabs-btn.active .pill-action ion-icon { color: #ffffff; }
 
     .light-theme app-pill-tabs .pill-tabs { background: #e2e8f0; }
     .light-theme app-pill-tabs .pill-tabs-slider { box-shadow: 0 2px 8px rgba(43, 146, 187, 0.3); }
@@ -76,7 +98,11 @@ export class PillTabsComponent {
   @Input() rightCount: number = null;
   @Input() centerCount: number = null;
   @Input() activeIndex: number = 0;
+  @Input() leftActionIcon: string;
+  @Input() rightActionIcon: string;
   @Output() activeIndexChange = new EventEmitter<number>();
+  @Output() leftActionClick = new EventEmitter<void>();
+  @Output() rightActionClick = new EventEmitter<void>();
 
   get hasCenter(): boolean { return !!this.centerLabel; }
 
@@ -91,5 +117,11 @@ export class PillTabsComponent {
   select(index: number) {
     this.activeIndex = index;
     this.activeIndexChange.emit(index);
+  }
+
+  onAction(event: Event, side: string) {
+    event.stopPropagation();
+    if (side === 'left') this.leftActionClick.emit();
+    else this.rightActionClick.emit();
   }
 }
