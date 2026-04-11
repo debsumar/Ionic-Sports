@@ -276,8 +276,7 @@ export class MatchTeamDetailsPage {
 
   gotoRecurringMatches() {
     this.closeFab();
-    // TODO: implement navigation to recurring matches page
-    this.commonService.toastMessage('Coming soon', 2000, ToastMessageType.Info);
+    this.navCtrl.push('AddrecurringmatchesPage', { match: JSON.stringify(this.match) });
   }
 
   gotoViewCoaches() {

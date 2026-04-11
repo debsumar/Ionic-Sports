@@ -1,5 +1,5 @@
-import { Component, Renderer2 } from "@angular/core";
-import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, Events } from "ionic-angular";
+import { Component, Renderer2, ViewChild } from "@angular/core";
+import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, Events, FabContainer } from "ionic-angular";
 import { ThemeService } from "../../../../services/theme.service";
 import { Storage } from "@ionic/storage";
 import { SharedServices } from "../../../services/sharedservice";
@@ -24,6 +24,7 @@ import { DetailHeaderRow } from "../../../../shared/components/detail-header/det
   templateUrl: "matchdetails.html",
 })
 export class MatchdetailsPage {
+  @ViewChild('fab') fab: FabContainer;
   isDarkTheme: boolean = false;
   activeType: boolean = true;
   invitedType: boolean = true;
@@ -641,6 +642,15 @@ export class MatchdetailsPage {
 
   gotoEditMatch() {
     this.navCtrl.push('EditmatchPage', { match: this.match });
+  }
+
+  closeFab() {
+    if (this.fab) this.fab.close();
+  }
+
+  gotoRecurringMatches() {
+    this.closeFab();
+    this.navCtrl.push('AddrecurringmatchesPage', { match: JSON.stringify(this.match) });
   }
 
   deleteConfirm() {

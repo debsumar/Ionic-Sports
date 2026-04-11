@@ -170,6 +170,8 @@ export class LeagueMatchInfoPage {
   parentClubKey: string;
   showPlayerSheet: boolean = false;
   selectedPlayer: LeagueMatchParticipantModel = null;
+  showTeamSheet: boolean = false;
+  teamSheetIsHome: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -741,52 +743,34 @@ export class LeagueMatchInfoPage {
   showAvailableTeams(isHomeTeam: boolean): void {
     this.closeFab();
     if (this.leagueParticipantForMatchRes.length > 0) {
-
-      let alert = this.alertCtrl.create();
-      alert.setTitle(`Select Team`);
-
-      for (let userIndex = 0; userIndex < this.leagueParticipantForMatchRes.length; userIndex++) {
-        alert.addInput({
-          type: 'radio',
-          label: this.leagueParticipantForMatchRes[userIndex].parentclubteam.teamName,
-          value: this.leagueParticipantForMatchRes[userIndex].id,
-          checked: isHomeTeam ? this.leagueParticipantForMatchRes[userIndex].parentclubteam.teamName == this.selectedHomeTeamText : this.leagueParticipantForMatchRes[userIndex].parentclubteam.teamName == this.selectedAwayTeamText
-        });
-      }
-
-      alert.addButton('Cancel');
-      alert.addButton({
-        text: 'OK',
-        handler: (selectedVal) => {
-          if (!selectedVal) {
-            this.commonService.toastMessage("Please select a team", 3000, ToastMessageType.Info);
-            return false; // prevent alert from dismissing          
-          }
-          this.selectedTeam = this.leagueParticipantForMatchRes.find(team => team.id === selectedVal);
-          if (isHomeTeam) {
-            if (selectedVal === this.selectedAwayTeamText) {
-              this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
-            } else {
-              this.UpdateLeagueFixtureInput.HomeParticipantId = selectedVal;
-              this.UpdateLeagueFixtureInput.AwayParticipantId = ""; //setting the deafult val to ""
-              this.updateLeagueFixture(isHomeTeam, this.selectedTeam.parentclubteam.teamName);
-            }
-          } else {
-            if (selectedVal === this.selectedHomeTeamText) {
-              this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
-            } else {
-              this.UpdateLeagueFixtureInput.AwayParticipantId = selectedVal;
-              this.UpdateLeagueFixtureInput.HomeParticipantId = ""; //setting the deafult val to ""
-              this.updateLeagueFixture(isHomeTeam, this.selectedTeam.parentclubteam.teamName);
-            }
-          }
-        }
-      });
-
-      alert.present();
-
+      this.teamSheetIsHome = isHomeTeam;
+      this.showTeamSheet = true;
     } else {
       this.commonService.toastMessage("No teams available", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
+    }
+  }
+
+  onTeamSelected(team: LeagueParticipationForMatchModel): void {
+    this.showTeamSheet = false;
+    const isHomeTeam = this.teamSheetIsHome;
+    this.selectedTeam = team;
+
+    if (isHomeTeam) {
+      if (team.parentclubteam.teamName === this.selectedAwayTeamText) {
+        this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
+        return;
+      }
+      this.UpdateLeagueFixtureInput.HomeParticipantId = team.id;
+      this.UpdateLeagueFixtureInput.AwayParticipantId = "";
+      this.updateLeagueFixture(isHomeTeam, team.parentclubteam.teamName);
+    } else {
+      if (team.parentclubteam.teamName === this.selectedHomeTeamText) {
+        this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
+        return;
+      }
+      this.UpdateLeagueFixtureInput.AwayParticipantId = team.id;
+      this.UpdateLeagueFixtureInput.HomeParticipantId = "";
+      this.updateLeagueFixture(isHomeTeam, team.parentclubteam.teamName);
     }
   }
 

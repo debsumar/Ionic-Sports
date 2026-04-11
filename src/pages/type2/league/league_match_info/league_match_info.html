@@ -45,6 +45,10 @@
         [leftLabel]="selectedHomeTeamText"
         [rightLabel]="selectedAwayTeamText"
         [activeIndex]="activeTabIndex"
+        [leftActionIcon]="'repeat'"
+        [rightActionIcon]="'repeat'"
+        (leftActionClick)="showAvailableTeams(true)"
+        (rightActionClick)="showAvailableTeams(false)"
         (activeIndexChange)="onTabChange($event)">
       </app-pill-tabs>
     </div>
@@ -161,9 +165,22 @@
       <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
     </div>
   </app-bottom-sheet>
+  <!-- Team Selection Bottom Sheet -->
+  <app-bottom-sheet [(visible)]="showTeamSheet"
+    [title]="teamSheetIsHome ? 'Select Home Team' : 'Select Away Team'"
+    [bottomOffset]="0">
+    <div *ngFor="let team of leagueParticipantForMatchRes"
+      class="sheet-item team-sheet-item"
+      [class.selected]="teamSheetIsHome ? team.parentclubteam.teamName === selectedHomeTeamText : team.parentclubteam.teamName === selectedAwayTeamText"
+      (click)="onTeamSelected(team)">
+      <div class="team-radio"></div>
+      <div class="sheet-item-info"><span class="sheet-item-name">{{team.parentclubteam.teamName}}</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+  </app-bottom-sheet>
 </ion-content>
 
-<ion-fab mini right bottom #fab *ngIf="!showPlayerSheet">
+<ion-fab mini right bottom #fab *ngIf="!showPlayerSheet && !showTeamSheet">
   <button class="fab-main" ion-fab mini>
     <ion-icon name="add"></ion-icon>
   </button>

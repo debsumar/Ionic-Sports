@@ -89,6 +89,7 @@ export const API = {
     REMOVE_COUPON: `events/coupons/delete_coupon`,
     EVENT_PRINT_REPORT: `events/bookings/printeventreport`,
     GET_LEAGUE_MATCHES: `league/getLeagueMatches`,
+    GET_ALL_LEAGUES: `league/get-all-leagues`,
     DELETE_LEAGUE_MATCHES: `league/deleteLeagueMatches`,
     Get_League_Participant_For_Match: `league/GetLeagueParticipantForMatch`,
     Update_League_Fixture: `league/UpdateLeagueFixture`,

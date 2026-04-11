@@ -81,7 +81,7 @@ export class LeagueteamlistingPage {
   searchInput: "";
   isPublish: boolean = true;
   isPending: boolean = true;
-  private subscription: RxSubscription; // Use the renamed type
+  private subscription: RxSubscription;
 
   constructor(
     public navCtrl: NavController,
@@ -99,65 +99,44 @@ export class LeagueteamlistingPage {
     public events: Events
   ) {
     this.leagueService.activeTypeSubject.subscribe((type) => {
-      console.log("LeagueTeamListing received type:", type);
       this.activeIndex = type;
-      // this.updateTitle(type);
     });
     this.commonService.category.pipe().subscribe((data) => {
-      console.log(data);
       if (data === "leagueteamlisting") {
-        // Force theme application when navigating to this page
-        setTimeout(() => {
-          this.loadTheme();
-        }, 100);
-
-        this.storage.get("userObj").then((val) => {
-          val = JSON.parse(val);
-          if (val.$key !== "") {
-            // this.LeagueFetchInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
-            //this.ParentClubTeamFetchInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
-            // this.FetchMatchesInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
-            // this.FetchMatchesInput.MemberKey = val.$key;
-          }
-
-          //this.getTeamsForParentClub(); //this is commented as we are going only with league only
-          //this.getMatches(); //this is commented as we are going only with league only
-          this.getLeaguesForParentClub();
-        });
+        setTimeout(() => { this.loadTheme(); }, 100);
+        this.fetchData();
       }
     });
 
     this.events.subscribe('team:refresh', () => {
-      this.getTeamsForParentClub();
+      if (this.activeIndex === 1) {
+        this.getTeamsForParentClub();
+      }
     });
   }
 
+  private fetchDebounceTimer: any = null;
+
+  private fetchData() {
+    if (this.fetchDebounceTimer) clearTimeout(this.fetchDebounceTimer);
+    this.fetchDebounceTimer = setTimeout(() => {
+      if (this.activeIndex === 1) {
+        this.getTeamsForParentClub();
+      } else {
+        this.getLeaguesForParentClub();
+      }
+    }, 300);
+  }
+
   ionViewWillEnter() {
-    console.log("LeagueTeamListing page - ionViewWillEnter");
-
-    // Load and apply theme immediately
     this.loadTheme();
-
-    // Subscribe to global theme changes
     this.themeService.isDarkTheme$.subscribe((isDark) => {
-      console.log("LeagueTeamListing page - theme service change:", isDark);
       this.applyTheme(isDark);
     });
-
-    // Listen for theme changes from other pages
     this.events.subscribe("theme:changed", (isDark) => {
-      console.log(
-        "LeagueTeamListing page - received theme change event:",
-        isDark
-      );
       this.applyTheme(isDark);
     });
-
-    if (this.activeIndex === 1) {
-      this.getTeamsForParentClub();
-    } else {
-      this.getLeaguesForParentClub();
-    }
+    this.fetchData();
   }
 
   ionViewDidEnter() {
@@ -584,66 +563,27 @@ export class LeagueteamlistingPage {
 
   //function to get the list of league
   getLeaguesForParentClub = () => {
-    // this.commonService.showLoader("Fetching Leagues...");
     this.LeagueFetchInput.user_postgre_metadata.UserParentClubId =
       this.sharedservice.getPostgreParentClubId();
-    this.LeagueFetchInput.user_device_metadata.UserAppType = 0;
+    this.LeagueFetchInput.user_device_metadata.UserAppType = AppType.ADMIN_NEW;
     this.LeagueFetchInput.user_device_metadata.UserDeviceType =
       this.sharedservice.getPlatform() == "android" ? 1 : 2;
-    const leaguesforparentclubQuery = gql`
-      query getLeaguesForParentClub($ParentClubDetails: LeagueFetchInput!) {
-        getLeaguesForParentClub(ParentClubDetails: $ParentClubDetails) {
-          id
-          created_at
-          created_by
-          updated_at
-          is_active
-          league_name
-          activity {
-            ActivityName
-            ActivityCode
-          }
-          league_category_text
-          league_category
-          league_age_group
-          start_date
-          end_date
-          league_visibility
-          league_type_text
-          grade
-          club {
-            Id
-            ClubName
-            FirebaseId
-          }
-          league_visibility
-        }
+
+    const payload = {
+      user_postgre_metadata: this.LeagueFetchInput.user_postgre_metadata,
+      user_device_metadata: this.LeagueFetchInput.user_device_metadata
+    };
+
+    this.httpService.post(`${API.GET_ALL_LEAGUES}`, payload).subscribe({
+      next: (res: any) => {
+        this.leaguesForParentClub = res.data || [];
+        this.filteredleagues = JSON.parse(JSON.stringify(this.leaguesForParentClub));
+      },
+      error: (error) => {
+        this.commonService.toastMessage("Fetching failed for leagues", 2500, ToastMessageType.Error);
+        console.error("Error in fetching:", error);
       }
-    `;
-    this.graphqlService
-      .query(
-        leaguesforparentclubQuery,
-        { ParentClubDetails: this.LeagueFetchInput },
-        0
-      )
-      .subscribe(
-        (res: any) => {
-          // this.commonService.hideLoader();
-          this.leaguesForParentClub = res.data.getLeaguesForParentClub;
-          this.filteredleagues = JSON.parse(
-            JSON.stringify(this.leaguesForParentClub)
-          );
-        },
-        (error) => {
-          // this.commonService.hideLoader();
-          this.commonService.toastMessage(
-            "Fetching failed for leagues",
-            2500,
-            ToastMessageType.Error
-          );
-          console.error("Error in fetching:", error);
-        }
-      );
+    });
   };
 
   matchStartDate(date) {

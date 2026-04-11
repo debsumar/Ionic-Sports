@@ -114,8 +114,24 @@
   </div>
 </ion-content>
 
-<ion-fab right bottom *ngIf="(!activeType) && (match) && (!match.Result || !match.Result.CreatedAt)">
-  <button class="fab-main" ion-fab mini (click)="gotoMatchInvitePlayers()">
+<ion-fab right bottom *ngIf="activeType">
+  <button class="fab-main" ion-fab mini (click)="gotoRecurringMatches()">
+    <ion-icon name="repeat"></ion-icon>
+  </button>
+</ion-fab>
+
+<ion-fab mini right bottom #fab *ngIf="!activeType">
+  <button class="fab-main" ion-fab mini>
     <ion-icon name="add"></ion-icon>
   </button>
+  <ion-fab-list side="top">
+    <p class="fab-label" (tap)="gotoMatchInvitePlayers()" style="margin-right: 46px">Invite Players</p>
+    <button class="fab-main" ion-fab class="fabTop" (tap)="gotoMatchInvitePlayers()">
+      <ion-icon name="person-add"></ion-icon>
+    </button>
+    <p class="fab-label" (tap)="gotoRecurringMatches()" style="margin-right: 46px">Recurring Matches</p>
+    <button class="fab-main" ion-fab class="fabTop" (tap)="gotoRecurringMatches()">
+      <ion-icon name="repeat"></ion-icon>
+    </button>
+  </ion-fab-list>
 </ion-fab>
