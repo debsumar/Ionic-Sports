@@ -26,6 +26,13 @@
         </div>
       </app-detail-header>
 
+      <!-- View Coaches Banner -->
+      <div class="coaches-banner" (tap)="gotoViewCoaches()">
+        <ion-icon name="school"></ion-icon>
+        <span>View Coaches</span>
+        <ion-icon name="arrow-forward" class="banner-arrow"></ion-icon>
+      </div>
+
       <!-- Publish Banner -->
       <div class="publish-banner" (tap)="goto_publishresult()"
         *ngIf="(isTeamParticipantsAvail) && (teams && teams.length > 0) && (match.Result === null) && (activeType)">

@@ -168,7 +168,7 @@ export class MatchdetailsPage {
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
-    if (this.match?.VenueName) rows.push({ icon: 'pin', text: this.match.VenueName });
+    if (this.match?.VenueName) rows.push({ icon: 'pin', text: (this.match as any).location && (this.match as any).location !== '' ? (this.match as any).location : this.match.VenueName });
     return rows;
   }
 
@@ -634,6 +634,10 @@ export class MatchdetailsPage {
     this.navCtrl.push("PublishresultPage", { matchId: this.match.MatchId, teams: teams });
   }
 
+
+  gotoViewCoaches() {
+    this.navCtrl.push('ViewCoachesPage', { match_id: this.match.MatchId });
+  }
 
   gotoEditMatch() {
     this.navCtrl.push('EditmatchPage', { match: this.match });

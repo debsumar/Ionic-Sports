@@ -73,8 +73,8 @@ export interface DetailHeaderRow {
     app-detail-header .detail-header-row-text { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.75); }
 
     /* Actions */
-    app-detail-header .detail-header-actions { position: absolute; top: 18px; right: 14px; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 6px; }
-    app-detail-header .detail-header-actions > [header-actions] { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    app-detail-header .detail-header-actions { position: absolute; top: 18px; right: 14px; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    app-detail-header .detail-header-actions > [header-actions] { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     app-detail-header .detail-header-actions .header-badge,
     app-detail-header .detail-header-actions .action-btn {
       margin: 0; background: rgba(255, 255, 255, 0.25) !important; color: #fff !important;

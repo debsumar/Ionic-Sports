@@ -14,17 +14,17 @@ page-teamdetails {
   // ── Header (uses app-detail-header) ──
   .header-badge {
     display: flex; align-items: center; justify-content: center;
-    width: 26px; height: 26px; border-radius: 50%;
+    width: 32px; height: 32px; border-radius: 50%;
     background: rgba(16, 185, 129, 0.15); color: #10b981;
-    ion-icon { font-size: 13px; }
+    ion-icon { font-size: 24px; }
     &.private { background: rgba(247, 110, 4, 0.15); color: #f76e04; }
   }
   .action-btn {
     display: flex; align-items: center; justify-content: center;
-    width: 26px; height: 26px; border-radius: 7px; border: none;
+    width: 32px; height: 32px; border-radius: 8px; border: none;
     background: rgba(43, 146, 187, 0.12); color: #3fbcd3;
     cursor: pointer; transition: background 0.2s ease;
-    ion-icon { font-size: 14px; }
+    ion-icon { font-size: 24px; }
     &:active { background: rgba(43, 146, 187, 0.25); }
     &.danger { background: rgba(239, 68, 68, 0.12); color: #ef4444; }
   }

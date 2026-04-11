@@ -218,7 +218,7 @@ export class EditmatchPage {
       },
       error: (err) => {
         this.commonService.hideLoader();
-        const msg = err.error?.message || 'Match update failed';
+        const msg = (err.error && err.error.message) ? err.error.message : 'Match update failed';
         this.commonService.toastMessage(msg, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
     });
