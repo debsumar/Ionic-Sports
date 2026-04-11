@@ -121,6 +121,18 @@
       </ion-item>
     </app-expandable-section>
 
+    <app-expandable-section label="RECURRING" [(expanded)]="isRecurring">
+      <ion-item>
+        <ion-label>Until When</ion-label>
+        <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY"
+          [(ngModel)]="recurringUntilWhen" [min]="startDate" [max]="maxDate"></ion-datetime>
+      </ion-item>
+      <div class="day-chips">
+        <button *ngFor="let day of allDays" class="day-chip"
+          [class.selected]="isDaySelected(day)" (click)="toggleDay(day)">{{day.substring(0,3)}}</button>
+      </div>
+    </app-expandable-section>
+
     <app-form-field [isDark]="isDarkTheme">
       <ion-item class="description-item">
         <ion-label stacked>Description</ion-label>

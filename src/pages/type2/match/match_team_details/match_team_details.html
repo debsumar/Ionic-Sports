@@ -46,8 +46,8 @@
         [leftLabel]="selectedHomeTeamText"
         [rightLabel]="selectedAwayTeamText"
         [activeIndex]="activeTabIndex"
-        [leftActionIcon]="'add'"
-        [rightActionIcon]="'add'"
+        [leftActionIcon]="'repeat'"
+        [rightActionIcon]="'repeat'"
         (leftActionClick)="showAvailableTeams(true)"
         (rightActionClick)="showAvailableTeams(false)"
         (activeIndexChange)="onTabChange($event)">
@@ -190,6 +190,10 @@
     <p class="fab-label" (tap)="showAvailableTeams(false)" style="margin-right: 46px">Away Team</p>
     <button class="fab-main" ion-fab class="fabTop" (tap)="showAvailableTeams(false)">
       <ion-icon name="people"></ion-icon>
+    </button>
+    <p class="fab-label" (tap)="gotoRecurringMatches()" style="margin-right: 46px">Recurring Matches</p>
+    <button class="fab-main" ion-fab class="fabTop" (tap)="gotoRecurringMatches()">
+      <ion-icon name="repeat"></ion-icon>
     </button>
   </ion-fab-list>
 </ion-fab>

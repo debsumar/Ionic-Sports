@@ -274,6 +274,12 @@ export class MatchTeamDetailsPage {
     this.navCtrl.push('EditmatchPage', { match: this.match });
   }
 
+  gotoRecurringMatches() {
+    this.closeFab();
+    // TODO: implement navigation to recurring matches page
+    this.commonService.toastMessage('Coming soon', 2000, ToastMessageType.Info);
+  }
+
   gotoViewCoaches() {
     this.closeFab();
     this.navCtrl.push('ViewCoachesPage', { match_id: this.match.MatchId });

@@ -64,20 +64,21 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
     }
     app-pill-tabs .pill-action {
       display: flex; align-items: center; justify-content: center;
-      width: 20px; height: 20px; border-radius: 50%;
-      background: rgba(255, 255, 255, 0.15); margin-left: 4px;
-      cursor: pointer; transition: background 0.2s ease;
+      width: 22px; height: 22px; border-radius: 50%; margin-left: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);
+      cursor: pointer; transition: transform 0.3s ease, background 0.2s ease;
     }
-    app-pill-tabs .pill-action ion-icon { font-size: 12px; color: #94a3b8; }
-    app-pill-tabs .pill-action:active { background: rgba(255, 255, 255, 0.3); }
-    app-pill-tabs .pill-tabs-btn.active .pill-action { background: rgba(255, 255, 255, 0.2); }
-    app-pill-tabs .pill-tabs-btn.active .pill-action ion-icon { color: #ffffff; }
+    app-pill-tabs .pill-action ion-icon { font-size: 14px; color: #64748b; transition: color 0.3s ease; }
+    app-pill-tabs .pill-action:active { transform: scale(0.9); }
+    app-pill-tabs .pill-tabs-btn.active .pill-action { background: rgba(255, 255, 255, 0.15); animation: pillActionPop 0.3s ease; }
+    app-pill-tabs .pill-tabs-btn.active .pill-action ion-icon { color: rgba(255, 255, 255, 0.85); }
+    @keyframes pillActionPop { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
 
-    .light-theme app-pill-tabs .pill-action { background: rgba(0, 0, 0, 0.08); }
-    .light-theme app-pill-tabs .pill-action ion-icon { color: #64748b; }
-    .light-theme app-pill-tabs .pill-action:active { background: rgba(0, 0, 0, 0.15); }
-    .light-theme app-pill-tabs .pill-tabs-btn.active .pill-action { background: rgba(255, 255, 255, 0.25); }
-    .light-theme app-pill-tabs .pill-tabs-btn.active .pill-action ion-icon { color: #ffffff; }
+    .light-theme app-pill-tabs .pill-action { background: rgba(0, 0, 0, 0.05); }
+    .light-theme app-pill-tabs .pill-action ion-icon { color: #94a3b8; }
+    .light-theme app-pill-tabs .pill-tabs-btn.active .pill-action { background: rgba(255, 255, 255, 0.2); }
+    .light-theme app-pill-tabs .pill-tabs-btn.active .pill-action ion-icon { color: rgba(255, 255, 255, 0.9); }
 
     .light-theme app-pill-tabs .pill-tabs { background: #e2e8f0; }
     .light-theme app-pill-tabs .pill-tabs-slider { box-shadow: 0 2px 8px rgba(43, 146, 187, 0.3); }
