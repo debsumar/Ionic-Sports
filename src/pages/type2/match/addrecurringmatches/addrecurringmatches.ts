@@ -19,7 +19,7 @@ import moment from "moment";
 export class AddrecurringmatchesPage {
   isDarkTheme: boolean = true;
   match: AllMatchData;
-  untilWhen: string = moment().add(1, 'week').format('YYYY-MM-DD');
+  untilWhen: string = '';
   selectedDays: string[] = [];
   allDays: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   minDate: string = '';
@@ -37,6 +37,7 @@ export class AddrecurringmatchesPage {
   ) {
     this.match = JSON.parse(this.navParams.get("match"));
     this.minDate = moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm").add(1, 'day').format('YYYY-MM-DD');
+    this.untilWhen = moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm").add(1, 'week').toISOString();
   }
 
   ionViewWillEnter() {
@@ -88,23 +89,22 @@ export class AddrecurringmatchesPage {
 
     this.commonService.showLoader("Creating recurring matches...");
 
-    const memberId = this.sharedservice.getLoggedInId();
-    const deviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+    const memberId = this.sharedservice.getLoggedInUserId();
 
     const payload = {
       parentclubId: this.sharedservice.getPostgreParentClubId(),
       clubId: '',
-      activityId: this.match.activityId,
+      activityId: '',
       memberId: memberId,
       action_type: 0,
-      device_type: deviceType,
       app_type: AppType.ADMIN_NEW,
       device_id: '',
       updated_by: memberId,
-      MatchId: this.match.MatchId,
+      parentclubTeamId: '',
       Round: parseInt(this.match.Round) || 0,
       MatchType: this.match.MatchType,
       MatchVenueName: this.match.VenueName,
+      MatchVenueId: this.match.VenueId || '',
       GameType: this.match.GameType,
       MatchTitle: this.match.MatchTitle,
       CreatedBy: memberId,
@@ -112,12 +112,15 @@ export class AddrecurringmatchesPage {
       MatchStartDate: this.match.MatchStartDate,
       MatchEndDate: this.match.MatchEndDate,
       MatchVisibility: 0,
+      Hosts: [{ UserId: memberId, RoleType: 2, UserType: 2 }],
       MatchStatus: 0,
       MatchDetails: this.match.Details || '',
       MatchPaymentType: 0,
       MemberFees: Number(this.match.MemberFees) || 0,
       NonMemberFees: Number(this.match.NonMemberFees) || 0,
-      Capacity: this.match.Capacity,
+      location_type: 1,
+      location_id: this.match.VenueId || '',
+      location: this.match.location || '',
       MatchDuration: this.match.MatchDuration != null ? String(this.match.MatchDuration) : '',
       UserParentClubId: this.sharedservice.getPostgreParentClubId(),
       UserActivityId: this.match.activityId,
