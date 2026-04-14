@@ -50,7 +50,6 @@ export class Type2TabConfig {
         //   { DefaultText: "Club Calendar", DisplayText: "Club Calendar", IsVisible: false, TabSequenceNo: 8, SuperMenuSequence: 0, Component: "Holiday", Icon: "calendar", Role: 2, Type: 2, Level: 2, IsApplicableVisibleFlag: true },
 
         //No Component starts here
-        { DefaultText: "Results", DisplayText: "Tournament", IsVisible: false, TabSequenceNo: 9, SuperMenuSequence: 0, Component: "TournamentPage", Icon: "calendar", Role: 2, Type: 2, Level: 1, IsApplicableVisibleFlag: true },
         //  { DefaultText: "Coach Tips", DisplayText: "Coach Tips", IsVisible: false, TabSequenceNo: 10, SuperMenuSequence: 0, Component: "", Icon: "calendar", Role: 2, Type: 2, Level: 1, IsApplicableVisibleFlag: true },
         //ends here
         // { DefaultText: "Member Activities", DisplayText: "Member Activities", IsVisible: false, TabSequenceNo: 11, SuperMenuSequence: 0, Component: "MyActivity", Icon: "ios-construct", Role: 2, Type: 2, Level: 1, IsApplicableVisibleFlag: true },
@@ -217,12 +216,6 @@ export class Type2TabConfig {
 
             if (!this.toggleAll && this.tabs[loop].IsApplicableVisibleFlag) {
                 // if (this.tabs[loop].DisplayText == 'Tournament' || this.tabs[loop].DisplayText == 'Tournaments') {
-                //     this.tabs[loop].IsAllowNotification = true;
-                //     this.fb.update(this.tabs[loop].Key, "/TabConfig/Member/" + this.selectedParentClubKey, {
-                //         IsVisible: true,
-                //         Component: 'TournamentPage'
-                //     });
-                // } else {
                 this.tabs[loop].IsAllowNotification = true;
                 this.fb.update(this.tabs[loop].Key, "/TabConfig/Member/" + this.selectedParentClubKey, { IsVisible: true });
                 // }
@@ -243,31 +236,22 @@ export class Type2TabConfig {
     //
     //<summary>
     changeNotificationToggle(tabItem, index) {
-        if (tabItem.DisplayText == 'Tournament' || tabItem.DisplayText == 'Tournaments') {
-
-            this.fb.update(tabItem.Key, "/TabConfig/Member/" + this.selectedParentClubKey, {
-                IsVisible: !tabItem.IsVisible,
-                Component: 'TournamentPage'
-            });
-        } else {
-            this.fb.update(tabItem.Key, "/TabConfig/Member/" + this.selectedParentClubKey, { IsVisible: !tabItem.IsVisible });
-            let flag = false;
-            for (let i = 0; i < this.tabs.length; i++) {
-                if (!tabItem.IsVisible) {
-                    this.toggleAll = true;
-                    flag = true;
-                    break;
-                }
-                if (this.tabs[i].IsVisible && i != index) {
-                    this.toggleAll = true;
-                    flag = true;
-                    break;
-                }
+        this.fb.update(tabItem.Key, "/TabConfig/Member/" + this.selectedParentClubKey, { IsVisible: !tabItem.IsVisible });
+        let flag = false;
+        for (let i = 0; i < this.tabs.length; i++) {
+            if (!tabItem.IsVisible) {
+                this.toggleAll = true;
+                flag = true;
+                break;
             }
-            if (!flag) {
-                this.toggleAll = false;
+            if (this.tabs[i].IsVisible && i != index) {
+                this.toggleAll = true;
+                flag = true;
+                break;
             }
-
+        }
+        if (!flag) {
+            this.toggleAll = false;
         }
     }
 

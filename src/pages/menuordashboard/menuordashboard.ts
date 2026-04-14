@@ -180,7 +180,6 @@ export class MenuOrDashboard {
       // // { title: 'Payment', component: "CoachPayment", icon: "cash", role: 2, type: 2, Level: 1 ,IsEnable:true},
       // { title: 'Booking', component: "BookingcontainerPage", icon: "bookmark", role: 2, type: 2, Level: 1, IsEnable: true },
       // // { title: 'Performance', component: "AppraisalPage", icon: "md-clipboard", role: 2, type: 2, Level: 1 ,IsEnable:true},
-      // { title: 'Tournaments', component: 'TournamentPage', icon: "trophy", role: 2, type: 2, Level: 1, IsEnable: true }
     } else if (user.RoleType == 6 || user.RoleType == 7 || user.RoleType == 8) {
       if (menus != undefined) {
         //let TotMenus = this.commonService.convertFbObjectToArray(user.Menu);

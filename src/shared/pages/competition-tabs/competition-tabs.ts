@@ -2,16 +2,16 @@ import { Component, ViewChild, Renderer2 } from "@angular/core";
 import { IonicPage, NavController, Events } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { CommonService } from "../../../services/common.service";
-import { CommonLeagueService } from "../league/commonleague.service";
-import { LeagueteamlistingPage } from "../league/leagueteamlisting/leagueteamlisting";
+import { CommonLeagueService } from "../../../pages/type2/league/commonleague.service";
+import { LeagueteamlistingPage } from "../../../pages/type2/league/leagueteamlisting/leagueteamlisting";
 import { ThemeService } from "../../../services/theme.service";
 
 @IonicPage()
 @Component({
-  selector: "page-tournament",
-  templateUrl: "tournament.html",
+  selector: "page-competition-tabs",
+  templateUrl: "competition-tabs.html",
 })
-export class TournamentPage {
+export class CompetitionTabsPage {
   @ViewChild("leagueTeamListingRef") leagueTeamListingComponent: LeagueteamlistingPage;
 
   Title: string = "Competition";
@@ -60,7 +60,7 @@ export class TournamentPage {
 
   applyTheme(isDark: boolean) {
     this.isDarkTheme = isDark;
-    const el = document.querySelector("page-tournament");
+    const el = document.querySelector("page-competition-tabs");
     if (el) {
       isDark ? this.renderer.removeClass(el, "light-theme")
              : this.renderer.addClass(el, "light-theme");
