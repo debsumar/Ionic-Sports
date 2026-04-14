@@ -68,7 +68,7 @@
         <div class="external-toggle">
           <span class="external-label">External</span>
           <label class="toggle-switch">
-            <input type="checkbox" [(ngModel)]="isExternalTeams" (ngModelChange)="filterTeamsByType()">
+            <input type="checkbox" [(ngModel)]="isExternalTeams" (ngModelChange)="getTeamsForParentClub()">
             <span class="toggle-slider"></span>
           </label>
         </div>

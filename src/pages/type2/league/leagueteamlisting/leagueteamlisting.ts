@@ -545,13 +545,14 @@ export class LeagueteamlistingPage {
       device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
       app_type: AppType.ADMIN_NEW,
       device_id: '',
-      updated_by: ''
+      updated_by: '',
+      isExternal: this.isExternalTeams
     };
     this.httpService.post(`${API.GET_TEAMS_FOR_PARENT_CLUB}`, payload).subscribe({
       next: (res: any) => {
         this.commonService.hideLoader();
         this.teamsForParentClub = res.data || [];
-        this.filterTeamsByType();
+        this.filteredteams = JSON.parse(JSON.stringify(this.teamsForParentClub));
       },
       error: (error) => {
         this.commonService.hideLoader();
@@ -668,13 +669,7 @@ export class LeagueteamlistingPage {
   }
 
   resetTeamItems() {
-    this.filterTeamsByType();
-  }
-
-  filterTeamsByType() {
-    this.filteredteams = this.isExternalTeams
-      ? this.teamsForParentClub.filter(t => !t.is_club_team)
-      : this.teamsForParentClub;
+    this.filteredteams = this.teamsForParentClub;
   }
 
   // 🎨 Get color based on league type text with theme support
