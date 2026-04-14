@@ -1,0 +1,29 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
+page-sessionmonthly {
+    @include android-sdk35-fixes;
+
+
+
+   
+    .scroll-content {
+        padding: 3px !important;
+        background-image: none !important;
+    }
+    ion-item {
+        ion-label {
+            overflow: visible !important;
+        }
+    }
+
+
+    .textareastyle {
+        input {
+            text-align: right;
+        }
+    }
+   
+
+managesession-page {
+}
+}
