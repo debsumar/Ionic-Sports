@@ -377,7 +377,7 @@ getSession(){
     async notifyGroupUsers(){
         if (this.term_ses_dets.session_members.length > 0) {
             const member_ids = this.term_ses_dets.session_members.map(member => member.is_child ? member.parent_id:member.user_id);
-            this.navCtrl.push("Type2NotificationSession",{
+            this.navCtrl.push("NotificationsPage",{
                 users:member_ids,
                 type:ModuleTypes.TERMSESSION,
                 heading:`Enrolment:${this.term_ses_dets.session.session_name}`,

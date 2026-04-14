@@ -639,7 +639,7 @@ export class MonthlySessionDetails {
   async notifyGroupUsers(){
     if (this.session_users.length > 0) {
         const member_ids = this.session_users.map(session_member => session_member.user.IsChild ? session_member.user.ParentId:session_member.user.Id);
-        this.navCtrl.push("Type2NotificationSession",{
+        this.navCtrl.push("NotificationsPage",{
             users:member_ids,
             type:ModuleTypes.MONTHLYSESSION,
             heading:`Enrolment:${this.monthly_ses_dets.session_name}`,

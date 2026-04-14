@@ -18,7 +18,6 @@ import { FirebaseService } from "../../../../services/firebase.service";
 import { SharedServices } from "../../../services/sharedservice";
 import { Storage } from "@ionic/storage";
 import { MatchModel } from "../models/match.model";
-import { MatchDuration } from "../../../../shared/model/utility.model";
 import moment from "moment";
 import { ClubVenue, SchoolVenue } from "../models/venue.model";
 import { GraphqlService } from "../../../../services/graphql.service";
@@ -29,6 +28,7 @@ import { RoundTypeInput, RoundTypesModel } from "../../../../shared/model/league
 import { AppType } from "../../../../shared/constants/module.constants";
 import { LeagueVenueType } from "../../../../shared/utility/enums";
 import { CatandType } from "../../league/models/location.model";
+import { MatchDuration } from "../../../../shared/model/match.model";
 /**
  * Generated class for the CreatematchPage page.
  *
@@ -354,20 +354,20 @@ export class CreatematchPage {
       },
       body: JSON.stringify({ textQuery: query })
     })
-    .then(res => res.json())
-    .then(data => {
-      if (data.places && data.places[0]) {
-        const name = (data.places[0].displayName?.text || '').toLowerCase();
-        const q = query.toLowerCase();
-        // Check if result name shares at least one word with the club name
-        const queryWords = q.split(/\s+/).filter(w => w.length > 2);
-        const match = queryWords.some(w => name.includes(w));
-        this.mapLocationAddress = match ? data.places[0].formattedAddress : '';
-      } else {
-        this.mapLocationAddress = '';
-      }
-    })
-    .catch(() => { this.mapLocationAddress = ''; });
+      .then(res => res.json())
+      .then(data => {
+        if (data.places && data.places[0]) {
+          const name = (data.places[0].displayName?.text || '').toLowerCase();
+          const q = query.toLowerCase();
+          // Check if result name shares at least one word with the club name
+          const queryWords = q.split(/\s+/).filter(w => w.length > 2);
+          const match = queryWords.some(w => name.includes(w));
+          this.mapLocationAddress = match ? data.places[0].formattedAddress : '';
+        } else {
+          this.mapLocationAddress = '';
+        }
+      })
+      .catch(() => { this.mapLocationAddress = ''; });
   }
 
   mapLocationAddress: string = '';

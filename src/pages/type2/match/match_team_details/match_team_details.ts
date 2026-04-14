@@ -11,7 +11,7 @@ import { AllMatchData, GetIndividualMatchParticipantModel, } from "../../../../s
 import { LeagueMatchActionType, LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus, ActivityTypeEnum } from "../../../../shared/utility/enums";
 import { API } from "../../../../shared/constants/api_constants";
 import { HttpService } from "../../../../services/http.service";
-import { AppType } from "../../../../shared/constants/module.constants";
+import { AppType, ModuleTypes } from "../../../../shared/constants/module.constants";
 import { TeamsForParentClubModel } from "../../league/models/team.model";
 import { Role } from "../../team/team.model";
 import { ThemeService } from "../../../../services/theme.service";
@@ -936,6 +936,27 @@ export class MatchTeamDetailsPage {
         type: ModuleTypeForEmail.LEAGUE_TEAM
       };
       this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No member(s) found in current team", 2500, ToastMessageType.Error);
+    }
+  }
+
+  gotoNotificationPage() {
+    if (this.getIndividualMatchParticipantRes.length > 0) {
+      const user_ids = this.getIndividualMatchParticipantRes.map(p =>
+        (p.user as any).IsChild ? ((p.user as any).ParentId || p.user.Id) : p.user.Id
+      );
+      const user_names = this.getIndividualMatchParticipantRes.map(p =>
+        p.user.FirstName + ' ' + p.user.LastName
+      );
+      this.navCtrl.push("NotificationsPage", {
+        users: user_ids,
+        user_names: user_names,
+        type: ModuleTypes.Match,
+        heading: `Match: ${this.match.MatchTitle}`,
+        module_id: this.match.MatchId,
+        page_id: "MATCH_TEAM_DETAILS"
+      });
     } else {
       this.commonService.toastMessage("No member(s) found in current team", 2500, ToastMessageType.Error);
     }

@@ -315,7 +315,7 @@ export class WeeklySessionDetailsPage {
       const member_data = await this.getSessionDets(sesData) as WeeklySessionMember[];
       if (member_data.length > 0) {
         const member_ids = member_data.map(enrol_member => enrol_member.member.IsChild ? enrol_member.member.ParentId:enrol_member.member.Id);
-        this.navCtrl.push("Type2NotificationSession",{
+        this.navCtrl.push("NotificationsPage",{
             users:member_ids,
             type:ModuleTypes.WEEKLYSESSION,
             heading:`Enrolment:${this.weeklyDets.session_name}(${sesData.session_name},${sesData.session_date})`,

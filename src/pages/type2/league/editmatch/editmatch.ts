@@ -7,9 +7,8 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
 import { ThemeService } from '../../../../services/theme.service';
-import { AllMatchData } from '../../../../shared/model/match.model';
+import { AllMatchData, MatchDuration } from '../../../../shared/model/match.model';
 import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
-import { MatchDuration } from '../../../../shared/model/utility.model';
 import { CatandType } from '../models/location.model';
 import moment from 'moment';
 
@@ -108,7 +107,7 @@ export class EditmatchPage {
     const el = document.querySelector('page-editmatch');
     if (el) {
       isDark ? this.renderer.removeClass(el, 'light-theme')
-             : this.renderer.addClass(el, 'light-theme');
+        : this.renderer.addClass(el, 'light-theme');
     }
   }
 

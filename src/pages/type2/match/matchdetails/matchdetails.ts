@@ -12,6 +12,7 @@ import { GraphqlService } from "../../../../services/graphql.service";
 import { AllMatchData } from "../../../../shared/model/match.model";
 import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
 import { ModuleTypeForEmail } from "../../mailtomemberbyadmin/mailtomemberbyadmin";
+import { ModuleTypes } from "../../../../shared/constants/module.constants";
 /**
  * Generated class for the MatchdetailsPage page.
  *
@@ -676,6 +677,25 @@ export class MatchdetailsPage {
         type: ModuleTypeForEmail.MEMBER
       };
       this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    }
+  }
+
+  gotoNotificationPage() {
+    if (this.participants.length > 0) {
+      const user_ids = this.participants.map(p =>
+        (p.User as any).IsChild ? ((p.User as any).ParentId || p.User.Id) : p.User.Id
+      );
+      const user_names = this.participants.map(p => p.User.FirstName + ' ' + p.User.LastName);
+      this.navCtrl.push("NotificationsPage", {
+        users: user_ids,
+        user_names: user_names,
+        type: ModuleTypes.Match,
+        heading: `Match: ${this.match.MatchTitle}`,
+        module_id: this.match.MatchId,
+        page_id: "MATCHDETAILS"
+      });
     } else {
       this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
     }

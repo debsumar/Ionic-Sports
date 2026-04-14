@@ -8,7 +8,7 @@ import { LeagueMatchParticipantModel, LeagueParticipantModel, LeagueParticipatio
 import { TeamsForParentClubModel } from "../models/team.model";
 import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
-import { AppType } from "../../../../shared/constants/module.constants";
+import { AppType, ModuleTypes } from "../../../../shared/constants/module.constants";
 import { LeagueMatch } from "../models/location.model";
 import { LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus, ActivityTypeEnum, LeagueMatchActionType } from "../../../../shared/utility/enums";
 import { GetPlayerModel } from "../../team/models/team.model";
@@ -744,6 +744,25 @@ export class LeagueMatchInfoPage {
     }
   }
 
+
+  gotoNotificationPage() {
+    if (this.leagueMatchParticipantRes.length > 0) {
+      const user_ids = this.leagueMatchParticipantRes.map(p =>
+        p.user.IsChild ? (p.user.ParentId || p.user.Id) : p.user.Id
+      );
+      const user_names = this.leagueMatchParticipantRes.map(p => p.user.FirstName + ' ' + p.user.LastName);
+      this.navCtrl.push("NotificationsPage", {
+        users: user_ids,
+        user_names: user_names,
+        type: ModuleTypes.LEAGUE,
+        heading: `Match: ${this.matchObj.match_title}`,
+        module_id: this.matchObj.fixture_id,
+        page_id: "LEAGUE_MATCH_INFO"
+      });
+    } else {
+      this.commonService.toastMessage("No member(s) found in current session", 2500, ToastMessageType.Error);
+    }
+  }
 
   toggleTeamDropdown(isHome: boolean) {
     this.teamActionIsHome = isHome;

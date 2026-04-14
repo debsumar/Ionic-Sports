@@ -355,3 +355,7 @@ export class MatchModelV3 {
 
 
 
+export interface MatchDuration {
+    id: number;
+    duration: number;
+}
