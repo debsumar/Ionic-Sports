@@ -45,10 +45,10 @@
         [leftLabel]="selectedHomeTeamText"
         [rightLabel]="selectedAwayTeamText"
         [activeIndex]="activeTabIndex"
-        [leftActionIcon]="'repeat'"
-        [rightActionIcon]="'repeat'"
-        (leftActionClick)="showAvailableTeams(true)"
-        (rightActionClick)="showAvailableTeams(false)"
+        [leftActionIcon]="'arrow-dropdown'"
+        [rightActionIcon]="'arrow-dropdown'"
+        (leftActionClick)="toggleTeamDropdown(true)"
+        (rightActionClick)="toggleTeamDropdown(false)"
         (activeIndexChange)="onTabChange($event)">
       </app-pill-tabs>
     </div>
@@ -165,6 +165,22 @@
       <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
     </div>
   </app-bottom-sheet>
+  <!-- Team Action Bottom Sheet -->
+  <app-bottom-sheet [(visible)]="showTeamActionDropdown"
+    [title]="teamActionIsHome ? selectedHomeTeamText : selectedAwayTeamText"
+    [bottomOffset]="0">
+    <div class="sheet-item" (click)="onTeamActionSelect('assign')">
+      <ion-icon name="people" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Assign Team</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item" (click)="onTeamActionSelect('external')">
+      <ion-icon name="person-add" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Add External Team</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+  </app-bottom-sheet>
+
   <!-- Team Selection Bottom Sheet -->
   <app-bottom-sheet [(visible)]="showTeamSheet"
     [title]="teamSheetIsHome ? 'Select Home Team' : 'Select Away Team'"
@@ -180,7 +196,7 @@
   </app-bottom-sheet>
 </ion-content>
 
-<ion-fab mini right bottom #fab *ngIf="!showPlayerSheet && !showTeamSheet">
+<ion-fab mini right bottom #fab *ngIf="!showPlayerSheet && !showTeamSheet && !showTeamActionDropdown">
   <button class="fab-main" ion-fab mini>
     <ion-icon name="add"></ion-icon>
   </button>

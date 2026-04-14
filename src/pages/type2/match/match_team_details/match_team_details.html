@@ -20,6 +20,9 @@
           <button class="action-btn" (click)="gotoEditMatch()">
             <ion-icon name="create"></ion-icon>
           </button>
+          <button class="action-btn" (click)="gotoEmailPage()">
+            <ion-icon name="mail"></ion-icon>
+          </button>
           <button class="action-btn danger" (click)="deleteConfirm()"
             *ngIf="(match) && (!match.Result || !match.Result.CreatedAt)">
             <ion-icon name="trash"></ion-icon>
@@ -46,10 +49,10 @@
         [leftLabel]="selectedHomeTeamText"
         [rightLabel]="selectedAwayTeamText"
         [activeIndex]="activeTabIndex"
-        [leftActionIcon]="'repeat'"
-        [rightActionIcon]="'repeat'"
-        (leftActionClick)="showAvailableTeams(true)"
-        (rightActionClick)="showAvailableTeams(false)"
+        [leftActionIcon]="'arrow-dropdown'"
+        [rightActionIcon]="'arrow-dropdown'"
+        (leftActionClick)="toggleTeamDropdown(true)"
+        (rightActionClick)="toggleTeamDropdown(false)"
         (activeIndexChange)="onTabChange($event)">
       </app-pill-tabs>
     </div>
@@ -163,6 +166,22 @@
     </div>
   </app-bottom-sheet>
 
+  <!-- Team Action Bottom Sheet -->
+  <app-bottom-sheet [(visible)]="showTeamActionDropdown"
+    [title]="teamActionIsHome ? selectedHomeTeamText : selectedAwayTeamText"
+    [bottomOffset]="0">
+    <div class="sheet-item" (click)="onTeamActionSelect('assign')">
+      <ion-icon name="people" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Assign Team</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item" (click)="onTeamActionSelect('external')">
+      <ion-icon name="person-add" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Add External Team</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+  </app-bottom-sheet>
+
   <!-- Team Selection Bottom Sheet -->
   <app-bottom-sheet [(visible)]="showTeamSheet"
     [title]="teamSheetIsHome ? 'Select Home Team' : 'Select Away Team'"
@@ -178,22 +197,8 @@
   </app-bottom-sheet>
 </ion-content>
 
-<ion-fab mini right bottom #fab *ngIf="!showPlayerSheet && !showTeamSheet">
-  <button class="fab-main" ion-fab mini>
-    <ion-icon name="add"></ion-icon>
+<ion-fab mini right bottom *ngIf="!showPlayerSheet && !showTeamSheet && !showTeamActionDropdown">
+  <button class="fab-main" ion-fab mini (tap)="gotoRecurringMatches()">
+    <ion-icon name="repeat"></ion-icon>
   </button>
-  <ion-fab-list side="top">
-    <p class="fab-label" (tap)="showAvailableTeams(true)" style="margin-right: 46px">Home Team</p>
-    <button class="fab-main" ion-fab class="fabTop" (tap)="showAvailableTeams(true)">
-      <ion-icon name="people"></ion-icon>
-    </button>
-    <p class="fab-label" (tap)="showAvailableTeams(false)" style="margin-right: 46px">Away Team</p>
-    <button class="fab-main" ion-fab class="fabTop" (tap)="showAvailableTeams(false)">
-      <ion-icon name="people"></ion-icon>
-    </button>
-    <p class="fab-label" (tap)="gotoRecurringMatches()" style="margin-right: 46px">Recurring Matches</p>
-    <button class="fab-main" ion-fab class="fabTop" (tap)="gotoRecurringMatches()">
-      <ion-icon name="repeat"></ion-icon>
-    </button>
-  </ion-fab-list>
 </ion-fab>

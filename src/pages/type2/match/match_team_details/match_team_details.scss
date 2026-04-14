@@ -11,6 +11,7 @@ page-match-team-details {
   .page-scroll-area {
     flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch;
     padding: 0 8px 80px;
+    max-width: 900px; margin: 0 auto; width: 100%; box-sizing: border-box;
   }
   .scroll-content { background: #0f172a !important; }
   ion-content { background: #0f172a !important; margin-bottom: 56px !important; }
@@ -75,11 +76,12 @@ page-match-team-details {
   }
 
   // ── Filter Pills ──
-  .filter-row { display: flex; align-items: center; gap: 6px; padding: 8px 4px 12px; }
+  .filter-row { display: flex; align-items: center; gap: 6px; padding: 8px 4px 12px; overflow-x: auto; -webkit-overflow-scrolling: touch; flex-wrap: nowrap; }
   .filter-pill {
     padding: 6px 14px; border-radius: 20px; border: none;
     font-size: 12px; font-weight: 700; letter-spacing: 0.2px;
     cursor: pointer; transition: opacity 0.2s ease, background 0.2s ease;
+    white-space: nowrap; flex-shrink: 0;
     &.playing { background: rgba(16, 185, 129, 0.15); color: #10b981; opacity: 0.5;
       &.active { background: #10b981; color: #fff; opacity: 1; }
     }
@@ -138,6 +140,7 @@ page-match-team-details {
   .player-detail-row {
     display: flex; align-items: center; justify-content: space-between;
     padding-top: 6px; border-top: 1px solid rgba(71, 85, 105, 0.2);
+    flex-wrap: wrap; gap: 4px;
   }
   .player-status-left {
     display: inline-flex; align-items: center; gap: 3px;
@@ -283,9 +286,12 @@ page-match-team-details {
     .player-avatar { width: 40px; height: 40px; font-size: 16px; border-radius: 10px; }
     .player-detail-row { font-size: 13px; }
     .medical-icon, .media-icon { width: 18px; height: 18px; }
-    .drop-zone { padding: 6px; }
+    .drop-zone { padding: 6px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
+    .empty-card { grid-column: 1 / -1; }
+    .coaches-banner, .publish-banner { font-size: 14px; padding: 14px 20px; }
   }
   @media (min-width: 1024px) {
     .page-scroll-area { padding: 0 24px 80px; }
+    .drop-zone { grid-template-columns: repeat(3, 1fr); gap: 8px; }
   }
 }

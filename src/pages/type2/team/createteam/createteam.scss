@@ -173,6 +173,8 @@ page-createteam {
     }
   }
 
+  .toggle-disabled, .field-disabled { pointer-events: none; opacity: 0.5; }
+
   .create-btn-wrap { position: sticky; bottom: 0; padding: 12px; z-index: 10; }
   // Remove focus borders
   .item-md.item-input.input-has-focus .item-inner { border-bottom-color: transparent !important; box-shadow: none !important; }

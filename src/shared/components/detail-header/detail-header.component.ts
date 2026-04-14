@@ -30,8 +30,9 @@ export interface DetailHeaderRow {
 
     app-detail-header .detail-header {
       --accent: #2b92bb;
-      position: relative; padding: 22px 18px 16px 22px; overflow: hidden;
+      position: relative; padding: 22px 50px 16px 22px; overflow: visible;
       background: linear-gradient(135deg, #1e293b 70%, var(--accent));
+      min-height: 100px;
     }
 
     /* Left accent strip */
@@ -73,14 +74,19 @@ export interface DetailHeaderRow {
     app-detail-header .detail-header-row-text { font-size: 13px; font-weight: 500; color: rgba(255, 255, 255, 0.75); }
 
     /* Actions */
-    app-detail-header .detail-header-actions { position: absolute; top: 18px; right: 14px; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+    app-detail-header .detail-header-actions { position: absolute; top: 14px; right: 10px; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; justify-content: flex-start; }
     app-detail-header .detail-header-actions > [header-actions] { display: flex; flex-direction: column; align-items: center; gap: 2px; }
     app-detail-header .detail-header-actions .header-badge,
     app-detail-header .detail-header-actions .action-btn {
       margin: 0; background: rgba(255, 255, 255, 0.25) !important; color: #fff !important;
       backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.15);
+      width: 28px; height: 28px; min-height: 28px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center; padding: 0;
+      flex-shrink: 0;
     }
+    app-detail-header .detail-header-actions .header-badge ion-icon,
+    app-detail-header .detail-header-actions .action-btn ion-icon { font-size: 14px; }
     app-detail-header .detail-header-actions .header-badge { color: #10b981 !important; }
     app-detail-header .detail-header-actions .header-badge.private { color: #f76e04 !important; }
     app-detail-header .detail-header-actions .action-btn.danger { color: #fca5a5 !important; }
@@ -123,15 +129,24 @@ export interface DetailHeaderRow {
 
     /* ── Responsive ── */
     @media (max-width: 359px) {
-      app-detail-header .detail-header { padding: 16px 14px 12px 18px; }
+      app-detail-header .detail-header { padding: 16px 44px 12px 18px; }
       app-detail-header .detail-header-title { font-size: 19px; }
       app-detail-header .detail-header-subtitle { font-size: 9px; }
+      app-detail-header .detail-header-actions { top: 10px; right: 8px; }
+      app-detail-header .detail-header-actions .header-badge,
+      app-detail-header .detail-header-actions .action-btn { width: 24px; height: 24px; min-height: 24px; border-radius: 6px; }
+      app-detail-header .detail-header-actions .header-badge ion-icon,
+      app-detail-header .detail-header-actions .action-btn ion-icon { font-size: 12px; }
     }
     @media (min-width: 768px) {
       app-detail-header .detail-header { padding: 26px 24px 18px 26px; }
       app-detail-header .detail-header-title { font-size: 26px; }
       app-detail-header .detail-header-subtitle { font-size: 11px; }
       app-detail-header .detail-header-row-text { font-size: 14px; }
+      app-detail-header .detail-header-actions .header-badge,
+      app-detail-header .detail-header-actions .action-btn { width: 34px; height: 34px; min-height: 34px; border-radius: 10px; }
+      app-detail-header .detail-header-actions .header-badge ion-icon,
+      app-detail-header .detail-header-actions .action-btn ion-icon { font-size: 17px; }
     }
   `]
 })

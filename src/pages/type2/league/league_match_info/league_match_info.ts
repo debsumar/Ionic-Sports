@@ -172,6 +172,8 @@ export class LeagueMatchInfoPage {
   selectedPlayer: LeagueMatchParticipantModel = null;
   showTeamSheet: boolean = false;
   teamSheetIsHome: boolean = true;
+  showTeamActionDropdown: boolean = false;
+  teamActionIsHome: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -260,7 +262,6 @@ export class LeagueMatchInfoPage {
         this.updateLeagueMatchInviteStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateLeagueMatchInviteStatusInput.MatchId = this.matchObj.match_id;
 
-        this.getLeagueParticipantForMatch();
         this.getRoleForPlayers();
         if (this.activeType && this.matchObj.home_team_id !== null) {
           this.loadAllParticipantsForCounts().then(() => {
@@ -290,6 +291,9 @@ export class LeagueMatchInfoPage {
     this.events.subscribe("theme:changed", (isDark) => {
       this.applyTheme(isDark);
     });
+    this.events.subscribe("team:refresh", () => {
+      this.getLeagueParticipantForMatch();
+    });
   }
 
   ionViewDidEnter() {
@@ -300,6 +304,7 @@ export class LeagueMatchInfoPage {
 
   ionViewWillLeave() {
     this.events.unsubscribe("theme:changed");
+    this.events.unsubscribe("team:refresh");
   }
 
   private loadTheme(): void {
@@ -740,6 +745,20 @@ export class LeagueMatchInfoPage {
   }
 
 
+  toggleTeamDropdown(isHome: boolean) {
+    this.teamActionIsHome = isHome;
+    this.showTeamActionDropdown = true;
+  }
+
+  onTeamActionSelect(action: string) {
+    this.showTeamActionDropdown = false;
+    if (action === 'assign') {
+      this.fetchAndShowTeams(this.teamActionIsHome);
+    } else if (action === 'external') {
+      this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.activityCode });
+    }
+  }
+
   showAvailableTeams(isHomeTeam: boolean): void {
     this.closeFab();
     if (this.leagueParticipantForMatchRes.length > 0) {
@@ -748,6 +767,20 @@ export class LeagueMatchInfoPage {
     } else {
       this.commonService.toastMessage("No teams available", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
     }
+  }
+
+  fetchAndShowTeams(isHome: boolean) {
+    this.httpService.post(`${API.Get_League_Participant_For_Match}`, this.leagueParticipantForMatchInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.leagueParticipantForMatchRes = res.data;
+        }
+        this.showAvailableTeams(isHome);
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to fetch teams", 2500, ToastMessageType.Error);
+      }
+    });
   }
 
   onTeamSelected(team: LeagueParticipationForMatchModel): void {

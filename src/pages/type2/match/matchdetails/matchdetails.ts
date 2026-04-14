@@ -11,6 +11,7 @@ import gql from "graphql-tag";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { AllMatchData } from "../../../../shared/model/match.model";
 import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
+import { ModuleTypeForEmail } from "../../mailtomemberbyadmin/mailtomemberbyadmin";
 /**
  * Generated class for the MatchdetailsPage page.
  *
@@ -651,6 +652,33 @@ export class MatchdetailsPage {
   gotoRecurringMatches() {
     this.closeFab();
     this.navCtrl.push('AddrecurringmatchesPage', { match: JSON.stringify(this.match) });
+  }
+
+  gotoEmailPage() {
+    if (this.participants.length > 0) {
+      const member_list = this.participants.map(p => ({
+        IsChild: (p.User as any).IsChild || false,
+        ParentId: (p.User as any).IsChild ? ((p.User as any).ParentId || "") : "",
+        MemberId: p.User.Id,
+        MemberEmail: (p.User as any).EmailID && (p.User as any).EmailID !== "" && (p.User as any).EmailID !== "-" && (p.User as any).EmailID !== "n/a"
+          ? (p.User as any).EmailID
+          : ((p.User as any).IsChild ? ((p.User as any).ParentEmailID || "") : ""),
+        MemberName: p.User.FirstName + " " + p.User.LastName
+      }));
+      const email_modal = {
+        module_info: {
+          module_id: this.match.MatchId,
+          module_booking_club_name: this.match.VenueName,
+          module_booking_name: this.match.MatchTitle,
+          module_booking_start_date: this.match.MatchStartDate,
+        },
+        email_users: member_list,
+        type: ModuleTypeForEmail.MEMBER
+      };
+      this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    }
   }
 
   deleteConfirm() {

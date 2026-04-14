@@ -52,6 +52,15 @@ export class CreateteamPage {
   postgre_parentclubId: string;
   publicType: boolean = true;
   isDarkTheme: boolean = true;
+  lockClubTeam: boolean = false;
+  lockActivity: boolean = false;
+
+  get isExternalTeam(): boolean {
+    return !this.parentClubTeamCreationInput.teamDetails.is_club_team;
+  }
+  set isExternalTeam(val: boolean) {
+    this.parentClubTeamCreationInput.teamDetails.is_club_team = !val;
+  }
   privateType: boolean = true;
 
 
@@ -124,6 +133,20 @@ export class CreateteamPage {
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad CreateteamPage");
+    const isClubTeam = this.navParams.get('is_club_team');
+    if (isClubTeam !== undefined && isClubTeam !== null) {
+      this.parentClubTeamCreationInput.teamDetails.is_club_team = isClubTeam;
+    }
+    this.lockClubTeam = this.navParams.get('lock_club_team') || false;
+    if (this.lockClubTeam) {
+      this.publicType = false;
+      this.parentClubTeamCreationInput.teamDetails.teamVisibility = 1;
+    }
+    const activityCode = this.navParams.get('activityCode');
+    if (activityCode) {
+      this.parentClubTeamCreationInput.teamDetails.activityCode = activityCode;
+      this.lockActivity = true;
+    }
   }
 
   ionViewWillLeave() {
@@ -482,9 +505,15 @@ export class CreateteamPage {
   }
 
   createTeamConfirm() {
-    this.commonService.commonAlert_V4("Create Team", "Are you sure you want to create the team?", "Yes:Create", "No", () => {
-      this.saveTeamDetails();
-    })
+    if (this.isExternalTeam) {
+      this.commonService.commonAlert_V4("External Team", "You are creating an external team. Want to proceed?", "Yes", "No", () => {
+        this.saveTeamDetails();
+      });
+    } else {
+      this.commonService.commonAlert_V4("Create Team", "Are you sure you want to create the team?", "Yes:Create", "No", () => {
+        this.saveTeamDetails();
+      });
+    }
   }
 
   saveTeamDetails = async () => {
@@ -533,7 +562,6 @@ export class CreateteamPage {
         this.httpService.post(`${API.CREATE_TEAM}`, restPayload).subscribe((res: any) => {
           this.commonService.hideLoader();
           const message = "Team created successfully";
-          this.commonService.updateCategory("leagueteamlisting");
           this.events.publish('team:refresh');
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
           this.navCtrl.pop();
