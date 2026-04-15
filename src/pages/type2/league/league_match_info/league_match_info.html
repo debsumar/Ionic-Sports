@@ -12,7 +12,8 @@
         [title]="matchObj?.match_title"
         [subtitle]="(matchObj?.activity_name || '') + ' · Team'"
         [detailRows]="headerDetailRows"
-        [accentColor]="headerAccentColor">
+        [accentColor]="headerAccentColor"
+        [visibilityIcon]="matchObj?.match_visibility==0?'globe':'lock'">
         <div header-actions>
           <button class="action-btn danger" (click)="deleteConfirm()">
             <ion-icon name="trash"></ion-icon>
@@ -172,12 +173,17 @@
   <app-bottom-sheet [(visible)]="showTeamActionDropdown"
     [title]="teamActionIsHome ? selectedHomeTeamText : selectedAwayTeamText"
     [bottomOffset]="0">
-    <div class="sheet-item" (click)="onTeamActionSelect('assign')">
+    <div class="sheet-item" (click)="onTeamActionSelect('club')">
       <ion-icon name="people" class="sheet-item-icon"></ion-icon>
-      <div class="sheet-item-info"><span class="sheet-item-name">Assign Team</span></div>
+      <div class="sheet-item-info"><span class="sheet-item-name">Parent Club Teams</span></div>
       <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
     </div>
     <div class="sheet-item" (click)="onTeamActionSelect('external')">
+      <ion-icon name="globe" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">External Teams</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item" (click)="onTeamActionSelect('create_external')">
       <ion-icon name="person-add" class="sheet-item-icon"></ion-icon>
       <div class="sheet-item-info"><span class="sheet-item-name">Add External Team</span></div>
       <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>

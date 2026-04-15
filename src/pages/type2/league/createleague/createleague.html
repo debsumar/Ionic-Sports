@@ -179,7 +179,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Age Group(Optional)</ion-label>
+        <ion-label>Age Group <span class="optional-tag">(Optional)</span></ion-label>
         <ion-input type="text" [(ngModel)]="leagueCreationInput.league.league_ageGroup" class="textareastyle"></ion-input>
         <button ion-button clear item-right class="help_btn" (click)="ageGroupHint()">
           <img style="width: 70%;" src="assets/images/info.svg">
@@ -268,7 +268,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item class="description-item">
-        <ion-label stacked>Description</ion-label>
+        <ion-label stacked>Description <span class="optional-tag">(Optional)</span></ion-label>
         <ion-textarea type="text" rows="5" [(ngModel)]="leagueCreationInput.league.league_description"
           placeholder="Competition instructions, rules, or notes..."></ion-textarea>
       </ion-item>

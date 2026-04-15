@@ -61,7 +61,8 @@ export class LeagueMatchInfoPage {
     app_type: 0,
     device_id: "",
     updated_by: "",
-    LeagueId: ""
+    LeagueId: "",
+    isExternal: false
   } //league participant for match input  
 
   //fetch api for teams and corresponding player details
@@ -771,10 +772,12 @@ export class LeagueMatchInfoPage {
 
   onTeamActionSelect(action: string) {
     this.showTeamActionDropdown = false;
-    if (action === 'assign') {
-      this.fetchAndShowTeams(this.teamActionIsHome);
+    if (action === 'club') {
+      this.fetchAndShowTeams(this.teamActionIsHome, false);
     } else if (action === 'external') {
-      this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.activityCode });
+      this.fetchAndShowTeams(this.teamActionIsHome, true);
+    } else if (action === 'create_external') {
+      this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.activityCode, leagueId: this.leagueId });
     }
   }
 
@@ -788,7 +791,8 @@ export class LeagueMatchInfoPage {
     }
   }
 
-  fetchAndShowTeams(isHome: boolean) {
+  fetchAndShowTeams(isHome: boolean, isExternal?: boolean) {
+    this.leagueParticipantForMatchInput.isExternal = isExternal === true;
     this.httpService.post(`${API.Get_League_Participant_For_Match}`, this.leagueParticipantForMatchInput).subscribe({
       next: (res: any) => {
         if (res) {
@@ -1083,6 +1087,7 @@ export class LeagueParticipantForMatchInput {
   device_id: string;
   updated_by: string;
   LeagueId: string;
+  isExternal: boolean;
 }
 
 

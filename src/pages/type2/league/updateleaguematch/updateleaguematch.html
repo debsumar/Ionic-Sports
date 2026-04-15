@@ -30,7 +30,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Round/Stage/Type</ion-label>
+        <ion-label>Round/Stage/Type <span class="optional-tag">(Optional)</span></ion-label>
         <ion-select [(ngModel)]="data.round">
           <ion-option *ngFor="let roundType of roundTypes" [value]="roundType.id">{{roundType.name}}</ion-option>
         </ion-select>
@@ -84,7 +84,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item class="description-item">
-        <ion-label stacked>Description</ion-label>
+        <ion-label stacked>Description <span class="optional-tag">(Optional)</span></ion-label>
         <ion-textarea type="text" rows="5" placeholder="Match instructions, rules, or notes..."
           [(ngModel)]="data.description"></ion-textarea>
       </ion-item>

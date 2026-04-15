@@ -12,11 +12,9 @@
         [title]="match.MatchTitle"
         [subtitle]="match.ActivityName + ' · ' + (match.MatchType==1?'Singles':'Doubles')"
         [detailRows]="headerDetailRows"
-        [accentColor]="headerAccentColor">
+        [accentColor]="headerAccentColor"
+        [visibilityIcon]="match?.MatchVisibility==0?'globe':'lock'">
         <div header-actions>
-          <div class="header-badge" [class.private]="match?.MatchVisibility==1">
-            <ion-icon [name]="match?.MatchVisibility==0?'globe':'lock'"></ion-icon>
-          </div>
           <button class="action-btn" (click)="gotoEditMatch()">
             <ion-icon name="create"></ion-icon>
           </button>

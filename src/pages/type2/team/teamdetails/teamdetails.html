@@ -12,11 +12,9 @@
         [title]="teamsForParentClub.teamName"
         [subtitle]="teamsForParentClub?.activity?.ActivityName"
         [detailRows]="headerDetailRows"
-        [accentColor]="'#a78bfa'">
+        [accentColor]="'#a78bfa'"
+        [visibilityIcon]="team?.teamVisibility==0?'globe':'lock'">
         <div header-actions>
-          <div class="header-badge" [class.private]="team?.teamVisibility==1">
-            <ion-icon [name]="team?.teamVisibility==0?'globe':'lock'"></ion-icon>
-          </div>
           <button class="action-btn" (click)="gotoEditTeam()">
             <ion-icon name="create"></ion-icon>
           </button>

@@ -24,7 +24,7 @@
       <ion-item>
         <ion-row style="width:100%">
           <ion-col col-7 style="margin:auto">
-            <span class="logo-label">Team Logo</span>
+            <span class="logo-label">Team Logo <span class="optional-tag">(Optional)</span></span>
           </ion-col>
           <ion-col col-3 style="margin:auto; text-align:center">
             <img *ngIf="parentClubTeamEdit.teamDetailsInput.logo_url"
@@ -60,7 +60,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Age Group</ion-label>
+        <ion-label>Age Group <span class="optional-tag">(Optional)</span></ion-label>
         <ion-input type="text" [(ngModel)]="team.ageGroup"></ion-input>
         <button ion-button clear item-right class="help_btn" (click)="ageGroupHint()">
           <img style="width: 70%;" src="assets/images/info.svg">
@@ -76,7 +76,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item class="description-item">
-        <ion-label stacked>Description</ion-label>
+        <ion-label stacked>Description <span class="optional-tag">(Optional)</span></ion-label>
         <ion-textarea type="text" rows="5" maxLength="500" placeholder="Team Description (optional)"
           [(ngModel)]="team.teamDescription"></ion-textarea>
       </ion-item>

@@ -58,7 +58,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Round/Stage/Type</ion-label>
+        <ion-label>Round/Stage/Type <span class="optional-tag">(Optional)</span></ion-label>
         <ion-select [(ngModel)]="createMatchInput.Round">
           <ion-option *ngFor="let roundType of roundTypes" [value]="roundType.id">{{roundType.name}}</ion-option>
         </ion-select>
@@ -92,7 +92,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Duration</ion-label>
+        <ion-label>Duration <span class="optional-tag">(Optional)</span></ion-label>
         <ion-select [(ngModel)]="selectedDuration" placeholder="Select duration">
           <ion-option *ngFor="let d of durations" [value]="d.id">{{d.duration}} mins</ion-option>
         </ion-select>
@@ -135,7 +135,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item class="description-item">
-        <ion-label stacked>Description</ion-label>
+        <ion-label stacked>Description <span class="optional-tag">(Optional)</span></ion-label>
         <ion-textarea type="text" rows="5" [(ngModel)]="createMatchInput.MatchDetails"
           placeholder="Match instructions, rules, or notes..."></ion-textarea>
       </ion-item>

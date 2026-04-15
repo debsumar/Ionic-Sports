@@ -77,7 +77,8 @@ export class MatchTeamDetailsPage {
     device_type: 0,
     app_type: 0,
     device_id: "",
-    updated_by: ""
+    updated_by: "",
+    isExternal: false
   }
   updateTeamInput: UpdateTeamInput = {
     parentclubId: "",
@@ -660,9 +661,11 @@ export class MatchTeamDetailsPage {
 
   onTeamActionSelect(action: string) {
     this.showTeamActionDropdown = false;
-    if (action === 'assign') {
-      this.fetchAndShowTeams(this.teamActionIsHome);
+    if (action === 'club') {
+      this.fetchAndShowTeams(this.teamActionIsHome, true);
     } else if (action === 'external') {
+      this.fetchAndShowTeams(this.teamActionIsHome, false);
+    } else if (action === 'create_external') {
       this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode });
     }
   }
@@ -677,7 +680,8 @@ export class MatchTeamDetailsPage {
     }
   }
 
-  fetchAndShowTeams(isHome: boolean) {
+  fetchAndShowTeams(isHome: boolean, isClubTeam?: boolean) {
+    this.getActivitySpecificTeamInput.isExternal = isClubTeam === false;
     this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, this.getActivitySpecificTeamInput).subscribe({
       next: (res: any) => {
         if (res) {
@@ -1044,6 +1048,7 @@ export class GetActivitySpecificTeamInput {
   app_type: number;
   device_id: string;
   updated_by: string;
+  isExternal: boolean;
 }
 
 export class UpdateTeamInput {

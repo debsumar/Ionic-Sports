@@ -105,7 +105,7 @@
 
 
     <ion-item class="allign-right">
-      <ion-label fixed>Match Title</ion-label>
+      <ion-label fixed>Match Title <span class="optional-tag">(Optional)</span></ion-label>
       <ion-input type="text" [(ngModel)]="inputObj.MatchName"></ion-input>
     </ion-item>
 
@@ -152,7 +152,7 @@
 
 
     <ion-item class="description-item">
-      <ion-label stacked>Description</ion-label>
+      <ion-label stacked>Description <span class="optional-tag">(Optional)</span></ion-label>
       <ion-textarea type="text" rows="5" class="textareastyle" [(ngModel)]="inputObj.MatchDetails"
         placeholder="Match instructions, rules, or notes..."></ion-textarea>
     </ion-item>

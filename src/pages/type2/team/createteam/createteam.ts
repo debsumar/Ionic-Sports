@@ -482,16 +482,6 @@ export class CreateteamPage {
       this.commonService.toastMessage(message, 3000, ToastMessageType.Info);
       return false;
     }
-    else if (this.parentClubTeamCreationInput.teamDetails.ageGroup == "" || this.parentClubTeamCreationInput.teamDetails.ageGroup == undefined) {
-      let message = "Enter Age group";
-      this.commonService.toastMessage(message, 3000, ToastMessageType.Info);
-      return false;
-    }
-    // else if (this.parentClubTeamCreationInput.teamDetails.teamDescription == "" || this.parentClubTeamCreationInput.teamDetails.teamDescription == undefined) {
-    //   let message = "Enter description";
-    //   this.showToast(message, 3000)
-    //   return false;
-    // }
     return true;
   }
   goToDashboardMenuPage() {
@@ -556,7 +546,8 @@ export class CreateteamPage {
           teamVisibility: this.parentClubTeamCreationInput.teamDetails.teamVisibility,
           teamDescription: this.parentClubTeamCreationInput.teamDetails.teamDescription,
           logoUrl: this.parentClubTeamCreationInput.teamDetails.logoUrl,
-          is_club_team: this.parentClubTeamCreationInput.teamDetails.is_club_team
+          is_club_team: this.parentClubTeamCreationInput.teamDetails.is_club_team,
+          ...(this.navParams.get('leagueId') ? { leagueId: this.navParams.get('leagueId') } : {})
         };
 
         this.httpService.post(`${API.CREATE_TEAM}`, restPayload).subscribe((res: any) => {

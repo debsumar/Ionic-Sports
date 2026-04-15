@@ -3,6 +3,15 @@
 page-updateleaguematch {
   @include android-sdk35-fixes;
 
+  .optional-tag {
+    font-size: 9px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0.2px;
+    color: #64748b;
+    opacity: 0.8;
+  }
+
   .scroll-content { background-color: #f8fafc !important; padding: 0 !important; }
   ion-content { margin-bottom: 56px !important; }
 

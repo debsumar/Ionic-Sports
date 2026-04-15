@@ -40,7 +40,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Team Logo</ion-label>
+        <ion-label>Team Logo <span class="optional-tag">(Optional)</span></ion-label>
         <img *ngIf="parentClubTeamCreationInput.teamDetails.logoUrl"
           [src]="parentClubTeamCreationInput.teamDetails.logoUrl" class="team-logo" item-end>
         <button ion-button icon-only clear (click)="selectTeamLogo()" class="upload-btn" item-end>
@@ -73,7 +73,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Age Group</ion-label>
+        <ion-label>Age Group <span class="optional-tag">(Optional)</span></ion-label>
         <ion-input type="text" [(ngModel)]="parentClubTeamCreationInput.teamDetails.ageGroup"></ion-input>
         <button ion-button clear item-right class="help_btn" (click)="ageGroupHint()">
           <ion-icon name="ios-help-circle-outline"></ion-icon>
@@ -96,7 +96,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item class="description-item">
-        <ion-label stacked>Description</ion-label>
+        <ion-label stacked>Description <span class="optional-tag">(Optional)</span></ion-label>
         <ion-textarea type="text" rows="5" maxLength="500" placeholder="Team description, notes..."
           [(ngModel)]="parentClubTeamCreationInput.teamDetails.teamDescription"></ion-textarea>
       </ion-item>

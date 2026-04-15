@@ -11,7 +11,10 @@ export interface DetailHeaderRow {
   template: `
     <div class="detail-header">
       <div class="detail-header-glow"></div>
-      <h2 class="detail-header-title">{{title}}</h2>
+      <h2 class="detail-header-title">
+        <ion-icon *ngIf="visibilityIcon" [name]="visibilityIcon" class="detail-header-visibility" [class.private]="visibilityIcon==='lock'"></ion-icon>
+        {{title}}
+      </h2>
       <span class="detail-header-subtitle" *ngIf="subtitle">{{subtitle}}</span>
       <div class="detail-header-rows">
         <div class="detail-header-row" *ngFor="let row of detailRows">
@@ -54,6 +57,15 @@ export interface DetailHeaderRow {
       position: relative; z-index: 1;
       font-size: 22px; font-weight: 800; margin: 0 0 6px; line-height: 1.2; letter-spacing: -0.5px;
       word-break: break-word; color: #fff;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* Visibility icon next to title */
+    app-detail-header .detail-header-visibility {
+      font-size: 18px; color: #10b981; flex-shrink: 0;
+    }
+    app-detail-header .detail-header-visibility.private {
+      color: #ef4444;
     }
 
     /* Subtitle pill */
@@ -112,6 +124,8 @@ export interface DetailHeaderRow {
       background: linear-gradient(135deg, #f8fafc 70%, var(--accent));
     }
     .light-theme app-detail-header .detail-header-title { color: #0f172a; }
+    .light-theme app-detail-header .detail-header-visibility { color: #10b981; }
+    .light-theme app-detail-header .detail-header-visibility.private { color: #ef4444; }
     .light-theme app-detail-header .detail-header-subtitle { color: #1e293b; background: rgba(0, 0, 0, 0.08); }
     .light-theme app-detail-header .detail-header-row-icon { color: var(--accent); }
     .light-theme app-detail-header .detail-header-row-text { color: #475569; }
@@ -155,6 +169,7 @@ export class DetailHeaderComponent implements OnChanges {
   @Input() subtitle: string = '';
   @Input() detailRows: DetailHeaderRow[] = [];
   @Input() accentColor: string = '#2b92bb';
+  @Input() visibilityIcon: string = '';
 
   constructor(private el: ElementRef) { }
 

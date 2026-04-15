@@ -115,12 +115,15 @@ export class NotificationsPage {
       page_id: this.navParams.get('page_id'),
     };
 
+    this.commonService.showLoader('Sending notification...');
     this.httpService.post(API.SEND_PUSH_NOTIFICATION, body, null, 1).subscribe({
       next: (res: any) => {
+        this.commonService.hideLoader();
         this.commonService.toastMessage('Notification sent successfully.', 2500, ToastMessageType.Success, ToastPlacement.Bottom);
         this.navCtrl.pop();
       },
       error: (err) => {
+        this.commonService.hideLoader();
         console.error('Error sending notification:', err);
         this.commonService.toastMessage('Notification sent failed', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
