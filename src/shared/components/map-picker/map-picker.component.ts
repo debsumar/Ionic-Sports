@@ -41,6 +41,8 @@ import { MapPickerModalComponent } from './map-picker-modal.component';
 })
 export class MapPickerComponent implements OnChanges {
   @Input() address: string = '';
+  @Input() lat: number = null;
+  @Input() lng: number = null;
   @Output() locationSelected = new EventEmitter<any>();
   selectedAddress: string = '';
 
@@ -53,7 +55,11 @@ export class MapPickerComponent implements OnChanges {
   }
 
   openMap() {
-    const modal = this.modalCtrl.create(MapPickerModalComponent, { initialAddress: this.selectedAddress });
+    const modal = this.modalCtrl.create(MapPickerModalComponent, {
+      initialAddress: this.selectedAddress,
+      initialLat: this.lat,
+      initialLng: this.lng
+    });
     modal.onDidDismiss((data) => {
       if (data) {
         this.selectedAddress = data.address;

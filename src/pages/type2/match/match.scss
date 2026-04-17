@@ -54,6 +54,7 @@ page-match {
     .vs-badge { background: #e2e8f0 !important; color: #64748b !important; }
     .footer-status { color: #d97706; &.published { color: #059669; } }
     .tag.type-tag { color: #fff; }
+    .tag.round-type-tag { background: rgba(124, 58, 237, 0.1); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.25); }
 
     .modern-empty-state {
       .empty-icon { color: #cbd5e1; }
@@ -192,6 +193,7 @@ page-match {
     font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.4;
   }
   .tag.type-tag { color: #fff; }
+  .tag.round-type-tag { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
   .lineup-btn {
     background: linear-gradient(135deg, #2b92bb, #1e6c8c) !important;
     color: #fff; font-size: 10px; font-weight: 700; text-transform: uppercase;

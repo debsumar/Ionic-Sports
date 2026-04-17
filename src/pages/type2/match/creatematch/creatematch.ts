@@ -1,5 +1,4 @@
 import { Component } from "@angular/core";
-import gql from "graphql-tag";
 import {
   IonicPage,
   LoadingController,
@@ -20,7 +19,6 @@ import { Storage } from "@ionic/storage";
 import { MatchModel } from "../models/match.model";
 import moment from "moment";
 import { ClubVenue, SchoolVenue } from "../models/venue.model";
-import { GraphqlService } from "../../../../services/graphql.service";
 import { Activities, Activity, ClubActivityInput, IClubDetails } from "../../../../shared/model/club.model";
 import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
@@ -143,7 +141,6 @@ export class CreatematchPage {
     public fb: FirebaseService,
     public sharedservice: SharedServices,
     public popoverCtrl: PopoverController,
-    private graphqlService: GraphqlService,
     private httpService: HttpService,
     private themeService: ThemeService,
     private events: Events
@@ -298,40 +295,30 @@ export class CreatematchPage {
   }
 
   getListOfClub() {
-    const clubs_input = {
+    const body = {
       parentclub_id: this.sharedservice.getPostgreParentClubId(),
-      user_postgre_metadata: {
-        UserMemberId: this.sharedservice.getLoggedInUserId()
-      },
-      user_device_metadata: {
-        UserAppType: 0,
-        UserDeviceType: this.sharedservice.getPlatform() == "android" ? 1 : 2
-      }
-    }
-    const clubs_query = gql`
-        query getVenuesByParentClub($clubs_input: ParentClubVenuesInput!){
-          getVenuesByParentClub(clubInput:$clubs_input){
-                Id
-                ClubName
-                FirebaseId
-                MapUrl
-                sequence
-            }
-        }
-        `;
-    this.graphqlService.query(clubs_query, { clubs_input: clubs_input }, 0)
-      .subscribe((res: any) => {
-        this.clubs = res.data.getVenuesByParentClub || [];
+      club_id: '',
+      activity_id: '',
+      member_id: this.sharedservice.getLoggedInUserId(),
+      action_type: 0,
+      device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
+      app_type: AppType.ADMIN_NEW,
+      device_id: this.sharedservice.getDeviceId() || 'web',
+      updated_by: this.sharedservice.getLoggedInUserId()
+    };
+    this.httpService.post(API.GET_PARENT_CLUB_VENUES, body, null, 1).subscribe({
+      next: (res: any) => {
+        this.clubs = res.data || [];
         if (this.clubs.length > 0) {
           this.selectedClub = this.clubs[0].Id;
+          this.autoFillLocation();
           this.getClubActivity();
         }
-
       },
-        (error) => {
-          this.commonService.toastMessage("No venues found", 2500, ToastMessageType.Error)
-          console.error("Error in fetching:", error);
-        })
+      error: () => {
+        this.commonService.toastMessage("No venues found", 2500, ToastMessageType.Error);
+      }
+    });
   }
 
 
@@ -343,34 +330,16 @@ export class CreatematchPage {
 
   autoFillLocation() {
     const club = this.clubs.find(c => c.Id === this.selectedClub);
-    if (!club || !club.ClubName) { this.mapLocationAddress = ''; return; }
-    const query = club.ClubName;
-    fetch('https://places.googleapis.com/v1/places:searchText', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'X-Goog-Api-Key': 'AIzaSyDpcFMCrpkNA_WXypfOPcBqEgqAr6_DRbE',
-        'X-Goog-FieldMask': 'places.formattedAddress,places.displayName'
-      },
-      body: JSON.stringify({ textQuery: query })
-    })
-      .then(res => res.json())
-      .then(data => {
-        if (data.places && data.places[0]) {
-          const name = (data.places[0].displayName?.text || '').toLowerCase();
-          const q = query.toLowerCase();
-          // Check if result name shares at least one word with the club name
-          const queryWords = q.split(/\s+/).filter(w => w.length > 2);
-          const match = queryWords.some(w => name.includes(w));
-          this.mapLocationAddress = match ? data.places[0].formattedAddress : '';
-        } else {
-          this.mapLocationAddress = '';
-        }
-      })
-      .catch(() => { this.mapLocationAddress = ''; });
+    if (!club) { this.mapLocationAddress = ''; this.mapLocationLat = null; this.mapLocationLng = null; return; }
+    const parts = [club.PostCode, club.FirstLineAddress].filter(Boolean);
+    this.mapLocationAddress = parts.join(', ');
+    this.mapLocationLat = club.MapLatitude ? parseFloat(club.MapLatitude) : null;
+    this.mapLocationLng = club.MapLongitude ? parseFloat(club.MapLongitude) : null;
   }
 
   mapLocationAddress: string = '';
+  mapLocationLat: number = null;
+  mapLocationLng: number = null;
 
   onMapLocationSelected(location: any) {
     this.mapLocationAddress = location.address || '';
@@ -497,6 +466,7 @@ export class CreatematchPage {
           location_id: this.createMatchInput.location_id,
           location: this.mapLocationAddress || '',
           MatchDuration: this.createMatchInput.MatchDuration,
+          match_round_type: this.createMatchInput.Round || 0,
           UserParentClubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
           UserActivityId: this.createMatchInput.user_postgre_metadata.UserActivityId,
           UserActionType: 0

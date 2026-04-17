@@ -36,7 +36,7 @@
       </ion-item>
     </app-form-field>
 
-    <app-map-picker [address]="mapLocationAddress" (locationSelected)="onMapLocationSelected($event)"></app-map-picker>
+    <app-map-picker [address]="mapLocationAddress" [lat]="mapLocationLat" [lng]="mapLocationLng" (locationSelected)="onMapLocationSelected($event)"></app-map-picker>
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>

@@ -10,6 +10,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
       <button class="pill-tabs-btn" [class.active]="activeIndex===0" (click)="select(0)">
         <ion-icon *ngIf="leftIcon" [name]="leftIcon"></ion-icon>
         {{leftLabel}}
+        <span class="pill-badge" *ngIf="leftBadge">{{leftBadge}}</span>
         <span class="pill-count" *ngIf="leftCount !== null && leftCount !== undefined">{{leftCount}}</span>
         <span class="pill-action" *ngIf="leftActionIcon" (click)="onAction($event, 'left')">
           <ion-icon [name]="leftActionIcon"></ion-icon>
@@ -24,6 +25,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
         (click)="select(centerLabel ? 2 : 1)">
         <ion-icon *ngIf="rightIcon" [name]="rightIcon"></ion-icon>
         {{rightLabel}}
+        <span class="pill-badge" *ngIf="rightBadge">{{rightBadge}}</span>
         <span class="pill-count" *ngIf="rightCount !== null && rightCount !== undefined">{{rightCount}}</span>
         <span class="pill-action" *ngIf="rightActionIcon" (click)="onAction($event, 'right')">
           <ion-icon [name]="rightActionIcon"></ion-icon>
@@ -47,10 +49,27 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
     }
     app-pill-tabs .pill-tabs-btn {
       position: relative; z-index: 1; flex: 1;
-      display: flex; align-items: center; justify-content: center; gap: 6px;
-      padding: 10px 0; background: none; border: none;
+      display: flex; align-items: center; justify-content: center; gap: 4px;
+      padding: 10px 4px; background: none; border: none;
       font-size: 13px; font-weight: 700; letter-spacing: 0.3px; line-height: 1;
       color: #64748b; cursor: pointer; transition: color 0.3s ease;
+      min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis;
+    }
+
+    @media (max-width: 359px) {
+      app-pill-tabs .pill-tabs-btn { font-size: 11px; padding: 8px 2px; gap: 2px; }
+      app-pill-tabs .pill-tabs-btn ion-icon { font-size: 14px; }
+      app-pill-tabs .pill-action { width: 18px; height: 18px; margin-left: 2px; }
+      app-pill-tabs .pill-action ion-icon { font-size: 12px; }
+      app-pill-tabs .pill-badge { font-size: 7px; }
+      app-pill-tabs .pill-count { font-size: 8px; padding: 1px 4px; }
+    }
+    @media (min-width: 360px) and (max-width: 399px) {
+      app-pill-tabs .pill-tabs-btn { font-size: 12px; gap: 3px; }
+    }
+    @media (min-width: 768px) {
+      app-pill-tabs .pill-tabs-btn { font-size: 15px; padding: 12px 8px; gap: 8px; }
+      app-pill-tabs .pill-action { width: 26px; height: 26px; }
     }
     app-pill-tabs .pill-tabs-btn ion-icon { font-size: 16px; }
     app-pill-tabs .pill-tabs-btn.active { color: #ffffff; }
@@ -61,6 +80,13 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
     }
     app-pill-tabs .pill-tabs-btn.active .pill-count {
       background: rgba(255, 255, 255, 0.25);
+    }
+    app-pill-tabs .pill-badge {
+      font-size: 9px; font-weight: 500; font-style: italic; text-transform: lowercase;
+      color: rgba(247,110,4,0.7); margin-left: 3px;
+    }
+    app-pill-tabs .pill-tabs-btn:not(.active) .pill-badge {
+      color: #f76e04;
     }
     app-pill-tabs .pill-action {
       display: flex; align-items: center; justify-content: center;
@@ -101,6 +127,8 @@ export class PillTabsComponent {
   @Input() activeIndex: number = 0;
   @Input() leftActionIcon: string;
   @Input() rightActionIcon: string;
+  @Input() leftBadge: string;
+  @Input() rightBadge: string;
   @Output() activeIndexChange = new EventEmitter<number>();
   @Output() leftActionClick = new EventEmitter<void>();
   @Output() rightActionClick = new EventEmitter<void>();

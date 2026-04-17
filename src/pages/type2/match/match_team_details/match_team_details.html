@@ -49,6 +49,8 @@
       <app-pill-tabs
         [leftLabel]="selectedHomeTeamText"
         [rightLabel]="selectedAwayTeamText"
+        [leftBadge]="isHomeExternal ? 'EXT' : null"
+        [rightBadge]="isAwayExternal ? 'EXT' : null"
         [activeIndex]="activeTabIndex"
         [leftActionIcon]="'arrow-dropdown'"
         [rightActionIcon]="'arrow-dropdown'"

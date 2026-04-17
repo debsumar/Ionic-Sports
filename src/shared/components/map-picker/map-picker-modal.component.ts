@@ -145,9 +145,14 @@ export class MapPickerModalComponent {
       });
     });
 
-    // Center on initial address if provided, else try geolocation
+    // Center on initial lat/lng if provided, else address, else geolocation
+    const initialLat = this.navParams.get('initialLat');
+    const initialLng = this.navParams.get('initialLng');
     const initialAddress = this.navParams.get('initialAddress');
-    if (initialAddress) {
+    if (initialLat && initialLng) {
+      this.map.panTo({ lat: initialLat, lng: initialLng });
+      this.map.setZoom(16);
+    } else if (initialAddress) {
       this.geocoder.geocode({ address: initialAddress }, (results, status) => {
         if (status === 'OK' && results[0]) {
           this.map.panTo(results[0].geometry.location);

@@ -37,6 +37,8 @@ export class MatchTeamDetailsPage {
   activeType: boolean = true;
   selectedHomeTeamText: string;
   selectedAwayTeamText: string;
+  isHomeExternal: boolean = false;
+  isAwayExternal: boolean = false;
   isDarkTheme: boolean = true;
   showPlayerSheet: boolean = false;
   selectedPlayer: GetIndividualMatchParticipantModel = null;
@@ -343,6 +345,11 @@ export class MatchTeamDetailsPage {
     });
     this.events.subscribe("team:refresh", () => {
       this.getActivitySpecificTeam();
+      this.detectExternalTeams();
+    });
+    this.detectExternalTeams();
+    this.loadAllParticipantsForCounts().then(() => {
+      this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
     });
   }
 
@@ -664,7 +671,12 @@ export class MatchTeamDetailsPage {
     if (action === 'club') {
       this.fetchAndShowTeams(this.teamActionIsHome, true);
     } else if (action === 'external') {
-      this.fetchAndShowTeams(this.teamActionIsHome, false);
+      if (this.cachedExternalTeams.length > 0) {
+        this.activitySpecificTeamsRes = this.cachedExternalTeams;
+        this.showAvailableTeams(this.teamActionIsHome);
+      } else {
+        this.fetchAndShowTeams(this.teamActionIsHome, false);
+      }
     } else if (action === 'create_external') {
       this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode });
     }
@@ -707,6 +719,7 @@ export class MatchTeamDetailsPage {
       this.selectedTeam = team;
       this.updateTeamInput.HomeParentclubTeamId = team.id;
       this.updateTeamInput.AwayParentclubTeamId = "";
+      this.isHomeExternal = !team.is_club_team;
       this.updateTeam(true, team.teamName);
     } else {
       if (team.teamName === this.selectedHomeTeamText) {
@@ -716,6 +729,7 @@ export class MatchTeamDetailsPage {
       this.selectedTeam = team;
       this.updateTeamInput.AwayParentclubTeamId = team.id;
       this.updateTeamInput.HomeParentclubTeamId = "";
+      this.isAwayExternal = !team.is_club_team;
       this.updateTeam(false, team.teamName);
     }
   }
@@ -808,6 +822,23 @@ export class MatchTeamDetailsPage {
         default:
           this.sections[2].items.push(participant);
           break;
+      }
+    });
+  }
+
+  cachedExternalTeams: TeamsForParentClubModel[] = [];
+
+  detectExternalTeams() {
+    const input = { ...this.getActivitySpecificTeamInput, isExternal: true };
+    this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, input).subscribe({
+      next: (res: any) => {
+        this.cachedExternalTeams = res?.data || [];
+        if (this.match.homeUserId) {
+          this.isHomeExternal = this.cachedExternalTeams.some(t => t.id === this.match.homeUserId);
+        }
+        if (this.match.awayUserId) {
+          this.isAwayExternal = this.cachedExternalTeams.some(t => t.id === this.match.awayUserId);
+        }
       }
     });
   }

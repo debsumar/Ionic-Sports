@@ -37,6 +37,9 @@ export class LeagueMatchInfoPage {
   activeType: boolean = true;
   selectedHomeTeamText: string;
   selectedAwayTeamText: string;
+  isHomeExternal: boolean = false;
+  isAwayExternal: boolean = false;
+  cachedExternalTeams: LeagueParticipationForMatchModel[] = [];
 
   matchObj: LeagueMatch;
   leagueId: string; //league id from prev page
@@ -294,6 +297,12 @@ export class LeagueMatchInfoPage {
     });
     this.events.subscribe("team:refresh", () => {
       this.getLeagueParticipantForMatch();
+      this.detectExternalTeams();
+    });
+    this.getLeagueParticipantForMatch();
+    this.detectExternalTeams();
+    this.loadAllParticipantsForCounts().then(() => {
+      this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
     });
   }
 
@@ -773,9 +782,19 @@ export class LeagueMatchInfoPage {
   onTeamActionSelect(action: string) {
     this.showTeamActionDropdown = false;
     if (action === 'club') {
-      this.fetchAndShowTeams(this.teamActionIsHome, false);
+      if (this.cachedClubTeams.length > 0) {
+        this.leagueParticipantForMatchRes = this.cachedClubTeams;
+        this.showAvailableTeams(this.teamActionIsHome);
+      } else {
+        this.fetchAndShowTeams(this.teamActionIsHome, false);
+      }
     } else if (action === 'external') {
-      this.fetchAndShowTeams(this.teamActionIsHome, true);
+      if (this.cachedExternalTeams.length > 0) {
+        this.leagueParticipantForMatchRes = this.cachedExternalTeams;
+        this.showAvailableTeams(this.teamActionIsHome);
+      } else {
+        this.fetchAndShowTeams(this.teamActionIsHome, true);
+      }
     } else if (action === 'create_external') {
       this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.activityCode, leagueId: this.leagueId });
     }
@@ -818,6 +837,7 @@ export class LeagueMatchInfoPage {
       }
       this.UpdateLeagueFixtureInput.HomeParticipantId = team.id;
       this.UpdateLeagueFixtureInput.AwayParticipantId = "";
+      this.isHomeExternal = !team.parentclubteam.is_club_team;
       this.updateLeagueFixture(isHomeTeam, team.parentclubteam.teamName);
     } else {
       if (team.parentclubteam.teamName === this.selectedHomeTeamText) {
@@ -826,6 +846,7 @@ export class LeagueMatchInfoPage {
       }
       this.UpdateLeagueFixtureInput.AwayParticipantId = team.id;
       this.UpdateLeagueFixtureInput.HomeParticipantId = "";
+      this.isAwayExternal = !team.parentclubteam.is_club_team;
       this.updateLeagueFixture(isHomeTeam, team.parentclubteam.teamName);
     }
   }
@@ -838,7 +859,6 @@ export class LeagueMatchInfoPage {
   changeType(val: boolean) {
     this.sections.forEach(section => section.items = []); // Clear the sections array
     this.activeType = val !== undefined ? val : !this.activeType;
-    this.getLeagueParticipantForMatch();
 
     // Load participants for the selected tab
     const teamId = this.activeType ? this.matchObj.home_team_id : this.matchObj.away_team_id;
@@ -850,12 +870,30 @@ export class LeagueMatchInfoPage {
     this.getFilteredSections();
   }
 
+  detectExternalTeams() {
+    const input = { ...this.leagueParticipantForMatchInput, isExternal: true };
+    this.httpService.post(`${API.Get_League_Participant_For_Match}`, input).subscribe({
+      next: (res: any) => {
+        this.cachedExternalTeams = res?.data || [];
+        if (this.matchObj.home_team_id) {
+          this.isHomeExternal = this.cachedExternalTeams.some(t => t.parentclubteam.id === this.matchObj.home_team_id);
+        }
+        if (this.matchObj.away_team_id) {
+          this.isAwayExternal = this.cachedExternalTeams.some(t => t.parentclubteam.id === this.matchObj.away_team_id);
+        }
+      }
+    });
+  }
+
+  cachedClubTeams: LeagueParticipationForMatchModel[] = [];
+
   //to fetch list of avilable teams
   getLeagueParticipantForMatch() {
     this.httpService.post(`${API.Get_League_Participant_For_Match}`, this.leagueParticipantForMatchInput).subscribe({
       next: (res: any) => {
         if (res) {
           this.leagueParticipantForMatchRes = res.data;
+          this.cachedClubTeams = res.data || [];
         }
       }
     });
