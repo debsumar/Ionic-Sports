@@ -59,7 +59,7 @@ export class MatchladderPage {
   get activeTabIndex(): number { return this.isPoints === 'Points' ? 0 : 1; }
 
   get searchCount(): number {
-    return this.isPoints === 'Points' ? (this.filteredLadder?.length || 0) : (this.filteredLadderHead?.length || 0);
+    return this.isPoints === 'Points' ? (this.filteredLadder ? this.filteredLadder.length : 0) : (this.filteredLadderHead ? this.filteredLadderHead.length : 0);
   }
 
   onTabChange(index: number) {

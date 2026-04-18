@@ -205,7 +205,7 @@ export class MatchTeamDetailsPage {
         this.teamRolesInput.ActionType = 0;
 
         this.getActivitySpecificTeamInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.getActivitySpecificTeamInput.memberId = this.sharedservice.getLoggedInId();
+        this.getActivitySpecificTeamInput.memberId = this.sharedservice.getLoggedInUserId();
         this.getActivitySpecificTeamInput.action_type = LeagueMatchActionType.MATCH;
         this.getActivitySpecificTeamInput.app_type = AppType.ADMIN_NEW;
         this.getActivitySpecificTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -223,7 +223,7 @@ export class MatchTeamDetailsPage {
         this.teamRolesInput.activityCode = parseInt(this.match.ActivityCode) || 0;
 
         this.getIndividualMatchParticipantInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.getIndividualMatchParticipantInput.memberId = this.sharedservice.getLoggedInId();
+        this.getIndividualMatchParticipantInput.memberId = this.sharedservice.getLoggedInUserId();
         this.getIndividualMatchParticipantInput.action_type = LeagueMatchActionType.MATCH;
         this.getIndividualMatchParticipantInput.app_type = AppType.ADMIN_NEW;
         this.getIndividualMatchParticipantInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -234,7 +234,7 @@ export class MatchTeamDetailsPage {
 
 
         this.updateTeamInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateTeamInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateTeamInput.memberId = this.sharedservice.getLoggedInUserId();
         this.updateTeamInput.action_type = LeagueMatchActionType.MATCH;;
         this.updateTeamInput.app_type = AppType.ADMIN_NEW;
         this.updateTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -243,7 +243,7 @@ export class MatchTeamDetailsPage {
 
         // Initialize updateMatchParticipantRoleInput
         this.updateMatchParticipantRoleInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateMatchParticipantRoleInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateMatchParticipantRoleInput.memberId = this.sharedservice.getLoggedInUserId();
         this.updateMatchParticipantRoleInput.action_type = LeagueMatchActionType.MATCH;
         this.updateMatchParticipantRoleInput.app_type = AppType.ADMIN_NEW;
         this.updateMatchParticipantRoleInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -251,7 +251,7 @@ export class MatchTeamDetailsPage {
 
         // Initialize updateMatchParticipationStatusInput
         this.updateMatchParticipationStatusInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateMatchParticipationStatusInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateMatchParticipationStatusInput.memberId = this.sharedservice.getLoggedInUserId();
         this.updateMatchParticipationStatusInput.action_type = LeagueMatchActionType.MATCH;
         this.updateMatchParticipationStatusInput.app_type = AppType.ADMIN_NEW;
         this.updateMatchParticipationStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -260,16 +260,14 @@ export class MatchTeamDetailsPage {
 
         // Initialize updateLeagueMatchInviteStatusInput
         this.updateLeagueMatchInviteStatusInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateLeagueMatchInviteStatusInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateLeagueMatchInviteStatusInput.memberId = this.sharedservice.getLoggedInUserId();
         this.updateLeagueMatchInviteStatusInput.action_type = LeagueMatchActionType.MATCH;
         this.updateLeagueMatchInviteStatusInput.app_type = AppType.ADMIN_NEW;
         this.updateLeagueMatchInviteStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateLeagueMatchInviteStatusInput.MatchId = this.match.MatchId;
 
-        // 📊 Load all participants first for accurate counts
-        this.loadAllParticipantsForCounts().then(() => {
-          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-        });
+        this.getActivitySpecificTeam();
+        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
         this.getRoleForPlayers();
       }
     });
@@ -343,14 +341,14 @@ export class MatchTeamDetailsPage {
     this.events.subscribe("theme:changed", (isDark) => {
       this.applyTheme(isDark);
     });
-    this.events.subscribe("team:refresh", () => {
-      this.getActivitySpecificTeam();
-      this.detectExternalTeams();
-    });
-    this.detectExternalTeams();
-    this.loadAllParticipantsForCounts().then(() => {
-      this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-    });
+    // this.events.subscribe("team:refresh", () => {
+    //   this.getActivitySpecificTeam();
+    //   this.detectExternalTeams();
+    // });
+    // this.detectExternalTeams();
+    // this.loadAllParticipantsForCounts().then(() => {
+    //   this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+    // });
   }
 
   ionViewDidEnter() {
@@ -361,7 +359,7 @@ export class MatchTeamDetailsPage {
 
   ionViewWillLeave() {
     this.events.unsubscribe("theme:changed");
-    this.events.unsubscribe("team:refresh");
+    //this.events.unsubscribe("team:refresh");
   }
 
   private loadTheme(): void {
@@ -561,9 +559,7 @@ export class MatchTeamDetailsPage {
           var response = res.message;
           this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
           // Refresh the participant data
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
-          });
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
         } else {
           this.commonService.toastMessage("Failed to update role", 3000, ToastMessageType.Error);
         }
@@ -581,9 +577,7 @@ export class MatchTeamDetailsPage {
           var response = res.message;
           this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
           // Refresh the participant data
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
-          });
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
         } else {
           this.commonService.toastMessage("Failed to update Invitation status", 3000, ToastMessageType.Error);
         }
@@ -602,9 +596,7 @@ export class MatchTeamDetailsPage {
           var response = res.message;
           this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
           // Refresh the participant data
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
-          });
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
         } else {
           this.commonService.toastMessage("Failed to update participation status", 3000, ToastMessageType.Error);
         }
@@ -640,13 +632,13 @@ export class MatchTeamDetailsPage {
   }
 
   get headerAccentColor(): string {
-    return this.commonService.getTypeAccentColor(this.match?.MatchType);
+    return this.commonService.getTypeAccentColor(this.match ? this.match.MatchType : undefined);
   }
 
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
-    if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
-    if (this.match?.VenueName) rows.push({ icon: 'pin', text: (this.match as any).location && (this.match as any).location !== '' ? (this.match as any).location : this.match.VenueName });
+    if (this.match && this.match.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
+    if (this.match && this.match.VenueName) rows.push({ icon: 'pin', text: (this.match as any).location && (this.match as any).location !== '' ? (this.match as any).location : this.match.VenueName });
     return rows;
   }
 
@@ -738,14 +730,11 @@ export class MatchTeamDetailsPage {
   changeType(val: boolean) {
     this.sections.forEach(section => section.items = []); // Clear the sections array
     this.activeType = val !== undefined ? val : !this.activeType;
-    this.getActivitySpecificTeam();
 
     // Load participants for the selected tab
     const teamId = this.activeType ? this.match.homeUserId : this.match.awayUserId;
     if (teamId !== null) {
-      this.loadAllParticipantsForCounts().then(() => {
-        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-      });
+      this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
     }
     this.getFilteredSections();
   }
@@ -832,7 +821,7 @@ export class MatchTeamDetailsPage {
     const input = { ...this.getActivitySpecificTeamInput, isExternal: true };
     this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, input).subscribe({
       next: (res: any) => {
-        this.cachedExternalTeams = res?.data || [];
+        this.cachedExternalTeams = (res && res.data) ? res.data : [];
         if (this.match.homeUserId) {
           this.isHomeExternal = this.cachedExternalTeams.some(t => t.id === this.match.homeUserId);
         }
@@ -843,13 +832,15 @@ export class MatchTeamDetailsPage {
     });
   }
 
-  //to fetch list of avilable teams
+  //to fetch list of avilable teams and detect external teams
   getActivitySpecificTeam() {
     this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, this.getActivitySpecificTeamInput).subscribe({
       next: (res: any) => {
         if (res) {
           this.activitySpecificTeamsRes = res.data;
         }
+        // After fetching teams, detect external teams
+        this.detectExternalTeams();
       }
     });
   }
@@ -876,9 +867,7 @@ export class MatchTeamDetailsPage {
           // Only refresh data if we're on the tab that was just updated
           const shouldRefresh = (isHomeTeam && this.activeType) || (!isHomeTeam && !this.activeType);
           if (shouldRefresh) {
-            this.loadAllParticipantsForCounts().then(() => {
-              this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-            });
+            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
           }
         } else {
           this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error);

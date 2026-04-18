@@ -184,7 +184,7 @@ export class ViewCoachesPage {
 
   // 🎨 Avatar helpers
   getInitials(coach: any): string {
-    return ((coach.first_name?.charAt(0) || '') + (coach.last_name?.charAt(0) || '')).toUpperCase();
+    return (((coach.first_name ? coach.first_name.charAt(0) : '') + (coach.last_name ? coach.last_name.charAt(0) : ''))).toUpperCase();
   }
 
   hasProfileImage(coach: any): boolean {

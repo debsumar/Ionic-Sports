@@ -266,13 +266,9 @@ export class LeagueMatchInfoPage {
         this.updateLeagueMatchInviteStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateLeagueMatchInviteStatusInput.MatchId = this.matchObj.match_id;
 
+        this.getLeagueParticipantForMatch();
+        this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
         this.getRoleForPlayers();
-        if (this.activeType && this.matchObj.home_team_id !== null) {
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getLeagueMatchParticipant(1);
-          });
-        }
-
       }
     });
   }
@@ -295,15 +291,11 @@ export class LeagueMatchInfoPage {
     this.events.subscribe("theme:changed", (isDark) => {
       this.applyTheme(isDark);
     });
+
     this.events.subscribe("team:refresh", () => {
       this.getLeagueParticipantForMatch();
-      this.detectExternalTeams();
     });
-    this.getLeagueParticipantForMatch();
-    this.detectExternalTeams();
-    this.loadAllParticipantsForCounts().then(() => {
-      this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-    });
+    
   }
 
   ionViewDidEnter() {
@@ -394,14 +386,14 @@ export class LeagueMatchInfoPage {
   }
 
   get headerAccentColor(): string {
-    return this.commonService.getTypeAccentColor(this.matchObj?.league_type);
+    return this.commonService.getTypeAccentColor(this.matchObj ? this.matchObj.league_type : undefined);
   }
 
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
-    if (this.matchObj?.start_date) rows.push({ icon: 'calendar', text: this.matchObj.start_date });
-    if (this.matchObj?.formatted_round) rows.push({ icon: 'flag', text: 'Round: ' + this.matchObj.formatted_round });
-    if (this.matchObj?.club_name) rows.push({ icon: 'pin', text: this.matchObj.club_name });
+    if (this.matchObj && this.matchObj.start_date) rows.push({ icon: 'calendar', text: this.matchObj.start_date });
+    if (this.matchObj && this.matchObj.formatted_round) rows.push({ icon: 'flag', text: 'Round: ' + this.matchObj.formatted_round });
+    if (this.matchObj && this.matchObj.club_name) rows.push({ icon: 'pin', text: this.matchObj.club_name });
     return rows;
   }
 
@@ -647,9 +639,7 @@ export class LeagueMatchInfoPage {
           var res = res.message;
 
           this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
-          });
+          this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
         }
       },
       error: (err) => {
@@ -669,9 +659,7 @@ export class LeagueMatchInfoPage {
           var response = res.message;
           this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
           // Refresh the participant data
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
-          });
+          this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
         } else {
           this.commonService.toastMessage("Failed to update Invitation status", 3000, ToastMessageType.Error);
         }
@@ -863,9 +851,7 @@ export class LeagueMatchInfoPage {
     // Load participants for the selected tab
     const teamId = this.activeType ? this.matchObj.home_team_id : this.matchObj.away_team_id;
     if (teamId !== null) {
-      this.loadAllParticipantsForCounts().then(() => {
-        this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-      });
+      this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
     }
     this.getFilteredSections();
   }
@@ -874,7 +860,7 @@ export class LeagueMatchInfoPage {
     const input = { ...this.leagueParticipantForMatchInput, isExternal: true };
     this.httpService.post(`${API.Get_League_Participant_For_Match}`, input).subscribe({
       next: (res: any) => {
-        this.cachedExternalTeams = res?.data || [];
+        this.cachedExternalTeams = (res && res.data) ? res.data : [];
         if (this.matchObj.home_team_id) {
           this.isHomeExternal = this.cachedExternalTeams.some(t => t.parentclubteam.id === this.matchObj.home_team_id);
         }
@@ -887,7 +873,7 @@ export class LeagueMatchInfoPage {
 
   cachedClubTeams: LeagueParticipationForMatchModel[] = [];
 
-  //to fetch list of avilable teams
+  //to fetch list of avilable teams and detect external teams
   getLeagueParticipantForMatch() {
     this.httpService.post(`${API.Get_League_Participant_For_Match}`, this.leagueParticipantForMatchInput).subscribe({
       next: (res: any) => {
@@ -895,6 +881,8 @@ export class LeagueMatchInfoPage {
           this.leagueParticipantForMatchRes = res.data;
           this.cachedClubTeams = res.data || [];
         }
+        // After fetching teams, detect external teams
+        this.detectExternalTeams();
       }
     });
   }
@@ -921,9 +909,7 @@ export class LeagueMatchInfoPage {
           // Only refresh data if we're on the tab that was just updated
           const shouldRefresh = (isHomeTeam && this.activeType) || (!isHomeTeam && !this.activeType);
           if (shouldRefresh) {
-            this.loadAllParticipantsForCounts().then(() => {
-              this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-            });
+            this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
           }
         } else {
           this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error);
@@ -951,6 +937,11 @@ export class LeagueMatchInfoPage {
       next: (res: any) => {
         if (res) {
           this.leagueMatchParticipantRes = res.data || [];
+
+          // Update allParticipants for accurate counts when fetching all
+          if (par === LeagueTeamPlayerStatusType.All) {
+            this.allParticipants = this.leagueMatchParticipantRes;
+          }
 
           this.sections.forEach(section => section.items = []);// Clear the sections array
           this.populateSections(); // Call populateSections after data is fetched
@@ -1001,9 +992,7 @@ export class LeagueMatchInfoPage {
           var res = res.message;
 
           this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getLeagueMatchParticipant(0);
-          });
+          this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
         }
       },
       error: (err) => {

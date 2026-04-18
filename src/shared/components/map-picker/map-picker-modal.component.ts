@@ -186,8 +186,8 @@ export class MapPickerModalComponent {
       .then(data => {
         this.zone.run(() => {
           this.suggestions = (data.suggestions || []).map(s => ({
-            description: s.placePrediction?.text?.text || '',
-            place_id: s.placePrediction?.placeId || ''
+            description: (s.placePrediction && s.placePrediction.text && s.placePrediction.text.text) ? s.placePrediction.text.text : '',
+            place_id: (s.placePrediction && s.placePrediction.placeId) ? s.placePrediction.placeId : ''
           }));
         });
       })

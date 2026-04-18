@@ -181,14 +181,14 @@ export class LeaguedetailsPage {
   }
 
   get headerAccentColor(): string {
-    return this.commonService.getTypeAccentColor(this.individualLeague?.league_type);
+    return this.commonService.getTypeAccentColor(this.individualLeague ? this.individualLeague.league_type : undefined);
   }
 
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     const l = this.individualLeague;
-    if (l?.start_date) rows.push({ icon: 'calendar', text: l.start_date + (l.end_date ? ' → ' + l.end_date : '') });
-    if (l?.club?.ClubName) rows.push({ icon: 'pin', text: l.club.ClubName });
+    if (l && l.start_date) rows.push({ icon: 'calendar', text: l.start_date + (l.end_date ? ' → ' + l.end_date : '') });
+    if (l && l.club && l.club.ClubName) rows.push({ icon: 'pin', text: l.club.ClubName });
     return rows;
   }
 
