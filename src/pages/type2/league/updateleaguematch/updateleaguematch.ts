@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { AlertController, IonicPage, LoadingController, NavController, NavParams, PopoverController } from 'ionic-angular';
+import { Component, Renderer2 } from '@angular/core';
+import { AlertController, IonicPage, LoadingController, NavController, NavParams, PopoverController, Events } from 'ionic-angular';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { SharedServices } from '../../../services/sharedservice';
 import { GraphqlService } from '../../../../services/graphql.service';
@@ -11,6 +11,7 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
 import { AppType } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
 
 import moment from 'moment';
 /**
@@ -41,6 +42,7 @@ export class UpdateleaguematchPage {
   data: LeagueMatch;
   start_date: string;
   start_time: string;
+  isDarkTheme: boolean = true;
   roundTypes: RoundTypesModel[] = [];
   roundTypeInput: RoundTypeInput = {
     parentclubId: '',
@@ -68,7 +70,7 @@ export class UpdateleaguematchPage {
     member_fees: 0.00,
     non_member_fees: 0.00
   }
-
+  currency: string = '£';
   constructor(
     public alertCtrl: AlertController,
     public navCtrl: NavController,
@@ -80,7 +82,10 @@ export class UpdateleaguematchPage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private sharedService: SharedServices,
-    private httpService: HttpService
+    private httpService: HttpService,
+    private renderer: Renderer2,
+    private themeService: ThemeService,
+    private events: Events
   ) {
     this.min = new Date().toISOString();
     this.max = "2049-12-31";
@@ -90,7 +95,6 @@ export class UpdateleaguematchPage {
 
     console.log("data is:", this.data);
     this.isChecked = this.data.payment_type == 1 ? true : false;
-    this.publicType = this.data.match_visibility == 0 ? true : false;
     this.publicType = this.data.match_visibility == 0 ? true : false;
     // this.inputObj.homeparticipant_id = this.data.home_team_id ? this.data.home_team_id : this.data.home_participant_id;
     // this.inputObj.awayparticipant_id = this.data.away_team_id ? this.data.away_team_id : this.data.away_participant_id;
@@ -120,27 +124,63 @@ export class UpdateleaguematchPage {
     this.getRoundTypes();
     this.getLocationForParentClub();
     this.getParticipants();
+    this.storage.get('Currency').then((currency) => {
+      let currencydets = JSON.parse(currency);
+      //console.log(currencydets);
+      this.currency = currencydets.CurrencySymbol;
+    });
+    this.updateMatchPaymentType(this.isChecked);
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad UpdateleaguematchPage');
+    this.loadTheme();
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.applyTheme(isDark);
+    });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  private applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-updateleaguematch');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme')
+             : this.renderer.addClass(el, 'light-theme');
+    }
   }
 
   getRoundTypes() {
-    //this.commonService.showLoader("Fetching info ...");
-    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        this.roundTypes = res.data || [];
-        if( this.roundTypes.length > 0) {
-          this.inputObj.round = this.data.round; // Set default round type
+    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.roundTypes = res.data || [];
+          if( this.roundTypes.length > 0) {
+            this.inputObj.round = this.data.round; // Set default round type
+          }
+          console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
+        } else {
+          console.log("error in fetching",)
         }
-        console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
-      } else {
-        //this.commonService.hideLoader();
-        console.log("error in fetching",)
       }
-    })
+    });
   }
 
   updateMatchPaymentType(isChecked: boolean): void {
@@ -337,13 +377,12 @@ export class UpdateleaguematchPage {
 
       this.inputObj.start_date = moment(new Date(this.start_date + " " + this.start_time).getTime()).format("YYYY-MM-DD HH:mm")
 
-      this.httpService.post('league/updateLeagueMatch', this.inputObj).subscribe((res: any) => {
-        console.log(res);
-        this.navCtrl.pop();
-      }, (error) => {
-        this.commonService.toastMessage("match updation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-      }
-      )
+      this.httpService.post('league/updateLeagueMatch', this.inputObj).subscribe({
+        next: (res: any) => {
+          console.log(res);
+          this.navCtrl.pop();
+        }
+      });
     }
   }
 }

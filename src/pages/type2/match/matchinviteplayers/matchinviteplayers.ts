@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, Renderer2 } from "@angular/core";
 import {
   AlertController,
   ViewController,
@@ -6,7 +6,9 @@ import {
   LoadingController,
   NavController,
   NavParams,
+  Events
 } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import {
   CommonService,
   ToastMessageType,
@@ -38,6 +40,7 @@ import { AppType } from "../../../../shared/constants/module.constants";
 })
 export class MatchinviteplayersPage {
   private searchTerms = new Subject<string>();
+  isDarkTheme: boolean = true;
   themeType: number;
   FetchAPPlusMembers: FetchAPPlusMembers = {
     ParentClubKey: "",
@@ -75,7 +78,10 @@ export class MatchinviteplayersPage {
     public storage: Storage,
     private sharedservice: SharedServices,
     public viewCtrl: ViewController,
-    private graphqlService: GraphqlService
+    private graphqlService: GraphqlService,
+    private themeService: ThemeService,
+    private events: Events,
+    private renderer: Renderer2
   ) {
 
     console.log("MatchinviteplayersPage");
@@ -127,7 +133,35 @@ export class MatchinviteplayersPage {
   }
 
 
-  ionViewWillEnter() { }
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-matchinviteplayers');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme') : this.renderer.addClass(el, 'light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-matchinviteplayers');
+        if (el2) { isDark ? this.renderer.removeClass(el2, 'light-theme') : this.renderer.addClass(el2, 'light-theme'); }
+      }, 100);
+    }
+  }
 
   doInfinite(infiniteScroll) {
     this.venus_user_input.offset += this.venus_user_input.limit;

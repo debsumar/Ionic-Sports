@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ViewController, Events } from 'ionic-angular';
+import { Storage } from '@ionic/storage';
 import { CommonService, ToastMessageType } from '../../../../../services/common.service';
 import { HttpService } from '../../../../../services/http.service';
 import { API } from '../../../../../shared/constants/api_constants';
@@ -10,6 +11,7 @@ import { LeagueMatch } from '../../models/location.model';
 import { AllMatchData } from '../../../../../shared/model/match.model';
 import { TeamsForParentClubModel } from '../../models/team.model';
 import { TennisResultModel } from '../../../../../shared/model/league_result.model';
+import { ThemeService } from '../../../../../services/theme.service';
 
 @IonicPage()
 @Component({
@@ -22,29 +24,32 @@ export class TennisResultInputPage {
   isLeague: boolean = false;
   isEditable: boolean = true;
   // League flow properties
-  homeTeamObj: LeagueParticipationForMatchModel;
-  awayTeamObj: LeagueParticipationForMatchModel;
-  matchObj: LeagueMatch;
+  homeTeamObj: any;
+  awayTeamObj: any;
+  matchObj: any;
 
   // Non-League flow properties
   matchTeamObj: AllMatchData;
   hometeamMatchObj: TeamsForParentClubModel;
   awayteamMatchObj: TeamsForParentClubModel;
 
-  // Optimized team properties for template binding
-  homeTeamId: string = "";
-  awayTeamId: string = "";
-  homeTeamName: string = "";
-  awayTeamName: string = "";
+  // DTO for template binding - simplified team data
+  teamData: {
+    homeTeamId: string;
+    awayTeamId: string;
+    homeTeamName: string;
+    awayTeamName: string;
+  } = {
+    homeTeamId: "",
+    awayTeamId: "",
+    homeTeamName: "",
+    awayTeamName: ""
+  };
 
   // Result properties
   result_json: TennisResultModel;
   selectedWinner: string = "";
   resultStatus: string = "1";
-  homeSetsWon: number = 0;
-  awaySetsWon: number = 0;
-  homeGamesWon: number = 0;
-  awayGamesWon: number = 0;
 
   // Status properties
   resultStatusList: ResultStatusModel[] = [];
@@ -57,13 +62,18 @@ export class TennisResultInputPage {
   getResultStatusByActivityInput: any = {};
 
 
+  isDarkTheme: boolean = true;
+
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     public commonService: CommonService,
     private httpService: HttpService,
     public sharedservice: SharedServices,
-    public viewCtrl: ViewController
+    public viewCtrl: ViewController,
+    public events: Events,
+    public storage: Storage,
+    public themeService: ThemeService
   ) {
     this.isLeague = this.navParams.get("isLeague") || false;
     this.result_json = this.navParams.get('result_json') || {};
@@ -76,42 +86,92 @@ export class TennisResultInputPage {
     this.getResultStatusByActivity();
   }
 
+  ionViewDidLoad() {
+    this.loadTheme();
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  loadTheme() {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      if (isDarkTheme !== null) {
+        this.isDarkTheme = isDarkTheme;
+      } else {
+        this.isDarkTheme = true;
+      }
+      this.applyTheme();
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme();
+    });
+  }
+
+  applyTheme() {
+    const element = document.querySelector('page-tennis-result-input');
+    if (element) {
+      if (this.isDarkTheme) {
+        element.classList.remove('light-theme');
+      } else {
+        element.classList.add('light-theme');
+      }
+    }
+  }
+
   private initializeTeamData(): void {
     if (this.isLeague) {
       this.matchObj = this.navParams.get("matchObj");
       this.homeTeamObj = this.navParams.get("homeTeamObj");
       this.awayTeamObj = this.navParams.get("awayTeamObj");
 
-      this.homeTeamId = this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.id || "";
-      this.awayTeamId = this.awayTeamObj && this.awayTeamObj.parentclubteam && this.awayTeamObj.parentclubteam.id || "";
-      this.homeTeamName = this.homeTeamObj && this.homeTeamObj.parentclubteam && this.homeTeamObj.parentclubteam.teamName || "";
-      this.awayTeamName = this.awayTeamObj && this.awayTeamObj.parentclubteam && this.awayTeamObj.parentclubteam.teamName || "";
+      // Handle different data structures for league flow
+      // Check if data is in parentclubteam structure or direct structure
+      if (this.homeTeamObj) {
+        if (this.homeTeamObj.parentclubteam) {
+          // Old structure with parentclubteam
+          this.teamData.homeTeamId = this.homeTeamObj.parentclubteam.id || "";
+          this.teamData.homeTeamName = this.homeTeamObj.parentclubteam.teamName || "";
+        } else {
+          // New structure - direct properties
+          this.teamData.homeTeamId = this.homeTeamObj.id || "";
+          this.teamData.homeTeamName = this.homeTeamObj.teamName || "";
+        }
+      }
+
+      if (this.awayTeamObj) {
+        if (this.awayTeamObj.parentclubteam) {
+          // Old structure with parentclubteam
+          this.teamData.awayTeamId = this.awayTeamObj.parentclubteam.id || "";
+          this.teamData.awayTeamName = this.awayTeamObj.parentclubteam.teamName || "";
+        } else {
+          // New structure - direct properties
+          this.teamData.awayTeamId = this.awayTeamObj.id || "";
+          this.teamData.awayTeamName = this.awayTeamObj.teamName || "";
+        }
+      }
     } else {
       this.matchTeamObj = this.navParams.get("matchObj");
       this.hometeamMatchObj = this.navParams.get("homeTeamObj");
       this.awayteamMatchObj = this.navParams.get("awayTeamObj");
 
-      this.homeTeamId = this.hometeamMatchObj && this.hometeamMatchObj.id || "";
-      this.awayTeamId = this.awayteamMatchObj && this.awayteamMatchObj.id || "";
-      this.homeTeamName = this.hometeamMatchObj && this.hometeamMatchObj.teamName || "";
-      this.awayTeamName = this.awayteamMatchObj && this.awayteamMatchObj.teamName || "";
+      this.teamData.homeTeamId = this.hometeamMatchObj && this.hometeamMatchObj.id || "";
+      this.teamData.awayTeamId = this.awayteamMatchObj && this.awayteamMatchObj.id || "";
+      this.teamData.homeTeamName = this.hometeamMatchObj && this.hometeamMatchObj.teamName || "";
+      this.teamData.awayTeamName = this.awayteamMatchObj && this.awayteamMatchObj.teamName || "";
     }
+
+    console.log('Initialized team data:', this.teamData);
   }
 
   initializeValues() {
     if (this.result_json.RESULT) {
       this.selectedWinner = this.result_json.RESULT.WINNER_ID || "";
       this.resultStatus = this.result_json.RESULT.RESULT_STATUS || "1";
-    }
-
-    if (this.result_json.HOME_TEAM) {
-      this.homeSetsWon = parseInt(this.result_json.HOME_TEAM.SETS_WON) || 0;
-      this.homeGamesWon = parseInt(this.result_json.HOME_TEAM.GAMES_WON) || 0;
-    }
-
-    if (this.result_json.AWAY_TEAM) {
-      this.awaySetsWon = parseInt(this.result_json.AWAY_TEAM.SETS_WON) || 0;
-      this.awayGamesWon = parseInt(this.result_json.AWAY_TEAM.GAMES_WON) || 0;
     }
   }
 
@@ -199,18 +259,22 @@ export class TennisResultInputPage {
       return;
     }
 
+    // Get calculated values from result_json (updated by set input)
+    const homeSetsWon = (this.result_json.HOME_TEAM && this.result_json.HOME_TEAM.SETS_WON) || '0';
+    const awaySetsWon = (this.result_json.AWAY_TEAM && this.result_json.AWAY_TEAM.SETS_WON) || '0';
+    const homeGamesWon = (this.result_json.HOME_TEAM && this.result_json.HOME_TEAM.GAMES_WON) || '0';
+    const awayGamesWon = (this.result_json.AWAY_TEAM && this.result_json.AWAY_TEAM.GAMES_WON) || '0';
+
     const resultData = {
       selectedWinner: this.selectedWinner,
       resultStatus: this.resultStatus,
-      homeSetsWon: this.homeSetsWon.toString(),
-      awaySetsWon: this.awaySetsWon.toString(),
-      homeGamesWon: this.homeGamesWon.toString(),
-      awayGamesWon: this.awayGamesWon.toString(),
-      //RESULT_STATUS: this.resultStatus,
+      homeSetsWon: homeSetsWon,
+      awaySetsWon: awaySetsWon,
+      homeGamesWon: homeGamesWon,
+      awayGamesWon: awayGamesWon,
       WINNER_ID: this.selectedResultStatus && this.selectedResultStatus.status === 'WIN' ? this.selectedWinner : ''
     };
 
-    //this.commonService.toastMessage("Result saved successfully", 2500, ToastMessageType.Success);
     this.viewCtrl.dismiss(resultData);
   }
 
@@ -221,36 +285,25 @@ export class TennisResultInputPage {
         return false;
       }
 
-      if (this.homeSetsWon < 0 || this.awaySetsWon < 0) {
-        this.commonService.toastMessage('Sets won cannot be negative', 3000, ToastMessageType.Error);
+      // Get calculated values from result_json
+      const homeSetsWon = parseInt((this.result_json.HOME_TEAM && this.result_json.HOME_TEAM.SETS_WON) || '0');
+      const awaySetsWon = parseInt((this.result_json.AWAY_TEAM && this.result_json.AWAY_TEAM.SETS_WON) || '0');
+
+      if (homeSetsWon === 0 && awaySetsWon === 0) {
+        this.commonService.toastMessage('Please enter set scores first', 3000, ToastMessageType.Error);
         return false;
       }
 
-      if (this.homeGamesWon < 0 || this.awayGamesWon < 0) {
-        this.commonService.toastMessage('Games won cannot be negative', 3000, ToastMessageType.Error);
-        return false;
-      }
-
-      if (this.homeSetsWon === 0 && this.awaySetsWon === 0) {
-        this.commonService.toastMessage('At least one team must win a set', 3000, ToastMessageType.Error);
-        return false;
-      }
-
-      if (this.homeSetsWon === this.awaySetsWon) {
+      if (homeSetsWon === awaySetsWon) {
         this.commonService.toastMessage('Match cannot end in a tie. One team must win more sets', 3000, ToastMessageType.Error);
         return false;
       }
 
-      const winnerSets = this.selectedWinner === this.homeTeamId ? this.homeSetsWon : this.awaySetsWon;
-      const loserSets = this.selectedWinner === this.homeTeamId ? this.awaySetsWon : this.homeSetsWon;
+      const winnerSets = this.selectedWinner === this.teamData.homeTeamId ? homeSetsWon : awaySetsWon;
+      const loserSets = this.selectedWinner === this.teamData.homeTeamId ? awaySetsWon : homeSetsWon;
 
       if (winnerSets <= loserSets) {
         this.commonService.toastMessage('Winner must have won more sets than the loser', 3000, ToastMessageType.Error);
-        return false;
-      }
-
-      if (winnerSets > 3) {
-        this.commonService.toastMessage('Maximum sets that can be won is 3', 3000, ToastMessageType.Error);
         return false;
       }
     }

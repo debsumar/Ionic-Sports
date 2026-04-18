@@ -158,6 +158,7 @@ export class ParentClubTeam {
   logo_url?: string;
   teamName: string;
   teamDescription: string;
+  is_club_team?: boolean;
 }
 
 export class User {

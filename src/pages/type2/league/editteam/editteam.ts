@@ -11,6 +11,7 @@ import { GraphqlService } from '../../../../services/graphql.service';
 import { TeamImageUploadService } from '../../team/team_image_upload/team_image_upload.service';
 import { Camera, CameraOptions, PictureSourceType } from '@ionic-native/camera';
 import { IClubDetails } from '../../../../shared/model/club.model';
+import { ThemeService } from '../../../../services/theme.service';
 
 /**
  * Generated class for the EditteamPage page.
@@ -30,6 +31,7 @@ export class EditteamPage {
   publicType: boolean = true;
   clubVenues: IClubDetails[] = [];
   privateType: boolean = true;
+  isDarkTheme: boolean = true;
   postgre_parentclubId: string;
   isShowImagePopup: boolean = false;
   arrow: boolean = false;
@@ -77,14 +79,13 @@ export class EditteamPage {
     public sharedservice: SharedServices,
     public commonService: CommonService,
     public popoverCtrl: PopoverController,
-    private toastCtrl: ToastController,
     private graphqlService: GraphqlService,
     public actionSheetCtrl: ActionSheetController,
 
     private imageUploadService: TeamImageUploadService,
     private camera: Camera,
     public sharedService: SharedServices,
-
+    private themeService: ThemeService
   ) {
     this.team = this.navParams.get("team");
     console.log(this.team);
@@ -113,8 +114,13 @@ export class EditteamPage {
   }
 
   ionViewWillEnter() {
-    console.log("ionViewDidLoad EditteamPage");
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.isDarkTheme = isDark; });
+  }
 
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    this.isDarkTheme = isDarkTheme !== null ? isDarkTheme : true;
   }
 
   gotoHome() {
@@ -261,9 +267,6 @@ export class EditteamPage {
           this.getActivity();
         }
         console.log("activity", this.clubVenues);
-      }, (error) => {
-        this.commonService.toastMessage("No venues found", 2500, ToastMessageType.Error)
-        console.error("Error in fetching:", error);
       });
   }
 

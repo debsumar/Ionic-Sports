@@ -12,8 +12,8 @@ export const environment = {
   aws_presignedUrl: "https://i97kakk5tk.execute-api.eu-west-2.amazonaws.com/Dev/generatesignedurl",
   SuperAdminKey: "-KoGLONcroK1vB02b9Gg",
   graphql_url: "https://api-dev.activitypro.co.uk/graphql",
-  // new_graphql_url: "https://api-dev.activitypro.co.uk:1026/graphql",
-  new_graphql_url: "http://localhost:9000/graphql",
+  new_graphql_url: "https://api-dev.activitypro.co.uk:1026/graphql",
+  // new_graphql_url: "http://localhost:9000/graphql",
   android_onesignal_id: "",
   ios_onesignal_id: "",
   firebaseConfig: {

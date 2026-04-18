@@ -4,12 +4,10 @@ import { CommonService, ToastMessageType, ToastPlacement } from '../../../../ser
 import { SharedServices } from '../../../services/sharedservice';
 import { FirebaseService } from '../../../../services/firebase.service';
 import { GraphqlService } from '../../../../services/graphql.service';
-import moment from 'moment';
 import { LeagueParticipantModel, LeaguesForParentClubModel } from '../models/league.model';
 import gql from 'graphql-tag';
 import { Storage } from '@ionic/storage';
 import { HttpService } from '../../../../services/http.service';
-import { error } from 'console';
 import { CatandType } from '../models/location.model';
 
 /**
@@ -188,12 +186,11 @@ export class LeaguepaymentPage {
   }
 
   getPaymentMode() {
-    this.httpService.post(`league/getPaymentMethods`, this.commonInput).subscribe((res: any) => {
-      this.paymentMode = res["data"];
-    }, (error) => {
-      this.commonService.toastMessage("Payment mode fetch failed", 2500, ToastMessageType.Error)
-    }
-    )
+    this.httpService.post(`league/getPaymentMethods`, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.paymentMode = res["data"];
+      }
+    });
   }
 
 
@@ -248,7 +245,7 @@ export class LeaguepaymentPage {
       this.commonService.toastMessage("Please enter the amount", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       return false;
     }
-    if (this.payment_update_input.user_payment.payment_mode == undefined) {
+    if (this.payment_update_input.user_payment.payment_mode == undefined || this.payment_update_input.user_payment.payment_mode == null) {
       this.commonService.toastMessage("Please select payment mode", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       return false;
     }

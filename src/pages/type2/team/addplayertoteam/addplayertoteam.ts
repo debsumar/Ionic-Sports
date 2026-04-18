@@ -1,12 +1,14 @@
-import { Component } from "@angular/core";
+import { Component, Renderer2 } from "@angular/core";
 import {
   IonicPage,
   NavController,
   NavParams,
   ViewController,
   LoadingController,
-  AlertController
+  AlertController,
+  Events
 } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import {
   CommonService,
   ToastMessageType,
@@ -61,7 +63,7 @@ interface TeamMember {
   templateUrl: "addplayertoteam.html",
 })
 export class Addplayertoteam {
-
+  isDarkTheme: boolean = false;
   themeType: number;
   FetchAPPlusMembers: FetchAPPlusMembers = {
     ParentClubKey: "",
@@ -114,9 +116,13 @@ export class Addplayertoteam {
     public fb: FirebaseService,
     public sharedservice: SharedServices,
     private alertCtrl: AlertController,
-    public viewCtrl: ViewController
+    public viewCtrl: ViewController,
+    private themeService: ThemeService,
+    private events: Events,
+    private renderer: Renderer2
   ) {
     this.themeType = sharedservice.getThemeType();
+
     this.existedPlayer = this.navParams.get("existedPlayer");
     this.teamMembersInput.teamId = this.navParams.get("teamid");
 
@@ -156,12 +162,42 @@ export class Addplayertoteam {
 
 
 
-  ionViewDidLoad() {
-    // Component loaded
+  async ionViewDidLoad() {
+    await this.loadTheme();
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.applyTheme(isDark);
+    });
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-addplayertoteam');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme') : this.renderer.addClass(el, 'light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-addplayertoteam');
+        if (el2) { isDark ? this.renderer.removeClass(el2, 'light-theme') : this.renderer.addClass(el2, 'light-theme'); }
+      }, 100);
+    }
   }
 
   ionViewWillLeave() {
-    // 🧹 Always cleanup subscriptions
+    this.events.unsubscribe('theme:changed');
     this.subscriptions.forEach(sub => {
       if (sub && !sub.closed) {
         sub.unsubscribe();
@@ -282,7 +318,7 @@ export class Addplayertoteam {
       if (data["getAllMembersByParentClubNMemberType"].length > 0) {
         this.members = data["getAllMembersByParentClubNMemberType"].map((member: UsersModel) => ({
           ...member,
-          isSelected: this.selectedMembersSet.has(member.Id),
+          isSelected: this.selectedMembersSet.has(member.Id) || this.existingPlayersSet.has(member.Id),
           isAlreadyExisted: this.existingPlayersSet.has(member.Id)
         }));
         this.filteredMembers.push(...this.members);
@@ -303,7 +339,7 @@ export class Addplayertoteam {
     if (!this.filteredMembers.length) return;
 
     this.filteredMembers.forEach(member => {
-      member.isSelected = this.selectedMembersSet.has(member.Id);
+      member.isSelected = this.selectedMembersSet.has(member.Id) || this.existingPlayersSet.has(member.Id);
       member.isAlreadyExisted = this.existingPlayersSet.has(member.Id);
     });
   }
@@ -353,20 +389,13 @@ export class Addplayertoteam {
     const memberlength = this.teamMembersInput.members.length;
     if (memberlength > 0) {
       try {
-        this.commonService.showLoader("Please wait...");
-
         const addPlayer = gql`
-    mutation addPlayerToTeam($addPlayer: TeamMembersInput!){
-      addPlayerToTeam(addPlayer:$addPlayer)
-        
-       
-    
-  }
-`;
+          mutation addPlayerToTeam($addPlayer: TeamMembersInput!){
+             addPlayerToTeam(addPlayer:$addPlayer)
+          }`;
         const mutationVariables = { addPlayer: this.teamMembersInput }
 
         const saveSubscription = this.graphqlService.mutate(addPlayer, mutationVariables, 0).subscribe((res: any) => {
-          this.commonService.hideLoader();
           const message = "Player Added Successfully";
 
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
@@ -375,7 +404,6 @@ export class Addplayertoteam {
 
         },
           (error) => {
-            this.commonService.hideLoader();
             this.handleError(error, "Failed to save player");
           }
         );
@@ -383,7 +411,6 @@ export class Addplayertoteam {
         this.subscriptions.push(saveSubscription);
 
       } catch (error) {
-        this.commonService.hideLoader();
         this.handleError(error, "Failed to save player");
       }
     }

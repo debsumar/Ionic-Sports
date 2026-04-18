@@ -23,6 +23,7 @@ import { GraphqlService } from '../../../../services/graphql.service';
 import { CoachList, SchoolList } from '../leaguemodels/creatematchforleague.dto';
 import { CatandType, Locations } from '../models/location.model';
 import { HttpService } from '../../../../services/http.service';
+import { ThemeService } from '../../../../services/theme.service';
 import { IClubDetails } from '../../../../shared/model/club.model';
 import { API } from '../../../../shared/constants/api_constants';
 
@@ -44,6 +45,7 @@ export class EditleaguePage {
   max: any;
   publicType: boolean = true;
   privateType: boolean = true;
+  isDarkTheme: boolean = true;
   coaches: CoachList[];
 
   leagueEditInput: LeagueEditInput = {
@@ -154,7 +156,7 @@ export class EditleaguePage {
     private graphqlService: GraphqlService,
     public events: Events,
     private httpService: HttpService,
-
+    private themeService: ThemeService
   ) {
     this.min = new Date().toISOString();
     this.max = "2049-12-31";
@@ -218,24 +220,29 @@ export class EditleaguePage {
         this.getLeagueType();
       }
     });
-
-
-
   }
-
-
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad EditleaguePage');
   }
 
   ionViewWillEnter() {
-    console.log("ionViewDidLoad EditleaguePage");
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+    });
     this.storage.get('Currency').then((currency) => {
       let currencydets = JSON.parse(currency);
-      console.log(currencydets);
       this.currency = currencydets.CurrencySymbol;
     });
+  }
+
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    this.isDarkTheme = isDarkTheme !== null ? isDarkTheme : true;
   }
 
   gotoDashboard() {
@@ -423,20 +430,19 @@ export class EditleaguePage {
   }
 
   getLeagueCategory() {
-    this.httpService.post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput).subscribe((res: any) => {
-      this.leagueCategory = res["data"]
-    }, (error) => {
-      this.commonService.toastMessage("category fetch failed", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
-    })
+    this.httpService.post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.leagueCategory = res["data"]
+      }
+    });
   }
 
   getLeagueType() {
-    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, this.commonInput).subscribe((res: any) => {
-      this.leagueType = res["data"]
-    }, (error) => {
-      this.commonService.toastMessage("type fetch failed", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
-    }
-    )
+    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.leagueType = res["data"]
+      }
+    });
   }
 
   changeDate() {
@@ -663,6 +669,7 @@ export class EditleaguePage {
           const message = "League Updated Successfully";
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
           this.commonService.updateCategory("leagueteamlisting");
+          this.events.publish('league:refresh');
           this.navCtrl.pop();
         }, (err) => {
           this.commonService.hideLoader();
@@ -722,6 +729,7 @@ export class EditleaguePage {
   }
 
   ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
     this.commonService.updateCategory("");
   }
 

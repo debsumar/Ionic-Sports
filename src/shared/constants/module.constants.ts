@@ -17,10 +17,12 @@ export enum ModuleTypes {
   Challenges = 117,
   Playground = 118,
   Match = 119,
-  league = 121,
+  LEAGUE = 700,
+  LEAGUE_TEAM = 125,
 
   ADMIN = 0,
   MEMBER = 1,
+  GENERIC = 0
 }
 export enum NoticationModuleTypes {
   MEMBER_EMAIL = 1,
@@ -44,7 +46,7 @@ export enum AppType {
   MEMBER = 1,
   APPPLUS = 2,
   MEMBER_NXTGEN = 11,
-  MEMBER_NXTGEN_GLOBAL = 999,
+  MEMBER_NXTGEN_GLOBAL = 999
 }
 
 export enum DeviceType {

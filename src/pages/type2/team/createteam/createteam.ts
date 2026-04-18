@@ -1,6 +1,5 @@
-import { Component, ViewChild } from "@angular/core";
+import { Component, ViewChild, Renderer2 } from "@angular/core";
 import { Apollo } from "apollo-angular";
-import { HttpLink } from "apollo-angular-link-http";
 import {
   ActionSheetController,
   IonicPage,
@@ -9,6 +8,7 @@ import {
   NavParams,
   PopoverController,
   ToastController,
+  Events
 } from "ionic-angular";
 import {
   CommonService,
@@ -25,10 +25,14 @@ import { TeamsForParentClubModel } from "../models/team.model";
 import { Activity } from "../../league/models/activity.model";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { HttpService } from "../../../../services/http.service";
+import { API } from "../../../../shared/constants/api_constants";
+import { AppType } from "../../../../shared/constants/module.constants";
 import { ClubActivityInput, IClubDetails } from "../../../../shared/model/club.model";
 import { NgModel } from "@angular/forms";
 import { TeamImageUploadService } from "../team_image_upload/team_image_upload.service";
 import { Camera, CameraOptions, PictureSourceType } from "@ionic-native/camera";
+import { ThemeService } from "../../../../services/theme.service";
+
 
 /**
  * Generated class for the CreateteamPage page.
@@ -47,7 +51,18 @@ export class CreateteamPage {
   img_url: string = "";
   postgre_parentclubId: string;
   publicType: boolean = true;
+  isDarkTheme: boolean = true;
+  lockClubTeam: boolean = false;
+  lockActivity: boolean = false;
+
+  get isExternalTeam(): boolean {
+    return !this.parentClubTeamCreationInput.teamDetails.is_club_team;
+  }
+  set isExternalTeam(val: boolean) {
+    this.parentClubTeamCreationInput.teamDetails.is_club_team = !val;
+  }
   privateType: boolean = true;
+
 
   clubs: IClubDetails[];
   club_activities: Activity[] = [];
@@ -66,7 +81,8 @@ export class CreateteamPage {
       teamVisibility: 0,
       teamDescription: "",
       venueType: 0,
-      logoUrl: ""
+      logoUrl: "",
+      is_club_team: true
     }
   };
 
@@ -101,20 +117,63 @@ export class CreateteamPage {
     public sharedservice: SharedServices,
     public popoverCtrl: PopoverController,
     private toastCtrl: ToastController,
-    private httpLink: HttpLink,
     private graphqlService: GraphqlService,
+    private httpService: HttpService,
     public actionSheetCtrl: ActionSheetController,
     private imageUploadService: TeamImageUploadService,
     private camera: Camera,
     public sharedService: SharedServices,
-  ) { }
+    private events: Events,
+    private themeService: ThemeService,
+    private renderer: Renderer2
+    
+  ) {
+
+  }
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad CreateteamPage");
+    const isClubTeam = this.navParams.get('is_club_team');
+    if (isClubTeam !== undefined && isClubTeam !== null) {
+      this.parentClubTeamCreationInput.teamDetails.is_club_team = isClubTeam;
+    }
+    this.lockClubTeam = this.navParams.get('lock_club_team') || false;
+    if (this.lockClubTeam) {
+      this.publicType = false;
+      this.parentClubTeamCreationInput.teamDetails.teamVisibility = 1;
+    }
+    const activityCode = this.navParams.get('activityCode');
+    if (activityCode) {
+      this.parentClubTeamCreationInput.teamDetails.activityCode = activityCode;
+      this.lockActivity = true;
+    }
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-createteam');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme')
+             : this.renderer.addClass(el, 'light-theme');
+    }
   }
 
   ionViewWillEnter() {
-
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
+    
     console.log("ionViewDidLoad CreateteamPage");
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
@@ -394,16 +453,9 @@ export class CreateteamPage {
   //shows hint for the age group
   ageGroupHint() {
     let message = "Enter age group separated by comma (,) e.g. 12U, 14U etc.";
-    this.showToast(message, 5000);
+    this.commonService.toastMessage(message, 2500,ToastMessageType.Info);
   }
-  showToast(m: string, dur: number) {
-    let toast = this.toastCtrl.create({
-      message: m,
-      duration: dur,
-      position: "bottom",
-    });
-    toast.present();
-  }
+  
 
   gotoTeamDetails() {
     this.navCtrl.push("TeamdetailsPage");
@@ -430,16 +482,6 @@ export class CreateteamPage {
       this.commonService.toastMessage(message, 3000, ToastMessageType.Info);
       return false;
     }
-    else if (this.parentClubTeamCreationInput.teamDetails.ageGroup == "" || this.parentClubTeamCreationInput.teamDetails.ageGroup == undefined) {
-      let message = "Enter Age group";
-      this.commonService.toastMessage(message, 3000, ToastMessageType.Info);
-      return false;
-    }
-    // else if (this.parentClubTeamCreationInput.teamDetails.teamDescription == "" || this.parentClubTeamCreationInput.teamDetails.teamDescription == undefined) {
-    //   let message = "Enter description";
-    //   this.showToast(message, 3000)
-    //   return false;
-    // }
     return true;
   }
   goToDashboardMenuPage() {
@@ -453,9 +495,15 @@ export class CreateteamPage {
   }
 
   createTeamConfirm() {
-    this.commonService.commonAlert_V4("Create Team", "Are you sure you want to create the team?", "Yes:Create", "No", () => {
-      this.saveTeamDetails();
-    })
+    if (this.isExternalTeam) {
+      this.commonService.commonAlert_V4("External Team", "You are creating an external team. Want to proceed?", "Yes", "No", () => {
+        this.saveTeamDetails();
+      });
+    } else {
+      this.commonService.commonAlert_V4("Create Team", "Are you sure you want to create the team?", "Yes:Create", "No", () => {
+        this.saveTeamDetails();
+      });
+    }
   }
 
   saveTeamDetails = async () => {
@@ -477,48 +525,43 @@ export class CreateteamPage {
         this.parentClubTeamCreationInput.teamDetails.venueKey = this.selectedClub;
         const club = this.clubs.find(club => club.FirebaseId === this.selectedClub)
         this.parentClubTeamCreationInput.teamDetails.clubId = club.Id;
-        const createTeam = gql`
-      mutation createTeamForParentClub(
-        $teamInput: ParentClubTeamCreationInput!
-      ) {
-        createTeamForParentClub(teamInput: $teamInput) {
-          id
-          created_at
-          created_by
-          updated_at
-          is_active
-          activity {
-            ActivityCode
-            ActivityName
-          }
-          venueKey
-          venueType
-         
-          ageGroup
-          teamName
-          teamStatus
-          teamVisibility
-          teamDescription
-          parentClub{
-            FireBaseId
-          }
-          
-        }
-      }
-    `;
-        const mutationVariable = { teamInput: this.parentClubTeamCreationInput };
-        this.graphqlService.mutate(createTeam, mutationVariable, 0).subscribe((res: any) => {
+
+        const restPayload = {
+          parentclubId: this.parentClubTeamCreationInput.user_postgre_metadata.UserParentClubId,
+          clubId: club.Id,
+          activityId: '',
+          memberId: '',
+          action_type: 0,
+          device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
+          app_type: AppType.ADMIN_NEW,
+          device_id: '',
+          updated_by: '',
+          activityCode: this.parentClubTeamCreationInput.teamDetails.activityCode,
+          venueKey: this.selectedClub,
+          venueType: this.parentClubTeamCreationInput.teamDetails.venueType,
+          ageGroup: this.parentClubTeamCreationInput.teamDetails.ageGroup,
+          teamName: this.parentClubTeamCreationInput.teamDetails.teamName,
+          shortName: this.parentClubTeamCreationInput.teamDetails.shortName,
+          teamStatus: this.parentClubTeamCreationInput.teamDetails.teamStatus,
+          teamVisibility: this.parentClubTeamCreationInput.teamDetails.teamVisibility,
+          teamDescription: this.parentClubTeamCreationInput.teamDetails.teamDescription,
+          logoUrl: this.parentClubTeamCreationInput.teamDetails.logoUrl,
+          is_club_team: this.parentClubTeamCreationInput.teamDetails.is_club_team,
+          ...(this.navParams.get('leagueId') ? { leagueId: this.navParams.get('leagueId') } : {})
+        };
+
+        this.httpService.post(`${API.CREATE_TEAM}`, restPayload).subscribe((res: any) => {
           this.commonService.hideLoader();
-          const message = "Team created successfully"
-          this.commonService.updateCategory("leagueteamlisting");
+          const message = "Team created successfully";
+          this.events.publish('team:refresh');
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
           this.navCtrl.pop();
         }, (error) => {
           this.commonService.hideLoader();
-          this.commonService.toastMessage("Team created successfully", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          const msg = (error.error && error.error.message) ? error.error.message : "Team creation failed";
+          this.commonService.toastMessage(msg, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
           console.error("error in fetching", error);
-        }
-        )
+        });
 
       }
     } catch (error) {
@@ -576,6 +619,7 @@ export class ParentClubTeamCreationInput {
     teamDescription: string;
     venueType: number;
     logoUrl: string;
+    is_club_team: boolean;
   };
 }
 

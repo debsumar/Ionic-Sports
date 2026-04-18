@@ -3,11 +3,10 @@ import gql from "graphql-tag";
 import {
   IonicPage,
   LoadingController,
-  NavController,
-  NavParams,
   Events,
+  NavParams,
+  NavController,
 } from "ionic-angular";
-import { type } from "os";
 import {
   CommonService,
   ToastMessageType,
@@ -25,6 +24,7 @@ import { API } from "../../../shared/constants/api_constants";
 import { AllMatchData, MatchModelV3 } from "../../../shared/model/match.model";
 import { AppType } from "../../../shared/constants/module.constants";
 import { ThemeService } from "../../../services/theme.service";
+import { SavedFormation } from "../league/models/lineup.model";
 /**
  * Generated class for the MatchPage page.
  *
@@ -72,10 +72,14 @@ export class MatchPage {
   //   ParticipationStatus: 0,
   // };
   today = moment().format("DD-MM-YYYY");
+  todayLabel = moment().format("dddd, D MMM");
   Today: number = 0;
   isPublish: boolean = true;
   isPending: boolean = true;
   isDarkTheme: boolean = false;
+  showLineupSheet: boolean = false;
+  lineupFormations: SavedFormation[] = [];
+  selectedLineupMatch: any = null;
 
   // sum: number = 0;
   // totalMatches = this.matches.filter((element) => {
@@ -95,35 +99,36 @@ export class MatchPage {
     public events: Events
   ) {
     this.commonService.category.pipe(first()).subscribe((data) => {
-      if (data == "matchlist") {
+      if(data == "matchlist") {
         // Force theme application when navigating to this page
         setTimeout(() => {
           this.loadTheme();
         }, 100);
-        
-        this.storage.get("userObj").then((val) => {
-          val = JSON.parse(val);
-          if (val.$key != "") {
-            // this.FetchUserInput.ParentClubKey = val.UserInfo[0].ParentClubKey;
-          }
-          // this.getMatches();
-          this.fetchAllMatches();
-        });
+        this.fetchMatchesInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
+        this.fetchAllMatchesInput.parentclubId = this.sharedservice.getPostgreParentClubId();
+        this.fetchAllMatchesInput.memberId = this.sharedservice.getLoggedInId();
+        this.fetchAllMatchesInput.action_type = 0;
+        this.fetchAllMatchesInput.app_type = AppType.ADMIN_NEW;
+        this.fetchAllMatchesInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
+        this.fetchAllMatchesInput.FetchType = 1;
+        this.fetchAllMatches();
       }
     });
 
-    this.fetchMatchesInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
-
-    this.fetchAllMatchesInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-    this.fetchAllMatchesInput.memberId = this.sharedservice.getLoggedInId();
-    this.fetchAllMatchesInput.action_type = 0;
-    this.fetchAllMatchesInput.app_type = AppType.ADMIN_NEW;
-    this.fetchAllMatchesInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
-    this.fetchAllMatchesInput.FetchType = 1;
+    this.events.subscribe('match:refresh', () => {
+      if (this.fetchAllMatchesInput.parentclubId) {
+        this.fetchAllMatches(false);
+      }
+    });
   }
 
   ionViewWillEnter() {
     console.log("Match page - ionViewWillEnter");
+
+    // Re-fetch matches if inputs are already initialized (e.g. returning from CreatematchPage)
+    if (this.fetchAllMatchesInput.parentclubId) {
+      this.fetchAllMatches(false);
+    }
     
     // Load and apply theme immediately
     this.loadTheme();
@@ -233,6 +238,7 @@ export class MatchPage {
   ionViewWillLeave() {
     // Clean up theme event subscription
     this.events.unsubscribe('theme:changed');
+    this.events.unsubscribe('match:refresh');
   }
 
   // Force theme check method
@@ -293,22 +299,21 @@ export class MatchPage {
 
   // 🎨 Get color based on match type name string with theme support
   getMatchTypeColorByName(matchTypeName: string): string {
-    if (!matchTypeName) return '#2b92bb';
+    if (!matchTypeName) return 'linear-gradient(180deg, #2b92bb, #1e6c8c)';
     
     const type = matchTypeName.toLowerCase();
-    const isDark = this.themeService.getCurrentTheme();
     
     if (type.includes('team')) {
-      return isDark ? '#32db64' : '#28a745'; // Green
+      return 'linear-gradient(180deg, #8b5cf6, #7c3aed)';
     }
     if (type.includes('singles') || type.includes('single')) {
-      return isDark ? '#35adff' : '#007bff'; // Blue
+      return 'linear-gradient(180deg, #35adff, #007bff)';
     }
     if (type.includes('doubles') || type.includes('double')) {
-      return isDark ? '#f76e04' : '#fd7e14'; // Orange
+      return 'linear-gradient(180deg, #f76e04, #e85d00)';
     }
     
-    return '#2b92bb'; // Primary blue for unknown types
+    return 'linear-gradient(180deg, #2b92bb, #1e6c8c)';
   }
 
   gotoDashboard() {
@@ -324,31 +329,105 @@ export class MatchPage {
       });
   }
 
+  goToLineup(match) {
+    this.fetchSavedFormations(match);
+  }
 
-  fetchAllMatches() {
-    this.commonService.showLoader("Fetching matches...");
-    this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        this.fetchAllMatchesRes = res.data;
-        this.matchlist = this.fetchAllMatchesRes.AllMatches;
-        console.log("FetchAllMatches RESPONSE", JSON.stringify(res.data));
-        this.filteredMatchlist = JSON.parse(JSON.stringify(this.matchlist));
-        let today = moment().format("YYYY-MM-DD");
-        this.Today = this.matchlist.filter((match) => {
-          let match_createdAt = moment(
-            match.MatchStartDate,
-            "YYYY-MM-DD"
-          ).format("YYYY-MM-DD");
+  private fetchSavedFormations(match) {
+    const deviceType = this.sharedservice.getPlatform() === "android" ? 1 : 2;
+    const payload = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId: "",
+      activityId: match.activityId || "",
+      memberId: this.sharedservice.getLoggedInId(),
+      action_type: 0,
+      device_type: deviceType,
+      app_type: AppType.ADMIN_NEW,
+      device_id: "",
+      updated_by: this.sharedservice.getLoggedInId(),
+      matchId: match.MatchId
+    };
 
-          return moment(today).isSame(match_createdAt);
-        }).length;
-      } else {
-        console.log("error in fetching",)
-      }
-    }, error => {
-      this.commonService.hideLoader();
-      this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
+    this.httpService.post(API.GET_SAVED_FORMATIONS, payload)
+      .subscribe(
+        (res: any) => {
+          const savedFormations: SavedFormation[] = res.data || [];
+          this.presentLineupActionSheet(match, savedFormations);
+        },
+        (error) => {
+          console.error("Error fetching saved formations:", error);
+          // Still show the action sheet with the "Create New" option even if fetch fails
+          this.presentLineupActionSheet(match, []);
+        }
+      );
+  }
+
+  private presentLineupActionSheet(match, savedFormations: SavedFormation[]) {
+    if (!match.homeUserName || !match.awayUserName) {
+      this.commonService.toastMessage('Please assign teams first', 2500, ToastMessageType.Error);
+      return;
+    }
+    if (match.activityId !== 'd47c2ac4-e571-488f-a895-c1940726900f') {
+      this.commonService.toastMessage('Team lineup data is not available for this activity', 2500, ToastMessageType.Info);
+      return;
+    }
+    this.selectedLineupMatch = match;
+    this.lineupFormations = savedFormations;
+    this.showLineupSheet = true;
+  }
+
+  selectFormation(f: SavedFormation) {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, f.lineup_name, false, f.formation_setup_id, f.team_id, f.team_size);
+  }
+
+  createNewLineup() {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, '', true);
+  }
+
+  private navigateToLineup(match, lineupName: string = '', isCreateNew: boolean = false, formationSetupId: string = '', teamId: string = '', teamSize: number = 0) {
+    this.navCtrl.push("LineupPage", {
+      match: match,
+      matchId: match.MatchId,
+      activityId: match.activityId,
+      homeUserId: match.homeUserId,
+      awayUserId: match.awayUserId,
+      homeUserName: match.homeUserName,
+      awayUserName: match.awayUserName,
+      lineupName: isCreateNew ? '' : (lineupName || 'Starting line-up'),
+      isCreateNew: isCreateNew,
+      formationSetupId: formationSetupId,
+      teamId: teamId,
+      teamSize: teamSize,
+      isLeague: false,  // False when navigating from match page
+      leagueId: ""      // Empty string for non-league context
+    });
+  }
+
+
+  fetchAllMatches(showLoader: boolean = true) {
+    if (showLoader) this.commonService.showLoader("Fetching Matches...");
+    this.httpService.post(`${API.FetchAllMatches}`, this.fetchAllMatchesInput).subscribe({
+      next: (res: any) => {
+        if (showLoader) this.commonService.hideLoader();
+        if (res) {
+          this.fetchAllMatchesRes = res.data;
+          this.matchlist = this.fetchAllMatchesRes.AllMatches;
+          console.log("FetchAllMatches RESPONSE", JSON.stringify(res.data));
+          this.filteredMatchlist = JSON.parse(JSON.stringify(this.matchlist));
+          let today = moment().format("YYYY-MM-DD");
+          this.Today = this.matchlist.filter((match) => {
+            let match_createdAt = moment(
+              match.MatchStartDate,
+              "YYYY-MM-DD"
+            ).format("YYYY-MM-DD");
+
+            return moment(today).isSame(match_createdAt);
+          }).length;
+        }
+      },
+      error: () => { if (showLoader) this.commonService.hideLoader(); }
     });
   }
 
@@ -509,6 +588,21 @@ export class MatchPage {
 
   initializeItems() {
     this.filteredMatches = this.matches;
+  }
+
+  getActivityIcon(activityName: string): string {
+    if (!activityName) return 'trophy';
+    const name = activityName.toLowerCase();
+    const map: { [key: string]: string } = {
+      'tennis': 'tennisball', 'padel tennis': 'tennisball', 'table tennis': 'tennisball',
+      'football': 'football', 'badminton': 'tennisball', 'basketball': 'basketball',
+      'cricket': 'baseball', 'golf': 'golf', 'swimming': 'water', 'fitness': 'fitness',
+      'gymnastics': 'body', 'boxing': 'hand', 'dance': 'musical-notes', 'sing': 'mic',
+      'education': 'school', 'netball': 'basketball', 'dodgeball': 'baseball',
+      'squash': 'tennisball', 'bar n restaurant': 'restaurant', 'act': 'film',
+      'private coaching': 'person'
+    };
+    return map[name] || 'trophy';
   }
 }
 

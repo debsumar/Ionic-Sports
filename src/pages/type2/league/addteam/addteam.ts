@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import {
   IonicPage,
   NavController,
   NavParams,
   LoadingController,
+  Events
 } from "ionic-angular";
+import { ThemeService } from '../../../../services/theme.service';
 import gql from "graphql-tag";
 import { Storage } from "@ionic/storage";
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
@@ -33,6 +35,7 @@ import { debounceTime, distinctUntilChanged } from "rxjs/operators";
 })
 export class AddteamPage {
 
+  isDarkTheme: boolean = true;
   league: LeaguesForParentClubModel;
   teamsForParentClub: TeamsForParentClubModel[] = [];
   filteredteams: TeamsForParentClubModel[] = [];
@@ -82,6 +85,9 @@ export class AddteamPage {
     public storage: Storage,
     public sharedservice: SharedServices,
     private httpService: HttpService,
+    private themeService: ThemeService,
+    private events: Events,
+    private renderer: Renderer2
   ) {
 
     this.leagueId = this.navParams.get("leagueId");
@@ -114,42 +120,59 @@ export class AddteamPage {
   }
 
   ionViewDidLoad() {
-    // Component loaded
+    this.loadTheme();
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
   }
 
   ionViewWillLeave() {
-    // 🧹 Always cleanup subscriptions
+    this.events.unsubscribe('theme:changed');
     this.subscriptions.forEach(sub => {
-      if (sub && !sub.closed) {
-        sub.unsubscribe();
-      }
+      if (sub && !sub.closed) { sub.unsubscribe(); }
     });
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-addteam');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme') : this.renderer.addClass(el, 'light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-addteam');
+        if (el2) { isDark ? this.renderer.removeClass(el2, 'light-theme') : this.renderer.addClass(el2, 'light-theme'); }
+      }, 100);
+    }
   }
 
 
 
   getTeam() {
-    this.commonService.showLoader("Fetching teams...");
-
     const teamSubscription = this.httpService.post('league/getActivitySpecificTeam', this.inputObj).subscribe({
       next: (res: any) => {
-        this.commonService.hideLoader();
         this.teamsForParentClub = res.data;
 
         if (this.teamsForParentClub.length > 0) {
           this.teamsForParentClub = this.teamsForParentClub.map(team => ({
             ...team,
-            isSelected: this.selectedTeamsSet.has(team.id),
-            isAlreadyExisted: this.existingTeamsSet.has(team.id)
+            isSelected: false,
+            isAlreadyExisted: false
           }));
         }
 
         this.filteredteams = [...this.teamsForParentClub];
         this.updateTeamStates();
-      },
-      error: (error) => {
-        this.commonService.hideLoader();
-        this.handleError(error, "Failed to fetch teams");
       }
     });
 
@@ -169,6 +192,10 @@ export class AddteamPage {
       this.selectedTeamsSet.add(team.id);
       this.leagueParticipantInput.parentclubteamIds.push(team.id);
     }
+    
+    // Update team selection state immediately
+    team.isSelected = this.selectedTeamsSet.has(team.id);
+    this.updateTeamStates();
   }
 
   getFilterItems(ev: any) {
@@ -193,7 +220,7 @@ export class AddteamPage {
     if (!this.filteredteams.length) return;
 
     this.filteredteams.forEach(team => {
-      team.isSelected = this.selectedTeamsSet.has(team.id);
+      team.isSelected = this.selectedTeamsSet.has(team.id) || this.existingTeamsSet.has(team.id);
       team.isAlreadyExisted = this.existingTeamsSet.has(team.id);
     });
   }

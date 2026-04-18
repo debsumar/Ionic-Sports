@@ -1,5 +1,6 @@
-import { Component } from "@angular/core";
-import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController } from "ionic-angular";
+import { Component, Renderer2, ViewChild } from "@angular/core";
+import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, Events, FabContainer } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import { Storage } from "@ionic/storage";
 import { SharedServices } from "../../../services/sharedservice";
 import { FirebaseService } from "../../../../services/firebase.service";
@@ -9,6 +10,9 @@ import moment from "moment";
 import gql from "graphql-tag";
 import { GraphqlService } from "../../../../services/graphql.service";
 import { AllMatchData } from "../../../../shared/model/match.model";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
+import { ModuleTypeForEmail } from "../../mailtomemberbyadmin/mailtomemberbyadmin";
+import { ModuleTypes } from "../../../../shared/constants/module.constants";
 /**
  * Generated class for the MatchdetailsPage page.
  *
@@ -22,6 +26,8 @@ import { AllMatchData } from "../../../../shared/model/match.model";
   templateUrl: "matchdetails.html",
 })
 export class MatchdetailsPage {
+  @ViewChild('fab') fab: FabContainer;
+  isDarkTheme: boolean = false;
   activeType: boolean = true;
   invitedType: boolean = true;
   UserInvitationStatus = {
@@ -62,7 +68,10 @@ export class MatchdetailsPage {
     public sharedservice: SharedServices,
     public actionSheetCtrl: ActionSheetController,
     public modalCtrl: ModalController,
-    private graphqlService: GraphqlService
+    private graphqlService: GraphqlService,
+    private themeService: ThemeService,
+    private events: Events,
+    private renderer: Renderer2
   ) {
     console.log(
       `${this.navParams.get("selectedmatchId")}:${this.navParams.get(
@@ -96,10 +105,42 @@ export class MatchdetailsPage {
     });
   }
 
-  ionViewDidLoad() {
-    console.log("ionViewDidLoad MatchdetailsPage");
-
+  async ionViewDidLoad() {
+    this.loadTheme();
   }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-matchdetails');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme') : this.renderer.addClass(el, 'light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-matchdetails');
+        if (el2) { isDark ? this.renderer.removeClass(el2, 'light-theme') : this.renderer.addClass(el2, 'light-theme'); }
+      }, 100);
+    }
+  }
+
+  get activeTabIndex(): number { return this.activeType ? 0 : 1; }
+  onTabChange(index: number) { this.changeType(index === 0); }
 
   getFormattedDate(date: any) {
     return moment(+date).format("DD MMM YYYY, hh:mm A");
@@ -121,6 +162,17 @@ export class MatchdetailsPage {
 
   formatMatchStartDate(date) {
     return moment(date, "YYYY-MM-DD HH:mm").local().format("DD-MMM-YYYY hh:mm A");
+  }
+
+  get headerAccentColor(): string {
+    return this.commonService.getTypeAccentColor(this.match?.MatchType);
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
+    if (this.match?.VenueName) rows.push({ icon: 'pin', text: (this.match as any).location && (this.match as any).location !== '' ? (this.match as any).location : this.match.VenueName });
+    return rows;
   }
 
   getColor(index: number) {
@@ -274,10 +326,7 @@ export class MatchdetailsPage {
       if (error.networkError) {
         console.error("Network Error:", error.networkError);
       }
-    }
-    )
-
-
+    })
   };
 
   canEditTeams() {
@@ -589,6 +638,69 @@ export class MatchdetailsPage {
   }
 
 
+  gotoViewCoaches() {
+    this.navCtrl.push('ViewCoachesPage', { match_id: this.match.MatchId });
+  }
+
+  gotoEditMatch() {
+    this.navCtrl.push('EditmatchPage', { match: this.match });
+  }
+
+  closeFab() {
+    if (this.fab) this.fab.close();
+  }
+
+  gotoRecurringMatches() {
+    this.closeFab();
+    this.navCtrl.push('AddrecurringmatchesPage', { match: JSON.stringify(this.match) });
+  }
+
+  gotoEmailPage() {
+    if (this.participants.length > 0) {
+      const member_list = this.participants.map(p => ({
+        IsChild: (p.User as any).IsChild || false,
+        ParentId: (p.User as any).IsChild ? ((p.User as any).ParentId || "") : "",
+        MemberId: p.User.Id,
+        MemberEmail: (p.User as any).EmailID && (p.User as any).EmailID !== "" && (p.User as any).EmailID !== "-" && (p.User as any).EmailID !== "n/a"
+          ? (p.User as any).EmailID
+          : ((p.User as any).IsChild ? ((p.User as any).ParentEmailID || "") : ""),
+        MemberName: p.User.FirstName + " " + p.User.LastName
+      }));
+      const email_modal = {
+        module_info: {
+          module_id: this.match.MatchId,
+          module_booking_club_name: this.match.VenueName,
+          module_booking_name: this.match.MatchTitle,
+          module_booking_start_date: this.match.MatchStartDate,
+        },
+        email_users: member_list,
+        type: ModuleTypeForEmail.MEMBER
+      };
+      this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    }
+  }
+
+  gotoNotificationPage() {
+    if (this.participants.length > 0) {
+      const user_ids = this.participants.map(p =>
+        (p.User as any).IsChild ? ((p.User as any).ParentId || p.User.Id) : p.User.Id
+      );
+      const user_names = this.participants.map(p => p.User.FirstName + ' ' + p.User.LastName);
+      this.navCtrl.push("NotificationsPage", {
+        users: user_ids,
+        user_names: user_names,
+        type: ModuleTypes.Match,
+        heading: `Match: ${this.match.MatchTitle}`,
+        module_id: this.match.MatchId,
+        page_id: "MATCHDETAILS"
+      });
+    } else {
+      this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    }
+  }
+
   deleteConfirm() {
     let match_delete_alert = this.alertCtrl.create({
       title: "Do you want to delete the match?",
@@ -617,11 +729,7 @@ export class MatchdetailsPage {
 
 
   delete() {
-
-    this.commonService.showLoader("Please wait...");
     try {
-
-
       const delete_Match = gql`
        mutation deleteMatch($deleteMatchInput: DeleteMatchInput!) {
         deleteMatch(deleteMatchInput: $deleteMatchInput)
@@ -630,22 +738,19 @@ export class MatchdetailsPage {
       const deleteVariable = { deleteMatchInput: { ParentClubKey: this.parentClubKey, MatchId: this.match.MatchId } }
 
       this.graphqlService.mutate(delete_Match, deleteVariable, 1).subscribe((response) => {
-        this.commonService.hideLoader();
         const message = "match deleted successfully";
         this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-        this.commonService.updateCategory("matchlist");
-        this.navCtrl.pop().then(() => this.navCtrl.pop().then());
+        this.commonService.updateCategory("match");
+        this.events.publish('match:refresh');
+        this.navCtrl.pop();
 
       }, (err) => {
-        this.commonService.hideLoader();
         console.error("GraphQL mutation error:", err);
         this.commonService.toastMessage("match deletion failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
       )
     } catch (error) {
-
       console.error("An error occurred:", error);
-
     }
   }
 

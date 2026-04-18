@@ -202,6 +202,7 @@ export interface ParticipantUserData {
     media_consent: boolean; // 📸 Media consent status
     profile_status: string; // 👁️ Profile visibility status
     AGE?: number; // 👶 Age (optional)
+    profile_image_url: string;
 }
 
 // 🏈 Interface for the Team details within a participant entry
@@ -296,7 +297,6 @@ export class GetIndividualMatchParticipantModel {
     Match: ParticipantMatchData; // 🏟️ Nested match details
     teamrole: ParticipantTeamRoleData; // 🎭 Nested team role details
     invite_status_text: string;
-    fixture_id: string;
 }
 
 // ___________-----------------------
@@ -333,6 +333,20 @@ export interface AllMatchData {
     homeUserName: string; // 👤 Home user name (if applicable)
     awayUserName: string; // 👤 Away user name (if applicable)
     LeagueFixtureId: string; // 🏟️ League fixture ID
+    home_team_score: string;
+    away_team_score: string;
+    is_home_team_winner: boolean | null;
+    is_away_team_winner: boolean | null;
+    result_status_text: string | null;
+    ResultStatus: number | null;
+    MatchVisibility: number;
+    match_round_type?: number;
+    match_round_type_text?: string;
+    location: string;
+    VenueId: string;
+    homeUserName2: string | null;
+    awayUserName2: string | null;
+    users: string[];
 }
 
 // 📄 Export class to hold the entire All Matches response data structure
@@ -343,3 +357,7 @@ export class MatchModelV3 {
 
 
 
+export interface MatchDuration {
+    id: number;
+    duration: number;
+}

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import {
   IonicPage,
   NavController,
@@ -6,8 +6,10 @@ import {
   ViewController,
   LoadingController,
   AlertController,
-  PopoverController
+  PopoverController,
+  Events
 } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import {
   CommonService,
   ToastMessageType,
@@ -57,8 +59,7 @@ interface StaffDetails {
   templateUrl: 'addstafftoteam.html',
 })
 export class AddstafftoteamPage {
-
-
+  isDarkTheme: boolean = false;
   themeType: number;
   staff: StaffModel[] = [];
   filteredStaff: StaffModel[] = [];
@@ -98,7 +99,9 @@ export class AddstafftoteamPage {
     public viewCtrl: ViewController,
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
-
+    private themeService: ThemeService,
+    private events: Events,
+    private renderer: Renderer2
   ) {
     this.existedstaff = this.navParams.get("existedstaff")
     this.themeType = sharedservice.getThemeType();
@@ -137,12 +140,42 @@ export class AddstafftoteamPage {
     this.subscriptions.push(searchSubscription);
   }
 
-  ionViewDidLoad() {
-    // Component loaded
+  async ionViewDidLoad() {
+    await this.loadTheme();
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.applyTheme(isDark);
+    });
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-addstafftoteam');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme') : this.renderer.addClass(el, 'light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-addstafftoteam');
+        if (el2) { isDark ? this.renderer.removeClass(el2, 'light-theme') : this.renderer.addClass(el2, 'light-theme'); }
+      }, 100);
+    }
   }
 
   ionViewWillLeave() {
-    // 🧹 Always cleanup subscriptions
+    this.events.unsubscribe('theme:changed');
     this.subscriptions.forEach(sub => {
       if (sub && !sub.closed) {
         sub.unsubscribe();
@@ -230,7 +263,6 @@ export class AddstafftoteamPage {
     const staffLength = this.addStaffInput.staffDetails.length;
     if (staffLength > 0) {
       try {
-        this.commonService.showLoader("Please wait...");
         console.log(JSON.stringify(this.addStaffInput));
 
         const addStaff = gql`
@@ -251,20 +283,17 @@ export class AddstafftoteamPage {
           .mutate(addStaff, mutationVariables, 0)
           .subscribe(
             (res: any) => {
-              this.commonService.hideLoader();
               const message = "Staff Added Successfully";
               this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
               this.viewCtrl.dismiss({ canRefreshData: true });
             },
             (error) => {
-              this.commonService.hideLoader();
               this.handleError(error, "Failed to save staff");
             }
           );
 
         this.subscriptions.push(saveSubscription);
       } catch (error) {
-        this.commonService.hideLoader();
         this.handleError(error, "Failed to save staff");
       }
     } else {

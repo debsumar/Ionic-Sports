@@ -8,7 +8,9 @@ import {
   Platform,
   ToastController,
   AlertController,
+  Events
 } from "ionic-angular";
+import { ThemeService } from "../../../../services/theme.service";
 import {
   CommonService,
   ToastMessageType,
@@ -38,7 +40,7 @@ import { Role } from "../team.model";
   templateUrl: 'addroleforplayernstaff.html',
 })
 export class AddroleforplayernstaffPage {
-
+  isDarkTheme: boolean = false;
   team: TeamsForParentClubModel;
   parentClubKey: string;
   // teamRoles: [];
@@ -75,7 +77,9 @@ export class AddroleforplayernstaffPage {
     public commonService: CommonService,
     private toastCtrl: ToastController,
     public sharedservice: SharedServices,
-    public navParams: NavParams) {
+    public navParams: NavParams,
+    private themeService: ThemeService,
+    private events: Events) {
 
     this.team = this.navParams.get("team");
     this.playerId = this.navParams.get("memberId");
@@ -104,7 +108,37 @@ export class AddroleforplayernstaffPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad AddroleforplayernstaffPage');
+    this.loadTheme();
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-addroleforplayernstaff');
+    if (el) {
+      isDark ? el.classList.remove('light-theme') : el.classList.add('light-theme');
+    } else {
+      setTimeout(() => {
+        const el2 = document.querySelector('page-addroleforplayernstaff');
+        if (el2) { isDark ? el2.classList.remove('light-theme') : el2.classList.add('light-theme'); }
+      }, 100);
+    }
   }
 
   selectRoleToUpdate(role) {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import {
   AlertController,
   IonicPage,
@@ -6,6 +6,7 @@ import {
   NavController,
   NavParams,
   PopoverController,
+  Events
 } from 'ionic-angular';
 import {
   CommonService,
@@ -25,6 +26,7 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
 import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
+import { ThemeService } from '../../../../services/theme.service';
 
 
 /**
@@ -44,6 +46,7 @@ export class CreatematchleaguePage {
   min: any;
   max: any;
   publicType: boolean = true;
+  isDarkTheme: boolean = true;
   privateType: boolean = true;
   parentClubKey: string = "";
   // saveLeagues: LeaguesForParentClubModel[] = [];
@@ -132,6 +135,7 @@ export class CreatematchleaguePage {
   location_type: number;
   activityId: string;
   postgre_parentclub_id: string;
+  currency: string = '£';
   constructor(
     public alertCtrl: AlertController,
     public navCtrl: NavController,
@@ -145,6 +149,9 @@ export class CreatematchleaguePage {
     public popoverCtrl: PopoverController,
     private graphqlService: GraphqlService,
     private sharedService: SharedServices,
+    private themeService: ThemeService,
+    private events: Events,
+    private renderer: Renderer2
   ) {
 
     this.leagueId = this.navParams.get("leagueId");
@@ -170,13 +177,9 @@ export class CreatematchleaguePage {
     this.inputObj.user_device_metadata.UserActionType = 0;
     this.inputObj.user_device_metadata.UserAppType = 0;
     this.inputObj.user_device_metadata.UserDeviceType = this.sharedservice.getPlatform() == "android" ? 1 : 2;
-
-    this.inputObj.CreatedBy = this.sharedservice.getLoggedInId();
-
+    this.inputObj.CreatedBy = this.sharedservice.getLoggedInUserId() || this.sharedService.getPostgreParentClubId();
     this.inputObj.LeagueId = this.leagueId;
-
     this.inputObj.match_type = +this.navParams.get("league_type");
-
     const inputFormat = 'DD-MMM-YYYY, ddd';
 
     if (this.leagueStartDate) {
@@ -197,16 +200,17 @@ export class CreatematchleaguePage {
 
 
   async getLoggedInData() {
-    const [login_obj, postgre_parentclub] = await Promise.all([
+    const [login_obj, postgre_parentclub,currency_dets] = await Promise.all([
       this.storage.get('userObj'),
       this.storage.get('postgre_parentclub'),
+      this.storage.get('Currency')
     ])
 
     if (login_obj) {
       this.parentClubKey = JSON.parse(login_obj).UserInfo[0].ParentClubKey;
       const val = JSON.parse(login_obj);
       this.roundTypeInput = new RoundTypeInput();
-      this.roundTypeInput.updated_by = this.sharedservice.getLoggedInUserId();
+      this.roundTypeInput.updated_by = this.sharedservice.getLoggedInUserId() || this.sharedService.getPostgreParentClubId();
       this.roundTypeInput.device_id = this.sharedservice.getDeviceId() || "";
       this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
       this.roundTypeInput.clubId = val.$key;
@@ -221,6 +225,10 @@ export class CreatematchleaguePage {
       this.getClubVenues();
     }
 
+    if(currency_dets){
+      const currencyObj = JSON.parse(currency_dets);
+      this.currency = currencyObj.CurrencySymbol;
+    }
   }
 
   goToDashboardMenuPage() {
@@ -238,6 +246,32 @@ export class CreatematchleaguePage {
   ionViewDidLoad() {
     console.log("ionViewDidLoad CreatematchleaguePage");
   }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => { this.applyTheme(isDark); });
+    this.events.subscribe('theme:changed', (isDark) => { this.applyTheme(isDark); });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-creatematchleague');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme')
+             : this.renderer.addClass(el, 'light-theme');
+    }
+  }
   saveLeagueDetails() {
     this.navCtrl.push("LeaguelistingPage");
   }
@@ -253,7 +287,7 @@ export class CreatematchleaguePage {
     const clubs_input = {
       parentclub_id: this.postgre_parentclub_id,
       user_postgre_metadata: {
-        UserMemberId: this.sharedservice.getLoggedInUserId()
+        UserMemberId: this.sharedservice.getLoggedInUserId() || this.sharedService.getPostgreParentClubId()
       },
       user_device_metadata: {
         UserAppType: 0,
@@ -534,19 +568,16 @@ export class CreatematchleaguePage {
   }
 
   getRoundTypes() {
-    this.commonService.showLoader("Fetching info ...");
-
-    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        this.roundTypes = res.data || [];
-        console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
-
-      } else {
-        this.commonService.hideLoader();
-        console.log("error in fetching",)
+    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.roundTypes = res.data || [];
+          console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
+        } else {
+          console.log("error in fetching")
+        }
       }
-    })
+    });
   }
 
 
@@ -560,6 +591,7 @@ export class CreatematchleaguePage {
         }
 
         this.inputObj.match_type = +this.inputObj.match_type;
+        this.inputObj.CreatedBy = this.sharedService.getLoggedInUserId() || this.sharedService.getPostgreParentClubId();
         if (this.inputObj.MatchPaymentType != 1) {
           this.inputObj.Member_Fee = "0.00";
           this.inputObj.Non_Member_Fee = "0.00";

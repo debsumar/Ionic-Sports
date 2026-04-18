@@ -1,23 +1,22 @@
 import { Component, Renderer2, ViewChild } from "@angular/core";
-import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, FabContainer, Events } from "ionic-angular";
+import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, FabContainer, Events } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { SharedServices } from "../../../services/sharedservice";
 import { FirebaseService } from "../../../../services/firebase.service";
 import { CommonService, ToastMessageType, ToastPlacement } from "../../../../services/common.service";
-import { Apollo } from "apollo-angular";
 import moment from "moment";
 import gql from "graphql-tag";
-import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../../services/graphql.service";
-import { error } from "console";
 import { AllMatchData, GetIndividualMatchParticipantModel, } from "../../../../shared/model/match.model";
-import { LeagueMatchActionType, MatchType, LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus, ActivityTypeEnum } from "../../../../shared/utility/enums";
+import { LeagueMatchActionType, LeagueParticipationStatus, LeagueTeamPlayerStatusType, LeaguePlayerInviteStatus, ActivityTypeEnum } from "../../../../shared/utility/enums";
 import { API } from "../../../../shared/constants/api_constants";
 import { HttpService } from "../../../../services/http.service";
-import { AppType } from "../../../../shared/constants/module.constants";
+import { AppType, ModuleTypes } from "../../../../shared/constants/module.constants";
 import { TeamsForParentClubModel } from "../../league/models/team.model";
 import { Role } from "../../team/team.model";
 import { ThemeService } from "../../../../services/theme.service";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
+import { ModuleTypeForEmail } from "../../mailtomemberbyadmin/mailtomemberbyadmin";
 /**
  * Generated class for the MatchTeamDetailsPage page.
  *
@@ -27,7 +26,7 @@ import { ThemeService } from "../../../../services/theme.service";
 
 @IonicPage()
 @Component({
-  selector: "page-match_team_details",
+  selector: "page-match-team-details",
   templateUrl: "match_team_details.html",
   providers: [HttpService]
 
@@ -38,6 +37,15 @@ export class MatchTeamDetailsPage {
   activeType: boolean = true;
   selectedHomeTeamText: string;
   selectedAwayTeamText: string;
+  isHomeExternal: boolean = false;
+  isAwayExternal: boolean = false;
+  isDarkTheme: boolean = true;
+  showPlayerSheet: boolean = false;
+  selectedPlayer: GetIndividualMatchParticipantModel = null;
+  showTeamSheet: boolean = false;
+  teamSheetIsHome: boolean = true;
+  showTeamActionDropdown: boolean = false;
+  teamActionIsHome: boolean = true;
 
   getIndividualMatchParticipantRes: GetIndividualMatchParticipantModel[] = [];
   allParticipants: GetIndividualMatchParticipantModel[] = []; // 📊 Store all participants for counting
@@ -71,7 +79,8 @@ export class MatchTeamDetailsPage {
     device_type: 0,
     app_type: 0,
     device_id: "",
-    updated_by: ""
+    updated_by: "",
+    isExternal: false
   }
   updateTeamInput: UpdateTeamInput = {
     parentclubId: "",
@@ -257,7 +266,6 @@ export class MatchTeamDetailsPage {
         this.updateLeagueMatchInviteStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateLeagueMatchInviteStatusInput.MatchId = this.match.MatchId;
 
-        this.getActivitySpecificTeam();
         // 📊 Load all participants first for accurate counts
         this.loadAllParticipantsForCounts().then(() => {
           this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
@@ -267,8 +275,23 @@ export class MatchTeamDetailsPage {
     });
   }
 
+  gotoEditMatch() {
+    this.navCtrl.push('EditmatchPage', { match: this.match });
+  }
+
+  gotoRecurringMatches() {
+    this.closeFab();
+    this.navCtrl.push('AddrecurringmatchesPage', { match: JSON.stringify(this.match) });
+  }
+
+  gotoViewCoaches() {
+    this.closeFab();
+    this.navCtrl.push('ViewCoachesPage', { match_id: this.match.MatchId });
+  }
+
   publish() {
     this.closeFab();
+
 
     // Debug: Check available team properties
     console.log("Available teams:", this.activitySpecificTeamsRes);
@@ -303,6 +326,10 @@ export class MatchTeamDetailsPage {
     }
   }
 
+  get activeTabIndex(): number { return this.activeType ? 0 : 1; }
+
+  onTabChange(index: number) { this.changeType(index === 0); }
+
   closeFab() {
     if (this.fab) {
       this.fab.close();
@@ -316,6 +343,14 @@ export class MatchTeamDetailsPage {
     this.events.subscribe("theme:changed", (isDark) => {
       this.applyTheme(isDark);
     });
+    this.events.subscribe("team:refresh", () => {
+      this.getActivitySpecificTeam();
+      this.detectExternalTeams();
+    });
+    this.detectExternalTeams();
+    this.loadAllParticipantsForCounts().then(() => {
+      this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+    });
   }
 
   ionViewDidEnter() {
@@ -326,6 +361,7 @@ export class MatchTeamDetailsPage {
 
   ionViewWillLeave() {
     this.events.unsubscribe("theme:changed");
+    this.events.unsubscribe("team:refresh");
   }
 
   private loadTheme(): void {
@@ -338,8 +374,9 @@ export class MatchTeamDetailsPage {
   }
 
   private applyTheme(isDark: boolean): void {
+    this.isDarkTheme = isDark;
     const applyThemeToElement = () => {
-      const element = document.querySelector("page-match_team_details");
+      const element = document.querySelector("page-match-team-details");
       if (element) {
         if (isDark) {
           element.classList.remove("light-theme");
@@ -437,55 +474,20 @@ export class MatchTeamDetailsPage {
 
   //ActionSheet Controller
   presentActionSheet(member: GetIndividualMatchParticipantModel) {
-    // if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType !== LeagueTeamPlayerStatusType.All) {
-    //   this.commonService.toastMessage('Please select "All" filter to perform actions', 3000, ToastMessageType.Info);
-    //   return;
-    // }
-    let actionSheet = this.actionSheetCtrl.create({
-      title: `${member.user.FirstName} ${member.user.LastName}`,
-      buttons: [
-        {
-          text: 'Confirmed',
-          icon: 'checkmark-circle',
-          cssClass: 'action-sheet-confirmed',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted);
-          }
-        },
-        {
-          text: 'Maybe',
-          icon: 'help-circle',
-          cssClass: 'action-sheet-maybe',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe);
-          }
-        },
-        {
-          text: 'Declined',
-          icon: 'close-circle',
-          cssClass: 'action-sheet-declined',
-          handler: () => {
-            this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined);
-            // Handle declined status
-          }
-        },
-        {
-          text: 'Update Role',
-          icon: 'people',
-          handler: () => {
-            //for updating roles
-            this.showRoles(member);
-            if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
-              //   this.showRoles(member);
-              // } else {
-              //   this.commonService.toastMessage('Please select "All" filter to update role', 3000, ToastMessageType.Info);
-              //   // event.preventDefault(); // Prevent the action from starting 
-            }
-          }
-        },
-      ]
-    });
-    actionSheet.present();
+    this.selectedPlayer = member;
+    this.showPlayerSheet = true;
+  }
+
+  onPlayerAction(action: string) {
+    this.showPlayerSheet = false;
+    const member = this.selectedPlayer;
+    if (!member) return;
+    switch (action) {
+      case 'confirmed': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted); break;
+      case 'maybe': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe); break;
+      case 'declined': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined); break;
+      case 'role': this.showRoles(member); break;
+    }
   }
 
   showRoles(member: GetIndividualMatchParticipantModel): void {
@@ -551,78 +553,63 @@ export class MatchTeamDetailsPage {
   }
 
   updatePlayerRole(member: GetIndividualMatchParticipantModel) {
-    this.commonService.showLoader("Updating Role...");
     this.updateMatchParticipantRoleInput.match_participation_id = member.id;
 
-    this.httpService.post(`${API.Update_League_Match_Participantipation_Role}`, this.updateMatchParticipantRoleInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        var response = res.message;
-        this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
-        // Refresh the participant data
-        this.loadAllParticipantsForCounts().then(() => {
-          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
-        });
-      } else {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage("Failed to update role", 3000, ToastMessageType.Error);
+    this.httpService.post(`${API.Update_League_Match_Participantipation_Role}`, this.updateMatchParticipantRoleInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          var response = res.message;
+          this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
+          // Refresh the participant data
+          this.loadAllParticipantsForCounts().then(() => {
+            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+          });
+        } else {
+          this.commonService.toastMessage("Failed to update role", 3000, ToastMessageType.Error);
+        }
       }
-    },
-      (err) => {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error);
-      });
+    });
   }
 
   updateLeagueMatchInviteStatus(member: GetIndividualMatchParticipantModel, inviteStatus: LeaguePlayerInviteStatus) {
-    this.commonService.showLoader("Please wait...");
     this.updateLeagueMatchInviteStatusInput.ParticipationId = member.id;
     this.updateLeagueMatchInviteStatusInput.InviteStatus = inviteStatus;
 
-    this.httpService.post(`${API.UpdateLeagueMatchInviteStatus}`, this.updateLeagueMatchInviteStatusInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        var response = res.message;
-        this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
-        // Refresh the participant data
-        this.loadAllParticipantsForCounts().then(() => {
-          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
-        });
-      } else {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage("Failed to update Invitation status", 3000, ToastMessageType.Error);
+    this.httpService.post(`${API.UpdateLeagueMatchInviteStatus}`, this.updateLeagueMatchInviteStatusInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          var response = res.message;
+          this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
+          // Refresh the participant data
+          this.loadAllParticipantsForCounts().then(() => {
+            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+          });
+        } else {
+          this.commonService.toastMessage("Failed to update Invitation status", 3000, ToastMessageType.Error);
+        }
       }
-    },
-      (err) => {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error);
-      });
+    });
   }
 
   //called when we use drag and drop to change the status of the player
   updateMatchParticipationStatus(participantStatus, newParticipantStatus: LeagueParticipationStatus, { participationId }: { participationId: string }) {
-    this.commonService.showLoader("Adding...");
     this.updateMatchParticipationStatusInput.ParticipationId = participationId;
     this.updateMatchParticipationStatusInput.ParticipationStatus = newParticipantStatus;
 
-    this.httpService.post(`${API.Update_League_Match_Participation_Status}`, this.updateMatchParticipationStatusInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        var response = res.message;
-        this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
-        // Refresh the participant data
-        this.loadAllParticipantsForCounts().then(() => {
-          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
-        });
-      } else {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage("Failed to update participation status", 3000, ToastMessageType.Error);
+    this.httpService.post(`${API.Update_League_Match_Participation_Status}`, this.updateMatchParticipationStatusInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          var response = res.message;
+          this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
+          // Refresh the participant data
+          this.loadAllParticipantsForCounts().then(() => {
+            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+          });
+        } else {
+          this.commonService.toastMessage("Failed to update participation status", 3000, ToastMessageType.Error);
+        }
       }
-    },
-      (err) => {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error);
-      });
+    });
   }
 
   getFilteredSections(): { title: string; items: GetIndividualMatchParticipantModel[] }[] {
@@ -652,6 +639,17 @@ export class MatchTeamDetailsPage {
     return this.allParticipants.length;
   }
 
+  get headerAccentColor(): string {
+    return this.commonService.getTypeAccentColor(this.match?.MatchType);
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
+    if (this.match?.VenueName) rows.push({ icon: 'pin', text: (this.match as any).location && (this.match as any).location !== '' ? (this.match as any).location : this.match.VenueName });
+    return rows;
+  }
+
   getAcceptedCount(sectionItems: GetIndividualMatchParticipantModel[]): number {
     return sectionItems.filter(item =>
       item.invite_status === LeaguePlayerInviteStatus.Accepted ||
@@ -659,56 +657,80 @@ export class MatchTeamDetailsPage {
     ).length;
   }
 
+  toggleTeamDropdown(isHome: boolean) {
+    this.teamActionIsHome = isHome;
+    this.showTeamActionDropdown = true;
+  }
+
+  closeTeamDropdown() {
+    this.showTeamActionDropdown = false;
+  }
+
+  onTeamActionSelect(action: string) {
+    this.showTeamActionDropdown = false;
+    if (action === 'club') {
+      this.fetchAndShowTeams(this.teamActionIsHome, true);
+    } else if (action === 'external') {
+      if (this.cachedExternalTeams.length > 0) {
+        this.activitySpecificTeamsRes = this.cachedExternalTeams;
+        this.showAvailableTeams(this.teamActionIsHome);
+      } else {
+        this.fetchAndShowTeams(this.teamActionIsHome, false);
+      }
+    } else if (action === 'create_external') {
+      this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode });
+    }
+  }
+
   showAvailableTeams(isHomeTeam: boolean): void {
     this.closeFab();
     if (this.activitySpecificTeamsRes.length > 0) {
-      // console.log(this.leagueParticipantForMatchRes);
-      let alert = this.alertCtrl.create();
-      alert.setTitle(`Select Team`);
-
-      for (let userIndex = 0; userIndex < this.activitySpecificTeamsRes.length; userIndex++) {
-        alert.addInput({
-          type: 'radio',
-          label: this.activitySpecificTeamsRes[userIndex].teamName,
-          value: this.activitySpecificTeamsRes[userIndex].id,
-          checked: isHomeTeam ? this.activitySpecificTeamsRes[userIndex].teamName == this.selectedHomeTeamText : this.activitySpecificTeamsRes[userIndex].teamName == this.selectedAwayTeamText
-        });
-      }
-
-      alert.addButton('Cancel');
-      alert.addButton({
-        text: 'OK',
-        handler: (selectedVal) => {
-          if (!selectedVal) {
-            this.commonService.toastMessage("Please select a team", 3000, ToastMessageType.Info);
-            return false; // prevent alert from dismissing          
-          }
-          this.selectedTeam = this.activitySpecificTeamsRes.find(team => team.id === selectedVal);
-
-          if (isHomeTeam) {
-            if (this.selectedTeam.teamName === this.selectedAwayTeamText) {
-              this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
-            } else {
-              this.updateTeamInput.HomeParentclubTeamId = selectedVal;
-              this.updateTeamInput.AwayParentclubTeamId = ""; //setting the deafult val to ""
-              this.updateTeam(isHomeTeam, this.selectedTeam.teamName);
-            }
-          } else {
-            if (this.selectedTeam.teamName === this.selectedHomeTeamText) {
-              this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
-            } else {
-              this.updateTeamInput.AwayParentclubTeamId = selectedVal;
-              this.updateTeamInput.HomeParentclubTeamId = ""; //setting the deafult val to ""
-              this.updateTeam(isHomeTeam, this.selectedTeam.teamName);
-            }
-          }
-        }
-      });
-
-      alert.present();
-
+      this.teamSheetIsHome = isHomeTeam;
+      this.showTeamSheet = true;
     } else {
       this.commonService.toastMessage("No teams available", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
+    }
+  }
+
+  fetchAndShowTeams(isHome: boolean, isClubTeam?: boolean) {
+    this.getActivitySpecificTeamInput.isExternal = isClubTeam === false;
+    this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, this.getActivitySpecificTeamInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.activitySpecificTeamsRes = res.data;
+        }
+        this.showAvailableTeams(isHome);
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to fetch teams", 2500, ToastMessageType.Error);
+      }
+    });
+  }
+
+  onTeamSelected(team: TeamsForParentClubModel): void {
+    this.showTeamSheet = false;
+    const isHomeTeam = this.teamSheetIsHome;
+
+    if (isHomeTeam) {
+      if (team.teamName === this.selectedAwayTeamText) {
+        this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
+        return;
+      }
+      this.selectedTeam = team;
+      this.updateTeamInput.HomeParentclubTeamId = team.id;
+      this.updateTeamInput.AwayParentclubTeamId = "";
+      this.isHomeExternal = !team.is_club_team;
+      this.updateTeam(true, team.teamName);
+    } else {
+      if (team.teamName === this.selectedHomeTeamText) {
+        this.commonService.toastMessage("Home and away teams can't be same", 3000, ToastMessageType.Info);
+        return;
+      }
+      this.selectedTeam = team;
+      this.updateTeamInput.AwayParentclubTeamId = team.id;
+      this.updateTeamInput.HomeParentclubTeamId = "";
+      this.isAwayExternal = !team.is_club_team;
+      this.updateTeam(false, team.teamName);
     }
   }
 
@@ -743,24 +765,25 @@ export class MatchTeamDetailsPage {
       input.TeamId = teamId;
       input.leagueTeamPlayerStatusType = LeagueTeamPlayerStatusType.All;
 
-      this.httpService.post(`${API.GetIndividualMatchParticipant}`, input).subscribe((res: any) => {
-        if (res) {
-          this.allParticipants = res.data || [];
+      this.httpService.post(`${API.GetIndividualMatchParticipant}`, input).subscribe({
+        next: (res: any) => {
+          if (res) {
+            this.allParticipants = res.data || [];
+          }
+          resolve();
+        },
+        error: () => {
+          resolve();
         }
-        resolve();
-      }, () => {
-        resolve();
       });
     });
   }
 
   //to fetch list of avilable players of both home & away teams
   getIndividualMatchParticipant(par?: LeagueTeamPlayerStatusType) {
-    this.commonService.showLoader("Fetching info ...");
     const teamId = this.activeType ? this.match.homeUserId : this.match.awayUserId;
 
     if (!teamId) {
-      this.commonService.hideLoader();
       this.getIndividualMatchParticipantRes = [];
       this.sections.forEach(section => section.items = []);
       return;
@@ -769,25 +792,19 @@ export class MatchTeamDetailsPage {
     this.getIndividualMatchParticipantInput.TeamId = teamId;
     this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType = par !== undefined ? par : LeagueTeamPlayerStatusType.All;
 
-    this.httpService.post(`${API.GetIndividualMatchParticipant}`, this.getIndividualMatchParticipantInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        this.getIndividualMatchParticipantRes = res.data || [];
+    this.httpService.post(`${API.GetIndividualMatchParticipant}`, this.getIndividualMatchParticipantInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.getIndividualMatchParticipantRes = res.data || [];
 
-        // 📊 Update allParticipants only when fetching all data
-        if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
-          this.allParticipants = res.data || [];
+          // 📊 Update allParticipants only when fetching all data
+          if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
+            this.allParticipants = res.data || [];
+          }
+
+          this.sections.forEach(section => section.items = []); // Clear the sections array
+          this.populateSections(); // Call populateSections after data is fetched
         }
-
-        this.sections.forEach(section => section.items = []); // Clear the sections array
-        this.populateSections(); // Call populateSections after data is fetched
-      }
-    }, error => {
-      this.commonService.hideLoader();
-      if (error.error && error.error.message) {
-        this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error);
-      } else {
-        this.commonService.toastMessage("Failed to fetch participants details", 3000, ToastMessageType.Error);
       }
     });
   }
@@ -809,59 +826,65 @@ export class MatchTeamDetailsPage {
     });
   }
 
+  cachedExternalTeams: TeamsForParentClubModel[] = [];
+
+  detectExternalTeams() {
+    const input = { ...this.getActivitySpecificTeamInput, isExternal: true };
+    this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, input).subscribe({
+      next: (res: any) => {
+        this.cachedExternalTeams = res?.data || [];
+        if (this.match.homeUserId) {
+          this.isHomeExternal = this.cachedExternalTeams.some(t => t.id === this.match.homeUserId);
+        }
+        if (this.match.awayUserId) {
+          this.isAwayExternal = this.cachedExternalTeams.some(t => t.id === this.match.awayUserId);
+        }
+      }
+    });
+  }
+
   //to fetch list of avilable teams
   getActivitySpecificTeam() {
-    this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, this.getActivitySpecificTeamInput).subscribe((res: any) => {
-      if (res) {
-        this.activitySpecificTeamsRes = res.data;
+    this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, this.getActivitySpecificTeamInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.activitySpecificTeamsRes = res.data;
+        }
       }
-    }, error => {
-      this.commonService.toastMessage(error.error.message, 3000, ToastMessageType.Error,);
     });
   }
 
   updateTeam(isHomeTeam?: boolean, teamName?: string) {
-    this.commonService.showLoader("Updating...");
-    this.httpService.post(`${API.Update_League_Fixture}`, this.updateTeamInput).subscribe((res: any) => {
-      if (res) {
-        this.commonService.hideLoader();
-        var res = res.message;
+    this.httpService.post(`${API.Update_League_Fixture}`, this.updateTeamInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          var res = res.message;
 
-        // Update frontend variables and match data on successful API call
-        if (isHomeTeam !== undefined && teamName) {
-          if (isHomeTeam) {
-            this.selectedHomeTeamText = teamName;
-            this.match.homeUserId = this.selectedTeam.id; // Update match data
-          } else {
-            this.selectedAwayTeamText = teamName;
-            this.match.awayUserId = this.selectedTeam.id; // Update match data
+          // Update frontend variables and match data on successful API call
+          if (isHomeTeam !== undefined && teamName) {
+            if (isHomeTeam) {
+              this.selectedHomeTeamText = teamName;
+              this.match.homeUserId = this.selectedTeam.id; // Update match data
+            } else {
+              this.selectedAwayTeamText = teamName;
+              this.match.awayUserId = this.selectedTeam.id; // Update match data
+            }
           }
-        }
 
-        this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
+          this.commonService.toastMessage(res, 3000, ToastMessageType.Success);
 
-        // Only refresh data if we're on the tab that was just updated
-        const shouldRefresh = (isHomeTeam && this.activeType) || (!isHomeTeam && !this.activeType);
-        if (shouldRefresh) {
-          this.loadAllParticipantsForCounts().then(() => {
-            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
-          });
-        }
-      } else {
-        this.commonService.hideLoader();
-        this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error);
-      }
-    },
-      (err) => {
-        this.commonService.hideLoader();
-        if (err.error && err.error.message) {
-          this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error,);
+          // Only refresh data if we're on the tab that was just updated
+          const shouldRefresh = (isHomeTeam && this.activeType) || (!isHomeTeam && !this.activeType);
+          if (shouldRefresh) {
+            this.loadAllParticipantsForCounts().then(() => {
+              this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
+            });
+          }
         } else {
-          this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error,);
+          this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error);
         }
-        // Frontend variables are NOT updated on API failure
       }
-    );
+    });
   }
 
 
@@ -910,8 +933,9 @@ export class MatchTeamDetailsPage {
         this.commonService.hideLoader();
         const message = "match deleted successfully";
         this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-        this.commonService.updateCategory("matchlist");
-        this.navCtrl.pop().then(() => this.navCtrl.pop().then());
+        this.commonService.updateCategory("match");
+        this.events.publish('match:refresh');
+        this.navCtrl.pop();
 
       }, (err) => {
         this.commonService.hideLoader();
@@ -921,6 +945,55 @@ export class MatchTeamDetailsPage {
     } catch (error) {
       this.commonService.hideLoader();
       this.commonService.toastMessage("match deletion failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+    }
+  }
+
+  gotoEmailPage() {
+    if (this.getIndividualMatchParticipantRes.length > 0) {
+      const member_list = this.getIndividualMatchParticipantRes.map(p => ({
+        IsChild: (p.user as any).IsChild || false,
+        ParentId: (p.user as any).IsChild ? ((p.user as any).ParentId || "") : "",
+        MemberId: p.user.Id,
+        MemberEmail: (p.user as any).EmailID && (p.user as any).EmailID !== "" && (p.user as any).EmailID !== "-" && (p.user as any).EmailID !== "n/a"
+          ? (p.user as any).EmailID
+          : ((p.user as any).IsChild ? ((p.user as any).ParentEmailID || "") : ""),
+        MemberName: p.user.FirstName + " " + p.user.LastName
+      }));
+      const email_modal = {
+        module_info: {
+          module_id: this.match.MatchId,
+          module_booking_club_name: this.match.VenueName,
+          module_booking_name: this.match.MatchTitle,
+          module_booking_start_date: this.match.MatchStartDate,
+        },
+        email_users: member_list,
+        subject: this.activeType ? `${this.selectedHomeTeamText}: ` : `${this.selectedAwayTeamText}: `,
+        type: ModuleTypeForEmail.LEAGUE_TEAM
+      };
+      this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No member(s) found in current team", 2500, ToastMessageType.Error);
+    }
+  }
+
+  gotoNotificationPage() {
+    if (this.getIndividualMatchParticipantRes.length > 0) {
+      const user_ids = this.getIndividualMatchParticipantRes.map(p =>
+        (p.user as any).IsChild ? ((p.user as any).ParentId || p.user.Id) : p.user.Id
+      );
+      const user_names = this.getIndividualMatchParticipantRes.map(p =>
+        p.user.FirstName + ' ' + p.user.LastName
+      );
+      this.navCtrl.push("NotificationsPage", {
+        users: user_ids,
+        user_names: user_names,
+        type: ModuleTypes.Match,
+        heading: `Match: ${this.match.MatchTitle}`,
+        module_id: this.match.MatchId,
+        page_id: "MATCH_TEAM_DETAILS"
+      });
+    } else {
+      this.commonService.toastMessage("No member(s) found in current team", 2500, ToastMessageType.Error);
     }
   }
 
@@ -1006,6 +1079,7 @@ export class GetActivitySpecificTeamInput {
   app_type: number;
   device_id: string;
   updated_by: string;
+  isExternal: boolean;
 }
 
 export class UpdateTeamInput {

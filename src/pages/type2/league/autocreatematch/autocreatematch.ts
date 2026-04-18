@@ -13,7 +13,7 @@ import { API } from '../../../../shared/constants/api_constants';
 import { AppType } from '../../../../shared/constants/module.constants';
 import { CatandType } from '../models/location.model';
 import { CommonRestApiDto } from '../../../../shared/model/common.model';
-
+import { Storage } from '@ionic/storage';
 /**
  * Generated class for the AutocreatematchPage page.
  *
@@ -61,8 +61,8 @@ export class AutocreatematchPage {
     end_date: '',
     match_type: 0,
     match_payment_type: 0,
-    member_fees: 0.00,
-    non_member_fees: 0.00,
+    member_fees: '0.00',
+    non_member_fees: '0.00',
   };
   roundTypes: RoundTypesModel[] = [];
 
@@ -83,12 +83,14 @@ export class AutocreatematchPage {
   team2Players: LeagueParticipantModel[] = [];
   leagueType: CatandType[] = [];
   league_type: number = 1; // Default to singles
+  currency: string = '£';
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     public commonService: CommonService,
     public sharedservice: SharedServices,
     private graphqlService: GraphqlService,
+    public storage: Storage,
     private httpService: HttpService,
   ) {
     this.leagueId = this.navParams.get('leagueId');
@@ -116,6 +118,11 @@ export class AutocreatematchPage {
     this.getLeagueTypes();
     this.getRoundTypes();
     this.getPlayers();
+    this.storage.get('Currency').then((currency) => {
+      let currencydets = JSON.parse(currency);
+      //console.log(currencydets);
+      this.currency = currencydets.CurrencySymbol;
+    });
   }
 
   getLeagueTypes() {
@@ -127,30 +134,24 @@ export class AutocreatematchPage {
     commonInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
     commonInput.app_type = AppType.ADMIN_NEW;
     commonInput.device_id = this.sharedservice.getDeviceId() || '';
-    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, commonInput).subscribe((res: any) => {
-      this.leagueType = res["data"];
-    }, (error) => {
-      this.commonService.toastMessage("type fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    })
+    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, commonInput).subscribe({
+      next: (res: any) => {
+        this.leagueType = res["data"];
+      }
+    });
   }
 
 
   getRoundTypes() {
-    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe((res: any) => {
-      if (res) {
-        this.roundTypes = res.data || [];
-        this.selectedRound = this.roundTypes.length > 0 ? this.roundTypes[0].id : 0; // Default to first round type
-        console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
-      } else {
-        this.commonService.hideLoader();
-        console.log("error in fetching",)
-      }
-    }, (error) => {
-      console.error("Error fetching round types:", error);
-      if (error && error.error && error.error.message) {
-        this.commonService.toastMessage(error.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-      } else {
-        this.commonService.toastMessage('Failed to fetch round types', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.roundTypes = res.data || [];
+          this.selectedRound = this.roundTypes.length > 0 ? this.roundTypes[0].id : 0; // Default to first round type
+          console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
+        } else {
+          console.log("error in fetching",)
+        }
       }
     });
   }
@@ -366,12 +367,12 @@ export class AutocreatematchPage {
     //   this.commonService.toastMessage('Please select a valid round', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
     //   return false;
     // }
-    else if (this.inputObj.match_payment_type == 1 && (!this.inputObj.member_fees || this.inputObj.member_fees <= 0)) {
+    else if ((this.inputObj.match_payment_type == 1) && (!this.inputObj.member_fees || parseFloat(this.inputObj.member_fees) <= 0)) {
       this.commonService.toastMessage('Please enter valid fees for member', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       return false;
     }
 
-    else if (this.inputObj.match_payment_type == 1 && (!this.inputObj.non_member_fees || this.inputObj.non_member_fees <= 0)) {
+    else if ((this.inputObj.match_payment_type == 1) && (!this.inputObj.non_member_fees || parseFloat(this.inputObj.non_member_fees) <= 0)) {
       this.commonService.toastMessage('Please enter valid fees for mnon-member', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       return false;
     }
@@ -397,21 +398,21 @@ export class AutocreatematchPage {
       }
 
       this.inputObj.league_id = this.leagueId,
-        this.inputObj.participant_ids = selectedPlayers.map(player => player.id)
+      this.inputObj.participant_ids = selectedPlayers.map(player => player.id)
       this.inputObj.round = Number(this.selectedRound),
-        this.inputObj.match_name = '',
-        this.inputObj.match_type = +this.inputObj.match_type; // 0 - singles, 1 - doubles, 2 - teams
+      this.inputObj.match_name = '',
+      this.inputObj.match_type = +this.inputObj.match_type; // 0 - singles, 1 - doubles, 2 - teams
       this.inputObj.start_date = moment(new Date(this.matchDate + " " + this.matchTime).getTime()).format("YYYY-MM-DD HH:mm");
       this.inputObj.end_date = moment(new Date(this.matchDate + " " + '23:59').getTime()).format("YYYY-MM-DD HH:mm");
       this.inputObj.group_id = '',
-        this.inputObj.stage = this.selectedRound,
-        this.inputObj.match_details = '',
-        this.inputObj.match_payment_type = this.isChecked ? 1 : 0; //
-
+      this.inputObj.stage = this.selectedRound,
+      this.inputObj.match_details = '',
+      this.inputObj.match_payment_type = this.isChecked ? 1 : 0; //
       this.inputObj.app_type = AppType.ADMIN_NEW;
       this.inputObj.action_type = 1; // Assuming 1 is the action type for creating matches
+      this.inputObj.device_id = this.sharedservice.getDeviceId() || this.sharedservice.getPlatform() || 'android';
+      this.inputObj.app_type = AppType.ADMIN_NEW;
       this.inputObj.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
-      this.inputObj.device_id = this.sharedservice.getDeviceId() || '';
 
       this.httpService.post(`${API.GENERATE_MATCHES}`, this.inputObj).subscribe({
         next: (res: any) => {

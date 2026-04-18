@@ -28,6 +28,8 @@ import { AppType } from "../../../../shared/constants/module.constants";
 import { ParticipantModel } from "../../match/matchdetails/matchdetails";
 import { MatchType } from "../../../../shared/utility/enums";
 import { ThemeService } from "../../../../services/theme.service";
+import { DetailHeaderRow } from "../../../../shared/components/detail-header/detail-header.component";
+import { SavedFormation } from "../models/lineup.model";
 /**
  * Generated class for the LeaguedetailsPage page.
  *
@@ -49,7 +51,7 @@ export class LeaguedetailsPage {
   MatchesType: boolean = true;
   league: LeaguesForParentClubModel;
   parentClubKey: string;
-  activeIndex: any;
+  activeIndex: number = 0;
   currencyDetails: any;
   match: LeagueMatch[];
   leagueStandingInput: LeagueStandingInput = {
@@ -95,6 +97,13 @@ export class LeaguedetailsPage {
   startTime: string;
   matchesLength: number;
   partcipantDataCount: number;
+  showLineupSheet: boolean = false;
+  lineupFormations: SavedFormation[] = [];
+  selectedLineupMatch: LeagueMatch = null;
+  showParticipantSheet: boolean = false;
+  selectedParticipant: LeagueParticipantModel = null;
+  showTeamSheet: boolean = false;
+  selectedTeam: LeagueStandingModel = null;
 
   constructor(
     public navCtrl: NavController,
@@ -130,6 +139,10 @@ export class LeaguedetailsPage {
     this.events.subscribe("theme:changed", (isDark) => {
       this.applyTheme(isDark);
     });
+    this.events.subscribe("league:refresh", () => {
+      this.getLeagueDetails();
+      this.getLeagueMatches();
+    });
     this.league_id = this.navParams.get("league_id");
     console.log("teams are", this.league_id);
     const [userobj, currency] = await Promise.all([
@@ -161,10 +174,22 @@ export class LeaguedetailsPage {
 
   ionViewDidLoad() {
     console.log("ionViewDidLoad LeaguedetailsPage");
-    this.activeIndex = "0";
+    this.activeIndex = 0;
     setTimeout(() => {
       this.loadTheme();
     }, 100);
+  }
+
+  get headerAccentColor(): string {
+    return this.commonService.getTypeAccentColor(this.individualLeague?.league_type);
+  }
+
+  get headerDetailRows(): DetailHeaderRow[] {
+    const rows: DetailHeaderRow[] = [];
+    const l = this.individualLeague;
+    if (l?.start_date) rows.push({ icon: 'calendar', text: l.start_date + (l.end_date ? ' → ' + l.end_date : '') });
+    if (l?.club?.ClubName) rows.push({ icon: 'pin', text: l.club.ClubName });
+    return rows;
   }
 
   ionViewDidEnter() {
@@ -173,6 +198,7 @@ export class LeaguedetailsPage {
 
   ionViewWillLeave() {
     this.events.unsubscribe("theme:changed");
+    this.events.unsubscribe("league:refresh");
   }
 
   private loadTheme(): void {
@@ -324,8 +350,17 @@ export class LeaguedetailsPage {
     //   ...mat
     //   formatted_round: mat.formatted_round
     // };
-    this.navCtrl.push("LeagueMatchInfoPage", { "match": mat, "leagueId": this.individualLeague.id, "activityCode": this.individualLeague.activity.ActivityCode, "activityId": this.individualLeague.activity.Id, "existingteam": this.leagueStanding.map(league_team => league_team.parentclubteam) });
+    // this.navCtrl.push("LeagueMatchInfoPage", { "match": mat, "leagueId": this.individualLeague.id, "activityCode": this.individualLeague.activity.ActivityCode, "activityId": this.individualLeague.activity.Id, "existingteam": this.leagueStanding.map(league_team => league_team.parentclubteam) });
     // this.navCtrl.push("LeagueMatchInfoPage", { "leagueId": this.individualLeague.id, "activityId": this.individualLeague.activity.Id, "existingteam": this.partcipantData });
+
+    const existingTeam = this.leagueStanding ? this.leagueStanding.map(league_team => league_team.parentclubteam) : [];
+    this.navCtrl.push("LeagueMatchInfoPage", {
+      "match": mat,
+      "leagueId": this.individualLeague.id,
+      "activityCode": this.individualLeague.activity.ActivityCode,
+      "activityId": this.individualLeague.activity.Id,
+      "existingteam": existingTeam
+    });
   }
 
   goToDashboardMenuPage() {
@@ -421,6 +456,83 @@ export class LeaguedetailsPage {
       );
   }
 
+  goToLineup(match: LeagueMatch) {
+    // Show action sheet with saved formations instead of directly navigating
+    this.fetchSavedFormations(match);
+  }
+
+  private fetchSavedFormations(match: LeagueMatch) {
+    const deviceType = this.sharedservice.getPlatform() === "android" ? 1 : 2;
+    const payload = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId: "",
+      activityId: this.individualLeague.activity.Id, // Hardcoded activity ID
+      memberId: this.sharedservice.getLoggedInId(),
+      action_type: 0,
+      device_type: deviceType,
+      app_type: AppType.ADMIN_NEW,
+      device_id: "",
+      updated_by: this.sharedservice.getLoggedInId(),
+      matchId: match.match_id
+    };
+
+    this.httpService.post(API.GET_SAVED_FORMATIONS, payload)
+      .subscribe(
+        (res: any) => {
+          const savedFormations: SavedFormation[] = res.data || [];
+          this.presentLineupActionSheet(match, savedFormations);
+        },
+        (error) => {
+          console.error("Error fetching saved formations:", error);
+          // Still show the action sheet with the "Create New" option even if fetch fails
+          this.presentLineupActionSheet(match, []);
+        }
+      );
+  }
+
+  private presentLineupActionSheet(match: LeagueMatch, savedFormations: SavedFormation[]) {
+    if (!match.homeusername || !match.awayusername) {
+      this.commonService.toastMessage('Please assign teams first', 2500, ToastMessageType.Error);
+      return;
+    }
+    if (this.individualLeague.activity.Id !== 'd47c2ac4-e571-488f-a895-c1940726900f') {
+      this.commonService.toastMessage('Team lineup data is not available for this activity', 2500, ToastMessageType.Info);
+      return;
+    }
+    this.selectedLineupMatch = match;
+    this.lineupFormations = savedFormations;
+    this.showLineupSheet = true;
+  }
+
+  selectFormation(f: SavedFormation) {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, f.lineup_name, false, f.formation_setup_id, f.team_id, f.team_size);
+  }
+
+  createNewLineup() {
+    this.showLineupSheet = false;
+    this.navigateToLineup(this.selectedLineupMatch, '', true);
+  }
+
+  private navigateToLineup(match: LeagueMatch, lineupName: string = '', isCreateNew: boolean = false, formationSetupId: string = '', teamId: string = '', teamSize: number = 0) {
+    this.navCtrl.push("LineupPage", {
+      match: match,
+      matchId: match.match_id,
+      activityId: this.individualLeague.activity.Id, // Hardcoded activity ID
+      homeUserId: match.home_team_id,      // Map from LeagueMatch property
+      awayUserId: match.away_team_id,      // Map from LeagueMatch property
+      homeUserName: match.homeusername, // Use lowercase
+      awayUserName: match.awayusername, // Use lowercase
+      lineupName: isCreateNew ? '' : (lineupName || 'Starting line-up'),
+      isCreateNew: isCreateNew,
+      formationSetupId: formationSetupId,
+      teamId: teamId,
+      teamSize: teamSize,
+      isLeague: true,           // True when navigating from league details
+      leagueId: this.league_id  // Pass the league ID
+    });
+  }
+
   gotoMatchDetails(match: LeagueMatch) {
     // this.navCtrl.push("LeaguematchdetailsPage");
     //this.navCtrl.push("UpdateleaguematchPage", { leagueId: this.individualLeague.id });
@@ -512,15 +624,14 @@ export class LeaguedetailsPage {
       leagueFixtureId: ""
     }
     commonInput.leagueFixtureId = mat.fixture_id;
-    this.httpService.post(API.DELETE_LEAGUE_MATCHES, commonInput).subscribe((res: any) => {
-      const message = "Match deleted successfully";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
-      console.log("match deleted", res);
-      this.getLeagueMatches();
-    }, (error) => {
-      this.commonService.toastMessage("Match fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    }
-    )
+    this.httpService.post(API.DELETE_LEAGUE_MATCHES, commonInput).subscribe({
+      next: (res: any) => {
+        const message = "Match deleted successfully";
+        this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+        console.log("match deleted", res);
+        this.getLeagueMatches();
+      }
+    });
   }
 
   updateResult(match: LeagueMatch) {
@@ -595,47 +706,23 @@ export class LeaguedetailsPage {
   }
 
   ActionSheet(participant: LeagueParticipantModel) {
-    const actionType = participant.amount_pay_status === 0 ? 1 : 2;
-    const actionText = participant.amount_pay_status === 0 ? 'Remove' : 'Withdraw';
+    this.selectedParticipant = participant;
+    this.showParticipantSheet = true;
+  }
 
-    let buttons = [
-      {
-        text: 'Update Payment',
-        handler: () => {
-          this.updatePayment(participant);
-        }
-      },
-      {
-        text: 'Profile',
-        handler: () => {
-          this.getProfile(participant);
-        }
-      },
-      {
-        text: 'Send Email',
-        handler: () => {
-          this.sendEmailToMember(participant);
-        }
-      }
-    ];
-
-    // Conditionally add the "Withdraw" button
-    if (participant.participant_status_text !== 'Withdrawn') {
-      buttons.push({
-        text: actionText,
-        handler: () => {
-          this.removeTeam(participant, actionType);
-        }
-      });
+  onParticipantAction(action: string) {
+    this.showParticipantSheet = false;
+    const participant = this.selectedParticipant;
+    if (!participant) return;
+    switch (action) {
+      case 'payment': this.updatePayment(participant); break;
+      case 'profile': this.getProfile(participant); break;
+      case 'email': this.sendEmailToMember(participant); break;
+      case 'remove':
+        const actionType = participant.amount_pay_status === 0 ? 1 : 2;
+        this.removeTeam(participant, actionType);
+        break;
     }
-
-    // Create the ActionSheet with the dynamic buttons array
-    let actionSheet = this.actionSheetCtrl.create({
-      buttons: buttons
-    });
-
-    // Present the ActionSheet
-    actionSheet.present();
   }
 
   gotoTeamDetails(team) {
@@ -874,7 +961,7 @@ export class LeaguedetailsPage {
     const participantsStatusQuery = gql`
     query getLeagueORTournamentStanding( $leagueStandingInput: LeagueStandingInput! ) {
       getLeagueORTournamentStanding(leagueStandingInput:$leagueStandingInput) {
-        id
+          id
         parentclubteam{      
                id
                teamName
@@ -934,30 +1021,18 @@ export class LeaguedetailsPage {
   }
 
   openTeamActions(team: LeagueStandingModel) {
-    //this.navCtrl.push("LeaguematchdetailsPage");
-    //this.navCtrl.push("UpdateleaguematchPage", { leagueId: this.individualLeague.id });
+    this.selectedTeam = team;
+    this.showTeamSheet = true;
+  }
 
-    let actionSheet = this.actionSheetCtrl.create({
-
-      buttons: [
-        {
-          text: "View Team",
-          handler: () => {
-            this.navCtrl.push("TeamdetailsPage", {
-              "team": team.parentclubteam
-            })
-          }
-        },
-        {
-          text: "Remove Team",
-          handler: () => {
-            this.removeTeam(team, 1)
-          }
-        }
-      ]
-    });
-    actionSheet.present();
-
+  onTeamAction(action: string) {
+    this.showTeamSheet = false;
+    const team = this.selectedTeam;
+    if (!team) return;
+    switch (action) {
+      case 'view': this.navCtrl.push("TeamdetailsPage", { "team": team.parentclubteam }); break;
+      case 'remove': this.removeTeam(team, 1); break;
+    }
   }
 
   //Get teams for a league
@@ -1045,10 +1120,23 @@ export class LeaguedetailsPage {
   }
 
   updatePayment(participant: LeagueParticipantModel) {
-
     this.navCtrl.push("LeaguepaymentPage", { SelectedMember: participant, SessionDetails: this.individualLeague })
+  }
 
 
+  sendEmailToGroup(){
+    const member_list = this.partcipantData.map(participant => this.prepareParticipantData(participant));
+    if (member_list.length > 0) {
+      const session = this.prepareSessionDetails();
+      const email_modal = {
+        module_info: session,
+        email_users: member_list,
+        type: 600
+      };
+      this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    }
   }
 
   sendEmailToMember(participant: LeagueParticipantModel) {
@@ -1125,27 +1213,31 @@ export class LeaguedetailsPage {
   getLeagueMatches() {
     this.commonInput.league_id = this.league_id;
 
-    this.httpService.post(API.GET_LEAGUE_MATCHES, this.commonInput).subscribe((res: any) => {
-      // this.match = res["data"];
-      // console.log("match data is:", this.match);
+    this.httpService.post(API.GET_LEAGUE_MATCHES, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.match = res.data;
+        this.matchesLength = this.match.length;
+      }
+    });
+  }
 
-      // for(let i=0;i<this.match.length;i++){
-      //   [this.startDate,this.startTime]=this.match[i].start_date.split(' ');
-      // }
-      this.match = res.data;
-      // this.match = res.data.map(match => ({
-      //   ...match,
-      //   start_date: this.datePipe.transform(match.start_date, 'dd-MMM-yyyy,HH:mm') || 'Invalid date'
-      // }));
-      this.matchesLength = this.match.length;
-    }, (error) => {
-      this.commonService.toastMessage("match fetch failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-    }
-    )
+  getActivityIcon(activityName: string): string {
+    if (!activityName) return 'trophy';
+    const name = activityName.toLowerCase();
+    const map: { [key: string]: string } = {
+      'tennis': 'tennisball', 'padel tennis': 'tennisball', 'table tennis': 'tennisball',
+      'football': 'football', 'badminton': 'tennisball', 'basketball': 'basketball',
+      'cricket': 'baseball', 'golf': 'golf', 'swimming': 'water', 'fitness': 'fitness',
+      'gymnastics': 'body', 'boxing': 'hand', 'dance': 'musical-notes', 'sing': 'mic',
+      'education': 'school', 'netball': 'basketball', 'dodgeball': 'baseball',
+      'squash': 'tennisball', 'bar n restaurant': 'restaurant', 'act': 'film',
+      'private coaching': 'person'
+    };
+    return map[name] || 'trophy';
   }
 
   showMatchActionSheet(match: LeagueMatch) {
-    if (this.individualLeague.league_type === 3) {
+    //if (this.individualLeague.league_type === 3) {
       //this.commonService.showMatchActionSheet(match, {
       //onViewDetails: () => this.gotoLeagueMatchInfoPage(match),//this.gotoLeagueMatchInfoPage(match),
       //onEdit: () => this.navCtrl.push("UpdateleaguematchPage", { match }),
@@ -1153,9 +1245,10 @@ export class LeaguedetailsPage {
       // onUpdateResult: () => this.updateResult(match)
       //});
       this.gotoLeagueMatchInfoPage(match);
-    } else {
+    //} else {
       this.gotoMatchDetails(match);
-    }
+    //}
+    this.gotoMatchDetails(match);
   }
 
 
