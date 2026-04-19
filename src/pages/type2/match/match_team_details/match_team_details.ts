@@ -205,7 +205,7 @@ export class MatchTeamDetailsPage {
         this.teamRolesInput.ActionType = 0;
 
         this.getActivitySpecificTeamInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.getActivitySpecificTeamInput.memberId = this.sharedservice.getLoggedInUserId();
+        this.getActivitySpecificTeamInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.getActivitySpecificTeamInput.action_type = LeagueMatchActionType.MATCH;
         this.getActivitySpecificTeamInput.app_type = AppType.ADMIN_NEW;
         this.getActivitySpecificTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -223,18 +223,17 @@ export class MatchTeamDetailsPage {
         this.teamRolesInput.activityCode = parseInt(this.match.ActivityCode) || 0;
 
         this.getIndividualMatchParticipantInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.getIndividualMatchParticipantInput.memberId = this.sharedservice.getLoggedInUserId();
+        this.getIndividualMatchParticipantInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.getIndividualMatchParticipantInput.action_type = LeagueMatchActionType.MATCH;
         this.getIndividualMatchParticipantInput.app_type = AppType.ADMIN_NEW;
         this.getIndividualMatchParticipantInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.getIndividualMatchParticipantInput.activityId = this.match.activityId;
         this.getIndividualMatchParticipantInput.MatchId = this.match.MatchId;
-        this.getIndividualMatchParticipantInput.TeamId = this.match.homeUserId; // Default to Home Team
         this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType = LeagueTeamPlayerStatusType.PLAYING; // Default to Playing
 
 
         this.updateTeamInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateTeamInput.memberId = this.sharedservice.getLoggedInUserId();
+        this.updateTeamInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.updateTeamInput.action_type = LeagueMatchActionType.MATCH;;
         this.updateTeamInput.app_type = AppType.ADMIN_NEW;
         this.updateTeamInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -243,7 +242,7 @@ export class MatchTeamDetailsPage {
 
         // Initialize updateMatchParticipantRoleInput
         this.updateMatchParticipantRoleInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateMatchParticipantRoleInput.memberId = this.sharedservice.getLoggedInUserId();
+        this.updateMatchParticipantRoleInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.updateMatchParticipantRoleInput.action_type = LeagueMatchActionType.MATCH;
         this.updateMatchParticipantRoleInput.app_type = AppType.ADMIN_NEW;
         this.updateMatchParticipantRoleInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -251,7 +250,7 @@ export class MatchTeamDetailsPage {
 
         // Initialize updateMatchParticipationStatusInput
         this.updateMatchParticipationStatusInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateMatchParticipationStatusInput.memberId = this.sharedservice.getLoggedInUserId();
+        this.updateMatchParticipationStatusInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.updateMatchParticipationStatusInput.action_type = LeagueMatchActionType.MATCH;
         this.updateMatchParticipationStatusInput.app_type = AppType.ADMIN_NEW;
         this.updateMatchParticipationStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -260,14 +259,14 @@ export class MatchTeamDetailsPage {
 
         // Initialize updateLeagueMatchInviteStatusInput
         this.updateLeagueMatchInviteStatusInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateLeagueMatchInviteStatusInput.memberId = this.sharedservice.getLoggedInUserId();
+        this.updateLeagueMatchInviteStatusInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.updateLeagueMatchInviteStatusInput.action_type = LeagueMatchActionType.MATCH;
         this.updateLeagueMatchInviteStatusInput.app_type = AppType.ADMIN_NEW;
         this.updateLeagueMatchInviteStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateLeagueMatchInviteStatusInput.MatchId = this.match.MatchId;
 
         this.getActivitySpecificTeam();
-        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        this.getMatchTeamsThenLoadParticipants();
         this.getRoleForPlayers();
       }
     });
@@ -765,6 +764,31 @@ export class MatchTeamDetailsPage {
           resolve();
         }
       });
+    });
+  }
+
+  getMatchTeamsThenLoadParticipants() {
+    const payload = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId: this.sharedservice.getPostgreParentClubId(),
+      activityId: this.match.activityId,
+      memberId: this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId(),
+      action_type: 0,
+      device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
+      app_type: 0,
+      device_id: "",
+      updated_by: this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId(),
+      matchId: this.match.MatchId
+    };
+    this.httpService.post(`${API.GetMatchTeamsByMatchId}`, payload).subscribe({
+      next: (res: any) => {
+        if (res && res.data) {
+          this.match.homeUserId = res.data.homeUserId;
+          this.match.awayUserId = res.data.awayUserId;
+          this.getIndividualMatchParticipantInput.TeamId = res.data.homeUserId;
+          this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        }
+      }
     });
   }
 
