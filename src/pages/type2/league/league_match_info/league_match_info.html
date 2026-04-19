@@ -207,18 +207,3 @@
   </app-bottom-sheet>
 </ion-content>
 
-<ion-fab mini right bottom #fab *ngIf="!showPlayerSheet && !showTeamSheet && !showTeamActionDropdown">
-  <button class="fab-main" ion-fab mini>
-    <ion-icon name="add"></ion-icon>
-  </button>
-  <ion-fab-list side="top">
-    <p class="fab-label" (tap)="showAvailableTeams(true)" style="margin-right: 46px">Home Team</p>
-    <button class="fab-main" ion-fab class="fabTop" (tap)="showAvailableTeams(true)">
-      <ion-icon name="people"></ion-icon>
-    </button>
-    <p class="fab-label" (tap)="showAvailableTeams(false)" style="margin-right: 46px">Away Team</p>
-    <button class="fab-main" ion-fab class="fabTop" (tap)="showAvailableTeams(false)">
-      <ion-icon name="people"></ion-icon>
-    </button>
-  </ion-fab-list>
-</ion-fab>

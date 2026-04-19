@@ -331,7 +331,7 @@ export class CreatematchPage {
   autoFillLocation() {
     const club = this.clubs.find(c => c.Id === this.selectedClub);
     if (!club) { this.mapLocationAddress = ''; this.mapLocationLat = null; this.mapLocationLng = null; return; }
-    const parts = [club.PostCode, club.FirstLineAddress].filter(Boolean);
+    const parts = [club.FirstLineAddress, club.PostCode].filter(Boolean);
     this.mapLocationAddress = parts.join(', ');
     this.mapLocationLat = club.MapLatitude ? parseFloat(club.MapLatitude) : null;
     this.mapLocationLng = club.MapLongitude ? parseFloat(club.MapLongitude) : null;
@@ -466,7 +466,6 @@ export class CreatematchPage {
           location_id: this.createMatchInput.location_id,
           location: this.mapLocationAddress || '',
           MatchDuration: this.createMatchInput.MatchDuration,
-          match_round_type: this.createMatchInput.Round || 0,
           UserParentClubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
           UserActivityId: this.createMatchInput.user_postgre_metadata.UserActivityId,
           UserActionType: 0

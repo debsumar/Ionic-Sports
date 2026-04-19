@@ -172,16 +172,32 @@ page-leaguedetails {
     &.paid { background: #2b92bb; color: #fff; }
     &.free { background: #f59e0b; color: #fff; }
   }
-  .match-teams-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .match-player {
-    flex: 1; text-align: center; font-size: 13px; font-weight: 700; color: #3fbcd3;
-    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-    &.tbd-text { color: #64748b; font-style: italic; font-weight: 500; }
+  .card-activity { font-size: 10px; font-weight: 600; color: #3fbcd3; margin: 1px 0 0; letter-spacing: 0.2px; }
+  .scoreboard {
+    display: flex; align-items: center; padding: 4px 0;
+    .sb-team { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;
+      &.sb-home { align-items: flex-start; }
+      &.sb-away { align-items: flex-end; }
+    }
+    .sb-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; color: #64748b; }
+    .sb-home .sb-label { color: #2b92bb; }
+    .sb-away .sb-label { color: #f76e04; }
+    .sb-name { font-size: 12px; font-weight: 700; color: #f1f5f9; letter-spacing: 0.1px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+      &.tbd { color: #64748b; font-style: italic; font-weight: 500; }
+    }
     .winner-icon { color: #ffd700 !important; font-size: 13px; margin-left: 2px; }
+    .sb-center { flex-shrink: 0; padding: 0 8px; text-align: center; }
+    .sb-vs { background: #475569; color: #f1f5f9; padding: 3px 8px; border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px; }
+    .sb-score { font-size: 14px; font-weight: 800; color: #f1f5f9; letter-spacing: 1px; }
   }
-  .vs-badge {
-    background: #475569; color: #f1f5f9; padding: 3px 8px;
-    border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px; flex-shrink: 0;
+  .card-venue-footer {
+    display: flex; align-items: center; gap: 4px; margin-top: 2px;
+    .venue-icon { font-size: 13px; color: #3fbcd3; flex-shrink: 0; }
+    .venue-text { font-size: 11px; font-weight: 400; color: #64748b;
+      text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+    }
   }
   .tag {
     display: inline-flex; align-items: center; padding: 4px 12px;
@@ -299,8 +315,9 @@ page-leaguedetails {
     .p-detail-row { border-top-color: rgba(226, 232, 240, 0.6); }
     .payment-date { color: #94a3b8; }
 
-    .match-player { color: #2b92bb; &.tbd-text { color: #94a3b8; } }
-    .vs-badge { background: #e2e8f0; color: #64748b; }
+    .card-activity { color: #2b92bb !important; }
+    .scoreboard { .sb-name { color: #1e293b; } .sb-vs { background: #cbd5e1; color: #1e293b; } .sb-score { color: #1e293b; } }
+    .card-venue-footer { .venue-icon { color: #94a3b8; } .venue-text { color: #94a3b8; } }
     .footer-right { color: #94a3b8; }
     .round-badge { background: #e2e8f0; color: #64748b; }
     .match-icon-wrapper { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.08);

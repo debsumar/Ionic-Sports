@@ -1,9 +1,8 @@
-import { Component, Renderer2, ViewChild } from "@angular/core";
-import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, FabContainer, Events } from "ionic-angular";
+import { Component, Renderer2 } from "@angular/core";
+import { ActionSheetController, IonicPage, LoadingController, NavController, NavParams, AlertController, ModalController, Events } from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { SharedServices } from "../../../services/sharedservice";
 import { CommonService, ToastMessageType, ToastPlacement } from "../../../../services/common.service";
-import { Apollo } from "apollo-angular";
 import { LeagueMatchParticipantModel, LeagueParticipantModel, LeagueParticipationForMatchModel, Match } from "../models/league.model";
 import { TeamsForParentClubModel } from "../models/team.model";
 import { HttpService } from "../../../../services/http.service";
@@ -32,7 +31,6 @@ import { DetailHeaderRow } from "../../../../shared/components/detail-header/det
   providers: [HttpService]
 })
 export class LeagueMatchInfoPage {
-  @ViewChild('fab') fab: FabContainer;
   currencyDetails: any;
   activeType: boolean = true;
   selectedHomeTeamText: string;
@@ -182,7 +180,6 @@ export class LeagueMatchInfoPage {
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
-    private apollo: Apollo,
     public commonService: CommonService,
     public loadingCtrl: LoadingController,
     public alertCtrl: AlertController,
@@ -267,7 +264,8 @@ export class LeagueMatchInfoPage {
         this.updateLeagueMatchInviteStatusInput.MatchId = this.matchObj.match_id;
 
         this.getLeagueParticipantForMatch();
-        this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
+        this.loadAllParticipantsForCounts();
+        this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
         this.getRoleForPlayers();
       }
     });
@@ -277,11 +275,6 @@ export class LeagueMatchInfoPage {
 
   onTabChange(index: number) { this.changeType(index === 0); }
 
-  closeFab() {
-    if (this.fab) {
-      this.fab.close();
-    }
-  }
 
   ionViewWillEnter() {
     this.loadTheme();
@@ -439,10 +432,10 @@ export class LeagueMatchInfoPage {
   }
 
   gotoSummary() {
-    this.closeFab();
 
-    const homeTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedHomeTeamText);
-    const awayTeam = this.leagueParticipantForMatchRes.find(team => team.parentclubteam.teamName === this.selectedAwayTeamText);
+    const allTeams = [...this.cachedClubTeams, ...this.cachedExternalTeams];
+    const homeTeam = allTeams.find(team => team.parentclubteam.teamName === this.selectedHomeTeamText);
+    const awayTeam = allTeams.find(team => team.parentclubteam.teamName === this.selectedAwayTeamText);
 
     if (this.selectedHomeTeamText != 'Home Team' && this.selectedAwayTeamText != 'Away Team') {
       const params = {
@@ -546,7 +539,6 @@ export class LeagueMatchInfoPage {
     }
   }
   showRoles(member: LeagueMatchParticipantModel): void {
-    this.closeFab();
     if (this.roles.length > 0) {
 
       let alert = this.alertCtrl.create();
@@ -603,32 +595,12 @@ export class LeagueMatchInfoPage {
          }
        `;
     this.graphqlService.query(playernstaffrole, { activityDetails: this.teamRolesInput }, 0).subscribe((data: any) => {
-      // this.commonService.hideLoader();
       this.roles = data.data.getTeamRoles.teamRoles;
-
     },
       (error) => {
-
+        this.commonService.toastMessage("failed to fetch role", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
     )
-    this.apollo
-      .query({
-        query: playernstaffrole,
-        fetchPolicy: "network-only",
-        variables: {
-          activityDetails: this.teamRolesInput,
-        },
-      })
-      .subscribe(
-        ({ data }) => {
-          this.roles = data["getTeamRoles"]["teamRoles"];
-
-          // this.commonService.hideLoader();
-        },
-        (err) => {
-
-          this.commonService.toastMessage("failed to fetch role", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-        })
   }
 
   updatePlayerRole(member: LeagueMatchParticipantModel) {
@@ -670,7 +642,7 @@ export class LeagueMatchInfoPage {
     });
   }
 
-  selectTeamForEmail(match: LeagueMatch) {
+  selectTeamForEmail() {
     // const teams = [
     //   {
     //     name:'home_team_id',
@@ -784,12 +756,13 @@ export class LeagueMatchInfoPage {
         this.fetchAndShowTeams(this.teamActionIsHome, true);
       }
     } else if (action === 'create_external') {
-      this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.activityCode, leagueId: this.leagueId });
+      this.commonService.commonAlert_V4('External Team', 'You are about to create an external team. Do you want to continue?', 'Yes:Continue', 'No', () => {
+        this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.activityCode, leagueId: this.leagueId });
+      });
     }
   }
 
   showAvailableTeams(isHomeTeam: boolean): void {
-    this.closeFab();
     if (this.leagueParticipantForMatchRes.length > 0) {
       this.teamSheetIsHome = isHomeTeam;
       this.showTeamSheet = true;
@@ -804,6 +777,11 @@ export class LeagueMatchInfoPage {
       next: (res: any) => {
         if (res) {
           this.leagueParticipantForMatchRes = res.data;
+          if (isExternal) {
+            this.cachedExternalTeams = res.data || [];
+          } else {
+            this.cachedClubTeams = res.data || [];
+          }
         }
         this.showAvailableTeams(isHome);
       },
@@ -867,6 +845,9 @@ export class LeagueMatchInfoPage {
         if (this.matchObj.away_team_id) {
           this.isAwayExternal = this.cachedExternalTeams.some(t => t.parentclubteam.id === this.matchObj.away_team_id);
         }
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to detect external teams", 2500, ToastMessageType.Error);
       }
     });
   }
@@ -883,6 +864,9 @@ export class LeagueMatchInfoPage {
         }
         // After fetching teams, detect external teams
         this.detectExternalTeams();
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to fetch teams", 2500, ToastMessageType.Error);
       }
     });
   }
@@ -921,15 +905,7 @@ export class LeagueMatchInfoPage {
   //fetch api for teams and corresponding player details
   getLeagueMatchParticipant(par: LeagueTeamPlayerStatusType) {
     //this.commonService.showLoader("Fetching info ...");
-    let teamId: string | null = null;
-    if (this.selectedTeam) {
-      teamId = this.selectedTeam.parentclubteam.id;
-    } else
-      if (this.activeType && this.matchObj.home_team_id !== null) {
-        teamId = this.matchObj.home_team_id;
-      } else if (!this.activeType && this.matchObj.away_team_id !== null) {
-        teamId = this.matchObj.away_team_id;
-      }
+    const teamId = this.activeType ? this.matchObj.home_team_id : this.matchObj.away_team_id;
     this.leagueMatchParticipantInput.TeamId = teamId
     this.leagueMatchParticipantInput.leagueTeamPlayerStatusType = par
     this.leagueMatchParticipantInput.MatchId = this.matchObj.match_id;

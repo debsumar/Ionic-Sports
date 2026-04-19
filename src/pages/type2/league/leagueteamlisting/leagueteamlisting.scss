@@ -78,6 +78,20 @@ page-leagueteamlisting {
         color: #64748b !important;
       }
 
+      .card-activity {
+        color: #2b92bb !important;
+      }
+
+      .card-venue-footer {
+        .venue-icon { color: #94a3b8; }
+        .venue-text { color: #94a3b8; }
+      }
+
+      .team-meta-row {
+        .meta-age { color: #2b92bb; }
+        .meta-count { color: #2b92bb; }
+      }
+
       .card-chevron {
         color: #cbd5e1 !important;
       }
@@ -91,8 +105,8 @@ page-leagueteamlisting {
       }
 
       .card-icon-wrapper.competition-bg {
-        background: rgba(0, 0, 0, 0.06);
-        border-color: rgba(0, 0, 0, 0.08);
+        background: rgba(0, 0, 0, 0.04);
+        border: none;
 
         .card-icon {
           color: #475569;
@@ -410,32 +424,32 @@ page-leagueteamlisting {
   }
 
   .card-content {
-    padding: 10px 10px 8px;
-    gap: 8px;
+    padding: 8px 8px 6px;
+    gap: 5px;
   }
 
   .card-icon-wrapper {
-    width: 34px;
-    height: 34px;
-    border-radius: 8px;
+    width: 26px;
+    height: 26px;
+    border-radius: 5px;
 
     .card-icon {
-      font-size: 15px;
+      font-size: 17px;
     }
   }
 
   .card-info {
     .card-title {
-      font-size: 13px;
+      font-size: 12px;
     }
 
     .card-subtitle {
-      font-size: 11px;
+      font-size: 10px;
     }
   }
 
   .card-top-row {
-    gap: 8px;
+    gap: 5px;
   }
 
   .detail-row {
@@ -472,11 +486,11 @@ page-leagueteamlisting {
 // Regular phones (360px - 399px)
 @media (min-width: 360px) and (max-width: 399px) {
   .card-content {
-    padding: 12px 12px 10px;
+    padding: 9px 10px 7px;
   }
 
   .card-info .card-title {
-    font-size: 14px;
+    font-size: 13px;
   }
 
   .detail-row .detail-text {
@@ -495,7 +509,7 @@ page-leagueteamlisting {
   }
 
   .card-content {
-    padding: 14px 14px 12px;
+    padding: 10px 12px 8px;
   }
 }
 
@@ -520,26 +534,26 @@ page-leagueteamlisting {
   }
 
   .card-content {
-    padding: 16px;
-    gap: 12px;
+    padding: 12px 14px 10px;
+    gap: 8px;
   }
 
   .card-icon-wrapper {
-    width: 44px;
-    height: 44px;
+    width: 36px;
+    height: 36px;
 
     .card-icon {
-      font-size: 20px;
+      font-size: 22px;
     }
   }
 
   .card-info {
     .card-title {
-      font-size: 16px;
+      font-size: 15px;
     }
 
     .card-subtitle {
-      font-size: 13px;
+      font-size: 12px;
     }
   }
 
@@ -586,11 +600,11 @@ page-leagueteamlisting {
 
 .card-content {
   flex: 1;
-  padding: 14px 14px 12px;
+  padding: 10px 12px 8px;
   min-width: 0;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 6px;
   position: relative;
   overflow: hidden;
   background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
@@ -599,28 +613,27 @@ page-leagueteamlisting {
 .card-top-row {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 6px;
 }
 
 .card-icon-wrapper {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  padding: 0;
 
   .card-icon {
-    font-size: 18px;
+    font-size: 20px;
     color: #fff;
   }
 
   &.competition-bg {
-    background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.08);
+    border: none;
   }
 
   &.teams-bg {
@@ -629,9 +642,9 @@ page-leagueteamlisting {
 }
 
 .team-avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
   overflow: hidden;
   flex-shrink: 0;
   border: 1px solid #475569;
@@ -648,22 +661,30 @@ page-leagueteamlisting {
   min-width: 0;
 
   .card-title {
-    font-size: 15px;
+    font-size: 14px;
     font-weight: 700;
-    line-height: 1.3;
+    line-height: 1.2;
     letter-spacing: -0.2px;
     color: #f1f5f9;
-    margin: 0 0 2px;
+    margin: 0 0 1px;
     word-break: break-word;
   }
 
   .card-subtitle {
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 500;
-    line-height: 1.3;
+    line-height: 1.2;
     letter-spacing: 0.1px;
     color: #94a3b8;
     margin: 0;
+  }
+
+  .card-activity {
+    font-size: 10px;
+    font-weight: 600;
+    color: #3fbcd3;
+    margin: 1px 0 0;
+    letter-spacing: 0.2px;
   }
 }
 
@@ -742,6 +763,28 @@ page-leagueteamlisting {
   display: flex;
   align-items: center;
   gap: 6px;
+  justify-content: space-between;
+}
+
+.card-venue-footer {
+  display: flex; align-items: center; gap: 4px; margin-top: 2px;
+  .venue-icon { font-size: 13px; color: #3fbcd3; flex-shrink: 0; }
+  .venue-text {
+    font-size: 11px; font-weight: 400; color: #64748b;
+    text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+
+.team-meta-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  .meta-age, .meta-count {
+    display: inline-flex; align-items: center; gap: 3px;
+    font-size: 11px; font-weight: 600; letter-spacing: 0.1px;
+    ion-icon { font-size: 13px; }
+  }
+  .meta-age { color: #3fbcd3; }
+  .meta-count { color: #3fbcd3; }
 }
 
 .tag {

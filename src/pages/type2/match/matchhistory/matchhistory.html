@@ -28,32 +28,27 @@
             (click)="gotoLeaguedetailsPage(league)">
             <div class="card-accent" [style.background]="getLeagueTypeColor(league.league_type_text)"></div>
             <div class="card-content">
+              <div class="corner-ribbon" [class.private]="league.league_visibility==1">
+                <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
+              </div>
               <div class="card-top-row">
                 <div class="card-icon-wrapper competition-bg">
                   <ion-icon [name]="getActivityIcon(league.activity?.ActivityName)" class="card-icon"></ion-icon>
                 </div>
                 <div class="card-info">
-                  <h3 class="card-title">{{league.league_name | titlecase}}</h3>
-                  <p class="card-subtitle">{{league.activity?.ActivityName}}</p>
+                  <h3 class="card-title">{{league.start_date}}</h3>
+                  <p class="card-subtitle">{{league.league_name | titlecase}}</p>
+                  <p class="card-activity">{{league.activity?.ActivityName}}</p>
                 </div>
-                <ion-icon name="arrow-forward" class="card-chevron"></ion-icon>
               </div>
               <div class="card-divider"></div>
-              <div class="card-details">
-                <div class="detail-row">
-                  <ion-icon name="calendar" class="detail-icon"></ion-icon>
-                  <span class="detail-text">{{league.start_date}}</span>
-                  <span class="detail-dot">·</span>
-                  <ion-icon name="pin" class="detail-icon"></ion-icon>
-                  <span class="detail-text venue-text">{{league.club?.ClubName}}</span>
-                </div>
-                <div class="corner-ribbon" [class.private]="league.league_visibility==1">
-                  <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
-                </div>
-              </div>
               <div class="card-tags">
                 <span class="tag type-tag" [style.background]="getLeagueTypeColor(league.league_type_text)">{{league.league_type_text}}</span>
                 <span class="tag category-tag" *ngIf="league.league_category_text">{{league.league_category_text}}<span *ngIf="league.league_age_group">/{{league.league_age_group}}</span></span>
+              </div>
+              <div class="card-venue-footer">
+                <ion-icon name="pin" class="venue-icon"></ion-icon>
+                <span class="venue-text">{{league.club?.ClubName}}</span>
               </div>
             </div>
           </div>
@@ -79,27 +74,29 @@
                   <ion-icon [name]="getActivityIcon(match.ActivityName)" class="card-icon"></ion-icon>
                 </div>
                 <div class="card-info">
-                  <h3 class="card-title">{{match.MatchTitle | titlecase}}</h3>
-                  <p class="card-subtitle">{{match.ActivityName}}</p>
+                  <h3 class="card-title">{{match.Date}}</h3>
+                  <p class="card-subtitle">{{match.MatchTitle | titlecase}}</p>
+                  <p class="card-activity">{{match.ActivityName}}</p>
                 </div>
-                <ion-icon name="arrow-forward" class="card-chevron"></ion-icon>
               </div>
               <div class="card-divider"></div>
-              <div class="card-details">
-                <div class="detail-row">
-                  <ion-icon name="calendar" class="detail-icon"></ion-icon>
-                  <span class="detail-text">{{match.MatchStartDate}}</span>
-                  <span class="detail-dot">·</span>
-                  <ion-icon name="pin" class="detail-icon"></ion-icon>
-                  <span class="detail-text venue-text">{{match.VenueName}}</span>
+              <div class="scoreboard">
+                <div class="sb-team sb-home">
+                  <span class="sb-label">HOME</span>
+                  <span class="sb-name" [class.tbd]="!match.homeUserName || !match.homeUserName.trim()">{{(match.homeUserName && match.homeUserName.trim()) ? match.homeUserName.trim() : 'TBD'}}</span>
+                </div>
+                <div class="sb-center">
+                  <span class="sb-score" *ngIf="match.home_team_score != null || match.away_team_score != null">{{match.home_team_score || '-'}} : {{match.away_team_score || '-'}}</span>
+                  <span class="sb-vs" *ngIf="match.home_team_score == null && match.away_team_score == null">VS</span>
+                </div>
+                <div class="sb-team sb-away">
+                  <span class="sb-label">AWAY</span>
+                  <span class="sb-name" [class.tbd]="!match.awayUserName || !match.awayUserName.trim()">{{(match.awayUserName && match.awayUserName.trim()) ? match.awayUserName.trim() : 'TBD'}}</span>
                 </div>
               </div>
-              <div class="players-section" *ngIf="match.homeUserName?.trim() && match.awayUserName?.trim()">
-                <div class="player-vs-container">
-                  <span class="player-name" [class.tbd]="match.homeUserName === 'TBD'">{{match.homeUserName}}</span>
-                  <span class="vs-badge">VS</span>
-                  <span class="player-name" [class.tbd]="match.awayUserName === 'TBD'">{{match.awayUserName}}</span>
-                </div>
+              <div class="card-venue-footer">
+                <ion-icon name="pin" class="venue-icon"></ion-icon>
+                <span class="venue-text">{{match.location && match.location !== '' ? match.location : match.VenueName}}</span>
               </div>
             </div>
           </div>

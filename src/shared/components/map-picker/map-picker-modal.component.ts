@@ -24,7 +24,7 @@ declare var google: any;
       </div>
       <div class="map-footer">
         <div class="map-address">{{ selectedAddress || 'Move map to select location' }}</div>
-        <button class="map-confirm-btn" (click)="confirm()" [disabled]="!selectedAddress">Confirm Location</button>
+        <button *ngIf="!readOnly" class="map-confirm-btn" (click)="confirm()" [disabled]="!selectedAddress">Confirm Location</button>
       </div>
     </div>
   `,
@@ -111,8 +111,11 @@ export class MapPickerModalComponent {
   selectedLng: number = 0;
   suggestions: any[] = [];
   searchTimeout: any;
+  readOnly: boolean = false;
 
-  constructor(private viewCtrl: ViewController, private navParams: NavParams, private zone: NgZone) {}
+  constructor(private viewCtrl: ViewController, private navParams: NavParams, private zone: NgZone) {
+    this.readOnly = this.navParams.get('readOnly') || false;
+  }
 
   ionViewDidLoad() {
     this.initMap();

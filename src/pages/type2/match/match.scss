@@ -25,7 +25,7 @@ page-match {
     padding: 0 4px;
     padding-bottom: 0;
 
-    .revamp-card { margin-bottom: 10px; }
+    .revamp-card { margin-bottom: 8px; }
   }
 
   // ── Light Theme ──
@@ -42,6 +42,9 @@ page-match {
     }
     .card-title { color: #1e293b !important; }
     .card-subtitle { color: #64748b !important; }
+    .card-activity { color: #2b92bb !important; }
+    .card-venue-footer { .mp-icon { color: #94a3b8; } .mp-text, .mp-text.mp-selected { color: #94a3b8 !important; } }
+    .scoreboard { .sb-name { color: #1e293b; } .sb-vs { background: #cbd5e1; color: #1e293b; } .sb-score { color: #1e293b; } }
     .card-chevron { color: #cbd5e1 !important; }
     .card-content { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
     .card-icon-wrapper.match-bg { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.08);
@@ -98,35 +101,36 @@ page-match {
   .card-accent { width: 5px; flex-shrink: 0; }
 
   .card-content {
-    flex: 1; padding: 14px 14px 12px; min-width: 0;
-    display: flex; flex-direction: column; gap: 10px;
+    flex: 1; padding: 10px 12px 8px; min-width: 0;
+    display: flex; flex-direction: column; gap: 6px;
     position: relative; overflow: hidden;
     background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
   }
 
-  .card-top-row { display: flex; align-items: center; gap: 10px; }
+  .card-top-row { display: flex; align-items: center; gap: 6px; }
 
   .card-icon-wrapper {
-    width: 40px; height: 40px; border-radius: 10px;
+    width: 32px; height: 32px; border-radius: 6px;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    .card-icon { font-size: 18px; color: #fff; }
+    padding: 0;
+    .card-icon { font-size: 20px; color: #fff; }
     &.match-bg {
-      background: rgba(255, 255, 255, 0.12);
-      backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      background: rgba(255, 255, 255, 0.08);
+      border: none;
     }
   }
 
   .card-info {
     flex: 1; min-width: 0;
     .card-title {
-      font-size: 15px; font-weight: 700; line-height: 1.3; letter-spacing: -0.2px;
-      color: #f1f5f9; margin: 0 0 2px; word-break: break-word;
+      font-size: 14px; font-weight: 700; line-height: 1.2; letter-spacing: -0.2px;
+      color: #f1f5f9; margin: 0 0 1px; word-break: break-word;
     }
     .card-subtitle {
-      font-size: 12px; font-weight: 500; line-height: 1.3; letter-spacing: 0.1px;
+      font-size: 11px; font-weight: 500; line-height: 1.2; letter-spacing: 0.1px;
       color: #94a3b8; margin: 0;
     }
+    .card-activity { font-size: 10px; font-weight: 600; color: #3fbcd3; margin: 1px 0 0; letter-spacing: 0.2px; }
   }
 
   .card-chevron { font-size: 16px; color: #475569; flex-shrink: 0; }
@@ -158,22 +162,48 @@ page-match {
   }
 
   // Players
-  .players-section {
-    .player-vs-container { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-    .player-name {
-      font-size: 12px; font-weight: 700; color: #3fbcd3; letter-spacing: 0.1px;
-      flex: 1; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-      &.tbd { color: #64748b; font-style: italic; font-weight: 500; }
+  .scoreboard {
+    display: flex; align-items: center; padding: 4px 0;
+    .sb-team {
+      flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;
+      &.sb-home { align-items: flex-start; }
+      &.sb-away { align-items: flex-end; }
+    }
+    .sb-label { font-size: 9px; font-weight: 700; letter-spacing: 0.8px; color: #64748b; }
+    .sb-home .sb-label { color: #2b92bb; }
+    .sb-away .sb-label { color: #f76e04; }
+    .sb-name {
+      font-size: 12px; font-weight: 700; color: #f1f5f9; letter-spacing: 0.1px;
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 100%;
+      &.tbd { color: #94a3b8; font-style: italic; font-weight: 500; }
     }
     .winner-icon { color: #ffd700 !important; font-size: 13px; margin-left: 2px; }
-    .vs-badge {
+    .sb-center {
+      flex-shrink: 0; padding: 0 8px; text-align: center;
+    }
+    .sb-vs {
       background: #475569; color: #f1f5f9; padding: 3px 8px;
-      border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px; flex-shrink: 0;
+      border-radius: 20px; font-size: 9px; font-weight: 700; letter-spacing: 0.3px;
+    }
+    .sb-score {
+      font-size: 14px; font-weight: 800; color: #f1f5f9; letter-spacing: 1px;
     }
   }
 
   // Card footer
   .card-footer { display: flex; align-items: center; justify-content: space-between; }
+  .card-venue-footer {
+    margin-top: 2px;
+    .map-picker-field {
+      margin: 0; padding: 4px 10px;
+      background: transparent; border: none; border-radius: 0;
+      backdrop-filter: none; -webkit-backdrop-filter: none;
+    }
+    .mp-icon { font-size: 13px; color: #3fbcd3; }
+    .mp-text { font-size: 11px; font-weight: 400; color: #64748b; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+    .mp-text.mp-selected { color: #64748b; font-weight: 400; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+    .mp-chevron { display: none; }
+  }
   .footer-right { display: flex; align-items: center; gap: 8px; }
   .footer-center { display: flex; align-items: center; gap: 8px; }
   .footer-status {
@@ -213,9 +243,9 @@ page-match {
 
   // Responsive — same breakpoints as league
   @media (max-width: 359px) {
-    .card-content { padding: 10px 10px 8px; gap: 8px; }
-    .card-icon-wrapper { width: 34px; height: 34px; .card-icon { font-size: 15px; } }
-    .card-info .card-title { font-size: 13px; }
+    .card-content { padding: 8px 8px 6px; gap: 5px; }
+    .card-icon-wrapper { width: 26px; height: 26px; .card-icon { font-size: 17px; } }
+    .card-info .card-title { font-size: 12px; }
     .tag { font-size: 9px; padding: 2px 7px; }
     .corner-ribbon { width: 26px; height: 26px;
       &::before { border-width: 0 26px 26px 0; }
@@ -223,14 +253,15 @@ page-match {
     }
   }
   @media (min-width: 400px) {
-    .card-content { padding: 14px 14px 12px; }
+    .card-content { padding: 10px 12px 8px; }
   }
   @media (min-width: 768px) {
-    .card-content { padding: 16px; gap: 12px; }
-    .card-icon-wrapper { width: 44px; height: 44px; .card-icon { font-size: 20px; } }
-    .card-info .card-title { font-size: 16px; }
-    .detail-row .detail-text { font-size: 14px; }
-    .tag { font-size: 11px; padding: 4px 12px; }
+    .card-content { padding: 12px 14px 10px; gap: 8px; }
+    .card-icon-wrapper { width: 36px; height: 36px; .card-icon { font-size: 22px; } }
+    .card-info .card-title { font-size: 15px; }
+    .detail-row .detail-text { font-size: 13px; }
+    .sb-name { font-size: 13px; }
+    .tag { font-size: 11px; padding: 3px 10px; }
   }
   // ── Lineup Bottom Sheet Content ──
   .sheet-empty {

@@ -267,7 +267,8 @@ export class MatchTeamDetailsPage {
         this.updateLeagueMatchInviteStatusInput.MatchId = this.match.MatchId;
 
         this.getActivitySpecificTeam();
-        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+        this.loadAllParticipantsForCounts();
+        this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.PLAYING);
         this.getRoleForPlayers();
       }
     });
@@ -296,8 +297,9 @@ export class MatchTeamDetailsPage {
     console.log("Looking for home team:", this.selectedHomeTeamText);
     console.log("Looking for away team:", this.selectedAwayTeamText);
 
-    const homeTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedHomeTeamText);
-    const awayTeam = this.activitySpecificTeamsRes.find(team => team.teamName === this.selectedAwayTeamText);
+    const allTeams = [...this.cachedClubTeams, ...this.cachedExternalTeams];
+    const homeTeam = allTeams.find(team => team.teamName === this.selectedHomeTeamText);
+    const awayTeam = allTeams.find(team => team.teamName === this.selectedAwayTeamText);
     console.log("Selected Home Team:", homeTeam);
     console.log("Selected Away Team:", awayTeam);
 
@@ -670,7 +672,9 @@ export class MatchTeamDetailsPage {
         this.fetchAndShowTeams(this.teamActionIsHome, false);
       }
     } else if (action === 'create_external') {
-      this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode });
+      this.commonService.commonAlert_V4('External Team', 'You are about to create an external team. Do you want to continue?', 'Yes:Continue', 'No', () => {
+        this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode });
+      });
     }
   }
 
@@ -690,6 +694,11 @@ export class MatchTeamDetailsPage {
       next: (res: any) => {
         if (res) {
           this.activitySpecificTeamsRes = res.data;
+          if (isClubTeam) {
+            this.cachedClubTeams = res.data || [];
+          } else {
+            this.cachedExternalTeams = res.data || [];
+          }
         }
         this.showAvailableTeams(isHome);
       },
@@ -815,6 +824,7 @@ export class MatchTeamDetailsPage {
     });
   }
 
+  cachedClubTeams: TeamsForParentClubModel[] = [];
   cachedExternalTeams: TeamsForParentClubModel[] = [];
 
   detectExternalTeams() {
@@ -828,6 +838,9 @@ export class MatchTeamDetailsPage {
         if (this.match.awayUserId) {
           this.isAwayExternal = this.cachedExternalTeams.some(t => t.id === this.match.awayUserId);
         }
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to detect external teams", 2500, ToastMessageType.Error);
       }
     });
   }
@@ -838,9 +851,13 @@ export class MatchTeamDetailsPage {
       next: (res: any) => {
         if (res) {
           this.activitySpecificTeamsRes = res.data;
+          this.cachedClubTeams = res.data || [];
         }
         // After fetching teams, detect external teams
         this.detectExternalTeams();
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to fetch teams", 2500, ToastMessageType.Error);
       }
     });
   }
