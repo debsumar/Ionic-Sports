@@ -188,8 +188,8 @@ export class MatchTeamDetailsPage {
     public events: Events
   ) {
     this.match = JSON.parse(this.navParams.get("match"));
-    this.selectedHomeTeamText = this.match.homeUserName != null ? this.match.homeUserName : 'Home Team';
-    this.selectedAwayTeamText = this.match.awayUserName != null ? this.match.awayUserName : 'Away Team';
+    this.selectedHomeTeamText = 'Home Team';
+    this.selectedAwayTeamText = 'Away Team';
     this.storage.get('Currency').then((val) => {
       this.currencyDetails = JSON.parse(val);
     });
@@ -266,7 +266,6 @@ export class MatchTeamDetailsPage {
         this.updateLeagueMatchInviteStatusInput.MatchId = this.match.MatchId;
 
         this.getActivitySpecificTeam();
-        this.getMatchTeamsThenLoadParticipants();
         this.getRoleForPlayers();
       }
     });
@@ -340,6 +339,7 @@ export class MatchTeamDetailsPage {
     this.events.subscribe("theme:changed", (isDark) => {
       this.applyTheme(isDark);
     });
+    this.getMatchTeamsThenLoadParticipants();
     // this.events.subscribe("team:refresh", () => {
     //   this.getActivitySpecificTeam();
     //   this.detectExternalTeams();
@@ -476,8 +476,8 @@ export class MatchTeamDetailsPage {
   }
 
   onPlayerAction(action: string) {
-    this.showPlayerSheet = false;
     const member = this.selectedPlayer;
+    this.showPlayerSheet = false;
     if (!member) return;
     switch (action) {
       case 'confirmed': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted); break;
@@ -575,11 +575,14 @@ export class MatchTeamDetailsPage {
         if (res) {
           var response = res.message;
           this.commonService.toastMessage(response, 3000, ToastMessageType.Success);
-          // Refresh the participant data
+          // Refresh with All to update counts and sections
           this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
         } else {
           this.commonService.toastMessage("Failed to update Invitation status", 3000, ToastMessageType.Error);
         }
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to update Invitation status", 3000, ToastMessageType.Error);
       }
     });
   }
@@ -783,8 +786,20 @@ export class MatchTeamDetailsPage {
     this.httpService.post(`${API.GetMatchTeamsByMatchId}`, payload).subscribe({
       next: (res: any) => {
         if (res && res.data) {
+          console.log('GetMatchTeamsByMatchId response:', JSON.stringify(res.data));
           this.match.homeUserId = res.data.homeUserId;
           this.match.awayUserId = res.data.awayUserId;
+          // Update team names and tab text from API response
+          const homeName = res.data.homeUserName || res.data.homeTeamName || res.data.home_team_name;
+          const awayName = res.data.awayUserName || res.data.awayTeamName || res.data.away_team_name;
+          if (homeName) {
+            this.match.homeUserName = homeName;
+            this.selectedHomeTeamText = homeName;
+          }
+          if (awayName) {
+            this.match.awayUserName = awayName;
+            this.selectedAwayTeamText = awayName;
+          }
           this.getIndividualMatchParticipantInput.TeamId = res.data.homeUserId;
           this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
         }
