@@ -177,48 +177,51 @@
               <ion-icon [name]="mat.match_visibility==0?'globe':'lock'"></ion-icon>
             </div>
             <div class="card-top-row">
-              <div class="match-icon-wrapper">
-                <ion-icon [name]="getActivityIcon(individualLeague?.activity?.ActivityName)" class="card-icon"></ion-icon>
-              </div>
               <div class="card-info">
-                <h3 class="card-title">{{mat.match_title}}</h3>
-                <p class="card-subtitle">{{mat.start_date}}</p>
-              </div>
-              <div class="match-badges-inline">
-                <span class="round-badge" *ngIf="mat.formatted_round">{{mat.formatted_round}}</span>
-                <span class="payment-badge" [ngClass]="mat.payment_type == 1 ? 'paid' : 'free'">
-                  {{mat.payment_type == 1 ? 'Paid' : 'Free'}}
-                </span>
+                <h3 class="card-title">{{mat.start_date}}</h3>
+                <p class="card-subtitle">{{mat.match_title}}</p>
+                <p class="card-activity">{{individualLeague?.activity?.ActivityName}}</p>
               </div>
             </div>
             <div class="card-divider"></div>
-            <div class="match-teams-row">
-              <span class="match-player" [class.tbd-text]="!mat.homeusername || !mat.homeusername.trim()">
-                {{mat.homeusername && mat.homeusername.trim() ? mat.homeusername : 'TBD'}}
-                <ion-icon name="trophy" class="winner-icon" *ngIf="mat.ResultStatus == 1 && mat.is_home_team_winner"></ion-icon>
-              </span>
-              <span class="vs-badge">VS</span>
-              <span class="match-player" [class.tbd-text]="!mat.awayusername || !mat.awayusername.trim()">
-                {{mat.awayusername && mat.awayusername.trim() ? mat.awayusername : 'TBD'}}
-                <ion-icon name="trophy" class="winner-icon" *ngIf="mat.ResultStatus == 1 && mat.is_away_team_winner"></ion-icon>
-              </span>
+            <div class="scoreboard">
+              <div class="sb-team sb-home">
+                <span class="sb-label">HOME</span>
+                <span class="sb-name" [class.tbd]="!mat.homeusername || !mat.homeusername.trim()">
+                  {{mat.homeusername && mat.homeusername.trim() ? mat.homeusername : 'TBD'}}
+                  <ion-icon name="trophy" class="winner-icon" *ngIf="mat.ResultStatus == 1 && mat.is_home_team_winner"></ion-icon>
+                </span>
+              </div>
+              <div class="sb-center">
+                <span class="sb-score" *ngIf="mat.ResultStatus == 1 && (mat.home_team_score != null || mat.away_team_score != null)">{{mat.home_team_score || '-'}} : {{mat.away_team_score || '-'}}</span>
+                <span class="sb-vs" *ngIf="mat.ResultStatus != 1 || (mat.home_team_score == null && mat.away_team_score == null)">VS</span>
+              </div>
+              <div class="sb-team sb-away">
+                <span class="sb-label">AWAY</span>
+                <span class="sb-name" [class.tbd]="!mat.awayusername || !mat.awayusername.trim()">
+                  {{mat.awayusername && mat.awayusername.trim() ? mat.awayusername : 'TBD'}}
+                  <ion-icon name="trophy" class="winner-icon" *ngIf="mat.ResultStatus == 1 && mat.is_away_team_winner"></ion-icon>
+                </span>
+              </div>
             </div>
             <div class="card-divider"></div>
             <div class="card-footer">
               <span class="tag type-tag" [style.background]="mat.ResultStatus == 1 ? '#10b981' : '#f59e0b'">
                 {{mat.ResultStatus == 1 ? 'Completed' : 'Upcoming'}}
               </span>
+              <span class="round-badge" *ngIf="mat.formatted_round">{{mat.formatted_round}}</span>
               <span class="footer-status" [class.published]="mat.ResultStatus == 1">
                 <ion-icon [name]="mat.ResultStatus == 1 ? 'checkmark-circle' : 'time'"></ion-icon>
                 {{mat.ResultStatus == 1 ? mat.result_status_text : 'Result Pending'}}
-              </span>
-              <span class="footer-score" *ngIf="mat.ResultStatus == 1 && (mat.home_team_score != null || mat.away_team_score != null)">
-                {{mat.home_team_score || '-'}} : {{mat.away_team_score || '-'}}
               </span>
               <button ion-button small class="lineup-btn" *ngIf="individualLeague?.league_type === 3"
                 (click)="goToLineup(mat); $event.stopPropagation()">
                 <ion-icon name="football"></ion-icon> Lineup
               </button>
+            </div>
+            <div class="card-venue-footer" *ngIf="mat.club_name">
+              <ion-icon name="pin" class="venue-icon"></ion-icon>
+              <span class="venue-text">{{mat.club_name}}</span>
             </div>
           </div>
         </div>

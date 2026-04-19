@@ -23,33 +23,28 @@
             (click)="gotoLeaguedetailsPage(league)">
             <div class="card-accent" [class.team-accent]="league.league_type_text?.toLowerCase().includes('team')" [style.background]="league.league_type_text?.toLowerCase().includes('team') ? null : getLeagueTypeColor(league.league_type_text)"></div>
             <div class="card-content">
+              <div class="corner-ribbon" [class.private]="league.league_visibility==1">
+                <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
+              </div>
               <div class="card-top-row">
                 <div class="card-icon-wrapper competition-bg">
                   <ion-icon [name]="getActivityIcon(league.activity.ActivityName)" class="card-icon"></ion-icon>
                 </div>
                 <div class="card-info">
-                  <h3 class="card-title">{{league.league_name | titlecase}}</h3>
-                  <p class="card-subtitle">{{league.activity.ActivityName}}</p>
+                  <h3 class="card-title">{{league.start_date}}</h3>
+                  <p class="card-subtitle">{{league.league_name | titlecase}}</p>
+                  <p class="card-activity">{{league.activity.ActivityName}}</p>
                 </div>
-                <ion-icon name="arrow-forward" class="card-chevron"></ion-icon>
               </div>
               <div class="card-divider"></div>
-              <div class="card-details">
-                <div class="detail-row">
-                  <ion-icon name="calendar" class="detail-icon"></ion-icon>
-                  <span class="detail-text">{{league.start_date}}</span>
-                  <span class="detail-dot">·</span>
-                  <ion-icon name="pin" class="detail-icon"></ion-icon>
-                  <span class="detail-text">{{league.club.ClubName}}</span>
-                </div>
-                <div class="corner-ribbon" [class.private]="league.league_visibility==1">
-                  <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
-                </div>
-              </div>
               <div class="card-tags">
                 <span class="tag type-tag" [style.background-color]="getLeagueTypeColor(league.league_type_text)">{{league.league_type_text}}</span>
                 <span class="tag category-tag" *ngIf="league.league_category_text">{{league.league_category_text}}<span *ngIf="league.league_age_group">/{{league.league_age_group}}</span></span>
                 <span class="tag grade-tag" *ngIf="league.grade">Grade {{league.grade}}</span>
+              </div>
+              <div class="card-venue-footer" (click)="$event.stopPropagation()">
+                <ion-icon name="pin" class="venue-icon"></ion-icon>
+                <span class="venue-text">{{league.club.ClubName}}</span>
               </div>
             </div>
           </div>
@@ -76,6 +71,9 @@
           <div class="revamp-card" *ngFor="let team of filteredteams" (click)="gotoTeamdetailsPage(team)">
             <div class="card-accent team-accent"></div>
             <div class="card-content">
+              <div class="corner-ribbon" [class.private]="team.teamVisibility==1">
+                <ion-icon [name]="team.teamVisibility==0 ? 'globe' : 'lock'"></ion-icon>
+              </div>
               <div class="card-top-row">
                 <div class="team-avatar" *ngIf="team.logo_url">
                   <img [src]="team.logo_url" alt="{{team.TeamName}} Logo" class="team-logo">
@@ -87,22 +85,14 @@
                   <h3 class="card-title">{{team.TeamName | titlecase}}</h3>
                   <p class="card-subtitle">{{team.ActivityName}}</p>
                 </div>
-                <ion-icon name="arrow-forward" class="card-chevron"></ion-icon>
               </div>
-              <div class="card-divider"></div>
-              <div class="card-details">
-                <div class="detail-row">
-                  <ion-icon name="people" class="detail-icon" *ngIf="team.ageGroup"></ion-icon>
-                  <span class="detail-text no-truncate" *ngIf="team.ageGroup">{{team.ageGroup}}</span>
-                  <span class="detail-dot" *ngIf="team.ageGroup">·</span>
-                  <ion-icon name="pin" class="detail-icon"></ion-icon>
-                  <span class="detail-text">{{team.club?.ClubName}}</span>
-                  <span class="detail-dot">·</span>
-                  <span class="player-count">{{team.NoOfPlayers}}<ion-icon name="people"></ion-icon></span>
-                </div>
-                <div class="corner-ribbon" [class.private]="team.teamVisibility==1">
-                  <ion-icon [name]="team.teamVisibility==0 ? 'globe' : 'lock'"></ion-icon>
-                </div>
+              <div class="team-meta-row">
+                <span class="meta-age" *ngIf="team.ageGroup"><ion-icon name="people"></ion-icon> {{team.ageGroup}}</span>
+                <span class="meta-count"><ion-icon name="person"></ion-icon> {{team.NoOfPlayers}} Members</span>
+              </div>
+              <div class="card-venue-footer">
+                <ion-icon name="pin" class="venue-icon"></ion-icon>
+                <span class="venue-text">{{team.club?.ClubName}}</span>
               </div>
               </div>
           </div>

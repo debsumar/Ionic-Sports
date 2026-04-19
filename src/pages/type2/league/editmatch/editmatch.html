@@ -42,8 +42,8 @@
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>Round/Stage <span class="optional-tag">(Optional)</span></ion-label>
-        <ion-select [(ngModel)]="data.Round">
-          <ion-option *ngFor="let r of roundTypes" [value]="r.id">{{r.name}}</ion-option>
+        <ion-select [(ngModel)]="data.Round" placeholder="Select round">
+          <ion-option *ngFor="let r of roundTypes" [value]="r.name">{{r.name}}</ion-option>
         </ion-select>
       </ion-item>
     </app-form-field>

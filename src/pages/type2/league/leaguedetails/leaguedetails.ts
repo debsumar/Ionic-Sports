@@ -181,14 +181,14 @@ export class LeaguedetailsPage {
   }
 
   get headerAccentColor(): string {
-    return this.commonService.getTypeAccentColor(this.individualLeague?.league_type);
+    return this.commonService.getTypeAccentColor(this.individualLeague ? this.individualLeague.league_type : undefined);
   }
 
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     const l = this.individualLeague;
-    if (l?.start_date) rows.push({ icon: 'calendar', text: l.start_date + (l.end_date ? ' → ' + l.end_date : '') });
-    if (l?.club?.ClubName) rows.push({ icon: 'pin', text: l.club.ClubName });
+    if (l && l.start_date) rows.push({ icon: 'calendar', text: l.start_date + (l.end_date ? ' → ' + l.end_date : '') });
+    if (l && l.club && l.club.ClubName) rows.push({ icon: 'pin', text: l.club.ClubName });
     return rows;
   }
 
@@ -727,10 +727,8 @@ export class LeaguedetailsPage {
 
   gotoTeamDetails(team) {
     this.navCtrl.push("TeamdetailsPage", {
-      "team": team.parentclubteam,
-
+      "team": { ...team.parentclubteam, Id: team.parentclubteam.id }
     })
-
   }
 
 
@@ -1012,11 +1010,7 @@ export class LeaguedetailsPage {
 
   tDetails(team: LeagueStandingModel) {
     this.navCtrl.push("TeamdetailsPage", {
-      "team": team.parentclubteam,
-      // teamName:team.parentclubteam.teamName,
-      // venue:team.parentclubteam.venue.VenueName,
-      // ageGroup:team.parentclubteam.ageGroup,
-      // visibility:team.parentclubteam.teamVisibility,
+      "team": { ...team.parentclubteam, Id: team.parentclubteam.id }
     })
   }
 
@@ -1030,7 +1024,7 @@ export class LeaguedetailsPage {
     const team = this.selectedTeam;
     if (!team) return;
     switch (action) {
-      case 'view': this.navCtrl.push("TeamdetailsPage", { "team": team.parentclubteam }); break;
+      case 'view': this.navCtrl.push("TeamdetailsPage", { "team": { ...team.parentclubteam, Id: team.parentclubteam.id } }); break;
       case 'remove': this.removeTeam(team, 1); break;
     }
   }

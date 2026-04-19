@@ -155,8 +155,8 @@ export class TeamdetailsPage {
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
     const t = this.teamsForParentClub;
-    if (t?.ageGroup) rows.push({ icon: 'people', text: 'Age Group: ' + t.ageGroup });
-    if (t?.club?.ClubName) rows.push({ icon: 'pin', text: t.club.ClubName });
+    if (t && t.ageGroup) rows.push({ icon: 'people', text: 'Age Group: ' + t.ageGroup });
+    if (t && t.club && t.club.ClubName) rows.push({ icon: 'pin', text: t.club.ClubName });
     return rows;
   }
 

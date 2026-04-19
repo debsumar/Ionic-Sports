@@ -20,8 +20,6 @@ export class AddrecurringmatchesPage {
   isDarkTheme: boolean = true;
   match: AllMatchData;
   untilWhen: string = '';
-  selectedDays: string[] = [];
-  allDays: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
   minDate: string = '';
   maxDate: string = moment().add(10, 'years').format('YYYY-MM-DD');
 
@@ -64,22 +62,13 @@ export class AddrecurringmatchesPage {
     }
   }
 
-  toggleDay(day: string) {
-    const i = this.selectedDays.indexOf(day);
-    i > -1 ? this.selectedDays.splice(i, 1) : this.selectedDays.push(day);
-  }
-
-  isDaySelected(day: string): boolean {
-    return this.selectedDays.indexOf(day) > -1;
-  }
-
   createRecurringMatches() {
     if (!this.untilWhen) {
       this.commonService.toastMessage("Select until when date", 2500, ToastMessageType.Error);
       return;
     }
-    if (this.selectedDays.length === 0) {
-      this.commonService.toastMessage("Select at least one day", 2500, ToastMessageType.Error);
+    if (moment(this.untilWhen).isSameOrBefore(moment())) {
+      this.commonService.toastMessage("Until when date must be in the future", 2500, ToastMessageType.Error);
       return;
     }
     if (moment(this.untilWhen).isSameOrBefore(moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm"))) {
@@ -125,8 +114,7 @@ export class AddrecurringmatchesPage {
       UserParentClubId: this.sharedservice.getPostgreParentClubId(),
       UserActivityId: this.match.activityId,
       UserActionType: 0,
-      untilWhen: moment(this.untilWhen).format("YYYY-MM-DD"),
-      days: this.selectedDays
+      untilWhen: moment(this.untilWhen).format("YYYY-MM-DD")
     };
 
     this.httpService.post(`${API.CREATE_RECURRING_MATCHES}`, payload).subscribe(

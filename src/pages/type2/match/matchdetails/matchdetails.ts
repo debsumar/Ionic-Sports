@@ -165,13 +165,13 @@ export class MatchdetailsPage {
   }
 
   get headerAccentColor(): string {
-    return this.commonService.getTypeAccentColor(this.match?.MatchType);
+    return this.commonService.getTypeAccentColor(this.match ? this.match.MatchType : undefined);
   }
 
   get headerDetailRows(): DetailHeaderRow[] {
     const rows: DetailHeaderRow[] = [];
-    if (this.match?.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
-    if (this.match?.VenueName) rows.push({ icon: 'pin', text: (this.match as any).location && (this.match as any).location !== '' ? (this.match as any).location : this.match.VenueName });
+    if (this.match && this.match.MatchStartDate) rows.push({ icon: 'calendar', text: this.formatMatchStartDate(this.match.MatchStartDate) });
+    if (this.match && this.match.VenueName) rows.push({ icon: 'pin', text: (this.match as any).location && (this.match as any).location !== '' ? (this.match as any).location : this.match.VenueName });
     return rows;
   }
 

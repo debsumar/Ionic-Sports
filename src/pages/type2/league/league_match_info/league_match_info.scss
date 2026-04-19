@@ -203,24 +203,6 @@ page-league-match-info {
     .sheet-item-name { color: #2b92bb; }
   }
 
-  // ── FAB ──
-  ion-fab {
-    .fab-main, [ion-fab] {
-      background: rgba(43, 146, 187, 0.35) !important;
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      color: #fff !important; border: 1px solid rgba(255, 255, 255, 0.15);
-      box-shadow: 0 4px 24px rgba(0, 0, 0, 0.15);
-    }
-    .fabTop { margin-bottom: 13px; }
-    .fab-label {
-      margin-left: -115px; margin-top: -47px; margin-bottom: 5px; margin-right: 36px;
-      padding: 5px 12px; color: #fff; font-size: 13px; font-weight: 600;
-      background: rgba(43, 146, 187, 0.85);
-      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-      border-radius: 8px; white-space: nowrap;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    }
-  }
 
   // ── Light Theme ──
   &.light-theme {
