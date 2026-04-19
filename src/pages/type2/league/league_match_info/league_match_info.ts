@@ -218,7 +218,7 @@ export class LeagueMatchInfoPage {
 
         this.parentClubKey = val.UserInfo[0].ParentClubKey;
         this.leagueParticipantForMatchInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.leagueParticipantForMatchInput.memberId = this.sharedservice.getLoggedInId();
+        this.leagueParticipantForMatchInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.leagueParticipantForMatchInput.action_type = 0;
         this.leagueParticipantForMatchInput.app_type = AppType.ADMIN_NEW;
         this.leagueParticipantForMatchInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -226,14 +226,14 @@ export class LeagueMatchInfoPage {
         this.leagueParticipantForMatchInput.activityId = this.activityId; //not mandatory field, just added for sanity
 
         this.leagueMatchParticipantInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.leagueMatchParticipantInput.memberId = this.sharedservice.getLoggedInId();
+        this.leagueMatchParticipantInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.leagueMatchParticipantInput.action_type = 0;
         this.leagueMatchParticipantInput.app_type = AppType.ADMIN_NEW;
         this.leagueMatchParticipantInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.leagueMatchParticipantInput.LeagueId = this.leagueId;
 
         this.UpdateLeagueFixtureInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.UpdateLeagueFixtureInput.memberId = this.sharedservice.getLoggedInId();
+        this.UpdateLeagueFixtureInput.memberId = this.sharedservice.getLoggedInId() || this.sharedservice.getLoggedInId();
         this.UpdateLeagueFixtureInput.action_type = 0;
         this.UpdateLeagueFixtureInput.app_type = AppType.ADMIN_NEW;
         this.UpdateLeagueFixtureInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -241,14 +241,14 @@ export class LeagueMatchInfoPage {
         this.UpdateLeagueFixtureInput.MatchId = this.matchObj.match_id;
 
         this.updateLeagueMatchParticipantipationRoleInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateLeagueMatchParticipantipationRoleInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateLeagueMatchParticipantipationRoleInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.updateLeagueMatchParticipantipationRoleInput.action_type = 0;
         this.updateLeagueMatchParticipantipationRoleInput.app_type = AppType.ADMIN_NEW;
         this.updateLeagueMatchParticipantipationRoleInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
         this.updateLeagueMatchParticipantipationRoleInput.activityId = this.activityId;
 
         this.updateLeagueMatchParticipationStatusInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateLeagueMatchParticipationStatusInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateLeagueMatchParticipationStatusInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.updateLeagueMatchParticipationStatusInput.action_type = 0;
         this.updateLeagueMatchParticipationStatusInput.app_type = AppType.ADMIN_NEW;
         this.updateLeagueMatchParticipationStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
@@ -257,7 +257,7 @@ export class LeagueMatchInfoPage {
 
         // Initialize updateLeagueMatchInviteStatusInput
         this.updateLeagueMatchInviteStatusInput.parentclubId = this.sharedservice.getPostgreParentClubId();
-        this.updateLeagueMatchInviteStatusInput.memberId = this.sharedservice.getLoggedInId();
+        this.updateLeagueMatchInviteStatusInput.memberId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
         this.updateLeagueMatchInviteStatusInput.action_type = LeagueMatchActionType.LEAGUE;
         this.updateLeagueMatchInviteStatusInput.app_type = AppType.ADMIN_NEW;
         this.updateLeagueMatchInviteStatusInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;

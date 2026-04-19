@@ -1,4 +1,4 @@
-import { Component } from "@angular/core";
+import { Component, OnDestroy } from "@angular/core";
 import gql from "graphql-tag";
 import {
   IonicPage,
@@ -48,7 +48,7 @@ import { AppType } from "../../../../shared/constants/module.constants";
   templateUrl: "leagueteamlisting.html",
   providers: [CommonLeagueService, HttpService],
 })
-export class LeagueteamlistingPage {
+export class LeagueteamlistingPage implements OnDestroy {
   activeIndex: number = 0;
   Title: string = "Leagues";
 
@@ -82,6 +82,9 @@ export class LeagueteamlistingPage {
   isPublish: boolean = true;
   isPending: boolean = true;
   private subscription: RxSubscription;
+  private categorySubscription: RxSubscription;
+  private activeTypeSubscription: RxSubscription;
+  private themeSubscription: RxSubscription;
 
   constructor(
     public navCtrl: NavController,
@@ -98,16 +101,21 @@ export class LeagueteamlistingPage {
     private themeService: ThemeService,
     public events: Events
   ) {
-    this.leagueService.activeTypeSubject.subscribe((type) => {
+    this.activeTypeSubscription = this.leagueService.activeTypeSubject.subscribe((type) => {
       this.activeIndex = type;
     });
-    this.commonService.category.pipe().subscribe((data) => {
+    this.categorySubscription = this.commonService.category.pipe().subscribe((data) => {
       if (data === "leagueteamlisting") {
         setTimeout(() => { this.loadTheme(); }, 100);
         this.fetchData();
       }
     });
-
+    this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe("theme:changed", (isDark) => {
+      this.applyTheme(isDark);
+    });
     this.events.subscribe('team:refresh', () => {
       if (this.activeIndex === 1) {
         this.getTeamsForParentClub();
@@ -130,13 +138,6 @@ export class LeagueteamlistingPage {
 
   ionViewWillEnter() {
     this.loadTheme();
-    this.themeService.isDarkTheme$.subscribe((isDark) => {
-      this.applyTheme(isDark);
-    });
-    this.events.subscribe("theme:changed", (isDark) => {
-      this.applyTheme(isDark);
-    });
-    this.fetchData();
   }
 
   ionViewDidEnter() {
@@ -251,14 +252,19 @@ export class LeagueteamlistingPage {
   }
 
   ionViewWillLeave() {
-    // Clean up theme event subscription
+    // Ionic events are cleaned up here for safety
     this.events.unsubscribe("theme:changed");
     this.events.unsubscribe("team:refresh");
+  }
 
-    // Clean up other subscriptions if needed
-    if (this.subscription) {
-      this.subscription.unsubscribe();
-    }
+  ngOnDestroy() {
+    // Clean up all RxJS subscriptions
+    if (this.subscription) { this.subscription.unsubscribe(); }
+    if (this.categorySubscription) { this.categorySubscription.unsubscribe(); }
+    if (this.activeTypeSubscription) { this.activeTypeSubscription.unsubscribe(); }
+    if (this.themeSubscription) { this.themeSubscription.unsubscribe(); }
+    this.events.unsubscribe("theme:changed");
+    this.events.unsubscribe("team:refresh");
   }
 
   // Force theme check method
@@ -313,12 +319,8 @@ export class LeagueteamlistingPage {
     // 📡 Also update the service for other components
     this.leagueService.setActiveLeagueType(index);
 
-    // 🎯 Load appropriate data based on selection
-    if (index === 0) {
-      this.getLeaguesForParentClub();
-    } else {
-      this.getTeamsForParentClub();
-    }
+    // 🎯 Load appropriate data based on selection (debounced)
+    this.fetchData();
   }
 
   createAction() {
