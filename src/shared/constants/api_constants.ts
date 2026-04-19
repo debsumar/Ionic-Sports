@@ -118,6 +118,7 @@ export const API = {
     CREATE_TEAM: `league/create-team`,
     CREATE_CLUB: `club/create_club`,
     GetTeamsByMatch: `match/get_teams_by_match`,
+    GetMatchTeamsByMatchId: `match/get-match-teams-by-match-id`,
     GetIndividualMatchParticipant: `match/GetIndividualMatchParticipant`,
     FetchAllMatches: `match/FetchAllMatches`,
     FETCH_COACHES: `coach/FetchCoaches`,
