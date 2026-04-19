@@ -204,11 +204,21 @@ page-newviewcourt {
         height: 420px !important;
     }
     .slots{
-        height: 62px !important;
+        height: 78px !important;
         text-align: center;
         color: #545454;
-        padding-top: 7px !important;
-        
+        display: flex !important;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .time-range{
+        color: rgba(0, 0, 0, 0.85);
+        font-size: 12px;
+        white-space: nowrap !important;
+        display: block;
+        overflow: hidden;
+        text-overflow: ellipsis;
     }
     .not-available{
         margin: 0;
@@ -258,9 +268,8 @@ page-newviewcourt {
     }
     .selected-court{
         background-color: #3fadf8;
-        .time{
+        .time-range{
             color: rgba(255, 255, 255, 0.85);
-            font-size: 14px;
             font-weight: bold;
         }
         .amount{

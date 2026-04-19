@@ -206,7 +206,7 @@ export class EditmatchPage {
       venue_id: '',
       location: this.mapLocationAddress || '',
       location_type: 0,
-      Round: this.data.Round ? (this.roundTypes.find(r => r.name === this.data.Round) || {}).id || 0 : 0
+      Round: this.data.Round ? (this.roundTypes.find(r => r.name === this.data.Round) || {} as any).id || 0 : 0
     };
 
     this.httpService.put(`${API.EDIT_MATCH}`, payload).subscribe({
