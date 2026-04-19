@@ -378,9 +378,9 @@ export class CreateteamPage {
     this.graphqlService.query(clubs_activity_query, { input_obj: club_activity_input }, 0)
       .subscribe((res: any) => {
         this.club_activities = res.data.getAllActivityByVenue as Activity[];
-        if (this.club_activities.length > 0) {
+        if (this.club_activities.length > 0 && !this.lockActivity) {
           this.parentClubTeamCreationInput.teamDetails.activityCode = (this.club_activities[0].ActivityCode).toString();
-        } else {
+        } else if (this.club_activities.length === 0) {
           this.commonService.toastMessage("No activities found", 2500, ToastMessageType.Error)
         }
       },

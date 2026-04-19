@@ -922,6 +922,7 @@ export class TeamdetailsPage {
 
     this.httpService.post(`${API.UPDATE_TEAM_MEMBER_FIELDS}`, this.updateTeamMemberFieldsInput).subscribe({
       next: (res: any) => {
+        this.commonService.hideLoader();
         if (res) {
           this.commonService.toastMessage(res.message, 3000, ToastMessageType.Success);
           this.updateTeamMemberFieldsRes = res;
@@ -931,6 +932,7 @@ export class TeamdetailsPage {
         }
       },
       error: (err) => {
+        this.commonService.hideLoader();
         this.commonService.toastMessage(err.error.message, 3000, ToastMessageType.Error);
       }
     });
