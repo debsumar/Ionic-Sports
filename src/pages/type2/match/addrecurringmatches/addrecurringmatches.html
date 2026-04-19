@@ -20,16 +20,6 @@
           [(ngModel)]="untilWhen" [min]="minDate" [max]="maxDate"></ion-datetime>
       </ion-item>
     </app-form-field>
-
-    <app-form-field [isDark]="isDarkTheme">
-      <div class="day-chips-section">
-        <p class="day-chips-label">WEEKDAYS</p>
-        <div class="day-chips">
-          <button *ngFor="let day of allDays" class="day-chip"
-            [class.selected]="isDaySelected(day)" (click)="toggleDay(day)">{{day.substring(0,3)}}</button>
-        </div>
-      </div>
-    </app-form-field>
   </ion-list>
 
   <app-glass-button label="Create Recurring Matches" (btnClick)="createRecurringMatches()"></app-glass-button>

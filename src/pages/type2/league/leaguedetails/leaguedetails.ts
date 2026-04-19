@@ -727,10 +727,8 @@ export class LeaguedetailsPage {
 
   gotoTeamDetails(team) {
     this.navCtrl.push("TeamdetailsPage", {
-      "team": team.parentclubteam,
-
+      "team": { ...team.parentclubteam, Id: team.parentclubteam.id }
     })
-
   }
 
 
@@ -1012,11 +1010,7 @@ export class LeaguedetailsPage {
 
   tDetails(team: LeagueStandingModel) {
     this.navCtrl.push("TeamdetailsPage", {
-      "team": team.parentclubteam,
-      // teamName:team.parentclubteam.teamName,
-      // venue:team.parentclubteam.venue.VenueName,
-      // ageGroup:team.parentclubteam.ageGroup,
-      // visibility:team.parentclubteam.teamVisibility,
+      "team": { ...team.parentclubteam, Id: team.parentclubteam.id }
     })
   }
 
@@ -1030,7 +1024,7 @@ export class LeaguedetailsPage {
     const team = this.selectedTeam;
     if (!team) return;
     switch (action) {
-      case 'view': this.navCtrl.push("TeamdetailsPage", { "team": team.parentclubteam }); break;
+      case 'view': this.navCtrl.push("TeamdetailsPage", { "team": { ...team.parentclubteam, Id: team.parentclubteam.id } }); break;
       case 'remove': this.removeTeam(team, 1); break;
     }
   }
