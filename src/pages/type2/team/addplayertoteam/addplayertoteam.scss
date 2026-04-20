@@ -3,12 +3,12 @@
 page-addplayertoteam {
   @include android-sdk35-fixes;
 
-  .scroll-content { padding: 0 !important; overflow: hidden !important; background: #0f172a !important; }
+  .scroll-content { padding: 0 !important; background: #0f172a !important; }
   ion-content { background: #0f172a !important; margin-bottom: 56px !important; }
 
-  .page-layout { display: flex; flex-direction: column; height: 100%; }
+  .page-layout { display: flex; flex-direction: column; }
   .page-fixed-header { flex-shrink: 0; background: #0f172a; z-index: 10; }
-  .page-scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 8px 80px; }
+  .page-scroll-area { padding: 0 8px 80px; }
 
   .section-header {
     display: flex; justify-content: space-between; align-items: center;
