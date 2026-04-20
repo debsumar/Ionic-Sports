@@ -828,12 +828,11 @@ async getProfile(session_member:TermSessionMembers) {
     }
 
     loyaltypoints() {
-        this.navCtrl.push('SessionLoyalty', { sessionDetails: this.term_ses_dets, clubName: this.term_ses_dets.session.ClubDetails.ClubName });
-
         // if (this.sessionDetails.PaymentOption == '100')
         //     this.navCtrl.push('SessionLoyalty', { sessionDetails: this.sessionDetails, clubName: this.clubName })
         // if (this.sessionDetails.PaymentOption == '101')
         //     this.navCtrl.push('SessionLoyalty', { sessionDetails: this.sessionDetails, clubName: this.clubName, monthStatus: this.selectedMonthKey, monthlyMember: ""})
+        this.navCtrl.push('SessionLoyalty', { sessionDetails: this.term_ses_dets, clubName: this.term_ses_dets.session.ClubDetails.ClubName });
     }
 
     ionViewWillLeave(){

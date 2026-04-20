@@ -11,9 +11,6 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../shared/dtos/club.dto';
 import { AppType } from '../../../../shared/constants/module.constants';
-
-
-
 /**
  * Generated class for the BookingPage page.
  *
@@ -40,7 +37,6 @@ export class BookingPage {
   currencyDetails: any = "";
   slotsType: boolean = false;
   slotListing = [];
-
   slots = [];
   pastSlots = [];
   upCommingSlots = [];
@@ -89,14 +85,7 @@ export class BookingPage {
   }
 
   getClubDetails() {
-    // this.fb.getAllWithQuery("/Club/Type2/" + this.selectedParentClubKey, { orderByChild: "IsEnable", equalTo: true }).subscribe((data) => {
-    //   this.clubs = data;
-    //   if (data.length != 0) {
-    //     this.selectedClubKey = this.clubs[0].$key;
-    //     this.getAllActivity();
-    //   }
-    // });
-       const body: GetParentClubVenuesRequestDto = {
+    const body: GetParentClubVenuesRequestDto = {
           parentclub_id: this.sharedService.getPostgreParentClubId(),
           app_type: AppType.ADMIN_NEW,
           device_type: this.sharedService.getPlatform() == 'android' ? 1 : 2,
@@ -344,6 +333,7 @@ export class BookingPage {
       this.slots = [];
     }
   }
+  
   getTodayBookings() {
     if (this.selectedCourt) {
       this.loading = this.loadingCtrl.create({

@@ -1,4 +1,10 @@
-page-bookingcontainer{
+@import '../../../theme/android-sdk35-fixes.scss';
+
+page-bookingcontainer {
+    @include android-sdk35-fixes;
+
+
+
     .slide-zoom{
         height:100% !important ;
     }
@@ -97,4 +103,3 @@ page-bookingcontainer{
         }
     }
 }
-

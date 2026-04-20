@@ -1,4 +1,10 @@
+@import '../../../../../theme/android-sdk35-fixes.scss';
+
 page-viewcourt {
+    @include android-sdk35-fixes;
+
+
+
     .toolbar-title{
         color:white !important;
     }
@@ -254,7 +260,6 @@ page-viewcourt {
     .swiper-wrapper{
         transition-duration: 0ms !important;
         transform: translate3d(5px, 0px, 0px);
-        align-items: stretch !important;
     //transform: translate3d(-1386px, 0px, 0px) !important;
     }
     .selected-court{

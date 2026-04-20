@@ -174,5 +174,6 @@ export const API = {
     GET_SAVED_FORMATIONS: 'league/lineup/getSavedFormationsForMatch',
     SEND_PUSH_NOTIFICATION: 'notifications/send-push-notification',
     GET_NOTIFICATIONS: 'notifications/get-notifications',
-    DELETE_NOTIFICATION: 'notifications/delete-notification'
+    DELETE_NOTIFICATION: 'notifications/delete-notification',
+    GET_SUPERADMIN_MEMBER_COUNT: 'superadmin/membercount',
 }

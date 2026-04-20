@@ -126,6 +126,8 @@ export class BookingCourt {
         this.paymentDEtails.purpose = this.purpose
 
         const creatTime = new Date(`${this.dmmmyyyformatDtae} 12:00`).getTime()
+        this.paymentDEtails.slots = []
+        this.paymentDEtails.members = []
         for (let i = 0; i < this.selectedSlots.length; i++) {
           const obj = {
             Price: this.selectedSlots[i].Price,
