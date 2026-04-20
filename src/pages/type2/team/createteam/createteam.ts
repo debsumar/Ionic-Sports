@@ -556,6 +556,8 @@ export class CreateteamPage {
           const message = "Team created successfully";
           this.events.publish('team:refresh');
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+          const onTeamCreated = this.navParams.get('onTeamCreated');
+          if (onTeamCreated) onTeamCreated();
           this.navCtrl.pop();
         }, (error) => {
           this.commonService.hideLoader();
