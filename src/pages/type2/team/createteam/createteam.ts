@@ -529,7 +529,7 @@ export class CreateteamPage {
         const restPayload = {
           parentclubId: this.parentClubTeamCreationInput.user_postgre_metadata.UserParentClubId,
           clubId: club.Id,
-          activityId: '',
+          activityId: this.navParams.get('activityId') || '',
           memberId: '',
           action_type: 0,
           device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
