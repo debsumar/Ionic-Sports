@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, ToastController, ActionSheetController, Alert, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, LoadingController, ToastController, ActionSheetController, Alert, AlertController, Events } from 'ionic-angular';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { TSMap } from 'typescript-map';
@@ -15,6 +15,7 @@ import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesRespons
 import { AppType } from '../../../../../shared/constants/module.constants';
 import { API } from '../../../../../shared/constants/api_constants';
 import { HttpService } from '../../../../../services/http.service';
+import { ThemeService } from '../../../../../services/theme.service';
 /**
  * Generated class for the ViewcourtPage page.
  *
@@ -109,13 +110,16 @@ export class ViewcourtPage {
   selectedActivity: string;
   courts=[];
   courtsList = [];
+  isDarkTheme: boolean = false;
   constructor(public sharedService:SharedServices,public alertCtrl:AlertController,
     public actionSheetCtrl:ActionSheetController,
     public toastCtrl:ToastController,public navCtrl: NavController, 
     public navParams: NavParams,public fb: FirebaseService,
     public storage: Storage, public commonService: CommonService,
     public http: HttpClient,public loadingCtrl: LoadingController,
-    private httpService: HttpService) {
+    private httpService: HttpService,
+    private themeService: ThemeService,
+    public events: Events) {
    
    this.recurringSubjectArray.forEach((element:String)=>{
      this.recurringSubjectSet.add(element);
@@ -156,6 +160,16 @@ export class ViewcourtPage {
   }
      
   ionViewDidEnter(){
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+
     this.loading = this.loadingCtrl.create({
       content: 'Please wait...'
     });
@@ -170,7 +184,39 @@ export class ViewcourtPage {
   }
 
   ionViewDidLoad() {
-    
+    setTimeout(() => { this.loadTheme(); }, 100);
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme(true);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const el = document.querySelector("page-viewcourt");
+    if (el) {
+      isDark ? el.classList.remove("light-theme") : el.classList.add("light-theme");
+      isDark ? document.body.classList.remove("light-theme") : document.body.classList.add("light-theme");
+    }
+  }
+
+  private forceThemeCheck(): void {
+    this.storage.get("dashboardTheme").then((storageTheme) => {
+      let isDark = true;
+      if (storageTheme !== null && storageTheme !== undefined) {
+        isDark = storageTheme;
+      } else if (document.body.classList.contains("light-theme")) {
+        isDark = false;
+      }
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
   }
   getClubDetails() {
         const body: GetParentClubVenuesRequestDto = {
@@ -804,9 +850,8 @@ sendEmail(obj,info){
 }
 
 
-ionViewWillLeave() { //unsbscribe all subscription to avoid all unnecessary data leaks
-  // Can make a loop too :D
- 
+ionViewWillLeave() {
+  this.events.unsubscribe('theme:changed');
 }
 
 

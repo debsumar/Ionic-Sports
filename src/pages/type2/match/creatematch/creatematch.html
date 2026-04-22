@@ -142,6 +142,9 @@
     </app-form-field>
   </ion-list>
 
-  <app-glass-button label="Create" (btnClick)="saveMatchDetails()"></app-glass-button>
 
 </ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <app-glass-button label="Create" (btnClick)="saveMatchDetails()"></app-glass-button>
+</ion-footer>

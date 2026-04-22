@@ -156,8 +156,8 @@ export class CreatematchPage {
     // let now = moment().add(10, 'year');
     // this.maxDate = moment(now).format("YYYY-MM-DD");
     // this.minDate = moment().format("YYYY-MM-DD");
-    this.createMatchInput.CreatedBy = this.sharedservice.getLoggedInUserId();
-    this.createMatchInput.Hosts.UserId = this.sharedservice.getLoggedInUserId();
+    this.createMatchInput.CreatedBy = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
+    this.createMatchInput.Hosts.UserId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
     this.createMatchInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
     this.createMatchInput.user_device_metadata.UserActionType = 2
   }
@@ -468,7 +468,10 @@ export class CreatematchPage {
           MatchDuration: this.createMatchInput.MatchDuration,
           UserParentClubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
           UserActivityId: this.createMatchInput.user_postgre_metadata.UserActivityId,
-          UserActionType: 0
+          user_postgre_metadata: this.createMatchInput.user_postgre_metadata,
+          user_device_metadata: this.createMatchInput.user_device_metadata,
+          UserActionType:2,
+          UpdatedBy: this.createMatchInput.CreatedBy
         };
 
         if (this.isRecurring) {

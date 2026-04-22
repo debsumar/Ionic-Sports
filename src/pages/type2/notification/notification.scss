@@ -1,4 +1,6 @@
+@import '../../../theme/android-sdk35-fixes.scss';
 notification-page {
+    @include android-sdk35-fixes;
     // Variables for sleek theming
     --card-bg-dark: #1e293b;
     --card-border-dark: #334155;

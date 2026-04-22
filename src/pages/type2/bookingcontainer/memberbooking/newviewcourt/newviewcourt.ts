@@ -16,6 +16,7 @@ import { HttpService } from '../../../../../services/http.service';
 import { API } from '../../../../../shared/constants/api_constants';
 import { GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto, ClubVenueDto } from '../../../../../shared/dtos/club.dto';
 import { AppType } from '../../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../../services/theme.service';
 /**
  * Generated class for the ViewcourtPage page.
  *
@@ -82,10 +83,11 @@ export class NewViewcourtPage {
   userKey: any;
   roleType:number;
   private isLoadingSlots: boolean = false; // Flag to prevent multiple simultaneous calls
+  isDarkTheme: boolean = false;
   constructor(public sharedService: SharedServices, public events: Events, 
     public ngZone: NgZone, public alertCtrl: AlertController, public actionSheetCtrl: ActionSheetController,
      public toastCtrl: ToastController, public navCtrl: NavController, public navParams: NavParams, public fb: FirebaseService, 
-     public storage: Storage, public commonService: CommonService, public http: HttpClient, public loadingCtrl: LoadingController, private httpService: HttpService) {
+     public storage: Storage, public commonService: CommonService, public http: HttpClient, public loadingCtrl: LoadingController, private httpService: HttpService, private themeService: ThemeService) {
     //  this.events.subscribe('updateScreen', () => {
     //    this.ngZone.run(() => {
    
@@ -137,7 +139,42 @@ export class NewViewcourtPage {
   }
 
   ngOnInit(){
-   
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme(true);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const el = document.querySelector("page-newviewcourt");
+    if (el) {
+      isDark ? el.classList.remove("light-theme") : el.classList.add("light-theme");
+      isDark ? document.body.classList.remove("light-theme") : document.body.classList.add("light-theme");
+    }
   }
 
 

@@ -109,17 +109,64 @@ export class AppadmindashboardPage {
       if (data.length > 0) {
         let userinfo = this.commonService.convertFbObjectToArray(data[0].UserInfo);
         data[0].UserInfo = userinfo;
-        this.storage.set('isLogin', true);
-        this.storage.set('LoginWhen', 'first');
-        this.storage.set('userObj', JSON.stringify(data[0]));
-        this.storage.set('memberType', BookingMemberType.ADMIN);
-        this.storage.set('UserKey', JSON.stringify(data[0].$key));
-        this.sharedService.setUserData(data[0]);
-        this.getUserMenus(data[0]);
+        // this.storage.set('isLogin', true);
+        // this.storage.set('LoginWhen', 'first');
+        // this.storage.set('userObj', JSON.stringify(data[0]));
+        // this.storage.set('memberType', BookingMemberType.ADMIN);
+        // this.storage.set('UserKey', JSON.stringify(data[0].$key));
+        // this.sharedService.setUserData(data[0]);
+        this.handleLogin(data[0], BookingMemberType.ADMIN, 'admin', data[0].$key);
+        //this.getUserMenus(data[0]);
       }
     }, (err) => {
       this.commonService.hideLoader();
     });
+  }
+
+  handleLogin(userData: any, memberType: any, userType: string, firebase_loggedinkey: string) {
+    this.httpService.get<{message: string, data: any}>(`${API.GET_PARENTCLUB_USER_BY_FIREBASEID}/${firebase_loggedinkey}`)
+      .subscribe({
+        next: async (res) => {
+          const userinfo = this.commonService.convertFbObjectToArray(userData.UserInfo);
+          userData.UserInfo = userinfo;
+          await Promise.all([ 
+             this.storage.set('isLogin', true),
+             this.storage.set('LoginWhen', 'first'),
+             this.storage.set('userObj', JSON.stringify(userData)),
+             this.storage.set('memberType', memberType),
+             this.storage.set('UserKey', JSON.stringify(userData.$key)),
+          ])
+
+          this.sharedService.setLoggedInType(memberType);
+          this.sharedService.setUserData(userData);
+          //await this.storage.set('loggedin_user', JSON.stringify(res.data));
+        
+          this.getUserMenus(userData);
+          // if (this.sharedService.getDeviceToken()) {
+          //   let key = userinfo[0].ParentClubKey;
+          //   if (userType == 'coach') {
+          //     key = userinfo[0].Key;
+          //   }
+          //   if (this.sharedService.getOnesignalPlayerId()) {
+          //     this.commonService.saveDeviceDetsforNotify(key);
+          //   }
+          // }
+
+          // if (this.sharedService.getThemeType() === 2) {
+          //   this.commonService.navCtrl.setRoot("Dashboard");
+          //   this.commonService.toastMessage("Logged in successfully...", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+          // }
+        },
+        error: (err) => {
+          this.commonService.hideLoader();
+          console.error("Error fetching events:", err);
+          if (err && err.error && err.error.message) {
+            this.commonService.toastMessage(err.error.message, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          } else {
+            this.commonService.toastMessage("Failed to fetch loggedin user details", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          }
+        }
+      });
   }
 
   getUserMenus(user) {

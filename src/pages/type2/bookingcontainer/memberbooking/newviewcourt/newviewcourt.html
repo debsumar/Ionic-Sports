@@ -7,7 +7,7 @@
 </ion-header> -->
 
 
-<ion-content >
+<ion-content [ngClass]="{'light-theme': !isDarkTheme}">
   <!-- <ion-item>
     <ion-label>Venue</ion-label>
     <ion-select [(ngModel)]="selectedClubKey" (ionChange)="changeCourt()">

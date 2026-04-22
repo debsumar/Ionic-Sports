@@ -3,6 +3,32 @@
 page-viewcourt {
     @include android-sdk35-fixes;
 
+    // ── Light Theme ──
+    &.light-theme, .light-theme & {
+      ion-content, .scroll-content { background: #f8fafc !important; }
+      .venuerow {
+        background: #ffffff;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+        ion-col { color: #1e293b; }
+        p { color: #1e293b; }
+      }
+      .head { color: #1e293b; }
+      .slots { color: #1e293b; }
+      .time { color: #1e293b; }
+      .amount { color: #475569; }
+      .not-available { color: #64748b; }
+      .court { box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08); }
+      .booked-court { background-color: #e2e8f0; color: #1e293b; .book-span { color: #1e293b; } }
+      .selected-court {
+        background-color: #3fadf8;
+        .time { color: #fff; }
+        .amount { color: #fff; }
+      }
+      p { color: #475569; }
+      .next-btn { background-color: #419147 !important; }
+      ion-footer { background: #f8fafc; }
+    }
+
 
 
     .toolbar-title{

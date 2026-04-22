@@ -109,6 +109,13 @@ page-creatematchleague {
       border-color: rgba(71, 85, 105, 0.5) !important;
       .text-input { color: #f8fafc !important; &::placeholder { color: #64748b !important; } }
     }
+
+    ion-footer {
+      background: #0f172a !important;
+      .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+        background: #0f172a !important;
+      }
+    }
   }
 
   .toggle_para {
@@ -202,7 +209,16 @@ page-creatematchleague {
     }
   }
 
-  .create-btn-wrap { position: sticky; bottom: 0; padding: 12px; z-index: 10; }
+  ion-footer {
+    background: #f8fafc !important;
+    box-shadow: none !important;
+    border: none !important;
+    &::before, &::after { display: none !important; }
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #f8fafc !important; border: none !important;
+    }
+    .glass-btn-wrap { position: relative; padding: 12px; }
+  }
   // Remove focus borders
   .item-inner { border-bottom: none !important; }
   .item-md.item-input.input-has-focus .item-inner { border-bottom-color: transparent !important; box-shadow: none !important; }
