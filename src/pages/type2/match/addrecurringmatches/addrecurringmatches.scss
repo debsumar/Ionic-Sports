@@ -1,4 +1,6 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
 page-addrecurringmatches {
+  @include android-sdk35-fixes;
   .scroll-content {
     background-color: #f8fafc !important;
   }
