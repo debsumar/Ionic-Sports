@@ -529,14 +529,15 @@ export class CreateteamPage {
         const restPayload = {
           parentclubId: this.parentClubTeamCreationInput.user_postgre_metadata.UserParentClubId,
           clubId: club.Id,
-          activityId: '',
-          memberId: '',
+          activityId: this.navParams.get('activityId') || '',
+          memberId: this.sharedservice.getLoggedInId() || '',
           action_type: 0,
           device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
           app_type: AppType.ADMIN_NEW,
           device_id: '',
-          updated_by: '',
-          activityCode: this.parentClubTeamCreationInput.teamDetails.activityCode,
+          updated_by: this.sharedservice.getLoggedInId() || '',
+          created_by: this.sharedservice.getLoggedInId() || '',
+          activityCode: String(this.parentClubTeamCreationInput.teamDetails.activityCode),
           venueKey: this.selectedClub,
           venueType: this.parentClubTeamCreationInput.teamDetails.venueType,
           ageGroup: this.parentClubTeamCreationInput.teamDetails.ageGroup,
@@ -555,6 +556,8 @@ export class CreateteamPage {
           const message = "Team created successfully";
           this.events.publish('team:refresh');
           this.commonService.toastMessage(message, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+          const onTeamCreated = this.navParams.get('onTeamCreated');
+          if (onTeamCreated) onTeamCreated();
           this.navCtrl.pop();
         }, (error) => {
           this.commonService.hideLoader();

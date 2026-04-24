@@ -1,0 +1,41 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>Availability</ion-title>
+    </ion-navbar>
+</ion-header>
+
+<ion-content [ngClass]="{'light-theme': !isDarkTheme}">
+    <app-pill-tabs
+        leftLabel="Date" rightLabel="Individual"
+        leftIcon="calendar" rightIcon="person"
+        [(activeIndex)]="activeIndex"
+        (activeIndexChange)="changeType($event)">
+    </app-pill-tabs>
+
+    <ion-row *ngIf="activeIndex===0" style="height: 100%">
+        <ion-col>
+            <page-newviewcourt></page-newviewcourt>
+        </ion-col>
+    </ion-row>
+    <ion-row *ngIf="activeIndex===1" style="height:100%">
+        <ion-col>
+            <page-viewcourt></page-viewcourt>
+        </ion-col>
+    </ion-row>
+</ion-content>
+
+<ion-fab mini right bottom #fab *ngIf="activeIndex === 0">
+    <button ion-fab mini class="fav-ico" style="background-color: #2b92bb;">
+        <ion-icon name="add"></ion-icon>
+    </button>
+    <ion-fab-list side="top">
+        <p class="fabEmailText" (click)="GotoSlide(1)">Recurring Booking</p>
+        <button style="background-color: #2b92bb; color:white" ion-fab class="fabTop" (click)="GotoSlide(1)">
+            <ion-icon name="ios-create-outline"></ion-icon>
+        </button>
+        <p class="fabEmailText" style="margin-left: -153px;" (click)="GotoSlide(2)">Active Booking</p>
+        <button style="background-color: #2b92bb; color:white" ion-fab class="fabTop" (click)="GotoSlide(2)">
+            <ion-icon name="ios-create-outline"></ion-icon>
+        </button>
+    </ion-fab-list>
+</ion-fab>

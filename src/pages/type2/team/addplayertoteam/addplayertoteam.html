@@ -26,9 +26,8 @@
             <span class="player-tag existing" *ngIf="member.isAlreadyExisted">Already Added</span>
           </div>
           <ion-checkbox
-            [(ngModel)]="member.isSelected"
-            [disabled]="member.isAlreadyExisted"
-            (ionChange)="selectMembers(member)">
+            [checked]="member.isSelected"
+            [disabled]="member.isAlreadyExisted">
           </ion-checkbox>
         </div>
       </app-list-card>
@@ -38,12 +37,13 @@
         <p class="empty-text">No players found</p>
       </div>
 
-      <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="venus_user_input.search_term==''">
-        <ion-infinite-scroll-content loadingSpinner="crescent"
-          loadingText="Loading more data..."></ion-infinite-scroll-content>
-      </ion-infinite-scroll>
     </div>
   </div>
+
+  <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="venus_user_input.search_term==''">
+    <ion-infinite-scroll-content loadingSpinner="crescent"
+      loadingText="Loading more data..."></ion-infinite-scroll-content>
+  </ion-infinite-scroll>
 
   <app-glass-button label="Add Player" (btnClick)="savePlayers()"></app-glass-button>
 </ion-content>

@@ -10,7 +10,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
   `,
   styles: [`
     .glass-btn-wrap {
-      position: sticky; bottom: 0; padding: 12px; z-index: 10;
+      position: sticky; bottom: 0; padding: 12px; padding-bottom: calc(12px + env(safe-area-inset-bottom, 16px)); z-index: 10;
     }
     .glass-btn {
       width: 100%; height: 48px; border: none; border-radius: 8px;

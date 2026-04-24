@@ -16,6 +16,7 @@ import { HttpService } from '../../../../../services/http.service';
 import { API } from '../../../../../shared/constants/api_constants';
 import { GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto, ClubVenueDto } from '../../../../../shared/dtos/club.dto';
 import { AppType } from '../../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../../services/theme.service';
 /**
  * Generated class for the ViewcourtPage page.
  *
@@ -63,10 +64,10 @@ export class NewViewcourtPage {
     { court: 'Polymeric', key: '5' },
     { court: 'SyntheticTurf', key: '6' },
     { court: 'Carpet', key: '7' },
-    { court: 'Acrylic', key: '9' },
-    { court: 'Poraflex', key: '10' },
-    { court: 'Tarmac', key: '11' },
-    { court: 'Others', key: '8' },
+    { court:'Acrylic', key:'9' },
+    { court:'Poraflex', key:'10' },
+    { court:'Tarmac', key:'11' },
+    {court:'Others', key:'8'},
   ]
   isMember = true;
   bookingDetails: any;
@@ -80,15 +81,16 @@ export class NewViewcourtPage {
   isTable = false
   Name: any;
   userKey: any;
-  roleType: number;
+  roleType:number;
   private isLoadingSlots: boolean = false; // Flag to prevent multiple simultaneous calls
-  constructor(public sharedService: SharedServices, public events: Events,
+  isDarkTheme: boolean = false;
+  constructor(public sharedService: SharedServices, public events: Events, 
     public ngZone: NgZone, public alertCtrl: AlertController, public actionSheetCtrl: ActionSheetController,
-    public toastCtrl: ToastController, public navCtrl: NavController, public navParams: NavParams, public fb: FirebaseService,
-    public storage: Storage, public commonService: CommonService, public http: HttpClient, public loadingCtrl: LoadingController, private httpService: HttpService) {
+     public toastCtrl: ToastController, public navCtrl: NavController, public navParams: NavParams, public fb: FirebaseService, 
+     public storage: Storage, public commonService: CommonService, public http: HttpClient, public loadingCtrl: LoadingController, private httpService: HttpService, private themeService: ThemeService) {
     //  this.events.subscribe('updateScreen', () => {
     //    this.ngZone.run(() => {
-
+   
 
     //    });
     //  });
@@ -111,10 +113,10 @@ export class NewViewcourtPage {
           }
           else if (val.IsSchoolMember) {
             this.isMember = false;
-            this.memberType = "SchoolMember";
+            this.memberType = "SchoolMember";  
           }
           break;
-        }
+        }   
         this.nestUrl = this.sharedService.getnestURL()
         this.getClubDetails();
         // this.events.subscribe('reload', (load) => {
@@ -132,12 +134,47 @@ export class NewViewcourtPage {
       this.currencyDetails = JSON.parse(val);
     }).catch(error => {
     });
-
-
+    
+    
   }
 
-  ngOnInit() {
+  ngOnInit(){
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+  }
 
+  ionViewWillEnter() {
+    this.loadTheme();
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme(true);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const el = document.querySelector("page-newviewcourt");
+    if (el) {
+      isDark ? el.classList.remove("light-theme") : el.classList.add("light-theme");
+      isDark ? document.body.classList.remove("light-theme") : document.body.classList.add("light-theme");
+    }
   }
 
 
@@ -147,14 +184,14 @@ export class NewViewcourtPage {
 
   //async getClubDetails() {
 
-  // this.fb.getAllWithQuery("/Club/Type2/" + this.parentClubKey, { orderByChild: "IsEnable", equalTo: true }).subscribe((data) => {
-  //   this.clubs = data;
-  //   if (data.length != 0) {
-  //     this.selectedClubKey = this.clubs[0].$key;
-  //     this.getAllActivity();
-  //   }
-  // });
-
+    // this.fb.getAllWithQuery("/Club/Type2/" + this.parentClubKey, { orderByChild: "IsEnable", equalTo: true }).subscribe((data) => {
+    //   this.clubs = data;
+    //   if (data.length != 0) {
+    //     this.selectedClubKey = this.clubs[0].$key;
+    //     this.getAllActivity();
+    //   }
+    // });
+   
   //}
   getAllActivity() {
     this.fb.getAll("/Activity/" + this.parentClubKey + "/" + this.selectedClubKey + "/").subscribe((data) => {
@@ -209,7 +246,7 @@ export class NewViewcourtPage {
     if (this.isLoadingSlots) {
       return;
     }
-
+    
     this.isLoadingSlots = true;
     this.loading = this.loadingCtrl.create({
       content: 'Please wait...'
@@ -237,11 +274,11 @@ export class NewViewcourtPage {
           startDate: startDate,
           endDate: endDate
         };
-
+        
         this.httpService.get(API.GET_MULTI_COURT_SLOT, params, null, 1).subscribe({
           next: (response) => {
             if (this.loading) {
-              this.loading.dismiss().catch(() => { });
+              this.loading.dismiss().catch(() => {});
             }
             if (response['data']['bookingDetails']) {
               this.bookingDetails = response['data']['bookingDetails']
@@ -258,7 +295,7 @@ export class NewViewcourtPage {
           },
           error: (err) => {
             if (this.loading) {
-              this.loading.dismiss().catch(() => { });
+              this.loading.dismiss().catch(() => {});
             }
             rej(err)
           }
@@ -266,7 +303,7 @@ export class NewViewcourtPage {
       } catch (err) {
         rej(err)
         if (this.loading) {
-          this.loading.dismiss().catch(() => { });
+          this.loading.dismiss().catch(() => {});
         }
       }
     })
@@ -439,9 +476,9 @@ export class NewViewcourtPage {
       clubKey: this.selectedClubKey,
       activityKey: this.selectedActivity,
       amount: this.totalPrice,
-      allcourt: this.courts,
+      allcourt: this.courts,  
       Email: this.Email,
-      Name: this.Name,
+      Name : this.Name,
       userKey: this.userKey,
       courtSelected: this.courtSelected,
       date: this.dmmmyyyformatDtae,
@@ -503,7 +540,7 @@ export class NewViewcourtPage {
           memberKey: 'admin',
           amount: this.totalPrice
         })
-
+        
         this.httpService.post(API.BOOK_FOR_ADMIN, paymentDEtails, null, 1).subscribe({
           next: (res) => {
             this.loading.dismiss()
@@ -527,15 +564,15 @@ export class NewViewcourtPage {
     let clubIndex = this.clubs.findIndex(club => club.FirebaseId === this.selectedClubKey);
     let selectedClub = this.clubs[clubIndex].ClubName;
     this.navCtrl.push('ActiveBookingDetail',
-      {
-        ParentClubKey: this.parentClubKey,
-        selectedClub: selectedClub,
-        ClubKey: slideInfo.courtInfo['ClubKey'],
-        courtInfoObj: slideInfo.courtInfo,
-        selectedCourt: slideInfo.courtInfo,
-        slotInfo: slot,
-        fromnewviewpage: true
-      });
+    {
+      ParentClubKey :  this.parentClubKey,
+      selectedClub : selectedClub,
+      ClubKey  : slideInfo.courtInfo['ClubKey'],
+      courtInfoObj : slideInfo.courtInfo,
+      selectedCourt : slideInfo.courtInfo,
+      slotInfo : slot,
+      fromnewviewpage: true
+    });  
 
   }
 

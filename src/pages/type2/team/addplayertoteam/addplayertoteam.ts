@@ -207,10 +207,7 @@ export class Addplayertoteam {
 
   doInfinite(infiniteScroll) {
     this.venus_user_input.offset += this.venus_user_input.limit;
-    this.getMembersData();
-    setTimeout(() => {
-      infiniteScroll.complete();
-    }, 300);
+    this.getMembersData(infiniteScroll);
   }
 
   getFilterItems(ev: any) {
@@ -235,6 +232,7 @@ export class Addplayertoteam {
     if (this.selectedMembersSet.has(member.Id)) {
       // 🗑️ Remove member
       this.selectedMembersSet.delete(member.Id);
+      member.isSelected = false;
       const memberIndex = this.teamMembersInput.members.findIndex(m => m.memberKey === member.Id);
       if (memberIndex > -1) {
         this.teamMembersInput.members.splice(memberIndex, 1);
@@ -242,6 +240,7 @@ export class Addplayertoteam {
     } else {
       // ➕ Add member
       this.selectedMembersSet.add(member.Id);
+      member.isSelected = true;
       this.teamMembersInput.members.push({ roleId: this.DEFAULT_ROLE_ID, memberKey: member.Id });
     }
   }
@@ -283,7 +282,7 @@ export class Addplayertoteam {
   }
 
 
-  getMembersData() {
+  getMembersData(infiniteScroll?) {
 
     const userQuery = gql`
     query getAllMembersByParentClubNMemberType($list_input: UsersListInput!) {
@@ -314,18 +313,25 @@ export class Addplayertoteam {
       { list_input: this.venus_user_input },
       0
     ).subscribe(({ data }) => {
-      this.members = [];
-      if (data["getAllMembersByParentClubNMemberType"].length > 0) {
-        this.members = data["getAllMembersByParentClubNMemberType"].map((member: UsersModel) => ({
+      const newMembers = data["getAllMembersByParentClubNMemberType"] || [];
+      if (newMembers.length > 0) {
+        this.members = newMembers.map((member: UsersModel) => ({
           ...member,
           isSelected: this.selectedMembersSet.has(member.Id) || this.existingPlayersSet.has(member.Id),
           isAlreadyExisted: this.existingPlayersSet.has(member.Id)
         }));
         this.filteredMembers.push(...this.members);
       }
+      if (infiniteScroll) {
+        infiniteScroll.complete();
+        if (newMembers.length < this.venus_user_input.limit) {
+          infiniteScroll.enable(false);
+        }
+      }
       this.updateMemberStates();
     },
       (error) => {
+        if (infiniteScroll) { infiniteScroll.complete(); }
         this.handleError(error, "Failed to fetch members data");
       }
     );

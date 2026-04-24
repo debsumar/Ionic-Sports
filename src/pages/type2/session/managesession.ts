@@ -316,7 +316,7 @@ export class Type2ManageSession {
       .then((val) => {
         this.currencyDetails = JSON.parse(val);
       })
-      .catch((error) => { });
+      .catch((error) => {});
   }
 
   ionViewDidLoad() {
@@ -431,7 +431,7 @@ export class Type2ManageSession {
       this.sessionListingInput.PostgresFields.PostgresClubId =
         this.selectedClub.toLowerCase() != "all"
           ? this.clubs.filter((club) => club.FirebaseId == this.selectedClub)[0]
-            .Id
+              .Id
           : "";
     }
 
@@ -1049,13 +1049,13 @@ export class Type2ManageSession {
                           (res[j][key].PaymentSetup[l].PaymentGatewayName ==
                             "RealEx" ||
                             res[j][key].PaymentSetup[l].PaymentGatewayName ==
-                            "StripeConnect" ||
+                              "StripeConnect" ||
                             res[j][key].PaymentSetup[l].PaymentGatewayName ==
-                            "paytm" ||
+                              "paytm" ||
                             res[j][key].PaymentSetup[l].PaymentGatewayName ==
-                            "Stripe") &&
+                              "Stripe") &&
                           res[j][key].PaymentSetup[l].SetupType ==
-                          "Session Management"
+                            "Session Management"
                         ) {
                           console.log("matched");
                           console.log(
@@ -1451,8 +1451,8 @@ export class Type2ManageSession {
         this.sessionListingInput.PostgresFields.PostgresClubId =
           this.selectedClub.toLowerCase() != "all"
             ? this.clubs.filter(
-              (club) => club.FirebaseId == this.selectedClub
-            )[0].Id
+                (club) => club.FirebaseId == this.selectedClub
+              )[0].Id
             : "";
         if (this.loggedin_type != 4) {
           this.sessionListingInput.PostgresFields.PostgresCoachId =
@@ -1471,8 +1471,8 @@ export class Type2ManageSession {
         this.weeklySessionListingInput.PostgresFields.PostgresClubId =
           this.selectedClub.toLowerCase() != "all"
             ? this.clubs.filter(
-              (club) => club.FirebaseId == this.selectedClub
-            )[0].Id
+                (club) => club.FirebaseId == this.selectedClub
+              )[0].Id
             : "";
         const club = this.clubs.filter(
           (club) => club.FirebaseId === this.selectedClub
@@ -1494,8 +1494,8 @@ export class Type2ManageSession {
         this.sessionListingInput.PostgresFields.PostgresClubId =
           this.selectedClub.toLowerCase() != "all"
             ? this.clubs.filter(
-              (club) => club.FirebaseId == this.selectedClub
-            )[0].Id
+                (club) => club.FirebaseId == this.selectedClub
+              )[0].Id
             : "";
         if (this.loggedin_type != 4) {
           this.sessionListingInput.PostgresFields.PostgresCoachId =
@@ -1526,8 +1526,8 @@ export class Type2ManageSession {
         this.sessionListingInput.PostgresFields.PostgresClubId =
           this.selectedClub.toLowerCase() != "all"
             ? this.clubs.filter(
-              (club) => club.FirebaseId == this.selectedClub
-            )[0].Id
+                (club) => club.FirebaseId == this.selectedClub
+              )[0].Id
             : "";
         if (this.loggedin_type != 4) {
           this.sessionListingInput.PostgresFields.PostgresCoachId =

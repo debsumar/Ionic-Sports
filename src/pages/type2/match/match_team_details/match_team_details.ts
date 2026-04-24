@@ -676,7 +676,7 @@ export class MatchTeamDetailsPage {
       }
     } else if (action === 'create_external') {
       this.commonService.commonAlert_V4('External Team', 'You are about to create an external team. Do you want to continue?', 'Yes:Continue', 'No', () => {
-        this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode });
+        this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode, onTeamCreated: () => { this.getActivitySpecificTeamInput.isExternal = false; this.getActivitySpecificTeam(); } });
       });
     }
   }
@@ -923,6 +923,7 @@ export class MatchTeamDetailsPage {
 
           // Only refresh data if we're on the tab that was just updated
           const shouldRefresh = (isHomeTeam && this.activeType) || (!isHomeTeam && !this.activeType);
+          this.events.publish('match:refresh');
           if (shouldRefresh) {
             this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
           }

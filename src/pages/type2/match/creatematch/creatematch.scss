@@ -244,6 +244,14 @@ page-creatematch {
       &.selected { background: #2b92bb; color: #fff; border-color: #2b92bb; }
     }
 
+    ion-footer {
+      background: #0f172a !important;
+
+      .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+        background: #0f172a !important;
+      }
+    }
+
     .access-pill {
       background-color: #334155;
     }
@@ -381,12 +389,24 @@ page-creatematch {
     }
   }
 
-  // CREATE BUTTON — STICKY FLOAT
-  .create-btn-wrap {
-    position: sticky;
-    bottom: 0;
-    padding: 12px;
-    z-index: 10;
+  ion-footer {
+    background: #f8fafc !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    &::before, &::after {
+      display: none !important;
+    }
+
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #f8fafc !important;
+      border: none !important;
+    }
+
+    .glass-btn-wrap {
+      position: relative;
+      padding: 12px;
+    }
   }
 
   .btn-gradient-shine {
