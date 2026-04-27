@@ -25,7 +25,7 @@
             <div class="card-info">
               <h3 class="card-title">{{match.Date}}</h3>
               <p class="card-subtitle">{{match.MatchTitle}}</p>
-              <p class="card-activity">{{match.ActivityName}}</p>
+              <p class="card-activity">{{match.ActivityName}} <span class="round-type-text" *ngIf="match.Round">{{match.Round}}</span></p>
             </div>
           </div>
           <div class="card-divider"></div>
@@ -50,7 +50,6 @@
           <div class="card-divider"></div>
           <div class="card-footer">
             <span class="tag type-tag" [style.background]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))">{{getMatchTypeName(match.MatchType)}}</span>
-            <span class="tag round-type-tag" *ngIf="match.Round">{{match.Round}}</span>
             <div class="footer-center">
               <span class="footer-status" [class.published]="match.ResultStatus == 1">
                 <ion-icon [name]="match.ResultStatus == 1 ? 'checkmark-circle' : 'time'"></ion-icon>

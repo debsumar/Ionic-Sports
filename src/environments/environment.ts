@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   email_url: "http://54.84.255.41:8121/",
   //emailUrl: "http://localhost:32683/";
   node_url: "https://activitypro-node.appspot.com",

@@ -79,9 +79,16 @@ page-addrecurringmatches {
     &.selected { background: #2b92bb; color: #fff; border-color: #2b92bb; }
   }
 
+  .recurring-hint {
+    padding: 4px 16px 8px; margin: 0; font-size: 12px; color: #64748b; font-weight: 400;
+    strong { font-weight: 700; color: #2b92bb; }
+  }
+
   // DARK THEME
   &:not(.light-theme) {
     .scroll-content { background-color: #0f172a !important; }
+
+    .recurring-hint { color: #94a3b8; strong { color: #3fbcd3; } }
 
     ion-item {
       background-color: #1e293b !important;

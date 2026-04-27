@@ -131,8 +131,8 @@ page-matchhistory {
     display: flex; align-items: center; gap: 4px; margin-top: 2px;
     .venue-icon { font-size: 13px; color: #3fbcd3; flex-shrink: 0; }
     .venue-text {
-      font-size: 11px; font-weight: 400; color: #64748b;
-      text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px;
+      font-size: 11px; font-weight: 500; color: #64748b;
+      text-decoration: none;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
   }

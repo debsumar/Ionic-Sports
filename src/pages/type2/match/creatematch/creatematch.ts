@@ -52,8 +52,7 @@ export class CreatematchPage {
   currency: string;
   isRecurring: boolean = false;
   recurringUntilWhen: string = moment().add(1, 'week').format('YYYY-MM-DD');
-  recurringDays: string[] = [];
-  allDays: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  
 
   roundTypeInput: RoundTypeInput = {
     parentclubId: '',
@@ -285,13 +284,8 @@ export class CreatematchPage {
     this.createMatchInput.MatchPaymentType = isChecked ? 1 : 0;
   }
 
-  toggleDay(day: string) {
-    const i = this.recurringDays.indexOf(day);
-    i > -1 ? this.recurringDays.splice(i, 1) : this.recurringDays.push(day);
-  }
-
-  isDaySelected(day: string): boolean {
-    return this.recurringDays.indexOf(day) > -1;
+  getRecurringDayName(): string {
+    return moment(this.startDate).format('dddd');
   }
 
   getListOfClub() {
@@ -392,10 +386,6 @@ export class CreatematchPage {
       this.commonService.toastMessage("Select until when date", 2500, ToastMessageType.Error);
       return false;
     }
-    else if (this.isRecurring && this.recurringDays.length === 0) {
-      this.commonService.toastMessage("Select at least one day", 2500, ToastMessageType.Error);
-      return false;
-    }
     else if (this.isRecurring && moment(this.recurringUntilWhen).isSameOrBefore(moment(this.startDate))) {
       this.commonService.toastMessage("Until when must be after start date", 2500, ToastMessageType.Error);
       return false;
@@ -476,7 +466,6 @@ export class CreatematchPage {
 
         if (this.isRecurring) {
           restPayload['untilWhen'] = moment(this.recurringUntilWhen).format("YYYY-MM-DD");
-          restPayload['days'] = this.recurringDays;
         }
 
         const apiUrl = this.isRecurring ? API.CREATE_RECURRING_MATCHES : API.CREATE_MATCH;

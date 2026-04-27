@@ -180,7 +180,7 @@
               <div class="card-info">
                 <h3 class="card-title">{{mat.start_date}}</h3>
                 <p class="card-subtitle">{{mat.match_title}}</p>
-                <p class="card-activity">{{individualLeague?.activity?.ActivityName}}</p>
+                <p class="card-activity">{{individualLeague?.activity?.ActivityName}} <span class="round-type-text" *ngIf="mat.formatted_round">{{mat.formatted_round}}</span></p>
               </div>
             </div>
             <div class="card-divider"></div>
@@ -209,7 +209,6 @@
               <span class="tag type-tag" [style.background]="mat.ResultStatus == 1 ? '#10b981' : '#f59e0b'">
                 {{mat.ResultStatus == 1 ? 'Completed' : 'Upcoming'}}
               </span>
-              <span class="round-badge" *ngIf="mat.formatted_round">{{mat.formatted_round}}</span>
               <span class="footer-status" [class.published]="mat.ResultStatus == 1">
                 <ion-icon [name]="mat.ResultStatus == 1 ? 'checkmark-circle' : 'time'"></ion-icon>
                 {{mat.ResultStatus == 1 ? mat.result_status_text : 'Result Pending'}}

@@ -163,16 +163,16 @@ page-leaguedetails {
     .card-icon { font-size: 18px; color: #fff; }
   }
   .match-badges-inline { display: flex; gap: 6px; flex-shrink: 0; }
-  .round-badge {
-    background: #334155; color: #94a3b8; padding: 2px 6px;
-    border-radius: 4px; font-size: 10px; font-weight: 500;
-  }
+  .round-badge { display: none; }
   .payment-badge {
     padding: 2px 6px; border-radius: 4px; font-size: 10px; font-weight: 600;
     &.paid { background: #2b92bb; color: #fff; }
     &.free { background: #f59e0b; color: #fff; }
   }
-  .card-activity { font-size: 10px; font-weight: 600; color: #3fbcd3; margin: 1px 0 0; letter-spacing: 0.2px; }
+  .card-activity {
+    display: flex; align-items: center; font-size: 10px; font-weight: 600; color: #3fbcd3; margin: 1px 0 0; letter-spacing: 0.2px;
+    .round-type-text { margin-left: auto; font-size: 9px; font-weight: 600; color: #3fbcd3; text-transform: uppercase; letter-spacing: 0.3px; }
+  }
   .scoreboard {
     display: flex; align-items: center; padding: 4px 0;
     .sb-team { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0;
@@ -194,8 +194,8 @@ page-leaguedetails {
   .card-venue-footer {
     display: flex; align-items: center; gap: 4px; margin-top: 2px;
     .venue-icon { font-size: 13px; color: #3fbcd3; flex-shrink: 0; }
-    .venue-text { font-size: 11px; font-weight: 400; color: #64748b;
-      text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px;
+    .venue-text { font-size: 11px; font-weight: 500; color: #64748b;
+      text-decoration: none;
       overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
     }
   }
@@ -319,7 +319,7 @@ page-leaguedetails {
     .scoreboard { .sb-name { color: #1e293b; } .sb-vs { background: #cbd5e1; color: #1e293b; } .sb-score { color: #1e293b; } }
     .card-venue-footer { .venue-icon { color: #94a3b8; } .venue-text { color: #94a3b8; } }
     .footer-right { color: #94a3b8; }
-    .round-badge { background: #e2e8f0; color: #64748b; }
+    .round-badge { display: none; }
     .match-icon-wrapper { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.08);
       .card-icon { color: #475569; }
     }

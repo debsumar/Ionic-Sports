@@ -36,7 +36,8 @@
       </ion-item>
     </app-form-field>
 
-    <app-map-picker [address]="mapLocationAddress" [lat]="mapLocationLat" [lng]="mapLocationLng" (locationSelected)="onMapLocationSelected($event)"></app-map-picker>
+    <app-map-picker [address]="mapLocationAddress" [lat]="mapLocationLat" [lng]="mapLocationLng"
+      (locationSelected)="onMapLocationSelected($event)"></app-map-picker>
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
@@ -76,7 +77,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Date</ion-label>
+        <ion-label>Start Date</ion-label>
         <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="startDate"
           [max]="maxDate"></ion-datetime>
       </ion-item>
@@ -92,7 +93,7 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-        <ion-label>Duration <span class="optional-tag">(Optional)</span></ion-label>
+        <ion-label>Duration</ion-label>
         <ion-select [(ngModel)]="selectedDuration" placeholder="Select duration">
           <ion-option *ngFor="let d of durations" [value]="d.id">{{d.duration}} mins</ion-option>
         </ion-select>
@@ -124,13 +125,12 @@
     <app-expandable-section label="RECURRING" [(expanded)]="isRecurring">
       <ion-item>
         <ion-label>Until When</ion-label>
-        <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY"
-          [(ngModel)]="recurringUntilWhen" [min]="startDate" [max]="maxDate"></ion-datetime>
+        <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="recurringUntilWhen"
+          [min]="startDate" [max]="maxDate"></ion-datetime>
       </ion-item>
-      <div class="day-chips">
-        <button *ngFor="let day of allDays" class="day-chip"
-          [class.selected]="isDaySelected(day)" (click)="toggleDay(day)">{{day.substring(0,3)}}</button>
-      </div>
+      <p class="recurring-hint" *ngIf="recurringUntilWhen">
+        Match will be created every week on <strong>{{getRecurringDayName()}}</strong> until <strong>{{recurringUntilWhen | date:'dd MMM yyyy'}}</strong>
+      </p>
     </app-expandable-section>
 
     <app-form-field [isDark]="isDarkTheme">

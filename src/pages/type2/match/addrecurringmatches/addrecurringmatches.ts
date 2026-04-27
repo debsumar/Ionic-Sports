@@ -62,6 +62,10 @@ export class AddrecurringmatchesPage {
     }
   }
 
+  getRecurringDayName(): string {
+    return moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm").format('dddd');
+  }
+
   createRecurringMatches() {
     if (!this.untilWhen) {
       this.commonService.toastMessage("Select until when date", 2500, ToastMessageType.Error);

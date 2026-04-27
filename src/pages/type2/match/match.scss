@@ -57,7 +57,6 @@ page-match {
     .vs-badge { background: #e2e8f0 !important; color: #64748b !important; }
     .footer-status { color: #d97706; &.published { color: #059669; } }
     .tag.type-tag { color: #fff; }
-    .tag.round-type-tag { background: rgba(124, 58, 237, 0.1); color: #7c3aed; border: 1px solid rgba(124, 58, 237, 0.25); }
 
     .modern-empty-state {
       .empty-icon { color: #cbd5e1; }
@@ -130,7 +129,10 @@ page-match {
       font-size: 11px; font-weight: 500; line-height: 1.2; letter-spacing: 0.1px;
       color: #94a3b8; margin: 0;
     }
-    .card-activity { font-size: 10px; font-weight: 600; color: #3fbcd3; margin: 1px 0 0; letter-spacing: 0.2px; }
+    .card-activity {
+      display: flex; align-items: center; font-size: 10px; font-weight: 600; color: #3fbcd3; margin: 1px 0 0; letter-spacing: 0.2px;
+      .round-type-text { margin-left: auto; font-size: 9px; font-weight: 600; color: #3fbcd3; text-transform: uppercase; letter-spacing: 0.3px; }
+    }
   }
 
   .card-chevron { font-size: 16px; color: #475569; flex-shrink: 0; }
@@ -200,8 +202,8 @@ page-match {
       backdrop-filter: none; -webkit-backdrop-filter: none;
     }
     .mp-icon { font-size: 13px; color: #3fbcd3; }
-    .mp-text { font-size: 11px; font-weight: 400; color: #64748b; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
-    .mp-text.mp-selected { color: #64748b; font-weight: 400; text-decoration: underline; text-decoration-style: dotted; text-underline-offset: 2px; }
+    .mp-text { font-size: 11px; font-weight: 500; color: #64748b; text-decoration: none !important; white-space: normal !important; }
+    .mp-text.mp-selected { color: #64748b; font-weight: 500; text-decoration: none !important; white-space: normal !important; }
     .mp-chevron { display: none; }
   }
   .footer-right { display: flex; align-items: center; gap: 8px; }
@@ -223,7 +225,6 @@ page-match {
     font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; line-height: 1.4;
   }
   .tag.type-tag { color: #fff; }
-  .tag.round-type-tag { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139, 92, 246, 0.3); }
   .lineup-btn {
     background: linear-gradient(135deg, #2b92bb, #1e6c8c) !important;
     color: #fff; font-size: 10px; font-weight: 700; text-transform: uppercase;
