@@ -25,6 +25,9 @@
         <div header-actions>
           <button class="action-btn" (click)="gotoEditLeague()"><ion-icon name="create"></ion-icon></button>
           <button class="action-btn danger" (click)="removeLeague()"><ion-icon name="trash"></ion-icon></button>
+          <button *ngIf="individualLeague?.league_type_text !== 'Team'"class="action-btn danger" (click)="sendEmailToGroup()">
+            <ion-icon name="mail"></ion-icon>
+          </button>
         </div>
       </app-detail-header>
 
@@ -157,7 +160,7 @@
                 </div>
               </div>
               <div class="p-detail-row">
-                <span class="p-detail"><ion-icon name="calendar"></ion-icon> {{calculateAge(participant.participant_details.dob)}} Yrs</span>
+                <span class="p-detail"><ion-icon name="calendar"></ion-icon> {{participant.participant_details.dob}} Yrs</span>
                 <img src="assets/images/protection.svg" class="medical-icon"
                   *ngIf="!this.inclusionSet.has(participant.participant_details.medical_condition)">
                 <img src="assets/images/no_camere2.jpeg" class="media-icon"
