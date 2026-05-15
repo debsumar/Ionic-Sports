@@ -405,7 +405,7 @@
                 </div>
               </div>
               <div class="p-detail-row">
-                <span class="p-detail"><ion-icon name="calendar"></ion-icon> {{calculateAge(participant.participant_details.dob)}} Yrs</span>
+                <span class="p-detail"><ion-icon name="calendar"></ion-icon> {{participant.participant_details.dob}} Yrs</span>
                 <img src="assets/images/protection.svg" class="medical-icon"
                   *ngIf="!this.inclusionSet.has(participant.participant_details.medical_condition)">
                 <img src="assets/images/no_camere2.jpeg" class="media-icon"

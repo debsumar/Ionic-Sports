@@ -55,6 +55,12 @@ page-matchinviteplayers {
     .empty-text { font-size: 14px; color: #64748b; margin: 0; }
   }
 
+  .loading-more {
+    display: flex; align-items: center; justify-content: center; gap: 8px; padding: 16px;
+    color: #64748b; font-size: 13px;
+    ion-spinner { color: #2b92bb; }
+  }
+
   &.light-theme {
     ion-navbar { background: #f8fafc !important;
       .toolbar-background { background: #f8fafc !important; }

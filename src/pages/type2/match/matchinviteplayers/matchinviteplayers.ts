@@ -100,13 +100,14 @@ export class MatchinviteplayersPage {
     ).subscribe(search_term => {
       this.venus_user_input.offset = 0;
       this.venus_user_input.limit = 18;
+      this.filteredMembers = [];
 
       if (search_term) {
         this.venus_user_input.search_term = search_term != '' && search_term.length > 2 ? search_term.replace(/ /g, '') : '';
       } else {
         this.venus_user_input.search_term = '';
       }
-      this.getParentClubAPPlusUsers();
+      this.getParentClubAPPlusUsers(2);
     })
 
 
@@ -128,7 +129,7 @@ export class MatchinviteplayersPage {
       this.invitationInput.InvitedBy = "476fd04d-4d42-42d4-865d-331c12a2a418";
       this.venus_user_input.parentclub_id = postgre_parentclub.Id;
       this.invitationInput.ParentClubId = postgre_parentclub.Id;
-      this.getParentClubAPPlusUsers()//first time call to get users
+      this.getParentClubAPPlusUsers(1)//first time call to get users
     }
   }
 
@@ -163,12 +164,24 @@ export class MatchinviteplayersPage {
     }
   }
 
+  isLoadingMore: boolean = false;
+
   doInfinite(infiniteScroll) {
     this.venus_user_input.offset += this.venus_user_input.limit;
-    this.getParentClubAPPlusUsers();
+    this.getParentClubAPPlusUsers(1);
     setTimeout(() => {
       infiniteScroll.complete();
     }, 300);
+  }
+
+  onScroll(event: any) {
+    if (this.search_term !== '' || this.isLoadingMore) return;
+    const el = event.target;
+    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
+      this.isLoadingMore = true;
+      this.venus_user_input.offset += this.venus_user_input.limit;
+      this.getParentClubAPPlusUsers(1);
+    }
   }
 
 
@@ -183,6 +196,7 @@ export class MatchinviteplayersPage {
 
   getFilterItems(ev: any) {
     const searchTerm = ev.target.value;
+    this.search_term = searchTerm;
     this.searchTerms.next(searchTerm);
   }
 
@@ -240,7 +254,7 @@ export class MatchinviteplayersPage {
 
   }
 
-  getParentClubAPPlusUsers() {
+  getParentClubAPPlusUsers(type: number) {
 
     this.commonService.showLoader("Fetching users...");
     const userQuery = gql`
@@ -267,8 +281,12 @@ export class MatchinviteplayersPage {
           }));
         }
 
-
-        this.filteredMembers = [...this.filteredMembers, ...JSON.parse(JSON.stringify(this.members))];
+        if (type === 2) {
+          this.filteredMembers = JSON.parse(JSON.stringify(this.members));
+        } else {
+          this.filteredMembers = [...this.filteredMembers, ...JSON.parse(JSON.stringify(this.members))];
+        }
+        this.isLoadingMore = false;
 
         this.checkForExistingUsers();
         // this.members = res.data.getAllMembersByParentClubNMemberType as MembersModel[];
@@ -299,6 +317,7 @@ export class MatchinviteplayersPage {
       },
       (error) => {
         this.commonService.hideLoader();
+        this.isLoadingMore = false;
         this.commonService.toastMessage("Fetching failed for member", 2500, ToastMessageType.Error);
         console.error("Error in fetching:", error);
         if (error.graphQLErrors) {
