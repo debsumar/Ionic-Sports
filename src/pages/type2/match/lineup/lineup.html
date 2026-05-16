@@ -224,9 +224,12 @@
         </div>
     </div>
 
-    <app-glass-button label="Save" (btnClick)="save()"></app-glass-button>
-
 </ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <app-glass-button label="Save" (btnClick)="save()"></app-glass-button>
+</ion-footer>
+
 
 <!-- Modals Overlay Section -->
 <div class="modals-overlay" *ngIf="showPlayerSelection || showPlayerOptions" (click)="closeAllDropdowns()">

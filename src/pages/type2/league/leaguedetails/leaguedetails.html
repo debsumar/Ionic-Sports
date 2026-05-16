@@ -160,7 +160,7 @@
                 </div>
               </div>
               <div class="p-detail-row">
-                <span class="p-detail"><ion-icon name="calendar"></ion-icon> {{participant.participant_details.dob}} Yrs</span>
+                <span class="p-detail"><ion-icon name="calendar"></ion-icon> {{calculateAge(participant.participant_details.dob)}} Yrs</span>
                 <img src="assets/images/protection.svg" class="medical-icon"
                   *ngIf="!this.inclusionSet.has(participant.participant_details.medical_condition)">
                 <img src="assets/images/no_camere2.jpeg" class="media-icon"
@@ -212,6 +212,7 @@
               <span class="tag type-tag" [style.background]="mat.ResultStatus == 1 ? '#10b981' : '#f59e0b'">
                 {{mat.ResultStatus == 1 ? 'Completed' : 'Upcoming'}}
               </span>
+              <!-- <span class="round-badge" *ngIf="mat.formatted_round">{{mat.formatted_round}}</span> -->
               <span class="footer-status" [class.published]="mat.ResultStatus == 1">
                 <ion-icon [name]="mat.ResultStatus == 1 ? 'checkmark-circle' : 'time'"></ion-icon>
                 {{mat.ResultStatus == 1 ? mat.result_status_text : 'Result Pending'}}
@@ -231,7 +232,7 @@
     </div>
   </div>
 
-  <app-bottom-sheet [(visible)]="showLineupSheet" title="Select Lineup" [bottomOffset]="0">
+  <app-bottom-sheet [(visible)]="showLineupSheet" title="Select Lineup" [bottomOffset]="30">
     <div class="sheet-empty" *ngIf="lineupFormations.length === 0">
       <ion-icon name="information-circle"></ion-icon>
       <span>No saved lineups available</span>

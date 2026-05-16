@@ -100,11 +100,12 @@ export class MatchinviteplayersPage {
     ).subscribe(search_term => {
       this.venus_user_input.offset = 0;
       this.venus_user_input.limit = 18;
-      this.filteredMembers = [];
 
       if (search_term) {
+        this.search_term = search_term;
         this.venus_user_input.search_term = search_term != '' && search_term.length > 2 ? search_term.replace(/ /g, '') : '';
       } else {
+        this.search_term = '';
         this.venus_user_input.search_term = '';
       }
       this.getParentClubAPPlusUsers(2);
@@ -164,24 +165,12 @@ export class MatchinviteplayersPage {
     }
   }
 
-  isLoadingMore: boolean = false;
-
   doInfinite(infiniteScroll) {
     this.venus_user_input.offset += this.venus_user_input.limit;
     this.getParentClubAPPlusUsers(1);
     setTimeout(() => {
       infiniteScroll.complete();
     }, 300);
-  }
-
-  onScroll(event: any) {
-    if (this.search_term !== '' || this.isLoadingMore) return;
-    const el = event.target;
-    if (el.scrollTop + el.clientHeight >= el.scrollHeight - 100) {
-      this.isLoadingMore = true;
-      this.venus_user_input.offset += this.venus_user_input.limit;
-      this.getParentClubAPPlusUsers(1);
-    }
   }
 
 
@@ -196,7 +185,7 @@ export class MatchinviteplayersPage {
 
   getFilterItems(ev: any) {
     const searchTerm = ev.target.value;
-    this.search_term = searchTerm;
+    this.search_term = searchTerm || '';
     this.searchTerms.next(searchTerm);
   }
 
@@ -286,38 +275,11 @@ export class MatchinviteplayersPage {
         } else {
           this.filteredMembers = [...this.filteredMembers, ...JSON.parse(JSON.stringify(this.members))];
         }
-        this.isLoadingMore = false;
 
         this.checkForExistingUsers();
-        // this.members = res.data.getAllMembersByParentClubNMemberType as MembersModel[];
-        // console.log("Member data is:", this.members);
-
-        // if (this.members.length > 0) {
-        //   for (let i = 0; i < this.members.length; i++) {
-        //     this.members[i]["isSelect"] = false;
-        //     this.members[i]["isAlreadExisted"] = false;
-
-        //     if (this.existed_members && this.existed_members.length > 0) {
-        //       for (let j = 0; j < this.existed_members.length; j++) {
-        //         if (
-        //           this.existed_members[j] &&
-        //           this.existed_members[j].User &&
-        //           this.members[i].Id === this.existed_members[j].User.Id
-        //         ) {
-        //           this.members[i]["isSelect"] = true;
-        //           this.members[i]["isAlreadExisted"] = true;
-        //           break; // Optional: If you want to exit the inner loop when a match is found
-        //         }
-        //       }
-        //     }
-        //   }
-        // }
-
-        // this.filteredMembers = JSON.parse(JSON.stringify(this.members));
       },
       (error) => {
         this.commonService.hideLoader();
-        this.isLoadingMore = false;
         this.commonService.toastMessage("Fetching failed for member", 2500, ToastMessageType.Error);
         console.error("Error in fetching:", error);
         if (error.graphQLErrors) {

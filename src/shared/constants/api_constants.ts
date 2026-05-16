@@ -176,4 +176,7 @@ export const API = {
     GET_NOTIFICATIONS: 'notifications/get-notifications',
     DELETE_NOTIFICATION: 'notifications/delete-notification',
     GET_SUPERADMIN_MEMBER_COUNT: 'superadmin/membercount',
+    GET_APKIDS_LOGIN_STATUS: 'apkids/loginstatus',
+    SUBADMIN_RESET_PASSWORD: 'parentclubuser/subadmin/resetpassword',
+    DELETE_VENUE: 'club/deleteVenue'
 }

@@ -174,7 +174,7 @@
   <!-- Team Action Bottom Sheet -->
   <app-bottom-sheet [(visible)]="showTeamActionDropdown"
     [title]="teamActionIsHome ? selectedHomeTeamText : selectedAwayTeamText"
-    [bottomOffset]="20">
+    [bottomOffset]="30">
     <div class="sheet-item" (click)="onTeamActionSelect('club')">
       <ion-icon name="people" class="sheet-item-icon"></ion-icon>
       <div class="sheet-item-info"><span class="sheet-item-name">Parent Club Teams</span></div>
@@ -195,7 +195,7 @@
   <!-- Team Selection Bottom Sheet -->
   <app-bottom-sheet [(visible)]="showTeamSheet"
     [title]="teamSheetIsHome ? 'Select Home Team' : 'Select Away Team'"
-    [bottomOffset]="20">
+    [bottomOffset]="30">
     <div *ngFor="let team of leagueParticipantForMatchRes"
       class="sheet-item team-sheet-item"
       [class.selected]="teamSheetIsHome ? team.parentclubteam.teamName === selectedHomeTeamText : team.parentclubteam.teamName === selectedAwayTeamText"

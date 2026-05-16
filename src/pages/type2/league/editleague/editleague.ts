@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, Renderer2 } from '@angular/core';
 import {
   Events,
   IonicPage,
@@ -156,7 +156,8 @@ export class EditleaguePage {
     private graphqlService: GraphqlService,
     public events: Events,
     private httpService: HttpService,
-    private themeService: ThemeService
+    private themeService: ThemeService,
+    private renderer: Renderer2
   ) {
     this.min = new Date().toISOString();
     this.max = "2049-12-31";
@@ -229,10 +230,10 @@ export class EditleaguePage {
   ionViewWillEnter() {
     this.loadTheme();
     this.themeService.isDarkTheme$.subscribe(isDark => {
-      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
     });
     this.events.subscribe('theme:changed', (isDark) => {
-      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
     });
     this.storage.get('Currency').then((currency) => {
       let currencydets = JSON.parse(currency);
@@ -242,7 +243,17 @@ export class EditleaguePage {
 
   async loadTheme() {
     const isDarkTheme = await this.storage.get('dashboardTheme');
-    this.isDarkTheme = isDarkTheme !== null ? isDarkTheme : true;
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.applyTheme(isDark);
+  }
+
+  private applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const el = document.querySelector('page-editleague');
+    if (el) {
+      isDark ? this.renderer.removeClass(el, 'light-theme')
+        : this.renderer.addClass(el, 'light-theme');
+    }
   }
 
   gotoDashboard() {
