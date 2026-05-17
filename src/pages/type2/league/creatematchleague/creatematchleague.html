@@ -61,45 +61,55 @@
     </div>
 
     <div *ngIf="inputObj.match_type == '2'">
-      <ion-item>
-        <ion-label>Team 1 - Player 1</ion-label>
-        <ion-select placeholder="Select" [(ngModel)]="inputObj.primary_participant_id">
-          <ion-option *ngFor="let participant of participantData" [value]="participant.id"
-            [disabled]="participant.id === primary_participant_id2 || participant.id === inputObj.secondary_participant_id || participant.id === secondary_participant_id2">
-            {{participant.participant_name}}
-          </ion-option>
+      <ion-item *ngIf="pairs.length > 0">
+        <ion-label>Pair 1 (Home)</ion-label>
+        <ion-select placeholder="Select Pair" (ionChange)="onHomePairSelect($event)">
+          <ion-option *ngFor="let pair of pairs" [value]="pair.pair_id">{{pair.pair_name}}</ion-option>
         </ion-select>
       </ion-item>
 
-      <ion-item>
-        <ion-label>Team 1 - Player 2</ion-label>
-        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.primary_participant_id2" (ionChange)="filterParticipants()">
-          <ion-option *ngFor="let participant of participantData" [value]="participant.id"
-            [disabled]="participant.id === inputObj.primary_participant_id || participant.id === inputObj.secondary_participant_id || participant.id === secondary_participant_id2">
-            {{participant.participant_name}}
-          </ion-option>
+      <ion-item *ngIf="pairs.length > 0">
+        <ion-label>Pair 2 (Away)</ion-label>
+        <ion-select placeholder="Select Pair" (ionChange)="onAwayPairSelect($event)">
+          <ion-option *ngFor="let pair of pairs" [value]="pair.pair_id">{{pair.pair_name}}</ion-option>
         </ion-select>
       </ion-item>
 
-      <ion-item>
-        <ion-label>Team 2 - Player 1</ion-label>
-        <ion-select placeholder="Select" [(ngModel)]="inputObj.secondary_participant_id">
-          <ion-option *ngFor="let participant of participantData" [value]="participant.id"
-            [disabled]="participant.id === inputObj.primary_participant_id || participant.id === primary_participant_id2 || participant.id === secondary_participant_id2">
-            {{participant.participant_name}}
-          </ion-option>
-        </ion-select>
-      </ion-item>
-
-      <ion-item>
-        <ion-label>Team 2 - Player 2</ion-label>
-        <ion-select placeholder="<Select>" [(ngModel)]="inputObj.secondary_participant_id2" (ionChange)="filterParticipants()">
-          <ion-option *ngFor="let participant of participantData" [value]="participant.id"
-            [disabled]="participant.id === inputObj.primary_participant_id || participant.id === primary_participant_id2 || participant.id === inputObj.secondary_participant_id">
-            {{participant.participant_name}}
-          </ion-option>
-        </ion-select>
-      </ion-item>
+      <!-- Fallback: manual player selection if no pairs -->
+      <div *ngIf="pairs.length === 0">
+        <ion-item>
+          <ion-label>Team 1 - Player 1</ion-label>
+          <ion-select placeholder="Select" [(ngModel)]="inputObj.primary_participant_id">
+            <ion-option *ngFor="let participant of participantData" [value]="participant.id">
+              {{participant.participant_name}}
+            </ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Team 1 - Player 2</ion-label>
+          <ion-select placeholder="Select" [(ngModel)]="inputObj.primary_participant_id2">
+            <ion-option *ngFor="let participant of participantData" [value]="participant.id">
+              {{participant.participant_name}}
+            </ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Team 2 - Player 1</ion-label>
+          <ion-select placeholder="Select" [(ngModel)]="inputObj.secondary_participant_id">
+            <ion-option *ngFor="let participant of participantData" [value]="participant.id">
+              {{participant.participant_name}}
+            </ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Team 2 - Player 2</ion-label>
+          <ion-select placeholder="Select" [(ngModel)]="inputObj.secondary_participant_id2">
+            <ion-option *ngFor="let participant of participantData" [value]="participant.id">
+              {{participant.participant_name}}
+            </ion-option>
+          </ion-select>
+        </ion-item>
+      </div>
     </div>
 
 

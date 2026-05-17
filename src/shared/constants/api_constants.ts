@@ -178,5 +178,32 @@ export const API = {
     GET_SUPERADMIN_MEMBER_COUNT: 'superadmin/membercount',
     GET_APKIDS_LOGIN_STATUS: 'apkids/loginstatus',
     SUBADMIN_RESET_PASSWORD: 'parentclubuser/subadmin/resetpassword',
-    DELETE_VENUE: 'club/deleteVenue'
+    DELETE_VENUE: 'club/deleteVenue',
+
+    // ─── Ladder ───
+    LADDER_GET_CONFIGS: 'ladder/getConfigs',
+    LADDER_SAVE_CONFIG: 'ladder/saveConfig',
+    LADDER_GET_RANKINGS: 'ladder/getRankings',
+    LADDER_INIT_RANKINGS: 'ladder/initRankings',
+    LADDER_ISSUE_CHALLENGE: 'ladder/issueChallenge',
+    LADDER_GET_CHALLENGES: 'ladder/getChallenges',
+    LADDER_RESPOND_CHALLENGE: 'ladder/respondChallenge',
+    LADDER_CANCEL_CHALLENGE: 'ladder/cancelChallenge',
+
+    // ─── Leaderboard ───
+    LEADERBOARD_GET_AGE_CATEGORIES: 'leaderboard/getAgeCategories',
+    LEADERBOARD_GET_USER_LEADERBOARD: 'leaderboard/getUserLeaderboard',
+
+    // ─── Groups ───
+    GET_GROUPS: 'league/getGroups',
+    GET_PARTICIPANT_GROUPS: 'league/getParticipantGroups',
+    ASSIGN_PARTICIPANT_TO_GROUP: 'league/assignParticipantToGroup',
+    CREATE_GROUPS: 'league/createGroups',
+    RENAME_GROUP: 'league/renameGroup',
+    DELETE_GROUP: 'league/deleteGroup',
+
+    // ─── Pairs (Doubles) ───
+    CREATE_PAIR: 'league/createPair',
+    GET_PAIRS: 'league/getPairs',
+    REMOVE_PAIR: 'league/removePair'
 }

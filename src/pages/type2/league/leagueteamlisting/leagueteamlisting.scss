@@ -65,9 +65,9 @@ page-leagueteamlisting {
     }
 
     .revamp-card {
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(226, 232, 240, 0.6);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 
 
       .card-title {
@@ -101,7 +101,7 @@ page-leagueteamlisting {
       }
 
       .card-content {
-        background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%);
+        background: transparent;
       }
 
       .card-icon-wrapper.competition-bg {
@@ -574,18 +574,17 @@ page-leagueteamlisting {
 // ─── REVAMPED CARD (shared structure) ───
 .revamp-card {
   display: flex;
-  border-radius: 14px;
-  border: 1px solid rgba(71, 85, 105, 0.4);
-  background: rgba(30, 41, 59, 0.5);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+  border-radius: 12px;
+  border: 1px solid #334155;
+  background: #1e293b;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
   cursor: pointer;
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 
   &:active {
     transform: scale(0.98);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.4);
   }
 }
 
@@ -607,7 +606,7 @@ page-leagueteamlisting {
   gap: 6px;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+  background: transparent;
 }
 
 .card-top-row {

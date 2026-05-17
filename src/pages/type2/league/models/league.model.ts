@@ -126,6 +126,7 @@ export class LeagueParticipantModel {
   participant_status_text: string;
   participant_details: UserAndDetail;
   isSelected?: boolean;
+  _groupId?: string;
 }
 
 export class ClubModel {

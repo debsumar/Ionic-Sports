@@ -38,25 +38,49 @@
     </app-form-field>
 
     <div *ngIf="this.data.league_type!=3">
-      <app-form-field [isDark]="isDarkTheme">
-        <ion-item>
-          <ion-label>Participants 1</ion-label>
-          <ion-select placeholder="Select" [(ngModel)]="inputObj.homeparticipant_id" (ionChange)="filterParticipants()">
-            <ion-option *ngFor="let participant of filteredPrimaryParticipants"
-              value="{{participant.id}}">{{participant.participant_name}}</ion-option>
-          </ion-select>
-        </ion-item>
-      </app-form-field>
+      <!-- Doubles with pairs -->
+      <div *ngIf="this.data.league_type == 2 && pairs.length > 0">
+        <app-form-field [isDark]="isDarkTheme">
+          <ion-item>
+            <ion-label>Pair 1 (Home)</ion-label>
+            <ion-select placeholder="Select Pair" [(ngModel)]="selectedHomePairId" (ionChange)="onHomePairSelect($event)">
+              <ion-option *ngFor="let pair of pairs" [value]="pair.pair_id">{{pair.pair_name}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-form-field>
 
-      <app-form-field [isDark]="isDarkTheme">
-        <ion-item>
-          <ion-label>Participants 2</ion-label>
-          <ion-select placeholder="Select" [(ngModel)]="inputObj.awayparticipant_id" (ionChange)="filterParticipants()">
-            <ion-option *ngFor="let participant of filteredSecondaryParticipants"
-              value="{{participant.id}}">{{participant.participant_name}}</ion-option>
-          </ion-select>
-        </ion-item>
-      </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+          <ion-item>
+            <ion-label>Pair 2 (Away)</ion-label>
+            <ion-select placeholder="Select Pair" [(ngModel)]="selectedAwayPairId" (ionChange)="onAwayPairSelect($event)">
+              <ion-option *ngFor="let pair of pairs" [value]="pair.pair_id">{{pair.pair_name}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-form-field>
+      </div>
+
+      <!-- Singles or doubles without pairs -->
+      <div *ngIf="this.data.league_type != 2 || pairs.length === 0">
+        <app-form-field [isDark]="isDarkTheme">
+          <ion-item>
+            <ion-label>Participants 1</ion-label>
+            <ion-select placeholder="Select" [(ngModel)]="inputObj.homeparticipant_id" (ionChange)="filterParticipants()">
+              <ion-option *ngFor="let participant of filteredPrimaryParticipants"
+                value="{{participant.id}}">{{participant.participant_name}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-form-field>
+
+        <app-form-field [isDark]="isDarkTheme">
+          <ion-item>
+            <ion-label>Participants 2</ion-label>
+            <ion-select placeholder="Select" [(ngModel)]="inputObj.awayparticipant_id" (ionChange)="filterParticipants()">
+              <ion-option *ngFor="let participant of filteredSecondaryParticipants"
+                value="{{participant.id}}">{{participant.participant_name}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-form-field>
+      </div>
     </div>
 
     <app-form-field [isDark]="isDarkTheme">
