@@ -54,16 +54,16 @@ export class AddrecurringmatchesPage {
     });
   }
 
+  getRecurringDayName(): string {
+    return moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm").format('dddd');
+  }
+
   private applyTheme(isDark: boolean) {
     this.isDarkTheme = isDark;
     const el = document.querySelector('page-addrecurringmatches');
     if (el) {
       isDark ? el.classList.remove('light-theme') : el.classList.add('light-theme');
     }
-  }
-
-  getRecurringDayName(): string {
-    return moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm").format('dddd');
   }
 
   createRecurringMatches() {

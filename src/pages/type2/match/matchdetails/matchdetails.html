@@ -18,124 +18,173 @@
           <button class="action-btn" (click)="gotoEditMatch()">
             <ion-icon name="create"></ion-icon>
           </button>
-          <button class="action-btn" (click)="gotoEmailPage()">
-            <ion-icon name="mail"></ion-icon>
-          </button>
-          <button class="action-btn" (click)="gotoNotificationPage()">
-            <ion-icon name="notifications"></ion-icon>
-          </button>
           <button class="action-btn danger" (click)="deleteConfirm()">
             <ion-icon name="trash"></ion-icon>
           </button>
         </div>
       </app-detail-header>
 
-      <!-- View Coaches Banner -->
-      <div class="coaches-banner" (tap)="gotoViewCoaches()">
-        <ion-icon name="school"></ion-icon>
-        <span>View Coaches</span>
-        <ion-icon name="arrow-forward" class="banner-arrow"></ion-icon>
-      </div>
-
-      <!-- Publish Banner -->
+      <!-- Publish Result / Result Published Banner -->
       <div class="publish-banner" (tap)="goto_publishresult()"
-        *ngIf="(isTeamParticipantsAvail) && (teams && teams.length > 0) && (match.Result === null) && (activeType)">
+        *ngIf="match.ResultStatus !== 1 && confirmedCount >= maxConfirmed">
         <ion-icon name="trophy"></ion-icon>
         <span>Publish Result</span>
         <ion-icon name="arrow-forward" class="banner-arrow"></ion-icon>
       </div>
+      <div class="result-banner" *ngIf="match.ResultStatus === 1">
+        <ion-icon name="checkmark-circle"></ion-icon>
+        <span>Result Published</span>
+        <span class="result-score" *ngIf="match.home_team_score || match.away_team_score">{{match.home_team_score || '0'}} - {{match.away_team_score || '0'}}</span>
+      </div>
 
-      <!-- Active / Invited Tabs -->
-      <app-pill-tabs
-        leftLabel="Active" [rightLabel]="'Invited (' + participants.length + ')'"
-        [activeIndex]="activeTabIndex"
-        (activeIndexChange)="onTabChange($event)">
-      </app-pill-tabs>
+      <!-- Home vs Away Scoreboard -->
+      <div class="vs-header" *ngIf="match.homeUserName || match.awayUserName">
+        <span class="vs-name home">{{match.homeUserName || 'TBD'}}</span>
+        <span class="vs-text">vs</span>
+        <span class="vs-name away">{{match.awayUserName || 'TBD'}}</span>
+      </div>
     </div>
 
     <div class="page-scroll-area">
-      <!-- Active Teams Tab -->
-      <div *ngIf="activeType">
-        <div *ngIf="teams && teams.length > 0">
-          <div *ngFor="let team of teams; let i = index" class="team-block">
-            <div class="team-label">
-              <span class="team-name" [style.color]="getColor(i)">{{team.TeamName}}</span>
-              <span class="team-winner" *ngIf="team.IsWinner">🏆</span>
-            </div>
-            <app-list-card *ngFor="let participant of team.Participants; let j = index"
-              [accentColor]="participant.User?.isUserAvailable ? (i === 0 ? '#10b981' : '#ef4444') : '#64748b'">
-              <div class="participant-row">
-                <div class="participant-info">
-                  <p class="participant-name" *ngIf="participant.User?.isUserAvailable">
-                    {{participant.User.FirstName}} {{participant.User.LastName}}
-                  </p>
-                  <p class="participant-name placeholder" *ngIf="!participant.User?.isUserAvailable">
-                    Add participant
-                  </p>
-                </div>
-                <button class="participant-action" [disabled]="!isCanEditTeams"
-                  [class.remove]="participant.User?.isUserAvailable"
-                  (click)="manipulateUser(participant.User, i, j)">
-                  <ion-icon [name]="participant.User?.isUserAvailable ? 'remove' : 'add'"></ion-icon>
-                </button>
-              </div>
-            </app-list-card>
-            <div class="vs-divider" *ngIf="i === 0 && teams.length > 1">
-              <span>VS</span>
-            </div>
+      <!-- HOME / AWAY Sections -->
+      <div class="mp-sections">
+        <!-- HOME SIDE -->
+        <div class="mp-side">
+          <div class="mp-side-header">
+            <span class="mp-side-label">HOME</span>
+            <button class="mp-add-btn" (click)="gotoMatchInvitePlayers()">
+              <ion-icon name="add"></ion-icon> Add
+            </button>
           </div>
+          <div class="mp-player-row" *ngFor="let p of homePlayers">
+            <span class="mp-player-name">{{p.name}}</span>
+            <span class="mp-status" [class.confirmed]="p.ParticipationStatus === 1" [class.pending]="p.ParticipationStatus !== 1"
+              (click)="updatePlayerStatus(p, p.ParticipationStatus === 1 ? 0 : 1)">
+              {{p.ParticipationStatus === 1 ? 'Confirmed' : 'Pending'}}
+            </span>
+            <button class="mp-remove-btn" (click)="updatePlayerStatus(p, 2)">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </div>
+          <p class="mp-empty" *ngIf="homePlayers.length === 0">No players added</p>
         </div>
-        <div class="empty-state" *ngIf="teams && teams.length === 0">
-          <ion-icon name="people" class="empty-icon"></ion-icon>
-          <p class="empty-text">No active teams found</p>
+
+        <!-- AWAY SIDE -->
+        <div class="mp-side">
+          <div class="mp-side-header">
+            <span class="mp-side-label">AWAY</span>
+            <button class="mp-add-btn" (click)="gotoMatchInvitePlayers()">
+              <ion-icon name="add"></ion-icon> Add
+            </button>
+          </div>
+          <div class="mp-player-row" *ngFor="let p of awayPlayers">
+            <span class="mp-player-name">{{p.name}}</span>
+            <span class="mp-status" [class.confirmed]="p.ParticipationStatus === 1" [class.pending]="p.ParticipationStatus !== 1"
+              (click)="updatePlayerStatus(p, p.ParticipationStatus === 1 ? 0 : 1)">
+              {{p.ParticipationStatus === 1 ? 'Confirmed' : 'Pending'}}
+            </span>
+            <button class="mp-remove-btn" (click)="updatePlayerStatus(p, 2)">
+              <ion-icon name="close"></ion-icon>
+            </button>
+          </div>
+          <p class="mp-empty" *ngIf="awayPlayers.length === 0">No players added</p>
         </div>
       </div>
 
-      <!-- Invited Tab -->
-      <div *ngIf="!activeType">
-        <app-list-card *ngFor="let part of participants"
-          [accentColor]="part.InviteStatus==0 ? '#2b92bb' : part.InviteStatus==1 ? '#10b981' : '#ef4444'"
-          (cardClick)="presentActionSheet(part)">
-          <div class="invite-row">
-            <div class="invite-avatar">{{part.User?.FirstName?.charAt(0)}}</div>
-            <div class="invite-info">
-              <p class="invite-name">{{part.User?.FirstName}} {{part.User?.LastName}}</p>
-            </div>
-            <span class="invite-status"
-              [class.pending]="part.InviteStatus==0"
-              [class.accepted]="part.InviteStatus==1"
-              [class.rejected]="part.InviteStatus>=2">
-              {{part.InviteStatus==0?"Pending":part.InviteStatus==1?"Accepted":"Rejected"}}
-            </span>
-          </div>
-        </app-list-card>
-        <div class="empty-state" *ngIf="participants?.length === 0">
-          <ion-icon name="mail" class="empty-icon"></ion-icon>
-          <p class="empty-text">No invited players</p>
+      <!-- Match Ready Status -->
+      <div class="mp-ready" *ngIf="confirmedCount >= maxConfirmed">
+        <ion-icon name="checkmark-circle"></ion-icon>
+        Match is ready — {{confirmedCount}}/{{maxConfirmed}} players confirmed
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Player Dialog removed - using MatchinviteplayersPage instead -->
+
+  <!-- Publish Result Dialog -->
+  <div class="result-dialog-overlay" *ngIf="showResultDialog" (click)="showResultDialog = false">
+    <div class="result-dialog" (click)="$event.stopPropagation()">
+      <div class="result-dialog-header">
+        <span class="result-dialog-title">Publish Result</span>
+        <button class="result-dialog-close" (click)="showResultDialog = false"><ion-icon name="close"></ion-icon></button>
+      </div>
+      <!-- Scoreboard -->
+      <div class="tr-scoreboard">
+        <div class="tr-player">
+          <div class="tr-avatar">{{(homePlayers[0]?.name || match.homeUserName)?.charAt(0)}}</div>
+          <span class="tr-name">{{homePlayers[0]?.name || match.homeUserName}}</span>
+          <span class="tr-sets-won">{{getHomeSets()}}</span>
+        </div>
+        <div class="tr-vs">VS</div>
+        <div class="tr-player">
+          <div class="tr-avatar away">{{(awayPlayers[0]?.name || match.awayUserName)?.charAt(0)}}</div>
+          <span class="tr-name">{{awayPlayers[0]?.name || match.awayUserName}}</span>
+          <span class="tr-sets-won">{{getAwaySets()}}</span>
         </div>
       </div>
+      <div class="tr-score-display" *ngIf="getScoreText()">{{getScoreText()}}</div>
+      <div class="tr-winner" *ngIf="getWinner()"><ion-icon name="trophy"></ion-icon> {{getWinner()}} wins</div>
+      <!-- Result Type -->
+      <div class="tr-section">
+        <label class="tr-label">Result Type</label>
+        <select class="tr-select" [(ngModel)]="resultType" (ngModelChange)="onResultTypeChange()">
+          <option value="normal">Completed</option>
+          <option value="retired">Retired Hurt</option>
+          <option value="walkover">Walkover</option>
+        </select>
+      </div>
+      <div class="tr-section" *ngIf="resultType === 'retired' || resultType === 'walkover'">
+        <label class="tr-label">{{resultType === 'retired' ? 'Who retired?' : 'Who withdrew?'}}</label>
+        <select class="tr-select" [(ngModel)]="retiredPlayer">
+          <option value="home">{{homePlayers[0]?.name || match.homeUserName}}</option>
+          <option value="away">{{awayPlayers[0]?.name || match.awayUserName}}</option>
+        </select>
+      </div>
+      <!-- Sets -->
+      <div *ngIf="resultType !== 'walkover'">
+        <div class="tr-section">
+          <div class="tr-section-header">
+            <label class="tr-label">Match Format</label>
+            <select class="tr-select small" [(ngModel)]="matchFormat" (ngModelChange)="onFormatChange()">
+              <option value="1">Best of 1</option>
+              <option value="3">Best of 3</option>
+              <option value="5">Best of 5</option>
+            </select>
+          </div>
+        </div>
+        <div class="tr-section">
+          <div class="tr-section-header">
+            <label class="tr-label">Set Scores</label>
+            <button class="tr-add-set-btn" *ngIf="!isMatchDecided() && sets.length < +matchFormat" (click)="addSet()">
+              <ion-icon name="add"></ion-icon> Add Set
+            </button>
+          </div>
+          <div class="tr-set-row" *ngFor="let set of sets; let i = index">
+            <span class="tr-set-num">Set {{i + 1}}</span>
+            <input type="number" min="0" max="7" [(ngModel)]="set.home" (input)="onScoreInput(i, 'home', $event.target.value)" class="tr-input">
+            <span class="tr-dash">–</span>
+            <input type="number" min="0" max="7" [(ngModel)]="set.away" (input)="onScoreInput(i, 'away', $event.target.value)" class="tr-input">
+            <ng-container *ngIf="needsTiebreak(set)">
+              <span class="tr-tb-label">TB</span>
+              <input type="number" min="0" [(ngModel)]="set.tbHome" class="tr-input sm">
+              <span class="tr-dash">–</span>
+              <input type="number" min="0" [(ngModel)]="set.tbAway" class="tr-input sm">
+            </ng-container>
+            <button class="tr-remove" *ngIf="sets.length > 1" (click)="removeSet(i)"><ion-icon name="close"></ion-icon></button>
+          </div>
+        </div>
+      </div>
+      <button class="tr-publish-btn" (click)="publishResult()" [disabled]="publishing">
+        <ion-icon name="checkmark-circle" *ngIf="!publishing"></ion-icon>
+        <ion-spinner *ngIf="publishing" name="crescent"></ion-spinner>
+        {{publishing ? 'Publishing...' : 'Publish Result'}}
+      </button>
     </div>
   </div>
 </ion-content>
 
-<ion-fab right bottom *ngIf="activeType">
-  <button class="fab-main" ion-fab mini (click)="gotoRecurringMatches()">
-    <ion-icon name="repeat"></ion-icon>
+<ion-fab mini right bottom>
+  <button class="fab-main" ion-fab mini (click)="gotoViewCoaches()">
+    <ion-icon name="school"></ion-icon>
   </button>
-</ion-fab>
-
-<ion-fab mini right bottom #fab *ngIf="!activeType">
-  <button class="fab-main" ion-fab mini>
-    <ion-icon name="add"></ion-icon>
-  </button>
-  <ion-fab-list side="top">
-    <p class="fab-label" (tap)="gotoMatchInvitePlayers()" style="margin-right: 46px">Invite Players</p>
-    <button class="fab-main" ion-fab class="fabTop" (tap)="gotoMatchInvitePlayers()">
-      <ion-icon name="person-add"></ion-icon>
-    </button>
-    <p class="fab-label" (tap)="gotoRecurringMatches()" style="margin-right: 46px">Recurring Matches</p>
-    <button class="fab-main" ion-fab class="fabTop" (tap)="gotoRecurringMatches()">
-      <ion-icon name="repeat"></ion-icon>
-    </button>
-  </ion-fab-list>
 </ion-fab>

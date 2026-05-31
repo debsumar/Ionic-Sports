@@ -55,7 +55,80 @@ page-matchdetails {
   @keyframes bannerShimmer { 0% { left: -100%; } 50% { left: 150%; } 100% { left: 150%; } }
   @keyframes bannerGradient { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
 
-  // ── Teams ──
+  .result-banner {
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 16px; background: rgba(16, 185, 129, 0.1); border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+    color: #10b981; font-size: 13px; font-weight: 700;
+    ion-icon { font-size: 16px; }
+    .result-score { margin-left: auto; font-size: 16px; font-weight: 800; }
+  }
+
+  // ── VS Header ──
+  .vs-header {
+    display: flex; align-items: center; justify-content: center; gap: 12px;
+    padding: 12px 16px; border-bottom: 1px solid rgba(71, 85, 105, 0.3);
+  }
+  .vs-name { font-size: 15px; font-weight: 700; color: #f1f5f9;
+    &.home { color: #10b981; }
+    &.away { color: #ef4444; }
+  }
+  .vs-text { font-size: 12px; font-weight: 600; color: #64748b; }
+
+  // ── Match Players Sections ──
+  .mp-sections { display: flex; flex-direction: column; gap: 12px; padding: 12px 0; }
+  .mp-side {
+    flex: 1; border-radius: 12px; border: 1px solid rgba(71, 85, 105, 0.3);
+    background: rgba(30, 41, 59, 0.5); padding: 12px; min-width: 0;
+  }
+  .mp-side-header {
+    display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+  }
+  .mp-side-label { font-size: 13px; font-weight: 800; color: #f1f5f9; letter-spacing: 0.5px; }
+  .mp-add-btn {
+    display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px;
+    border: 1px solid rgba(43, 146, 187, 0.4); background: transparent;
+    color: #3fbcd3; font-size: 11px; font-weight: 700;
+    ion-icon { font-size: 14px; }
+  }
+  .mp-player-row {
+    display: flex; align-items: center; gap: 6px; padding: 8px 10px;
+    border-radius: 8px; background: rgba(15, 23, 42, 0.4); margin-bottom: 6px;
+  }
+  .mp-player-name { flex: 1; font-size: 13px; font-weight: 600; color: #f1f5f9; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .mp-status {
+    padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: 700; cursor: pointer;
+    &.confirmed { background: rgba(16, 185, 129, 0.15); color: #10b981; }
+    &.pending { background: rgba(245, 158, 11, 0.15); color: #f59e0b; }
+  }
+  .mp-remove-btn {
+    width: 24px; height: 24px; border-radius: 6px; border: none;
+    background: rgba(239, 68, 68, 0.1); color: #ef4444;
+    display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0;
+  }
+  .mp-empty { font-size: 12px; color: #64748b; text-align: center; padding: 16px 0; margin: 0; }
+  .mp-ready {
+    display: flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 12px; font-size: 13px; font-weight: 600; color: #10b981;
+    ion-icon { font-size: 16px; }
+  }
+
+  // ── Add Player Dialog ──
+  .mp-search { margin-bottom: 12px; }
+  .mp-searchbar {
+    --background: rgba(15, 23, 42, 0.6); --border-radius: 8px; --box-shadow: none;
+    --color: #f1f5f9; --placeholder-color: #64748b; --icon-color: #64748b;
+    padding: 0; .searchbar-input { font-size: 14px !important; }
+  }
+  .mp-results { max-height: 300px; overflow-y: auto; }
+  .mp-result-row {
+    display: flex; align-items: center; justify-content: space-between; padding: 10px 12px;
+    border-radius: 8px; margin-bottom: 4px; cursor: pointer;
+    &:active { background: rgba(43, 146, 187, 0.08); }
+  }
+  .mp-result-name { font-size: 14px; font-weight: 600; color: #f1f5f9; }
+  .mp-result-icon { font-size: 20px; color: #3fbcd3; }
+
+  // ── Teams (legacy, keep for compatibility) ──
   .team-block { margin-bottom: 8px; }
   .team-label { display: flex; align-items: center; gap: 6px; padding: 8px 4px 4px; }
   .team-name { font-size: 14px; font-weight: 700; }
@@ -147,4 +220,41 @@ page-matchdetails {
     .page-scroll-area { padding: 0 16px 80px; }
   }
   @media (min-width: 1024px) { .page-scroll-area { padding: 0 24px 80px; } }
+
+  // ── Result Dialog ──
+  .result-dialog-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 9999;
+    background: rgba(0, 0, 0, 0.6); display: flex; align-items: flex-start; justify-content: center;
+    padding: 40px 12px; overflow-y: auto;
+  }
+  .result-dialog {
+    width: 100%; max-width: 420px; border-radius: 16px; padding: 16px;
+    background: #1e293b; border: 1px solid rgba(71, 85, 105, 0.4);
+  }
+  .result-dialog-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .result-dialog-title { font-size: 16px; font-weight: 700; color: #f1f5f9; }
+  .result-dialog-close { width: 28px; height: 28px; border-radius: 6px; border: none; background: rgba(71, 85, 105, 0.3); color: #94a3b8; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  .tr-scoreboard {
+    display: flex; align-items: center; justify-content: space-between; padding: 12px;
+    background: rgba(43, 146, 187, 0.06); border-radius: 10px; margin-bottom: 10px;
+  }
+  .tr-player { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .tr-avatar { width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 14px; font-weight: 700; &.away { background: rgba(239, 68, 68, 0.15); color: #ef4444; } }
+  .tr-name { font-size: 12px; font-weight: 600; color: #f1f5f9; text-align: center; }
+  .tr-sets-won { font-size: 20px; font-weight: 800; color: #3fbcd3; }
+  .tr-vs { font-size: 12px; font-weight: 700; color: #64748b; padding: 0 8px; }
+  .tr-score-display { text-align: center; font-size: 14px; font-weight: 700; color: #94a3b8; padding: 6px; background: rgba(15, 23, 42, 0.5); border-radius: 6px; margin-bottom: 8px; }
+  .tr-winner { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 8px; color: #10b981; font-size: 13px; font-weight: 700; background: rgba(16, 185, 129, 0.08); border-radius: 6px; margin-bottom: 10px; }
+  .tr-section { margin-bottom: 12px; }
+  .tr-section-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .tr-label { font-size: 11px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.3px; }
+  .tr-select { width: 100%; padding: 8px 10px; border-radius: 8px; border: 1px solid rgba(71, 85, 105, 0.4); background: rgba(15, 23, 42, 0.6); color: #f1f5f9; font-size: 13px; font-weight: 600; &.small { width: auto; } option { background: #1e293b; color: #f1f5f9; } }
+  .tr-set-row { display: flex; align-items: center; gap: 6px; margin-bottom: 6px; }
+  .tr-set-num { font-size: 11px; font-weight: 700; color: #64748b; min-width: 36px; }
+  .tr-input { width: 40px; padding: 8px 6px; border-radius: 6px; border: 1px solid rgba(71, 85, 105, 0.4); background: rgba(15, 23, 42, 0.6); color: #f1f5f9; font-size: 14px; font-weight: 700; text-align: center; &.sm { width: 32px; } &:focus { border-color: #2b92bb; outline: none; } }
+  .tr-dash { color: #64748b; font-weight: 700; }
+  .tr-tb-label { font-size: 10px; font-weight: 700; color: #f59e0b; }
+  .tr-remove { width: 24px; height: 24px; border-radius: 6px; border: none; background: rgba(239, 68, 68, 0.1); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+  .tr-add-set-btn { display: flex; align-items: center; gap: 4px; padding: 5px 10px; border-radius: 6px; border: 1px solid rgba(43, 146, 187, 0.4); background: transparent; color: #3fbcd3; font-size: 11px; font-weight: 700; }
+  .tr-publish-btn { width: 100%; padding: 12px; border-radius: 8px; border: none; background: linear-gradient(135deg, #2b92bb, #1e6c8c); color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 6px; margin-top: 12px; &:disabled { opacity: 0.5; } }
 }

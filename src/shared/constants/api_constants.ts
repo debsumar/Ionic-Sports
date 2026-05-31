@@ -15,6 +15,10 @@ export const API = {
     USER_UPDATE: `user`,
     TERM_SESSION_PENDING_PAYMENTS: `session/getTermPendingPayments`,
     MONTHLY_SESSION_PAYMENT_REPORT: `paymentreport/monthlyses_paymentreport`,
+    EVENT_PAYMENT_REPORT: `paymentreport/eventpaymentreport`,
+    SCHOOL_SESSION_PAYMENT_REPORT: `paymentreport/schoolSessionPaymentReport`,
+    HOLIDAYCAMP_PAYMENT_LISTING: `paymentreport/holidaycampPayment_listing`,
+    MEMBERSHIP_PAYMENT_LIST: `paymentreport/membership_payment_list`,
     CLUB_ACTIVITIES: 'club_activity/get_club_activities',
     ASSIGN_CLUB_ACTIVITIES: 'club_activity/assign_club_activities',
     UPDATE_MONTHLY_SESSION_ENDDATE: `monthly_session/update_enddate`,
@@ -67,6 +71,8 @@ export const API = {
     GET_MEMBERSHIP_RENEWEAL_SETUP: `membership_renewal_setup/get_renewal_setup`,
     CREATE_MEMBERSHIP_RENEWEAL_SETUP: `membership_renewal_setup/create_renewal_setup`,
     UPDATE_MEMBERSHIP_RENEWEAL_SETUP: `membership_renewal_setup/update_renewal_setup`,
+    GET_EVENTS_CAPTIONS: `events/caption/get_parentclub_captions`,
+    UPDATE_EVENTS_CAPTION: `events/caption/update_caption`,
     GET_EVENTS_LIST: `events/get_parentclub_events`,
     CREATE_EVENT: `events/create_event`,
     GET_EVENTS_TYPES: `events/get_event_types`,
@@ -167,6 +173,7 @@ export const API = {
     WALLET_PAYMENT_REPORT_BY_DATE: 'wallet/paymentreportbydate',
     WALLET_TOTAL_BALANCE: 'wallet/getavailabletotalbalance',
     GET_PARENT_CLUB_VENUES: 'club/GetParentClubVenues',
+    GET_CLUB: 'club/GetClub',
     CHECK_WALLET_FOR_PARENT_CLUB: 'wallet/checkwallet',
     GET_TEAM_FORMATIONS: 'league/lineup/getTeamFormations',
     SAVE_TEAM_FORMATION: 'league/lineup/saveTeamFormation',
@@ -176,4 +183,61 @@ export const API = {
     GET_NOTIFICATIONS: 'notifications/get-notifications',
     DELETE_NOTIFICATION: 'notifications/delete-notification',
     GET_SUPERADMIN_MEMBER_COUNT: 'superadmin/membercount',
+    GET_APKIDS_LOGIN_STATUS: 'apkids/loginstatus',
+    SUBADMIN_RESET_PASSWORD: 'parentclubuser/subadmin/resetpassword',
+    DELETE_VENUE: 'club/deleteVenue',
+    ATTACHMENT_EMAIL: 'superadmin/attachmentemail',
+
+    // ─── Ladder ───
+    LADDER_GET_CONFIGS: 'ladder/getConfigs',
+    LADDER_SAVE_CONFIG: 'ladder/saveConfig',
+    LADDER_GET_RANKINGS: 'ladder/getRankings',
+    LADDER_INIT_RANKINGS: 'ladder/initRankings',
+    LADDER_ISSUE_CHALLENGE: 'ladder/issueChallenge',
+    LADDER_GET_CHALLENGES: 'ladder/getChallenges',
+    LADDER_RESPOND_CHALLENGE: 'ladder/respondChallenge',
+    LADDER_CANCEL_CHALLENGE: 'ladder/cancelChallenge',
+
+    // ─── Leaderboard ───
+    LEADERBOARD_GET_AGE_CATEGORIES: 'leaderboard/getAgeCategories',
+    LEADERBOARD_GET_USER_LEADERBOARD: 'leaderboard/getUserLeaderboard',
+
+    // ─── Groups ───
+    GET_GROUPS: 'league/getGroups',
+    GET_PARTICIPANT_GROUPS: 'league/getParticipantGroups',
+    ASSIGN_PARTICIPANT_TO_GROUP: 'league/assignParticipantToGroup',
+    CREATE_GROUPS: 'league/createGroups',
+    RENAME_GROUP: 'league/renameGroup',
+    DELETE_GROUP: 'league/deleteGroup',
+
+    // ─── Pairs (Doubles) ───
+    CREATE_PAIR: 'league/createPair',
+    GET_PAIRS: 'league/getPairs',
+    REMOVE_PAIR: 'league/removePair',
+
+    // ─── Match Players ───
+    GET_MATCH_PARTICIPANTS: 'match/getMatchParticipants',
+    ADD_PLAYERS_TO_MATCH: 'match/AddPlayersToMatch',
+    UPDATE_STANDALONE_PARTICIPATION_STATUS: 'match/UpdateStandaloneParticipationStatus',
+    PUBLISH_RESULT_STANDALONE: 'match/PublishResultStandAlone',
+
+    // ── Legacy nest URL endpoints (host: activitypro-nest-261607.appspot.com) ──
+    // Pass type=2 to httpService when calling these so they hit the legacy
+    // nest server rather than the new Applus API.
+    LEGACY_MEMBERSHIP_ASSIGN_MONTHLY: 'membership/assignmonthlymembership',
+    LEGACY_MEMBERSHIP_RENEW_MONTHLY: 'membership/renewmonthlymembership',
+    LEGACY_MEMBERSHIP_CANCEL: 'membership/cancelmembership',
+    LEGACY_MEMBERSHIP_HISTORY_INFO: 'membership/membershiphistoryinfo',
+    LEGACY_MEMBERSHIP_DISCOUNT_LIST: 'membership/discount',
+    LEGACY_MEMBERSHIP_ADMIN_PAYMENT_UPDATE: 'membership/adminpaymentupdate',
+    LEGACY_MEMBERSHIP_PAYMENT_REPORT: 'membership/paymentreport',
+    LEGACY_MEMBERSHIP_MONTHLY_MONTHS: 'membership/monthlymembershipmonths',
+    LEGACY_MONTHLY_SESSION_SUBSCRIPTIONS: 'session/monthlysessionsubscriptions',
+    LEGACY_LOCATION_PLACE_DETAILS: 'location/getplacedetails',
+    LEGACY_TOURNAMENT_UPDATE_PAYMENT_BY_ADMIN: 'turnament/updatepaymenybyadmin',
+    LEGACY_SUPERADMIN_SYNC_GLOBAL_PROMOTION: 'superadmin/sinkglobalpromotion',
+    LEGACY_EVENTS_HISTORY: 'events/history',
+    LEGACY_EVENTS_CREATE: 'events/create',
+    LEGACY_SESSION_PRINT_REPORT: 'session/printreport',
+    LEGACY_HOLIDAYCAMP_PRINT_SESSION_MEMBER_REPORT: 'Holidaycamp/printsessionmembereport',
 }

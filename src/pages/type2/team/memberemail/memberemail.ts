@@ -11,7 +11,7 @@ import { CommonService, ToastMessageType, ToastPlacement } from '../../../../ser
 import { SharedServices } from '../../../services/sharedservice';
 import { GetStaffModel } from '../models/team.model';
 import gql from "graphql-tag";
-import { Apollo } from 'apollo-angular';
+import { GraphqlService } from '../../../../services/graphql.service';
 
 /**
  * Generated class for the MemberemailPage page.
@@ -52,7 +52,7 @@ export class MemberemailPage {
     private toastCtrl: ToastController, public sharedservice: SharedServices,
     public storage: Storage, public commonService: CommonService,
     public fb: FirebaseService, public platform: Platform, public params: NavParams,
-    public viewCtrl: ViewController, public navParams: NavParams,private apollo: Apollo,
+    public viewCtrl: ViewController, public navParams: NavParams,private graphqlService: GraphqlService,
   ) {
  this.staff=this.navParams.get("staff");
 //  console.table(this.staff);
@@ -154,19 +154,16 @@ export class MemberemailPage {
 
 
     let url = this.sharedservice.getEmailUrl();
-    $.ajax({
-      url: `${this.sharedservice.getnestURL()}/messeging/notificationemail`,
-      data: emailObj,
-
-      type: "POST",
-      success: function (respnse) {
-      },
-      error: function (xhr, status) {
-        console.log(xhr, status)
-      }
+    const email_mutation = gql`
+      mutation sendNotificationEmail($emailInput: EmailNotification!) {
+        sendNotificationEmail(emailInput: $emailInput)
+      }`;
+    this.graphqlService.mutate(email_mutation, { emailInput: emailObj }, 0).subscribe((response) => {
+      this.showToast("Mail sent successfully", 5000);
+      this.navCtrl.pop();
+    }, (err) => {
+      console.log(err);
     });
-    this.showToast("Mail sent successfully", 5000);
-    this.navCtrl.pop();
   }
 
  

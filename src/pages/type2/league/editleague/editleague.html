@@ -262,12 +262,14 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item class="description-item">
-        <ion-label stacked>Description</ion-label>
+        <ion-label stacked>Description <span class="optional-tag">(Optional)</span></ion-label>
         <ion-textarea type="text" rows="5" [(ngModel)]="league.league_description"
           placeholder="Competition instructions, rules, or notes..."></ion-textarea>
       </ion-item>
     </app-form-field>
   </ion-list>
-
-  <app-glass-button label="Update" (btnClick)="updateLeagueConfirm()"></app-glass-button>
 </ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <app-glass-button label="Update" (btnClick)="updateLeagueConfirm()"></app-glass-button>
+</ion-footer>

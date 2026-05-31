@@ -37,10 +37,18 @@ page-lineup {
         }
     }
 
-    // Content container
+    // Content container - dark by default (no class needed)
     .lineup-container {
-        background: #f5f5f5;
+        background: #0f172a !important;
         min-height: 100%;
+    }
+
+    .scroll-content {
+        background: #0f172a !important;
+    }
+
+    ion-content {
+        background: #0f172a !important;
     }
 
     // Form section
@@ -669,8 +677,7 @@ page-lineup {
     }
 
     // Theme support for modals
-    &.dark-theme,
-    .dark-theme & {
+    &:not(.light-theme) {
         .modal-card {
             background: #1e293b;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
@@ -746,15 +753,19 @@ page-lineup {
         }
     }
 
-    // Light theme styles
+    // Light theme styles - only when explicitly set
     &.light-theme,
-    .light-theme & {
+    .light-theme {
         .scroll-content {
-            background: #f8fafc;
+            background: #f8fafc !important;
+        }
+
+        &.scroll-content {
+            background: #f8fafc !important;
         }
 
         .lineup-container {
-            background: #f8fafc;
+            background: #f8fafc !important;
         }
 
         .setting-label { color: #64748b !important; }
@@ -763,15 +774,49 @@ page-lineup {
         .dropdown-arrow { color: #94a3b8 !important; }
     }
 
-    // Dark theme styles
-    &.dark-theme,
-    .dark-theme & {
+    // Dark theme styles (default state - no .light-theme class means dark)
+    &:not(.light-theme) {
         .scroll-content {
             background: #0f172a !important;
         }
 
         .lineup-container {
             background: #0f172a !important;
+        }
+
+        .setting-label { color: #94a3b8 !important; }
+        .setting-value { color: #ffffff !important; }
+        .setting-icon { color: #00b4a0 !important; }
+        .dropdown-arrow { color: #64748b !important; }
+
+        .substitutes-section {
+            .section-title { color: #94a3b8; }
+
+            .substitutes-container {
+                background: #334155;
+
+                .sub-item {
+                    .player-avatar-container {
+                        .player-image-wrapper {
+                            border-color: #475569;
+                            background: #1e293b;
+                        }
+
+                        .player-name-badge span {
+                            color: #f1f5f9;
+                        }
+                    }
+
+                    &.add-sub .node-circle {
+                        border-style: dashed;
+                        border-color: #475569;
+
+                        .node-icon {
+                            color: #94a3b8;
+                        }
+                    }
+                }
+            }
         }
 
         .dropdown-menu {
@@ -926,5 +971,27 @@ page-lineup {
 
     .toolbar-title {
         color: #fff;
+    }
+
+    ion-footer {
+        background: #0f172a !important;
+        box-shadow: none !important;
+        border: none !important;
+        padding-bottom: 0 !important;
+
+        &::before, &::after { display: none !important; }
+
+        .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+            background: #0f172a !important;
+            border: none !important;
+        }
+    }
+
+    &.light-theme ion-footer,
+    .light-theme ion-footer {
+        background: #f8fafc !important;
+        .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+            background: #f8fafc !important;
+        }
     }
 }
