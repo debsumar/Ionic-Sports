@@ -31,18 +31,18 @@
         </div>
       </app-detail-header>
 
-      <!-- View Coaches Banner -->
-      <div class="coaches-banner" (tap)="gotoViewCoaches()">
-        <ion-icon name="school"></ion-icon>
-        <span>View Coaches</span>
-        <ion-icon name="arrow-forward" class="banner-arrow"></ion-icon>
-      </div>
-
-      <!-- Option C: Banner below header -->
-      <div class="publish-banner" (tap)="publish()">
-        <ion-icon name="trophy"></ion-icon>
-        <span>Publish Result</span>
-        <ion-icon name="arrow-forward" class="banner-arrow"></ion-icon>
+      <!-- CTA Links -->
+      <div class="cta-row">
+        <div class="cta-link" (tap)="gotoViewCoaches()">
+          <ion-icon name="school"></ion-icon>
+          <span>View Coaches</span>
+          <ion-icon name="arrow-forward"></ion-icon>
+        </div>
+        <div class="cta-link cta-publish" (tap)="publish()">
+          <ion-icon name="trophy"></ion-icon>
+          <span>Publish Result</span>
+          <ion-icon name="arrow-forward"></ion-icon>
+        </div>
       </div>
 
       <!-- Team Tabs -->
@@ -124,7 +124,7 @@
                   </span>
                 </div>
                 <div class="player-payment-right" [ngClass]="item.amount_pay_status == 1 ? 'pay-paid-bg' : 'pay-pending-bg'"
-                  *ngIf="item.amount_pay_status == 1 || (item.amount_due && item.amount_due != '0.00' && item.amount_due != '0')">
+                  *ngIf="item.amount_pay_status != 0 || (item.amount_due && item.amount_due != '0.00' && item.amount_due != '0')">
                   <span [class]="item.amount_pay_status == 1 ? 'pay-paid' : 'pay-pending'">
                     {{item.amount_pay_status_text}}
                   </span>
@@ -147,6 +147,11 @@
   <app-bottom-sheet [(visible)]="showPlayerSheet"
     [title]="selectedPlayer?.user?.FirstName + ' ' + selectedPlayer?.user?.LastName"
     [bottomOffset]="0">
+    <div class="sheet-item" (click)="onPlayerAction('payment')">
+      <ion-icon name="card" class="sheet-item-icon"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Update Payment</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
     <div class="sheet-item confirmed-item" (click)="onPlayerAction('confirmed')">
       <ion-icon name="checkmark-circle" class="sheet-item-icon"></ion-icon>
       <div class="sheet-item-info"><span class="sheet-item-name">Confirmed</span></div>
@@ -186,6 +191,12 @@
     <div class="sheet-item" (click)="onTeamActionSelect('create_external')">
       <ion-icon name="person-add" class="sheet-item-icon"></ion-icon>
       <div class="sheet-item-info"><span class="sheet-item-name">Add External Team</span></div>
+      <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
+    </div>
+    <div class="sheet-item" (click)="onTeamActionSelect('remove')"
+      *ngIf="teamActionIsHome ? match.homeUserId : match.awayUserId">
+      <ion-icon name="trash" class="sheet-item-icon" color="danger"></ion-icon>
+      <div class="sheet-item-info"><span class="sheet-item-name">Remove Team</span></div>
       <ion-icon name="arrow-forward" class="sheet-item-chevron"></ion-icon>
     </div>
   </app-bottom-sheet>

@@ -23,6 +23,25 @@
     <p class="recurring-hint" *ngIf="untilWhen">
       Match will be created every week on <strong>{{getRecurringDayName()}}</strong> until <strong>{{untilWhen | date:'dd MMM yyyy'}}</strong>
     </p>
+
+    <ng-container *ngIf="isTeamMatch">
+      <app-form-field [isDark]="isDarkTheme">
+        <ion-item>
+          <ion-label>Home Team</ion-label>
+          <ion-select [(ngModel)]="selectedHomeTeamId" placeholder="Select home team">
+            <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedAwayTeamId">{{t.teamName}}</ion-option>
+          </ion-select>
+        </ion-item>
+      </app-form-field>
+      <app-form-field [isDark]="isDarkTheme">
+        <ion-item>
+          <ion-label>Away Team</ion-label>
+          <ion-select [(ngModel)]="selectedAwayTeamId" placeholder="Select away team">
+            <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedHomeTeamId">{{t.teamName}}</ion-option>
+          </ion-select>
+        </ion-item>
+      </app-form-field>
+    </ng-container>
   </ion-list>
 
   <app-glass-button label="Create Recurring Matches" (btnClick)="createRecurringMatches()"></app-glass-button>

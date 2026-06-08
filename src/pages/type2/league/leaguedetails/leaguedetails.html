@@ -192,8 +192,7 @@
         <!-- Overall Stats Table -->
         <div *ngIf="statsData.length > 0">
           <h4 class="stats-group-header" *ngIf="groups.length > 0">Overall</h4>
-          <div class="revamp-card standings-card">
-            <div class="card-accent" style="background: linear-gradient(180deg, #2b92bb, #1e6c8c)"></div>
+          <primary-card class="standings-card" [accentColor]="'linear-gradient(180deg, #2b92bb, #1e6c8c)'">
             <div class="card-content">
               <div class="standings-table-wrap">
                 <table class="standings-table stats-table">
@@ -226,13 +225,12 @@
                 </table>
               </div>
             </div>
-          </div>
+          </primary-card>
 
           <!-- Per-Group Stats Tables -->
           <div *ngFor="let group of getGroupedParticipants()">
             <h4 class="stats-group-header">{{group.name}}</h4>
-            <div class="revamp-card standings-card" *ngIf="getGroupStats(group.playerNames).length > 0">
-              <div class="card-accent" style="background: linear-gradient(180deg, #8b5cf6, #7c3aed)"></div>
+            <primary-card class="standings-card" *ngIf="getGroupStats(group.playerNames).length > 0" [accentColor]="'linear-gradient(180deg, #8b5cf6, #7c3aed)'">
               <div class="card-content">
                 <div class="standings-table-wrap">
                   <table class="standings-table stats-table">
@@ -265,7 +263,7 @@
                   </table>
                 </div>
               </div>
-            </div>
+            </primary-card>
             <div class="stats-empty-sm" *ngIf="getGroupStats(group.playerNames).length === 0">
               No results yet for this group
             </div>
@@ -274,8 +272,7 @@
 
         <!-- Fallback to league standing if no result_json data -->
         <div *ngIf="statsData.length === 0 && leagueStanding && leagueStanding.length > 0">
-          <div class="revamp-card standings-card">
-            <div class="card-accent" style="background: linear-gradient(180deg, #2b92bb, #1e6c8c)"></div>
+          <primary-card class="standings-card" [accentColor]="'linear-gradient(180deg, #2b92bb, #1e6c8c)'">
             <div class="card-content">
               <div class="standings-table-wrap">
                 <table class="standings-table">
@@ -302,7 +299,7 @@
                 </table>
               </div>
             </div>
-          </div>
+          </primary-card>
         </div>
       </div>
 
@@ -310,8 +307,7 @@
       <div *ngIf="activeIndex === 0" class="tab-content">
         <!-- Team type: standings table -->
         <div *ngIf="individualLeague?.league_type_text === 'Team'">
-          <div class="revamp-card standings-card">
-            <div class="card-accent" style="background: linear-gradient(180deg, #8b5cf6, #7c3aed)"></div>
+          <primary-card class="standings-card" [accentColor]="'linear-gradient(180deg, #8b5cf6, #7c3aed)'">
             <div class="card-content">
               <div class="standings-table-wrap">
                 <table class="standings-table">
@@ -340,7 +336,7 @@
                 </table>
               </div>
             </div>
-          </div>
+          </primary-card>
         </div>
 
         <!-- Non-Team type: participant cards -->
@@ -479,8 +475,7 @@
 
       <!-- Matches Tab (index 1) -->
       <div *ngIf="activeIndex === matchesTabIndex" class="tab-content matches-container">
-        <div class="revamp-card" (click)="onMatchCardClick(mat)" *ngFor="let mat of match">
-          <div class="card-accent" [style.background]="mat.ResultStatus == 1 ? 'linear-gradient(180deg, #10b981, #059669)' : 'linear-gradient(180deg, #f59e0b, #d97706)'"></div>
+        <primary-card *ngFor="let mat of match" (cardClick)="onMatchCardClick(mat)" [accentColor]="mat.ResultStatus == 1 ? 'linear-gradient(180deg, #10b981, #059669)' : 'linear-gradient(180deg, #f59e0b, #d97706)'">
           <div class="card-content">
             <div class="corner-ribbon" [class.private]="mat.match_visibility==1">
               <ion-icon [name]="mat.match_visibility==0?'globe':'lock'"></ion-icon>
@@ -533,7 +528,7 @@
               <span class="venue-text">{{mat.club_name}}</span>
             </div>
           </div>
-        </div>
+        </primary-card>
       </div>
 
       <!-- Box League Tab -->

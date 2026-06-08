@@ -25,7 +25,7 @@ page-match {
     padding: 0 4px;
     padding-bottom: 0;
 
-    .revamp-card { margin-bottom: 8px; }
+    primary-card { display: block; margin-bottom: 8px; }
   }
 
   // ── Light Theme ──
@@ -35,18 +35,13 @@ page-match {
     .context-line { color: #94a3b8; }
     .match-fixed-header { background: #f8fafc; }
 
-    .revamp-card {
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(226, 232, 240, 0.6);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-    }
     .card-title { color: #1e293b !important; }
     .card-subtitle { color: #64748b !important; }
     .card-activity { color: #2b92bb !important; }
     .card-venue-footer { .mp-icon { color: #94a3b8; } .mp-text, .mp-text.mp-selected { color: #94a3b8 !important; } }
     .scoreboard { .sb-name { color: #1e293b; } .sb-vs { background: #cbd5e1; color: #1e293b; } .sb-score { color: #1e293b; } }
     .card-chevron { color: #cbd5e1 !important; }
-    .card-content { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
+    .card-content { background: transparent; }
     .card-icon-wrapper.match-bg { background: rgba(0, 0, 0, 0.06); border-color: rgba(0, 0, 0, 0.08);
       .card-icon { color: #475569; }
     }
@@ -84,27 +79,10 @@ page-match {
     @media (min-width: 1024px) { grid-template-columns: repeat(3, 1fr); gap: 14px; }
   }
 
-  // Card — same as league .revamp-card
-  .revamp-card {
-    display: flex;
-    border-radius: 14px;
-    border: 1px solid rgba(71, 85, 105, 0.4);
-    background: rgba(30, 41, 59, 0.5);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    cursor: pointer;
-    overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    &:active { transform: scale(0.98); }
-  }
-
-  .card-accent { width: 5px; flex-shrink: 0; }
-
   .card-content {
     flex: 1; padding: 10px 12px 8px; min-width: 0;
     display: flex; flex-direction: column; gap: 6px;
     position: relative; overflow: hidden;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
   }
 
   .card-top-row { display: flex; align-items: center; gap: 6px; }

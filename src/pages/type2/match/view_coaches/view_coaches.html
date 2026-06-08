@@ -30,11 +30,10 @@
 
     <div class="page-scroll-area">
       <div class="items-container" *ngIf="filteredCoaches.length > 0">
-        <div class="revamp-card" *ngFor="let coach of filteredCoaches"
+        <primary-card *ngFor="let coach of filteredCoaches"
           [class.selected]="isSelected(coach.Id)"
           [class.removing]="isMarkedForRemoval(coach.Id)"
-          (click)="toggleCoach(coach.Id)">
-          <div class="card-accent"></div>
+          (cardClick)="toggleCoach(coach.Id)">
           <div class="card-content">
             <div class="card-top-row">
               <div class="coach-avatar" *ngIf="!hasProfileImage(coach)">{{getInitials(coach)}}</div>
@@ -62,7 +61,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </primary-card>
       </div>
 
       <div class="modern-empty-state" *ngIf="filteredCoaches.length === 0">

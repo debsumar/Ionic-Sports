@@ -8,6 +8,8 @@ import { API } from "../../../../shared/constants/api_constants";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { ThemeService } from "../../../../services/theme.service";
 import { AllMatchData } from "../../../../shared/model/match.model";
+import { MatchType } from "../../../../shared/utility/enums";
+import { TeamsForParentClubModel } from "../../league/models/team.model";
 import moment from "moment";
 
 @IonicPage()
@@ -22,6 +24,13 @@ export class AddrecurringmatchesPage {
   untilWhen: string = '';
   minDate: string = '';
   maxDate: string = moment().add(10, 'years').format('YYYY-MM-DD');
+  teamList: TeamsForParentClubModel[] = [];
+  selectedHomeTeamId: string = '';
+  selectedAwayTeamId: string = '';
+
+  get isTeamMatch(): boolean {
+    return +this.match.MatchType === MatchType.TEAM;
+  }
 
   constructor(
     public navCtrl: NavController,
@@ -36,6 +45,29 @@ export class AddrecurringmatchesPage {
     this.match = JSON.parse(this.navParams.get("match"));
     this.minDate = moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm").add(1, 'day').format('YYYY-MM-DD');
     this.untilWhen = moment(this.match.MatchStartDate, "YYYY-MM-DD HH:mm").add(1, 'week').toISOString();
+    if (this.isTeamMatch) {
+      this.selectedHomeTeamId = this.match.homeUserId || '';
+      this.selectedAwayTeamId = this.match.awayUserId || '';
+      this.fetchTeams();
+    }
+  }
+
+  fetchTeams() {
+    const body = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId: '',
+      activityId: this.match.activityId,
+      memberId: this.sharedservice.getLoggedInUserId(),
+      action_type: 1,
+      device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
+      app_type: AppType.ADMIN_NEW,
+      device_id: '',
+      updated_by: '',
+      isExternal: false
+    };
+    this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, body).subscribe({
+      next: (res: any) => { this.teamList = res.data || []; }
+    });
   }
 
   ionViewWillEnter() {
@@ -117,9 +149,14 @@ export class AddrecurringmatchesPage {
       MatchDuration: this.match.MatchDuration != null ? String(this.match.MatchDuration) : '',
       UserParentClubId: this.sharedservice.getPostgreParentClubId(),
       UserActivityId: this.match.activityId,
-      UserActionType: 0,
+      UserActionType: 2,
       untilWhen: moment(this.untilWhen).format("YYYY-MM-DD")
     };
+
+    if (this.isTeamMatch) {
+      payload['HomeParentclubTeamId'] = this.selectedHomeTeamId || '';
+      payload['AwayParentclubTeamId'] = this.selectedAwayTeamId || '';
+    }
 
     this.httpService.post(`${API.CREATE_RECURRING_MATCHES}`, payload).subscribe(
       (res: any) => {

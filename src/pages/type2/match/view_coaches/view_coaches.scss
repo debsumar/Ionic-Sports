@@ -11,13 +11,10 @@ page-view-coaches {
     .page-fixed-header { background: #f8fafc; }
     .header-title { color: #1e293b; }
     .back-btn ion-icon { color: #1e293b !important; }
-    .revamp-card {
-      background: rgba(255, 255, 255, 0.55); border-color: rgba(226, 232, 240, 0.6);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-      &.selected { border-color: #2b92bb; }
-      &.removing { border-color: #ef4444; }
+    primary-card {
+      &.selected .primary-card { border-color: #2b92bb; }
+      &.removing .primary-card { border-color: #ef4444; }
     }
-    .card-content { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, transparent 75%); }
     .card-title { color: #1e293b !important; }
     .card-subtitle { color: #64748b !important; }
     .coach-avatar { background: rgba(43, 146, 187, 0.12); color: #2b92bb; }
@@ -77,25 +74,15 @@ page-view-coaches {
     @media (min-width: 1024px) { grid-template-columns: repeat(3, 1fr); }
   }
 
-  .revamp-card {
-    display: flex; border-radius: 14px;
-    border: 1px solid rgba(71, 85, 105, 0.4);
-    background: rgba(30, 41, 59, 0.5);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    cursor: pointer; overflow: hidden;
-    transition: transform 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
-    &:active { transform: scale(0.98); }
-    &.selected { border-color: #2b92bb; }
-    &.removing { border-color: #ef4444; opacity: 0.6; }
+  primary-card {
+    display: block;
+    &.selected .primary-card { border-color: #2b92bb; }
+    &.removing { opacity: 0.6; .primary-card { border-color: #ef4444; } }
   }
-
-  .card-accent { width: 5px; flex-shrink: 0; background: linear-gradient(180deg, #2b92bb, #1e6c8c); }
 
   .card-content {
     flex: 1; padding: 14px; min-width: 0;
     display: flex; flex-direction: column; gap: 10px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, transparent 75%);
   }
 
   .card-top-row { display: flex; align-items: center; gap: 10px; }

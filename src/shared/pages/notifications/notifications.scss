@@ -20,6 +20,31 @@ page-notifications {
     box-sizing: border-box;
   }
 
+  .recipient-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .select-all-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    background: rgba(43, 146, 187, 0.15);
+    border: 1px solid rgba(43, 146, 187, 0.3);
+    color: #3fbcd3;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.1px;
+    cursor: pointer;
+    ion-icon { font-size: 16px; }
+    &:active { transform: scale(0.97); }
+  }
+
   .recipient-badge {
     display: inline-flex;
     align-items: center;
@@ -37,7 +62,7 @@ page-notifications {
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
-    max-height: 90px;
+    max-height: 150px;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
@@ -45,6 +70,7 @@ page-notifications {
   .recipient-chip {
     display: inline-flex;
     align-items: center;
+    gap: 5px;
     padding: 4px 10px;
     border-radius: 16px;
     background: rgba(71, 85, 105, 0.3);
@@ -58,6 +84,27 @@ page-notifications {
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
+    cursor: pointer;
+    outline: none;
+    ion-icon { font-size: 13px; flex-shrink: 0; }
+    &:active { transform: scale(0.97); }
+
+    &.chip-paid {
+      background: rgba(34, 197, 94, 0.15);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #4ade80;
+    }
+
+    &.chip-pending {
+      background: rgba(239, 68, 68, 0.15);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #f87171;
+    }
+
+    &.chip-unselected {
+      opacity: 0.45;
+      border-style: dashed;
+    }
   }
 
   .heading-display {
@@ -220,6 +267,24 @@ page-notifications {
       background: rgba(226, 232, 240, 0.5);
       border-color: #e2e8f0;
       color: #475569;
+
+      &.chip-paid {
+        background: rgba(34, 197, 94, 0.12);
+        border-color: rgba(34, 197, 94, 0.4);
+        color: #16a34a;
+      }
+
+      &.chip-pending {
+        background: rgba(239, 68, 68, 0.12);
+        border-color: rgba(239, 68, 68, 0.4);
+        color: #dc2626;
+      }
+    }
+
+    .select-all-toggle {
+      background: rgba(43, 146, 187, 0.1);
+      border-color: rgba(43, 146, 187, 0.25);
+      color: #2b92bb;
     }
 
     ion-item.form-item {
@@ -252,7 +317,7 @@ page-notifications {
     .notif-header { padding: 10px 8px 6px; gap: 8px; }
     .recipient-badge { padding: 4px 10px; span { font-size: 11px; } }
     .recipient-chip { font-size: 10px; padding: 3px 8px; }
-    .recipient-chips { max-height: 70px; }
+    .recipient-chips { max-height: 120px; }
     .heading-display { padding: 4px 10px; span { font-size: 11px; } }
     ion-list { margin: 6px 8px !important; }
     ion-item.form-item { padding-left: 12px; ion-label { font-size: 10px !important; } }
@@ -264,7 +329,7 @@ page-notifications {
     .notif-header { padding: 16px 16px 8px; }
     ion-list { margin: 8px 16px !important; }
     .send-btn-wrap { padding: 12px 16px; }
-    .recipient-chips { max-height: 100px; }
+    .recipient-chips { max-height: 170px; }
   }
 
   @media (min-width: 768px) {
@@ -273,7 +338,7 @@ page-notifications {
     .send-btn-wrap { padding: 16px 24px; }
     .recipient-badge span { font-size: 14px; }
     .recipient-chip { font-size: 12px; padding: 5px 12px; }
-    .recipient-chips { max-height: 120px; gap: 8px; }
+    .recipient-chips { max-height: 200px; gap: 8px; }
     .heading-display span { font-size: 13px; }
     .description-item ion-textarea .text-input { font-size: 16px !important; }
     .btn-send { height: 52px; font-size: 17px; border-radius: 10px; }

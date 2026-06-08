@@ -64,11 +64,7 @@ page-leagueteamlisting {
       }
     }
 
-    .revamp-card {
-      background: #ffffff;
-      border: 1px solid #e2e8f0;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
+    primary-card {
 
       .card-title {
         color: #1e293b !important;
@@ -571,33 +567,13 @@ page-leagueteamlisting {
   }
 }
 
-// ─── REVAMPED CARD (shared structure) ───
-.revamp-card {
-  display: flex;
-  border-radius: 12px;
-  border: 1px solid #334155;
-  background: #1e293b;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-  cursor: pointer;
-  overflow: hidden;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-
-  &:active {
-    transform: scale(0.98);
-    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.4);
-  }
+primary-card {
+  display: block;
 }
 
-.card-accent {
-  width: 5px;
-  flex-shrink: 0;
 
-  &.team-accent {
-    background: linear-gradient(180deg, #8b5cf6, #7c3aed);
-  }
-}
 
-.revamp-card > .card-content {
+.card-content {
   flex: 1;
   padding: 10px 12px 8px;
   min-width: 0;

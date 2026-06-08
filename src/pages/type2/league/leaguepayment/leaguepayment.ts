@@ -37,6 +37,7 @@ export class LeaguepaymentPage {
   paymentMode: CatandType[]
 
   parentClubId: string = "";
+  isDarkTheme: boolean = false;
 
   payment_update_input: LeaguePaymentInput_V3 = {
     user_postgre_metadata: new UserPostgreMetadataField,
@@ -137,7 +138,7 @@ export class LeaguepaymentPage {
   }
 
   ionViewDidLoad() {
-    console.log('ionViewDidLoad LeaguepaymentPage');
+    this.storage.get('dashboardTheme').then((v) => this.isDarkTheme = v !== null ? v : true);
   }
 
   cancel() {

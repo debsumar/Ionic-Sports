@@ -42,7 +42,7 @@
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>Activity</ion-label>
-        <ion-select [(ngModel)]="activityId">
+        <ion-select (ionChange)="onActivityChange()" [(ngModel)]="activityId">
           <ion-option *ngFor="let type of activities" value="{{type.id}}">{{type.activity_name}}</ion-option>
         </ion-select>
       </ion-item>
@@ -51,7 +51,7 @@
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>Match Type</ion-label>
-        <ion-select [(ngModel)]="createMatchInput.MatchType">
+        <ion-select (ionChange)="onMatchTypeChange()" [(ngModel)]="createMatchInput.MatchType">
           <ion-option *ngFor="let type of leagueType" [value]="type.value">{{type.key}}</ion-option>
         </ion-select>
       </ion-item>
@@ -122,7 +122,7 @@
       </ion-item>
     </app-expandable-section>
 
-    <app-expandable-section label="RECURRING" [(expanded)]="isRecurring">
+    <app-expandable-section label="RECURRING" [(expanded)]="isRecurring" (expandedChange)="onRecurringToggle($event)">
       <ion-item>
         <ion-label>Until When</ion-label>
         <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="recurringUntilWhen"
@@ -131,6 +131,20 @@
       <p class="recurring-hint" *ngIf="recurringUntilWhen">
         Match will be created every week on <strong>{{getRecurringDayName()}}</strong> until <strong>{{recurringUntilWhen | date:'dd MMM yyyy'}}</strong>
       </p>
+      <ng-container *ngIf="+createMatchInput.MatchType === 3">
+        <ion-item>
+          <ion-label>Home Team</ion-label>
+          <ion-select [(ngModel)]="selectedHomeTeamId" placeholder="Select home team">
+            <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedAwayTeamId">{{t.teamName}}</ion-option>
+          </ion-select>
+        </ion-item>
+        <ion-item>
+          <ion-label>Away Team</ion-label>
+          <ion-select [(ngModel)]="selectedAwayTeamId" placeholder="Select away team">
+            <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedHomeTeamId">{{t.teamName}}</ion-option>
+          </ion-select>
+        </ion-item>
+      </ng-container>
     </app-expandable-section>
 
     <app-form-field [isDark]="isDarkTheme">

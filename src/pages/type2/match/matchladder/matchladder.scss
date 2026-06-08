@@ -48,7 +48,7 @@ page-matchladder {
   app-list-card { display: block; margin-bottom: 6px; }
   .ladder-row {
     display: flex; align-items: center; gap: 12px; padding: 12px 14px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
   }
   .rank-badge {
     width: 36px; height: 36px; border-radius: 10px; flex-shrink: 0;

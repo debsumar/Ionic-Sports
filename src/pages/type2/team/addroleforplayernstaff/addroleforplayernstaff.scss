@@ -18,7 +18,7 @@ page-addroleforplayernstaff {
   app-list-card { display: block; margin-bottom: 6px; }
   .role-row {
     display: flex; align-items: center; gap: 12px; padding: 14px 16px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
     cursor: pointer;
   }
   .role-avatar {
@@ -48,7 +48,7 @@ page-addroleforplayernstaff {
     ion-content { background: #f8fafc !important; }
     .page-fixed-header { background: #f8fafc; }
     .section-title { color: #1e293b; }
-    .role-row { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
+    .role-row { background: transparent; }
     .role-name { color: #1e293b; }
     .empty-state .empty-icon { color: #cbd5e1; }
   }

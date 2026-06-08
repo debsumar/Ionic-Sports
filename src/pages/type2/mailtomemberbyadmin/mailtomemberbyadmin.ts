@@ -35,6 +35,8 @@ export class MailToMemberByAdminPage {
   campDetails: any;
   module_obj: EmailModalForModule;
   isDarkTheme: boolean = true;
+  isLeagueTeams: boolean = false;
+  allSelected: boolean = true;
 
   constructor(
     public navCtrl: NavController,
@@ -51,6 +53,8 @@ export class MailToMemberByAdminPage {
     public events: Events
   ) {
     this.module_obj = this.params.get("email_modal");
+    this.isLeagueTeams = this.module_obj.isLeagueTeams || this.module_obj.isMatchTeam || false;
+    (this.module_obj.email_users || []).forEach(u => u.selected = true);
     if (this.module_obj.type == ModuleTypeForEmail.TERMSESSION || this.module_obj.type == ModuleTypeForEmail.MONTHLYSESSION) {
       this.emailObj.Message = "Dear All,";
       if (this.module_obj.email_users.length > 0) {
@@ -163,8 +167,11 @@ export class MailToMemberByAdminPage {
         this.commonService.toastMessage("Email message is required", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         return;
       }
-      if (this.module_obj.email_users.length == 0) {
-        this.commonService.toastMessage("No recipients found", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      const members = this.isLeagueTeams
+        ? this.module_obj.email_users.filter(u => u.selected)
+        : this.module_obj.email_users;
+      if (members.length == 0) {
+        this.commonService.toastMessage(this.isLeagueTeams ? "Please select at least one recipient" : "No recipients found", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         return;
       }
 
@@ -181,7 +188,7 @@ export class MailToMemberByAdminPage {
         Message: this.emailObj.Message,
       }
 
-      emailFormembers.Members = this.module_obj.email_users;
+      emailFormembers.Members = members;
 
       const email_mutation = gql`
       mutation sendNotificationEmail($emailInput: EmailNotification!) {
@@ -239,6 +246,22 @@ export class MailToMemberByAdminPage {
   dismiss() {
     this.viewCtrl.dismiss();
   }
+
+  toggleRecipient(u: EmailUsers) {
+    u.selected = !u.selected;
+    this.allSelected = this.module_obj.email_users.length > 0 && this.module_obj.email_users.every(item => item.selected);
+    this.updateRecipientCount();
+  }
+
+  toggleSelectAll() {
+    this.allSelected = !this.allSelected;
+    this.module_obj.email_users.forEach(u => u.selected = this.allSelected);
+    this.updateRecipientCount();
+  }
+
+  updateRecipientCount() {
+    this.numberOfPeople = this.module_obj.email_users.filter(u => u.selected).length + " recipients";
+  }
 }
 
 
@@ -257,6 +280,8 @@ export class EmailModalForModule {
   email_users: EmailUsers[];
   type: number;
   subject?: string;
+  isLeagueTeams?: boolean;
+  isMatchTeam?: boolean;
 }
 
 export class EmailUsers {
@@ -265,6 +290,8 @@ export class EmailUsers {
   MemberId: string
   MemberEmail: string
   MemberName: string
+  payStatus?: number
+  selected?: boolean
 }
 
 export enum ModuleTypeForEmail {

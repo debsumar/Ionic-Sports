@@ -16,10 +16,11 @@ import { MapPickerModalComponent } from './map-picker/map-picker-modal.component
 import { FormFieldComponent } from './form-field/form-field.component';
 import { DetailHeaderComponent } from './detail-header/detail-header.component';
 import { ProgressBarComponent } from './progress-bar/progress-bar';
+import { PrimaryCardComponent } from './primary-card/primary-card.component';
 
 @NgModule({
-  declarations: [ExpandableSectionComponent, AccessToggleComponent, PillTabsComponent, SearchBarComponent, ListCardComponent, BottomSheetComponent, FabComponent, GlassButtonComponent, MapPickerComponent, FormFieldComponent, DetailHeaderComponent, ProgressBarComponent],
+  declarations: [ExpandableSectionComponent, AccessToggleComponent, PillTabsComponent, SearchBarComponent, ListCardComponent, BottomSheetComponent, FabComponent, GlassButtonComponent, MapPickerComponent, FormFieldComponent, DetailHeaderComponent, ProgressBarComponent, PrimaryCardComponent],
   imports: [CommonModule, FormsModule, IonicModule],
-  exports: [ExpandableSectionComponent, AccessToggleComponent, PillTabsComponent, SearchBarComponent, ListCardComponent, BottomSheetComponent, FabComponent, GlassButtonComponent, MapPickerComponent, FormFieldComponent, DetailHeaderComponent, ProgressBarComponent]
+  exports: [ExpandableSectionComponent, AccessToggleComponent, PillTabsComponent, SearchBarComponent, ListCardComponent, BottomSheetComponent, FabComponent, GlassButtonComponent, MapPickerComponent, FormFieldComponent, DetailHeaderComponent, ProgressBarComponent, PrimaryCardComponent]
 })
 export class SharedComponentsModule {}

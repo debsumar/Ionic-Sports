@@ -24,9 +24,9 @@
       <div *ngIf="activeIndex==0" class="tab-content">
 
         <div class="items-container" *ngIf="filteredleagues.length > 0">
-          <div class="revamp-card" *ngFor="let league of filteredleagues"
-            (click)="gotoLeaguedetailsPage(league)">
-            <div class="card-accent" [style.background]="getLeagueTypeColor(league.league_type_text)"></div>
+          <primary-card *ngFor="let league of filteredleagues"
+            [accentColor]="getLeagueTypeColor(league.league_type_text)"
+            (cardClick)="gotoLeaguedetailsPage(league)">
             <div class="card-content">
               <div class="corner-ribbon" [class.private]="league.league_visibility==1">
                 <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
@@ -51,7 +51,7 @@
                 <span class="venue-text">{{league.club?.ClubName}}</span>
               </div>
             </div>
-          </div>
+          </primary-card>
         </div>
 
         <div class="modern-empty-state" *ngIf="filteredleagues.length === 0">
@@ -65,9 +65,9 @@
       <div *ngIf="activeIndex==1" class="tab-content">
 
         <div class="items-container" *ngIf="filteredMatchlist.length > 0">
-          <div class="revamp-card" *ngFor="let match of filteredMatchlist"
-            (click)="gotoMatchdetailsPage(match)">
-            <div class="card-accent" [style.background]="getMatchTypeColor(match.MatchType)"></div>
+          <primary-card *ngFor="let match of filteredMatchlist"
+            [accentColor]="getMatchTypeColor(match.MatchType)"
+            (cardClick)="gotoMatchdetailsPage(match)">
             <div class="card-content">
               <div class="card-top-row">
                 <div class="card-icon-wrapper match-bg">
@@ -99,7 +99,7 @@
                 <span class="venue-text">{{match.location && match.location !== '' ? match.location : match.VenueName}}</span>
               </div>
             </div>
-          </div>
+          </primary-card>
         </div>
 
         <div class="modern-empty-state" *ngIf="filteredMatchlist.length === 0">

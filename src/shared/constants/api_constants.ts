@@ -220,6 +220,8 @@ export const API = {
     ADD_PLAYERS_TO_MATCH: 'match/AddPlayersToMatch',
     UPDATE_STANDALONE_PARTICIPATION_STATUS: 'match/UpdateStandaloneParticipationStatus',
     PUBLISH_RESULT_STANDALONE: 'match/PublishResultStandAlone',
+    UPDATE_TEAM_MATCH_PARTICIPANT_PAYMENT: 'match/UpdateTeamMatchParticipantPayment',
+    GET_MATCH_PAYMENT_METHODS: 'utility/getPaymentMethods',
 
     // ── Legacy nest URL endpoints (host: activitypro-nest-261607.appspot.com) ──
     // Pass type=2 to httpService when calling these so they hit the legacy

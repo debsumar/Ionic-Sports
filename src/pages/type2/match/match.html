@@ -11,9 +11,9 @@
     </div>
 
     <div class="match-scroll-area">
-      <div class="revamp-card" *ngFor="let match of filteredMatchlist"
-        (click)="gotoMatchdetailsPage(match)">
-        <div class="card-accent" [style.background]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))"></div>
+      <primary-card *ngFor="let match of filteredMatchlist"
+        [accentColor]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))"
+        (cardClick)="gotoMatchdetailsPage(match)">
         <div class="card-content">
           <div class="corner-ribbon" [class.private]="match.MatchVisibility==1">
             <ion-icon [name]="match.MatchVisibility==0 ? 'globe' : 'lock'"></ion-icon>
@@ -65,7 +65,7 @@
             <app-map-picker [address]="match.location && match.location !== '' ? match.location : match.VenueName" [readOnly]="true"></app-map-picker>
           </div>
         </div>
-      </div>
+      </primary-card>
 
       <div class="modern-empty-state" *ngIf="filteredMatchlist.length === 0">
         <div class="empty-illustration">

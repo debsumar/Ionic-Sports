@@ -15,13 +15,13 @@
 <ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
   <ion-list>
     <div class="member-card">
-      <p class="mem_name">{{selectedMemberDetails.participant_details.first_name}} {{selectedMemberDetails.participant_details.last_name}}</p>
-      <p class="match-title">{{selectedLeagueDetails.league_name}}</p>
+      <p class="mem_name">{{selectedMemberDetails.user.FirstName}} {{selectedMemberDetails.user.LastName}}</p>
+      <p class="match-title">{{selectedMatchDetails.MatchTitle}}</p>
       <p *ngIf="selectedMemberDetails.amount_pay_status==0">
-        <span class="due">{{userData.Currency}}{{selectedMemberDetails.amount_due | number: '1.2-2'}} {{selectedMemberDetails.amount_pay_status_text}}</span>
+        <span class="due">{{userData.Currency}}{{selectedMemberDetails.amount_due | number: '1.2-2'}} Due</span>
       </p>
       <p *ngIf="selectedMemberDetails.amount_pay_status!=0">
-        <span class="paid">{{userData.Currency}}{{selectedMemberDetails.paid_amount | number: '1.2-2'}} {{selectedMemberDetails.amount_pay_status_text}}</span>
+        <span class="paid">{{userData.Currency}}{{selectedMemberDetails.paid_amount | number: '1.2-2'}} Paid</span>
       </p>
     </div>
 
@@ -36,7 +36,7 @@
       <ion-item>
         <ion-label>Payment Mode</ion-label>
         <ion-select [(ngModel)]="payment_update_input.user_payment.payment_mode" [disabled]="selectedMemberDetails.amount_pay_status!='0'" placeholder="Select">
-          <ion-option *ngFor="let pay of paymentMode" [value]="pay.value">{{pay.key}}</ion-option>
+          <ion-option *ngFor="let pay of paymentMode" [value]="pay.id">{{pay.name}}</ion-option>
         </ion-select>
       </ion-item>
     </app-form-field>

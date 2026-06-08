@@ -9,18 +9,19 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
       <div class="list-card-body">
         <ng-content></ng-content>
       </div>
+      <div class="list-card-check" *ngIf="showCheckbox" (click)="$event.stopPropagation()">
+        <ion-checkbox [ngModel]="checked" [disabled]="checkboxDisabled" (ngModelChange)="onCheck($event)"></ion-checkbox>
+      </div>
     </div>
   `,
   styles: [`
     app-list-card { display: block; min-width: 0; overflow: hidden; }
     app-list-card .list-card {
       display: flex;
-      border-radius: 14px;
-      border: 1px solid rgba(71, 85, 105, 0.4);
-      background: rgba(30, 41, 59, 0.5);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+      border-radius: 16px;
+      border: 1px solid rgba(148, 163, 184, 0.12);
+      background: #1c2a3e;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
       cursor: pointer;
       overflow: hidden;
       transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -31,15 +32,25 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
     app-list-card .list-card-body {
       flex: 1; min-width: 0; position: relative; overflow: hidden;
     }
+    app-list-card .list-card-check { display: flex; align-items: center; padding: 0 12px; flex-shrink: 0; }
 
     .light-theme app-list-card .list-card {
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(226, 232, 240, 0.6);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+      background: #ffffff;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
     }
   `]
 })
 export class ListCardComponent {
   @Input() accentColor: string = null;
+  @Input() showCheckbox: boolean = false;
+  @Input() checked: boolean = false;
+  @Input() checkboxDisabled: boolean = false;
   @Output() cardClick = new EventEmitter<any>();
+  @Output() checkedChange = new EventEmitter<boolean>();
+
+  onCheck(value: boolean) {
+    this.checked = value;
+    this.checkedChange.emit(value);
+  }
 }

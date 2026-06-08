@@ -38,22 +38,11 @@ page-leaguedetails {
   }
 
   // ── Revamp Card (shared glassmorphism structure) ──
-  .revamp-card {
-    display: flex; border-radius: 14px;
-    border: 1px solid rgba(71, 85, 105, 0.4);
-    background: rgba(30, 41, 59, 0.5);
-    backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-    cursor: pointer; overflow: hidden;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    &:active { transform: scale(0.98); }
-  }
-  .card-accent { width: 5px; flex-shrink: 0; }
+  primary-card { display: block; }
   .card-content {
     flex: 1; min-width: 0; padding: 14px 14px 12px;
     display: flex; flex-direction: column; gap: 10px;
     position: relative; overflow: hidden;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
   }
   .card-top-row { display: flex; align-items: center; gap: 10px; }
   .card-info {
@@ -79,7 +68,7 @@ page-leaguedetails {
     &.private::before { border-color: transparent #f76e04 transparent transparent; }
   }
 
-  // ── Standings Table (inside revamp-card) ──
+  // ── Standings Table (inside primary-card) ──
   .standings-card {
     margin: 4px 8px;
     .card-content { padding: 0; gap: 0; }
@@ -332,7 +321,7 @@ page-leaguedetails {
   }
   .participant-card {
     padding: 12px; display: flex; flex-direction: column; gap: 8px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
   }
   .p-top-row { display: flex; align-items: center; gap: 10px; }
   .p-avatar {
@@ -380,13 +369,12 @@ page-leaguedetails {
   .medical-icon { width: 16px; height: 16px; }
   .media-icon { width: 16px; height: 16px; }
 
-  // ── Match Cards (revamp-card pattern) ──
+  // ── Match Cards (primary-card pattern) ──
   .matches-container { padding: 0 8px; display: grid; grid-template-columns: 1fr; gap: 10px; }
   .match-icon-wrapper {
     width: 40px; height: 40px; border-radius: 10px;
     display: flex; align-items: center; justify-content: center; flex-shrink: 0;
     background: rgba(255, 255, 255, 0.12);
-    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
     border: 1px solid rgba(255, 255, 255, 0.15);
     .card-icon { font-size: 18px; color: #fff; }
   }
@@ -615,14 +603,6 @@ page-leaguedetails {
       &.danger { background: rgba(239, 68, 68, 0.08); color: #ef4444; }
     }
 
-    .revamp-card {
-      background: rgba(255, 255, 255, 0.55);
-      border: 1px solid rgba(226, 232, 240, 0.6);
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
-    }
-    .card-content {
-      background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%);
-    }
     .card-info .card-title { color: #1e293b !important; }
     .card-info .card-subtitle { color: #64748b !important; }
     .card-divider { background: rgba(226, 232, 240, 0.6); }
@@ -634,7 +614,7 @@ page-leaguedetails {
     }
 
     .participant-card {
-      background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%);
+      background: transparent;
     }
     .p-name { color: #1e293b; }
     .p-detail { color: #64748b; }

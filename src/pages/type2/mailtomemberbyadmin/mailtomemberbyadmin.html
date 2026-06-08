@@ -11,14 +11,31 @@
 
 <ion-content>
   <div class="email-header">
-    <div class="recipient-badge">
-      <ion-icon name="people"></ion-icon>
-      <span>{{numberOfPeople}}</span>
+    <div class="recipient-badge-row">
+      <div class="recipient-badge">
+        <ion-icon name="people"></ion-icon>
+        <span>{{numberOfPeople}}</span>
+      </div>
+      <button type="button" class="select-all-toggle" *ngIf="isLeagueTeams && module_obj.email_users.length > 0" (click)="toggleSelectAll()">
+        <ion-icon [name]="allSelected ? 'checkbox' : 'square-outline'"></ion-icon>
+        <span>{{allSelected ? 'Unselect all' : 'Select all'}}</span>
+      </button>
     </div>
-    <div class="recipient-chips">
+    <div class="recipient-chips" *ngIf="!isLeagueTeams">
       <span class="recipient-chip" *ngFor="let user of module_obj.email_users">
         {{user.MemberName}}
       </span>
+    </div>
+    <div class="recipient-chips" *ngIf="isLeagueTeams">
+      <button type="button" class="recipient-chip"
+        *ngFor="let user of module_obj.email_users"
+        [class.chip-unselected]="!user.selected"
+        [class.chip-paid]="user.payStatus == 1"
+        [class.chip-pending]="user.payStatus == 0"
+        (click)="toggleRecipient(user)">
+        <ion-icon [name]="user.selected ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+        {{user.MemberName}}
+      </button>
     </div>
   </div>
 

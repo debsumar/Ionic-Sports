@@ -19,9 +19,9 @@
       <!-- Competitions Tab -->
       <div *ngIf="activeIndex==0" class="tab-content">
         <div class="competitions-container" *ngIf="filteredleagues.length > 0">
-          <div class="revamp-card" *ngFor="let league of filteredleagues"
-            (click)="gotoLeaguedetailsPage(league)">
-            <div class="card-accent" [class.team-accent]="league.league_type_text?.toLowerCase().includes('team')" [style.background]="league.league_type_text?.toLowerCase().includes('team') ? null : getLeagueTypeColor(league.league_type_text)"></div>
+          <primary-card *ngFor="let league of filteredleagues"
+            [accentColor]="getLeagueTypeColor(league.league_type_text)"
+            (cardClick)="gotoLeaguedetailsPage(league)">
             <div class="card-content">
               <div class="corner-ribbon" [class.private]="league.league_visibility==1">
                 <ion-icon [name]="league.league_visibility==0 ? 'globe' : 'lock'"></ion-icon>
@@ -47,7 +47,7 @@
                 <span class="venue-text">{{league.club.ClubName}}</span>
               </div>
             </div>
-          </div>
+          </primary-card>
         </div>
         <div class="modern-empty-state" *ngIf="filteredleagues.length === 0">
           <div class="empty-illustration"><ion-icon name="trophy" class="empty-icon"></ion-icon></div>
@@ -68,8 +68,8 @@
           </label>
         </div>
         <div class="teams-container" *ngIf="filteredteams.length > 0">
-          <div class="revamp-card" *ngFor="let team of filteredteams" (click)="gotoTeamdetailsPage(team)">
-            <div class="card-accent team-accent"></div>
+          <primary-card *ngFor="let team of filteredteams" (cardClick)="gotoTeamdetailsPage(team)"
+            [accentColor]="'linear-gradient(180deg, #8b5cf6, #7c3aed)'">
             <div class="card-content">
               <div class="corner-ribbon" [class.private]="team.teamVisibility==1">
                 <ion-icon [name]="team.teamVisibility==0 ? 'globe' : 'lock'"></ion-icon>
@@ -95,7 +95,7 @@
                 <span class="venue-text">{{team.club?.ClubName}}</span>
               </div>
               </div>
-          </div>
+          </primary-card>
         </div>
         <div class="modern-empty-state" *ngIf="filteredteams.length === 0">
           <div class="empty-illustration"><ion-icon name="people" class="empty-icon"></ion-icon></div>
