@@ -685,7 +685,8 @@ export class LeagueMatchInfoPage {
           ParentId: enrol_member.user.IsChild ? enrol_member.user.ParentId : "",
           MemberId: enrol_member.user.Id,
           MemberEmail: enrol_member.user.EmailID != "" && enrol_member.user.EmailID != "-" && enrol_member.user.EmailID != "n/a" ? enrol_member.user.EmailID : (enrol_member.user.IsChild ? enrol_member.user.ParentEmailID : ""),
-          MemberName: enrol_member.user.FirstName + " " + enrol_member.user.LastName
+          MemberName: enrol_member.user.FirstName + " " + enrol_member.user.LastName,
+          payStatus: enrol_member.amount_pay_status
         }
       })
       const league_team_info = {
@@ -706,7 +707,8 @@ export class LeagueMatchInfoPage {
         module_info: league_team_info,
         email_users: member_list,
         subject: this.activeType ? `${this.selectedHomeTeamText}: ` : `${this.selectedAwayTeamText}: `,
-        type: ModuleTypeForEmail.LEAGUE_TEAM
+        type: ModuleTypeForEmail.LEAGUE_TEAM,
+        isLeagueTeams: true
       }
       this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
     } else {
@@ -721,9 +723,12 @@ export class LeagueMatchInfoPage {
         p.user.IsChild ? (p.user.ParentId || p.user.Id) : p.user.Id
       );
       const user_names = this.leagueMatchParticipantRes.map(p => p.user.FirstName + ' ' + p.user.LastName);
+      const pay_status = this.leagueMatchParticipantRes.map(p => p.amount_pay_status);
       this.navCtrl.push("NotificationsPage", {
         users: user_ids,
         user_names: user_names,
+        pay_status: pay_status,
+        isLeagueTeams: true,
         type: ModuleTypes.LEAGUE,
         heading: `Match: ${this.matchObj.match_title}`,
         module_id: this.matchObj.fixture_id,
@@ -758,6 +763,12 @@ export class LeagueMatchInfoPage {
     } else if (action === 'create_external') {
       this.commonService.commonAlert_V4('External Team', 'You are about to create an external team. Do you want to continue?', 'Yes:Continue', 'No', () => {
         this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.activityCode, leagueId: this.leagueId, activityId: this.activityId, onTeamCreated: () => { this.getLeagueParticipantForMatch(); } });
+      });
+    } else if (action === 'remove') {
+      const isHome = this.teamActionIsHome;
+      const teamName = isHome ? this.selectedHomeTeamText : this.selectedAwayTeamText;
+      this.commonService.commonAlert_V4('Remove Team', `Remove "${teamName}" from this match?`, 'Yes:Remove', 'No', () => {
+        this.removeLeagueTeam(isHome);
       });
     }
   }
@@ -826,11 +837,8 @@ export class LeagueMatchInfoPage {
     this.sections.forEach(section => section.items = []); // Clear the sections array
     this.activeType = val !== undefined ? val : !this.activeType;
 
-    // Load participants for the selected tab
-    const teamId = this.activeType ? this.matchObj.home_team_id : this.matchObj.away_team_id;
-    if (teamId !== null) {
-      this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
-    }
+    // Load participants for the selected tab (guard inside handles an empty side).
+    this.getLeagueMatchParticipant(LeagueTeamPlayerStatusType.All);
     this.getFilteredSections();
   }
 
@@ -902,10 +910,57 @@ export class LeagueMatchInfoPage {
     });
   }
 
+  // Remove the team from the given side. action_type=2 signals removal; only the
+  // side being removed carries its parentclub team id, the other stays empty.
+  removeLeagueTeam(isHome: boolean) {
+    const payload = {
+      ...this.UpdateLeagueFixtureInput,
+      action_type: 2,
+      MatchId: this.matchObj.match_id,
+      HomeParticipantId: "",
+      AwayParticipantId: "",
+      HomeParentclubTeamId: isHome ? this.matchObj.home_team_id : "",
+      AwayParentclubTeamId: isHome ? "" : this.matchObj.away_team_id
+    };
+    this.httpService.post(`${API.Update_League_Fixture}`, payload).subscribe({
+      next: (res: any) => {
+        if (res) {
+          if (isHome) {
+            this.selectedHomeTeamText = 'Home Team';
+            this.matchObj.home_team_id = null;
+            this.isHomeExternal = false;
+          } else {
+            this.selectedAwayTeamText = 'Away Team';
+            this.matchObj.away_team_id = null;
+            this.isAwayExternal = false;
+          }
+          this.commonService.toastMessage(res.message || 'Team removed', 3000, ToastMessageType.Success);
+          // If the removed side is the active tab, clear its roster + counts.
+          if ((isHome && this.activeType) || (!isHome && !this.activeType)) {
+            this.leagueMatchParticipantRes = [];
+            this.allParticipants = [];
+            this.sections.forEach(section => section.items = []);
+          }
+        } else {
+          this.commonService.toastMessage("Failed to remove team", 3000, ToastMessageType.Error);
+        }
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to remove team", 3000, ToastMessageType.Error);
+      }
+    });
+  }
+
   //fetch api for teams and corresponding player details
   getLeagueMatchParticipant(par: LeagueTeamPlayerStatusType) {
     //this.commonService.showLoader("Fetching info ...");
     const teamId = this.activeType ? this.matchObj.home_team_id : this.matchObj.away_team_id;
+    if (!teamId) {
+      this.leagueMatchParticipantRes = [];
+      this.allParticipants = [];
+      this.sections.forEach(section => section.items = []);
+      return;
+    }
     this.leagueMatchParticipantInput.TeamId = teamId
     this.leagueMatchParticipantInput.leagueTeamPlayerStatusType = par
     this.leagueMatchParticipantInput.MatchId = this.matchObj.match_id;

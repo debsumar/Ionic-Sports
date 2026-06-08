@@ -63,7 +63,7 @@ export class LineupPage {
     // ===========================================
     // Theme State
     // ===========================================
-    isDarkTheme: boolean = false;
+    isDarkTheme: boolean = true;
 
     // ===========================================
     // Lineup Configuration
@@ -366,12 +366,12 @@ export class LineupPage {
 
     private loadTheme(): void {
         this.storage.get('dashboardTheme').then((theme) => {
-            const isDark = theme === 'dark' || theme === true;
+            const isDark = theme === 'dark' || theme === true || theme === null;
             this.isDarkTheme = isDark;
             this.applyTheme(isDark);
         }).catch(() => {
-            this.isDarkTheme = false;
-            this.applyTheme(false);
+            this.isDarkTheme = true;
+            this.applyTheme(true);
         });
     }
 
@@ -380,15 +380,9 @@ export class LineupPage {
             const el = document.querySelector("page-lineup");
             if (el) {
                 if (isDark) {
-                    el.classList.add("dark-theme");
                     el.classList.remove("light-theme");
-                    document.body.classList.add("dark-theme");
-                    document.body.classList.remove("light-theme");
                 } else {
-                    el.classList.remove("dark-theme");
                     el.classList.add("light-theme");
-                    document.body.classList.remove("dark-theme");
-                    document.body.classList.add("light-theme");
                 }
                 return true;
             }
@@ -402,10 +396,9 @@ export class LineupPage {
 
     private forceThemeCheck(): void {
         this.storage.get("dashboardTheme").then((storageTheme) => {
-            const bodyHasDarkTheme = document.body.classList.contains("dark-theme");
-            let isDark = storageTheme === 'dark' || storageTheme === true;
-            if (storageTheme === null && bodyHasDarkTheme) {
-                isDark = true;
+            let isDark = true;
+            if (storageTheme === 'light' || storageTheme === false) {
+                isDark = false;
             }
             this.isDarkTheme = isDark;
             this.applyTheme(isDark);

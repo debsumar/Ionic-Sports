@@ -39,6 +39,8 @@
       </div>
     </div>
   </div>
-
-  <app-glass-button label="Add" (btnClick)="assignTeams()"></app-glass-button>
 </ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <app-glass-button label="Add" (btnClick)="assignTeams()"></app-glass-button>
+</ion-footer>

@@ -11,12 +11,26 @@
 
 <ion-content>
   <div class="notif-header">
-    <div class="recipient-badge">
-      <ion-icon name="people"></ion-icon>
-      <span>{{numberOfPeople}}</span>
+    <div class="recipient-badge-row">
+      <div class="recipient-badge">
+        <ion-icon name="people"></ion-icon>
+        <span>{{numberOfPeople}}</span>
+      </div>
+      <button type="button" class="select-all-toggle" *ngIf="recipients.length > 0" (click)="toggleSelectAll()">
+        <ion-icon [name]="allSelected ? 'checkbox' : 'square-outline'"></ion-icon>
+        <span>{{allSelected ? 'Unselect all' : 'Select all'}}</span>
+      </button>
     </div>
-    <div class="recipient-chips" *ngIf="userNames.length > 0">
-      <span class="recipient-chip" *ngFor="let name of userNames">{{name}}</span>
+    <div class="recipient-chips" *ngIf="recipients.length > 0">
+      <button type="button" class="recipient-chip"
+        *ngFor="let r of recipients"
+        [class.chip-unselected]="!r.selected"
+        [class.chip-paid]="isLeagueTeams && r.payStatus == 1"
+        [class.chip-pending]="isLeagueTeams && r.payStatus == 0"
+        (click)="toggleRecipient(r)">
+        <ion-icon [name]="r.selected ? 'checkmark-circle' : 'ellipse-outline'"></ion-icon>
+        {{r.name}}
+      </button>
     </div>
     <div class="heading-display" *ngIf="notification_input.heading">
       <ion-icon name="notifications"></ion-icon>

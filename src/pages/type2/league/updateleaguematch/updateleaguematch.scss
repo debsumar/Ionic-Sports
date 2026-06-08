@@ -13,7 +13,6 @@ page-updateleaguematch {
   }
 
   .scroll-content { background-color: #f8fafc !important; padding: 0 !important; }
-  ion-content { margin-bottom: 56px !important; }
 
   ion-list { margin: 12px !important; background: transparent !important; }
 
@@ -115,6 +114,18 @@ page-updateleaguematch {
         &::placeholder { color: #94a3b8 !important; font-weight: 400 !important; text-align: left !important; }
       }
     }
+  }
+
+  ion-footer {
+    background: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+    padding-bottom: 0 !important;
+    &::before, &::after { display: none !important; }
+  }
+
+  &.light-theme ion-footer {
+    background: #f8fafc !important;
   }
 
   // Remove all borders and focus states

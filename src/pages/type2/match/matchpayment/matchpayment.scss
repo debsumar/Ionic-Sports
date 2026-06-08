@@ -1,0 +1,95 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-matchpayment {
+  @include android-sdk35-fixes;
+
+  ion-content.light-theme .scroll-content { background: #f8fafc !important; }
+  ion-content.dark-theme .scroll-content { background: #0f172a !important; }
+
+  ion-list {
+    margin: 12px !important;
+    background: transparent !important;
+  }
+
+  app-form-field ion-input .text-input { text-align: right !important; }
+
+  .member-card {
+    margin: 0 0 12px 0;
+    padding: 14px 16px;
+    border-radius: 12px;
+    background: #1e293b;
+    border: 1px solid #334155;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+
+    .mem_name { margin: 0 0 4px; font-size: 18px; font-weight: 700; color: #fff; }
+    .match-title { margin: 0 0 6px; font-size: 15px; color: #cbd5e1; }
+    p { margin: 2px 0; }
+    .due { color: #ef4444; font-weight: 600; }
+    .paid { color: #10b981; font-weight: 600; }
+  }
+
+  ion-content.light-theme .member-card {
+    background: #fff;
+    border-color: #e2e8f0;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    .mem_name { color: #0f172a; }
+    .match-title { color: #475569; }
+  }
+
+  .description-item {
+    flex-direction: column;
+    align-items: stretch;
+    padding-top: 12px;
+    padding-bottom: 16px;
+
+    ion-label { margin-bottom: 10px !important; display: block; }
+
+    ion-textarea {
+      border-radius: 12px !important;
+      padding: 12px !important;
+      margin: 0 !important;
+
+      .text-input {
+        width: 100% !important;
+        font-weight: 500 !important;
+        font-size: 15px !important;
+        line-height: 1.5;
+        text-align: left !important;
+        &::placeholder { font-weight: 400 !important; }
+      }
+    }
+  }
+
+  ion-content.light-theme .description-item ion-textarea {
+    background: rgba(255, 255, 255, 0.45) !important;
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important;
+    .text-input { color: #0f172a !important; &::placeholder { color: #94a3b8 !important; } }
+  }
+
+  ion-content.dark-theme .description-item ion-textarea {
+    background: rgba(30, 41, 59, 0.6) !important;
+    border: 1px solid rgba(71, 85, 105, 0.5) !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important;
+    .text-input { color: #f8fafc !important; &::placeholder { color: #64748b !important; } }
+  }
+
+  ion-footer {
+    background: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    &::before, &::after { display: none !important; }
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #0f172a !important;
+      border: none !important;
+    }
+
+    &.light-theme {
+      background: #f8fafc !important;
+      .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+        background: #f8fafc !important;
+      }
+    }
+  }
+}

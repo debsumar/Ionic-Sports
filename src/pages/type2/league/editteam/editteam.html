@@ -93,5 +93,11 @@
     </div>
   </div>
 
-  <app-glass-button label="Update" (btnClick)="updateTeamDetails()"></app-glass-button>
+  
 </ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <app-glass-button label="Update" (btnClick)="updateTeamDetails()"></app-glass-button>
+</ion-footer>
+
+

@@ -6,6 +6,8 @@ import { Storage } from '@ionic/storage';
 import * as $ from 'jquery';
 import { GetStaffModel } from '../models/team.model';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
+import gql from 'graphql-tag';
+import { GraphqlService } from '../../../../services/graphql.service';
 
 /**
  * Generated class for the SenmailtostaffPage page.
@@ -61,7 +63,8 @@ export class SenmailtostaffPage {
      public alertCtrl: AlertController,
      private toastCtrl: ToastController,
      public commonService: CommonService,
-     public sharedservice: SharedServices,) {
+     public sharedservice: SharedServices,
+     private graphqlService: GraphqlService) {
       this.staff=this.navParams.get("staff");
       console.log("staffs are:",this.staff);
       
@@ -189,19 +192,16 @@ export class SenmailtostaffPage {
 
 
     let url = this.sharedservice.getEmailUrl();
-    $.ajax({
-      url: `${this.sharedservice.getnestURL()}/messeging/notificationemail`,
-      data: emailObj,
-
-      type: "POST",
-      success: function (respnse) {
-      },
-      error: function (xhr, status) {
-        console.log(xhr, status)
-      }
+    const email_mutation = gql`
+      mutation sendNotificationEmail($emailInput: EmailNotification!) {
+        sendNotificationEmail(emailInput: $emailInput)
+      }`;
+    this.graphqlService.mutate(email_mutation, { emailInput: emailObj }, 0).subscribe((response) => {
+      this.showToast("Mail sent successfully", 5000);
+      this.navCtrl.pop();
+    }, (err) => {
+      console.log(err);
     });
-    this.showToast("Mail sent successfully", 5000);
-    this.navCtrl.pop();
   }
 
   

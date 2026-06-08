@@ -297,6 +297,7 @@ export class GetIndividualMatchParticipantModel {
     Match: ParticipantMatchData; // 🏟️ Nested match details
     teamrole: ParticipantTeamRoleData; // 🎭 Nested team role details
     invite_status_text: string;
+    payment_comments: string;
 }
 
 // ___________-----------------------
@@ -340,6 +341,8 @@ export interface AllMatchData {
     result_status_text: string | null;
     ResultStatus: number | null;
     MatchVisibility: number;
+    match_round_type?: number;
+    match_round_type_text?: string;
     location: string;
     VenueId: string;
     homeUserName2: string | null;

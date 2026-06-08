@@ -11,9 +11,9 @@
     </div>
 
     <div class="match-scroll-area">
-      <div class="revamp-card" *ngFor="let match of filteredMatchlist"
-        (click)="gotoMatchdetailsPage(match)">
-        <div class="card-accent" [style.background]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))"></div>
+      <primary-card *ngFor="let match of filteredMatchlist"
+        [accentColor]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))"
+        (cardClick)="gotoMatchdetailsPage(match)">
         <div class="card-content">
           <div class="corner-ribbon" [class.private]="match.MatchVisibility==1">
             <ion-icon [name]="match.MatchVisibility==0 ? 'globe' : 'lock'"></ion-icon>
@@ -25,7 +25,7 @@
             <div class="card-info">
               <h3 class="card-title">{{match.Date}}</h3>
               <p class="card-subtitle">{{match.MatchTitle}}</p>
-              <p class="card-activity">{{match.ActivityName}}</p>
+              <p class="card-activity">{{match.ActivityName}} <span class="round-type-text" *ngIf="match.Round">{{match.Round}}</span></p>
             </div>
           </div>
           <div class="card-divider"></div>
@@ -50,7 +50,6 @@
           <div class="card-divider"></div>
           <div class="card-footer">
             <span class="tag type-tag" [style.background]="getMatchTypeColorByName(getMatchTypeName(match.MatchType))">{{getMatchTypeName(match.MatchType)}}</span>
-            <span class="tag round-type-tag" *ngIf="match.Round">{{match.Round}}</span>
             <div class="footer-center">
               <span class="footer-status" [class.published]="match.ResultStatus == 1">
                 <ion-icon [name]="match.ResultStatus == 1 ? 'checkmark-circle' : 'time'"></ion-icon>
@@ -66,7 +65,7 @@
             <app-map-picker [address]="match.location && match.location !== '' ? match.location : match.VenueName" [readOnly]="true"></app-map-picker>
           </div>
         </div>
-      </div>
+      </primary-card>
 
       <div class="modern-empty-state" *ngIf="filteredMatchlist.length === 0">
         <div class="empty-illustration">
@@ -80,7 +79,7 @@
     </div>
   </div>
 
-  <app-bottom-sheet [(visible)]="showLineupSheet" title="Select Lineup" [bottomOffset]="70">
+  <app-bottom-sheet [(visible)]="showLineupSheet" title="Select Lineup" [bottomOffset]="110">
     <div class="sheet-empty" *ngIf="lineupFormations.length === 0">
       <ion-icon name="information-circle"></ion-icon>
       <span>No saved lineups available</span>

@@ -3,6 +3,7 @@
 page-editleague {
   @include android-sdk35-fixes;
 
+  // Default = dark theme (no class needed)
   .scroll-content {
     background-color: #0f172a !important;
     padding: 0 !important;
@@ -59,8 +60,8 @@ page-editleague {
   .toggle_para { margin: 0; font-weight: 700 !important; font-size: 11px !important; text-transform: uppercase !important; letter-spacing: 0.6px !important; color: #94a3b8; }
 
   // Light theme override
-  .light-theme {
-    &.scroll-content, .scroll-content { background-color: #f8fafc !important; }
+  &.light-theme {
+    .scroll-content { background-color: #f8fafc !important; }
     ion-item {
       background-color: #ffffff !important; border-color: #e2e8f0 !important;
       box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03) !important;
@@ -98,10 +99,30 @@ page-editleague {
     input:checked + span { background-color: #2b92bb; }
     input:checked + span:before { transform: translateX(26px); }
   }
-  .toggle_para { margin: 0; font-weight: 700 !important; font-size: 11px !important; text-transform: uppercase !important; letter-spacing: 0.6px !important; color: #64748b; }
   .flex_col { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 12px 0; }
   .help_btn { --color: #6b7280; min-width: 32px; width: 32px; height: 32px; }
   .input_txt_right .text-input { text-align: right !important; }
+
+  // Footer - default dark, button at bottom
+  ion-footer {
+    background: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    &::before, &::after { display: none !important; }
+
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #0f172a !important;
+      border: none !important;
+    }
+  }
+
+  &.light-theme ion-footer {
+    background: #f8fafc !important;
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #f8fafc !important;
+    }
+  }
 
   // Remove borders/focus states
   .item-inner { border-bottom: none !important; }
@@ -116,15 +137,15 @@ page-editleague {
     flex-direction: column; align-items: stretch; padding-top: 12px; padding-bottom: 16px;
     ion-label { margin-bottom: 10px !important; display: block; }
     ion-textarea {
-      background: rgba(255, 255, 255, 0.45) !important;
+      background: rgba(30, 41, 59, 0.6) !important;
       backdrop-filter: blur(12px) !important; -webkit-backdrop-filter: blur(12px) !important;
-      border: 1px solid rgba(255, 255, 255, 0.6) !important;
+      border: 1px solid rgba(71, 85, 105, 0.5) !important;
       border-radius: 12px !important; padding: 12px !important; margin: 0 !important;
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06) !important; text-align: left !important;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2) !important; text-align: left !important;
       .text-input {
-        color: #0f172a !important; margin: 0 !important; width: 100% !important;
+        color: #f8fafc !important; margin: 0 !important; width: 100% !important;
         font-weight: 500 !important; font-size: 15px !important; line-height: 1.5; text-align: left !important;
-        &::placeholder { color: #94a3b8 !important; font-weight: 400 !important; text-align: left !important; }
+        &::placeholder { color: #64748b !important; font-weight: 400 !important; text-align: left !important; }
       }
     }
   }

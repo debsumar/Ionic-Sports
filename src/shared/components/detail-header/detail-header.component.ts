@@ -10,7 +10,6 @@ export interface DetailHeaderRow {
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="detail-header">
-      <div class="detail-header-glow"></div>
       <h2 class="detail-header-title">
         <ion-icon *ngIf="visibilityIcon" [name]="visibilityIcon" class="detail-header-visibility" [class.private]="visibilityIcon==='lock'"></ion-icon>
         {{title}}
@@ -34,23 +33,19 @@ export interface DetailHeaderRow {
     app-detail-header .detail-header {
       --accent: #2b92bb;
       position: relative; padding: 22px 50px 16px 22px; overflow: visible;
-      background: linear-gradient(135deg, #1e293b 70%, var(--accent));
+      background: #1e293b;
       min-height: 100px;
     }
 
     /* Left accent strip */
     app-detail-header .detail-header::before {
       content: ''; position: absolute; top: 0; left: 0; bottom: 0; width: 4px; z-index: 1;
-      background: linear-gradient(180deg, #fff, var(--accent));
+      background: var(--accent);
       opacity: 0.4;
     }
 
     /* Ambient glow */
-    app-detail-header .detail-header-glow {
-      position: absolute; top: -30px; right: -30px; width: 120px; height: 120px;
-      background: radial-gradient(circle, var(--accent) 0%, transparent 70%);
-      opacity: 0.12; pointer-events: none;
-    }
+
 
     /* Title */
     app-detail-header .detail-header-title {
@@ -106,22 +101,12 @@ export interface DetailHeaderRow {
     /* Bottom line */
     app-detail-header .detail-header-line {
       position: absolute; bottom: 0; left: 0; right: 0; height: 2px; overflow: hidden;
-      background: linear-gradient(90deg, rgba(255,255,255,0.3), transparent 80%);
-    }
-    app-detail-header .detail-header-line::after {
-      content: ''; position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
-      animation: headerLineShimmer 3s ease-in-out infinite;
-    }
-
-    @keyframes headerLineShimmer {
-      0% { left: -60%; }
-      100% { left: 100%; }
+      background: rgba(255,255,255,0.3);
     }
 
     /* ── Light theme ── */
     .light-theme app-detail-header .detail-header {
-      background: linear-gradient(135deg, #f8fafc 70%, var(--accent));
+      background: #f8fafc;
     }
     .light-theme app-detail-header .detail-header-title { color: #0f172a; }
     .light-theme app-detail-header .detail-header-visibility { color: #10b981; }
@@ -137,9 +122,9 @@ export interface DetailHeaderRow {
     .light-theme app-detail-header .detail-header-actions .header-badge { color: #10b981 !important; }
     .light-theme app-detail-header .detail-header-actions .header-badge.private { color: #f76e04 !important; }
     .light-theme app-detail-header .detail-header-actions .action-btn.danger { color: #ef4444 !important; }
-    .light-theme app-detail-header .detail-header-glow { opacity: 0.12; }
-    .light-theme app-detail-header .detail-header-line { background: linear-gradient(90deg, rgba(0,0,0,0.1), transparent 80%); }
-    .light-theme app-detail-header .detail-header::before { background: linear-gradient(180deg, #fff, var(--accent)); opacity: 0.3; }
+
+    .light-theme app-detail-header .detail-header-line { background: rgba(0,0,0,0.1); }
+    .light-theme app-detail-header .detail-header::before { background: var(--accent); opacity: 0.3; }
 
     /* ── Responsive ── */
     @media (max-width: 359px) {

@@ -129,6 +129,7 @@ export class CreatematchleaguePage {
   filteredParticipantData: LeagueParticipantModel[];
   filteredPrimaryParticipants: LeagueParticipantModel[];
   filteredSecondaryParticipants: LeagueParticipantModel[];
+  pairs: any[] = [];
 
   selectedParticipant1: LeagueParticipantModel;
   location_id: string;
@@ -195,6 +196,9 @@ export class CreatematchleaguePage {
 
     this.getLoggedInData();
     this.getParticipants();
+    if (this.inputObj.match_type === 2) {
+      this.loadPairs();
+    }
 
   }
 
@@ -631,10 +635,31 @@ export class CreatematchleaguePage {
     } catch (error) {
       this.commonService.hideLoader();
       console.log("Error:", error);
-      this.commonService.toastMessage("Match creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom)
+      this.commonService.toastMessage("Match creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
     }
   }
 
+  loadPairs() {
+    this.httpService.post(API.GET_PAIRS, { league_id: this.leagueId }).subscribe({
+      next: (res: any) => { this.pairs = res.data || []; },
+      error: () => {}
+    });
+  }
 
+  onHomePairSelect(pairId: string) {
+    var pair = this.pairs.find(function(p) { return p.pair_id === pairId; });
+    if (pair && pair.players && pair.players.length >= 2) {
+      this.inputObj.primary_participant_id = pair.players[0].id;
+      this.inputObj.primary_participant_id2 = pair.players[1].id;
+    }
+  }
+
+  onAwayPairSelect(pairId: string) {
+    var pair = this.pairs.find(function(p) { return p.pair_id === pairId; });
+    if (pair && pair.players && pair.players.length >= 2) {
+      this.inputObj.secondary_participant_id = pair.players[0].id;
+      this.inputObj.secondary_participant_id2 = pair.players[1].id;
+    }
+  }
 }
 

@@ -33,7 +33,7 @@ page-teamdetails {
   app-list-card { display: block; margin-bottom: 6px; }
   .member-row {
     display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
   }
   .member-avatar {
     width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
@@ -89,7 +89,7 @@ page-teamdetails {
     .scroll-content { background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important; }
     ion-content { background: #f8fafc !important; }
     .page-fixed-header { background: #f8fafc; }
-    .member-row { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
+    .member-row { background: transparent; }
     .member-name { color: #1e293b; }
     .member-role { color: #64748b; }
     .empty-state .empty-icon { color: #cbd5e1; }

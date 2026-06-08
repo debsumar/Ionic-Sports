@@ -37,6 +37,10 @@ export class MatchTeamDetailsPage {
   activeType: boolean = true;
   selectedHomeTeamText: string;
   selectedAwayTeamText: string;
+  // Canonical home/away ids from navParams (stable per navigation), used to
+  // reconcile the inconsistent ordering returned by GetMatchTeamsByMatchId.
+  private canonicalHomeUserId: string;
+  private canonicalAwayUserId: string;
   isHomeExternal: boolean = false;
   isAwayExternal: boolean = false;
   isDarkTheme: boolean = true;
@@ -188,6 +192,8 @@ export class MatchTeamDetailsPage {
     public events: Events
   ) {
     this.match = JSON.parse(this.navParams.get("match"));
+    this.canonicalHomeUserId = this.match.homeUserId || (this.match as any).homeTeamId;
+    this.canonicalAwayUserId = this.match.awayUserId || (this.match as any).awayTeamId;
     this.selectedHomeTeamText = 'Home Team';
     this.selectedAwayTeamText = 'Away Team';
     this.storage.get('Currency').then((val) => {
@@ -290,19 +296,15 @@ export class MatchTeamDetailsPage {
   publish() {
     this.closeFab();
 
-
-    // Debug: Check available team properties
-    console.log("Available teams:", this.activitySpecificTeamsRes);
-    console.log("Looking for home team:", this.selectedHomeTeamText);
-    console.log("Looking for away team:", this.selectedAwayTeamText);
-
     const allTeams = [...this.cachedClubTeams, ...this.cachedExternalTeams];
-    const homeTeam = allTeams.find(team => team.teamName === this.selectedHomeTeamText);
-    const awayTeam = allTeams.find(team => team.teamName === this.selectedAwayTeamText);
-    console.log("Selected Home Team:", homeTeam);
-    console.log("Selected Away Team:", awayTeam);
+    const homeTeam = allTeams.find(team => team.id === this.match.homeUserId);
+    const awayTeam = allTeams.find(team => team.id === this.match.awayUserId);
 
     if (this.selectedHomeTeamText != 'Home Team' && this.selectedAwayTeamText != 'Away Team') {
+      if (!homeTeam || !awayTeam) {
+        this.commonService.toastMessage('Unable to resolve selected teams', 3000, ToastMessageType.Error);
+        return;
+      }
       const params = {
         "match": this.match,
         "leagueId": '',
@@ -487,7 +489,12 @@ export class MatchTeamDetailsPage {
       case 'maybe': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe); break;
       case 'declined': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined); break;
       case 'role': this.showRoles(member); break;
+      case 'payment': this.gotoPayment(member); break;
     }
+  }
+
+  gotoPayment(member: GetIndividualMatchParticipantModel) {
+    this.navCtrl.push('MatchpaymentPage', { SelectedMember: member, MatchDetails: this.match });
   }
 
   showRoles(member: GetIndividualMatchParticipantModel): void {
@@ -678,6 +685,12 @@ export class MatchTeamDetailsPage {
       this.commonService.commonAlert_V4('External Team', 'You are about to create an external team. Do you want to continue?', 'Yes:Continue', 'No', () => {
         this.navCtrl.push("CreateteamPage", { is_club_team: false, lock_club_team: true, activityCode: this.match.ActivityCode, onTeamCreated: () => { this.getActivitySpecificTeamInput.isExternal = false; this.getActivitySpecificTeam(); } });
       });
+    } else if (action === 'remove') {
+      const isHome = this.teamActionIsHome;
+      const teamName = isHome ? this.selectedHomeTeamText : this.selectedAwayTeamText;
+      this.commonService.commonAlert_V4('Remove Team', `Remove "${teamName}" from this match?`, 'Yes:Remove', 'No', () => {
+        this.removeTeam(isHome);
+      });
     }
   }
 
@@ -796,12 +809,21 @@ export class MatchTeamDetailsPage {
     this.httpService.post(`${API.GetMatchTeamsByMatchId}`, payload).subscribe({
       next: (res: any) => {
         if (res && res.data) {
-          console.log('GetMatchTeamsByMatchId response:', JSON.stringify(res.data));
-          this.match.homeUserId = res.data.homeUserId;
-          this.match.awayUserId = res.data.awayUserId;
+          let homeUserId = res.data.homeUserId || res.data.homeTeamId;
+          let awayUserId = res.data.awayUserId || res.data.awayTeamId;
+          let homeName = res.data.homeUserName || res.data.homeTeamName || res.data.home_team_name;
+          let awayName = res.data.awayUserName || res.data.awayTeamName || res.data.away_team_name;
+          // GetMatchTeamsByMatchId can return home/away in inconsistent order across
+          // loads. If the returned ids are the exact swap of the canonical match ids,
+          // restore the canonical orientation so home stays home and away stays away.
+          if (this.canonicalHomeUserId && this.canonicalAwayUserId &&
+            homeUserId === this.canonicalAwayUserId && awayUserId === this.canonicalHomeUserId) {
+            [homeUserId, awayUserId] = [awayUserId, homeUserId];
+            [homeName, awayName] = [awayName, homeName];
+          }
+          this.match.homeUserId = homeUserId;
+          this.match.awayUserId = awayUserId;
           // Update team names and tab text from API response
-          const homeName = res.data.homeUserName || res.data.homeTeamName || res.data.home_team_name;
-          const awayName = res.data.awayUserName || res.data.awayTeamName || res.data.away_team_name;
           if (homeName) {
             this.match.homeUserName = homeName;
             this.selectedHomeTeamText = homeName;
@@ -810,7 +832,7 @@ export class MatchTeamDetailsPage {
             this.match.awayUserName = awayName;
             this.selectedAwayTeamText = awayName;
           }
-          this.getIndividualMatchParticipantInput.TeamId = res.data.homeUserId;
+          this.recomputeExternalFlags();
           this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
         }
       }
@@ -823,6 +845,7 @@ export class MatchTeamDetailsPage {
 
     if (!teamId) {
       this.getIndividualMatchParticipantRes = [];
+      this.allParticipants = [];
       this.sections.forEach(section => section.items = []);
       return;
     }
@@ -830,13 +853,25 @@ export class MatchTeamDetailsPage {
     this.getIndividualMatchParticipantInput.TeamId = teamId;
     this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType = par !== undefined ? par : LeagueTeamPlayerStatusType.All;
 
-    this.httpService.post(`${API.GetIndividualMatchParticipant}`, this.getIndividualMatchParticipantInput).subscribe({
+    // Snapshot the request so overlapping calls can't clobber each other's body,
+    // and capture the team we asked for to discard stale (out-of-order) responses.
+    const status = this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType;
+    const requestedTeamId = teamId;
+    const input = { ...this.getIndividualMatchParticipantInput };
+
+    this.httpService.post(`${API.GetIndividualMatchParticipant}`, input).subscribe({
       next: (res: any) => {
+        // Drop responses for a team/tab/filter the user has since navigated away from.
+        const currentTeamId = this.activeType ? this.match.homeUserId : this.match.awayUserId;
+        if (requestedTeamId !== currentTeamId ||
+          status !== this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType) {
+          return;
+        }
         if (res) {
           this.getIndividualMatchParticipantRes = res.data || [];
 
           // 📊 Update allParticipants only when fetching all data
-          if (this.getIndividualMatchParticipantInput.leagueTeamPlayerStatusType === LeagueTeamPlayerStatusType.All) {
+          if (status === LeagueTeamPlayerStatusType.All) {
             this.allParticipants = res.data || [];
           }
 
@@ -867,17 +902,24 @@ export class MatchTeamDetailsPage {
   cachedClubTeams: TeamsForParentClubModel[] = [];
   cachedExternalTeams: TeamsForParentClubModel[] = [];
 
+  // Compute EXT badges from the cached external list against the *final* match
+  // ids. Safe to call from either the teams fetch or the external fetch — whichever
+  // resolves last, the flags reflect the correct home/away ids (no race).
+  private recomputeExternalFlags() {
+    if (this.match.homeUserId) {
+      this.isHomeExternal = this.cachedExternalTeams.some(t => t.id === this.match.homeUserId);
+    }
+    if (this.match.awayUserId) {
+      this.isAwayExternal = this.cachedExternalTeams.some(t => t.id === this.match.awayUserId);
+    }
+  }
+
   detectExternalTeams() {
     const input = { ...this.getActivitySpecificTeamInput, isExternal: true };
     this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, input).subscribe({
       next: (res: any) => {
         this.cachedExternalTeams = (res && res.data) ? res.data : [];
-        if (this.match.homeUserId) {
-          this.isHomeExternal = this.cachedExternalTeams.some(t => t.id === this.match.homeUserId);
-        }
-        if (this.match.awayUserId) {
-          this.isAwayExternal = this.cachedExternalTeams.some(t => t.id === this.match.awayUserId);
-        }
+        this.recomputeExternalFlags();
       },
       error: () => {
         this.commonService.toastMessage("Failed to detect external teams", 2500, ToastMessageType.Error);
@@ -913,9 +955,11 @@ export class MatchTeamDetailsPage {
             if (isHomeTeam) {
               this.selectedHomeTeamText = teamName;
               this.match.homeUserId = this.selectedTeam.id; // Update match data
+              this.canonicalHomeUserId = this.selectedTeam.id; // keep reconciliation in sync
             } else {
               this.selectedAwayTeamText = teamName;
               this.match.awayUserId = this.selectedTeam.id; // Update match data
+              this.canonicalAwayUserId = this.selectedTeam.id; // keep reconciliation in sync
             }
           }
 
@@ -930,6 +974,45 @@ export class MatchTeamDetailsPage {
         } else {
           this.commonService.toastMessage("Failed to update fixture", 3000, ToastMessageType.Error);
         }
+      }
+    });
+  }
+
+  // Remove the team from the given side. action_type=2 signals removal; only the
+  // side being removed carries its parentclub team id, the other stays empty.
+  removeTeam(isHome: boolean) {
+    const payload = {
+      ...this.updateTeamInput,
+      action_type: 2,
+      MatchId: this.match.MatchId,
+      HomeParentclubTeamId: isHome ? this.match.homeUserId : "",
+      AwayParentclubTeamId: isHome ? "" : this.match.awayUserId
+    };
+    this.httpService.post(`${API.Update_League_Fixture}`, payload).subscribe({
+      next: (res: any) => {
+        if (res) {
+          if (isHome) {
+            this.selectedHomeTeamText = 'Home Team';
+            this.match.homeUserId = null;
+            this.canonicalHomeUserId = null;
+            this.isHomeExternal = false;
+          } else {
+            this.selectedAwayTeamText = 'Away Team';
+            this.match.awayUserId = null;
+            this.canonicalAwayUserId = null;
+            this.isAwayExternal = false;
+          }
+          this.commonService.toastMessage(res.message || 'Team removed', 3000, ToastMessageType.Success);
+          this.events.publish('match:refresh');
+          if ((isHome && this.activeType) || (!isHome && !this.activeType)) {
+            this.getIndividualMatchParticipant(LeagueTeamPlayerStatusType.All);
+          }
+        } else {
+          this.commonService.toastMessage("Failed to remove team", 3000, ToastMessageType.Error);
+        }
+      },
+      error: () => {
+        this.commonService.toastMessage("Failed to remove team", 3000, ToastMessageType.Error);
       }
     });
   }
@@ -1004,7 +1087,8 @@ export class MatchTeamDetailsPage {
         MemberEmail: (p.user as any).EmailID && (p.user as any).EmailID !== "" && (p.user as any).EmailID !== "-" && (p.user as any).EmailID !== "n/a"
           ? (p.user as any).EmailID
           : ((p.user as any).IsChild ? ((p.user as any).ParentEmailID || "") : ""),
-        MemberName: p.user.FirstName + " " + p.user.LastName
+        MemberName: p.user.FirstName + " " + p.user.LastName,
+        payStatus: p.amount_pay_status
       }));
       const email_modal = {
         module_info: {
@@ -1015,7 +1099,8 @@ export class MatchTeamDetailsPage {
         },
         email_users: member_list,
         subject: this.activeType ? `${this.selectedHomeTeamText}: ` : `${this.selectedAwayTeamText}: `,
-        type: ModuleTypeForEmail.LEAGUE_TEAM
+        type: ModuleTypeForEmail.LEAGUE_TEAM,
+        isMatchTeam: true
       };
       this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
     } else {
@@ -1031,9 +1116,12 @@ export class MatchTeamDetailsPage {
       const user_names = this.getIndividualMatchParticipantRes.map(p =>
         p.user.FirstName + ' ' + p.user.LastName
       );
+      const pay_status = this.getIndividualMatchParticipantRes.map(p => p.amount_pay_status);
       this.navCtrl.push("NotificationsPage", {
         users: user_ids,
         user_names: user_names,
+        pay_status: pay_status,
+        isMatchTeam: true,
         type: ModuleTypes.Match,
         heading: `Match: ${this.match.MatchTitle}`,
         module_id: this.match.MatchId,

@@ -1,0 +1,65 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Payment Details</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="goToDashboardMenuPage()">
+        <img src="assets/images/home.svg" class="home_btn" />
+      </button>
+      <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <ion-list>
+    <div class="member-card">
+      <p class="mem_name">{{selectedMemberDetails.user.FirstName}} {{selectedMemberDetails.user.LastName}}</p>
+      <p class="match-title">{{selectedMatchDetails.MatchTitle}}</p>
+      <p *ngIf="selectedMemberDetails.amount_pay_status==0">
+        <span class="due">{{userData.Currency}}{{selectedMemberDetails.amount_due | number: '1.2-2'}} Due</span>
+      </p>
+      <p *ngIf="selectedMemberDetails.amount_pay_status!=0">
+        <span class="paid">{{userData.Currency}}{{selectedMemberDetails.paid_amount | number: '1.2-2'}} Paid</span>
+      </p>
+    </div>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Payment Amount</ion-label>
+        <ion-input type="number" (keyup)="validateAmount($event)" [(ngModel)]="payment_update_input.user_payment.amount" [disabled]="(selectedMemberDetails.amount_pay_status=='1')"></ion-input>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Payment Mode</ion-label>
+        <ion-select [(ngModel)]="payment_update_input.user_payment.payment_mode" [disabled]="selectedMemberDetails.amount_pay_status!='0'" placeholder="Select">
+          <ion-option *ngFor="let pay of paymentMode" [value]="pay.id">{{pay.name}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Payment Status</ion-label>
+        <ion-select [(ngModel)]="payment_update_input.user_payment.payment_status" [disabled]="(selectedMemberDetails.amount_pay_status =='1')" placeholder="Select">
+          <ion-option value="3">Pending Verification</ion-option>
+          <ion-option value="1">Paid</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item class="description-item">
+        <ion-label stacked>Comments</ion-label>
+        <ion-textarea rows="4" [(ngModel)]="payment_update_input.user_payment.comments" [disabled]="selectedMemberDetails.amount_pay_status =='1'" placeholder="Add a comment..."></ion-textarea>
+      </ion-item>
+    </app-form-field>
+  </ion-list>
+</ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme" *ngIf="selectedMemberDetails.amount_pay_status != 1">
+  <app-glass-button label="Update" (btnClick)="confirmationPaymentAlert()"></app-glass-button>
+</ion-footer>

@@ -37,6 +37,9 @@ export class UpdateleaguematchPage {
   participantData: LeagueParticipantModel[];
   filteredPrimaryParticipants: LeagueParticipantModel[];
   filteredSecondaryParticipants: LeagueParticipantModel[];
+  pairs: any[] = [];
+  selectedHomePairId: string = '';
+  selectedAwayPairId: string = '';
   isChecked:boolean = false;
   match: string;
   data: LeagueMatch;
@@ -124,6 +127,21 @@ export class UpdateleaguematchPage {
     this.getRoundTypes();
     this.getLocationForParentClub();
     this.getParticipants();
+    if (this.data.league_type === 2) {
+      this.httpService.post(API.GET_PAIRS, { league_id: this.data.league_id }).subscribe({
+        next: (res: any) => {
+          this.pairs = res.data || [];
+          // Pre-select pairs based on current participant IDs
+          var homeId = this.data.home_participant_id;
+          var awayId = this.data.away_participant_id;
+          var homePair = this.pairs.find(function(p) { return p.players && p.players.some(function(pl) { return pl.id === homeId; }); });
+          var awayPair = this.pairs.find(function(p) { return p.players && p.players.some(function(pl) { return pl.id === awayId; }); });
+          if (homePair) this.selectedHomePairId = homePair.pair_id;
+          if (awayPair) this.selectedAwayPairId = awayPair.pair_id;
+        },
+        error: () => {}
+      });
+    }
     this.storage.get('Currency').then((currency) => {
       let currencydets = JSON.parse(currency);
       //console.log(currencydets);
@@ -383,6 +401,20 @@ export class UpdateleaguematchPage {
           this.navCtrl.pop();
         }
       });
+    }
+  }
+
+  onHomePairSelect(pairId: string) {
+    var pair = this.pairs.find(function(p) { return p.pair_id === pairId; });
+    if (pair && pair.players && pair.players.length >= 2) {
+      this.inputObj.homeparticipant_id = pair.players[0].id;
+    }
+  }
+
+  onAwayPairSelect(pairId: string) {
+    var pair = this.pairs.find(function(p) { return p.pair_id === pairId; });
+    if (pair && pair.players && pair.players.length >= 2) {
+      this.inputObj.awayparticipant_id = pair.players[0].id;
     }
   }
 }

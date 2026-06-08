@@ -20,7 +20,7 @@ page-addstafftoteam {
   app-list-card { display: block; margin-bottom: 6px; }
   .staff-row {
     display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
     cursor: pointer;
   }
   .staff-avatar {
@@ -59,7 +59,7 @@ page-addstafftoteam {
     ion-content { background: #f8fafc !important; }
     .page-fixed-header { background: #f8fafc; }
     .section-title { color: #1e293b; }
-    .staff-row { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
+    .staff-row { background: transparent; }
     .staff-name { color: #1e293b; }
     .staff-role { color: #64748b; }
     ion-checkbox { --background: #fff; --border-color: #d1d5db; }

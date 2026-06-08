@@ -35,7 +35,7 @@ page-potm {
   app-list-card { display: block; margin-bottom: 4px; }
   .player-row {
     display: flex; align-items: center; gap: 8px; padding: 10px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
     cursor: pointer; transition: opacity 0.2s;
     &.selected { background: rgba(16, 185, 129, 0.15); }
     &.disabled { opacity: 0.4; cursor: not-allowed; }
@@ -69,7 +69,7 @@ page-potm {
     }
     .selection-badge { background: rgba(43, 146, 187, 0.1); border-color: rgba(43, 146, 187, 0.2); }
     .team-header .team-name { color: #1e293b; }
-    .player-row { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
+    .player-row { background: transparent; }
     .player-name { color: #1e293b; }
   }
 

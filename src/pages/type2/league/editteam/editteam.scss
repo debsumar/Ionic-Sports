@@ -14,6 +14,8 @@ page-editteam {
 
   .scroll-content { background-color: #0f172a !important; padding: 0 !important; }
   ion-content { margin-bottom: 56px !important; }
+  ion-footer { background: #0f172a !important; border-top: none !important; }
+  ion-footer.light-theme { background: #f8fafc !important; }
   ion-list { margin: 12px !important; background: transparent !important; }
   .item, .item-inner, .item-block { background-color: transparent !important; border: none !important; }
 

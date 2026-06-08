@@ -3,7 +3,7 @@
 page-matchinviteplayers {
   @include android-sdk35-fixes;
 
-  .scroll-content { padding: 0 !important; overflow: hidden !important; background: #0f172a !important; }
+  .scroll-content { padding: 0 !important; background: #0f172a !important; }
   ion-content { background: #0f172a !important; margin-bottom: 56px !important; }
 
   ion-navbar { background: #0f172a !important; color: #f1f5f9 !important;
@@ -14,8 +14,8 @@ page-matchinviteplayers {
   }
 
   .page-layout { display: flex; flex-direction: column; height: 100%; }
-  .page-fixed-header { flex-shrink: 0; background: #0f172a; z-index: 10; }
-  .page-scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 8px 80px; }
+  .page-fixed-header { position: sticky; top: 0; background: #0f172a; z-index: 10; }
+  .page-list-area { padding: 0 8px 80px; }
 
   .section-header { display: flex; align-items: center; padding: 10px 16px 8px; }
   .section-title { font-size: 15px; font-weight: 700; color: #f1f5f9; }
@@ -23,7 +23,7 @@ page-matchinviteplayers {
   app-list-card { display: block; margin-bottom: 6px; }
   .player-row {
     display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
     cursor: pointer;
   }
   .player-avatar {
@@ -65,19 +65,19 @@ page-matchinviteplayers {
     ion-content { background: #f8fafc !important; }
     .page-fixed-header { background: #f8fafc; }
     .section-title { color: #1e293b; }
-    .player-row { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
+    .player-row { background: transparent; }
     .player-name { color: #1e293b; }
     ion-checkbox { --background: #fff; --border-color: #d1d5db; }
     .empty-state .empty-icon { color: #cbd5e1; }
   }
 
   @media (max-width: 359px) {
-    .page-scroll-area { padding: 0 4px 80px; }
+    .page-list-area { padding: 0 4px 80px; }
     .player-name { font-size: 13px; }
     .player-avatar { width: 28px; height: 28px; font-size: 12px; }
   }
   @media (min-width: 768px) {
-    .page-scroll-area { padding: 0 16px 80px; }
+    .page-list-area { padding: 0 16px 80px; }
     .player-name { font-size: 15px; }
     .player-avatar { width: 40px; height: 40px; font-size: 16px; }
   }

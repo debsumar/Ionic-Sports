@@ -24,8 +24,9 @@ import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
 import { RoundTypeInput, RoundTypesModel } from "../../../../shared/model/league.model";
 import { AppType } from "../../../../shared/constants/module.constants";
-import { LeagueVenueType } from "../../../../shared/utility/enums";
+import { LeagueVenueType, MatchType } from "../../../../shared/utility/enums";
 import { CatandType } from "../../league/models/location.model";
+import { TeamsForParentClubModel } from "../../league/models/team.model";
 import { MatchDuration } from "../../../../shared/model/match.model";
 /**
  * Generated class for the CreatematchPage page.
@@ -52,8 +53,10 @@ export class CreatematchPage {
   currency: string;
   isRecurring: boolean = false;
   recurringUntilWhen: string = moment().add(1, 'week').format('YYYY-MM-DD');
-  recurringDays: string[] = [];
-  allDays: string[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  teamList: TeamsForParentClubModel[] = [];
+  selectedHomeTeamId: string = '';
+  selectedAwayTeamId: string = '';
+  
 
   roundTypeInput: RoundTypeInput = {
     parentclubId: '',
@@ -285,13 +288,8 @@ export class CreatematchPage {
     this.createMatchInput.MatchPaymentType = isChecked ? 1 : 0;
   }
 
-  toggleDay(day: string) {
-    const i = this.recurringDays.indexOf(day);
-    i > -1 ? this.recurringDays.splice(i, 1) : this.recurringDays.push(day);
-  }
-
-  isDaySelected(day: string): boolean {
-    return this.recurringDays.indexOf(day) > -1;
+  getRecurringDayName(): string {
+    return moment(this.startDate).format('dddd');
   }
 
   getListOfClub() {
@@ -324,8 +322,54 @@ export class CreatematchPage {
 
   onChangeOfClub() {
     this.club_activities = [];
+    this.resetTeams();
     this.getClubActivity();
     this.autoFillLocation();
+  }
+
+  resetTeams() {
+    this.teamList = [];
+    this.selectedHomeTeamId = '';
+    this.selectedAwayTeamId = '';
+  }
+
+  fetchTeamsForMatch() {
+    if (this.teamList.length > 0) return;
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
+    const realActivityId = selectedActivity ? selectedActivity.activity.Id : '';
+    if (!realActivityId) {
+      this.commonService.toastMessage("Select an activity first", 2500, ToastMessageType.Error);
+      return;
+    }
+    const body = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId: '',
+      activityId: realActivityId,
+      memberId: this.sharedservice.getLoggedInUserId(),
+      action_type: 1,
+      device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
+      app_type: AppType.ADMIN_NEW,
+      device_id: '',
+      updated_by: '',
+      isExternal: false
+    };
+    this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, body).subscribe({
+      next: (res: any) => { this.teamList = res.data || []; }
+    });
+  }
+
+  onRecurringToggle(expanded: boolean) {
+    if (expanded && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
+  }
+
+  onMatchTypeChange() {
+    if (+this.createMatchInput.MatchType !== MatchType.TEAM) this.resetTeams();
+    else if (this.isRecurring) this.fetchTeamsForMatch();
+  }
+
+  onActivityChange() {
+    this.resetTeams();
+    if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
   }
 
   autoFillLocation() {
@@ -356,6 +400,7 @@ export class CreatematchPage {
           this.activities = res.data.club_activities;
           this.activityId = this.activities[0].id;
           console.log("activity", this.activityId);
+          if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
         }
       }
     });
@@ -390,10 +435,6 @@ export class CreatematchPage {
     }
     else if (this.isRecurring && !this.recurringUntilWhen) {
       this.commonService.toastMessage("Select until when date", 2500, ToastMessageType.Error);
-      return false;
-    }
-    else if (this.isRecurring && this.recurringDays.length === 0) {
-      this.commonService.toastMessage("Select at least one day", 2500, ToastMessageType.Error);
       return false;
     }
     else if (this.isRecurring && moment(this.recurringUntilWhen).isSameOrBefore(moment(this.startDate))) {
@@ -476,7 +517,10 @@ export class CreatematchPage {
 
         if (this.isRecurring) {
           restPayload['untilWhen'] = moment(this.recurringUntilWhen).format("YYYY-MM-DD");
-          restPayload['days'] = this.recurringDays;
+          if (+this.createMatchInput.MatchType === MatchType.TEAM) {
+            restPayload['HomeParentclubTeamId'] = this.selectedHomeTeamId || '';
+            restPayload['AwayParentclubTeamId'] = this.selectedAwayTeamId || '';
+          }
         }
 
         const apiUrl = this.isRecurring ? API.CREATE_RECURRING_MATCHES : API.CREATE_MATCH;

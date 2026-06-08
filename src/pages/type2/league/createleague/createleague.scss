@@ -316,4 +316,25 @@ page-createleague {
     z-index: 10;
   }
 
+  ion-footer {
+    background: #f8fafc !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    &::before, &::after { display: none !important; }
+
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #f8fafc !important;
+      border: none !important;
+    }
+  }
+
+  &:not(.light-theme) ion-footer,
+  .dark-theme ion-footer {
+    background: #0f172a !important;
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #0f172a !important;
+    }
+  }
+
 }

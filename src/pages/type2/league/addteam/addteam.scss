@@ -22,7 +22,7 @@ page-addteam {
   app-list-card { display: block; margin-bottom: 6px; }
   .team-row {
     display: flex; align-items: center; gap: 10px; padding: 12px 14px;
-    background: linear-gradient(145deg, rgba(43, 146, 187, 0.3) 0%, rgba(53, 173, 255, 0.12) 40%, transparent 75%);
+    background: transparent;
     cursor: pointer;
   }
   .team-avatar {
@@ -64,7 +64,7 @@ page-addteam {
       .bar-button, .back-button-icon { color: #1e293b !important; }
     }
     .section-title { color: #1e293b; }
-    .team-row { background: linear-gradient(145deg, rgba(43, 146, 187, 0.25) 0%, rgba(53, 173, 255, 0.1) 40%, transparent 75%); }
+    .team-row { background: transparent; }
     .team-name { color: #1e293b; }
     ion-checkbox { --background: #fff; --border-color: #d1d5db; }
     .empty-state .empty-icon { color: #cbd5e1; }
