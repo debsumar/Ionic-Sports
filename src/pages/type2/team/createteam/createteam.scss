@@ -107,6 +107,14 @@ page-createteam {
       border-color: rgba(71, 85, 105, 0.5) !important;
       .text-input { color: #f8fafc !important; &::placeholder { color: #64748b !important; } }
     }
+
+    ion-footer {
+      background: #0f172a !important;
+
+      .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+        background: #0f172a !important;
+      }
+    }
   }
 
   .error-item {
@@ -199,4 +207,24 @@ page-createteam {
   .image-popup-container { position: relative; max-width: 90%; max-height: 90%; }
   .popup-image { width: 100%; height: auto; max-height: 80vh; object-fit: contain; }
   .close-btn { position: absolute; top: -10px; right: -10px; background: rgba(255, 255, 255, 0.9); border-radius: 50%; width: 40px; height: 40px; color: #333; }
+
+  ion-footer {
+    background: #f8fafc !important;
+    box-shadow: none !important;
+    border: none !important;
+
+    &::before, &::after {
+      display: none !important;
+    }
+
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #f8fafc !important;
+      border: none !important;
+    }
+
+    .glass-btn-wrap {
+      position: relative;
+      padding: 12px;
+    }
+  }
 }

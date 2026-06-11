@@ -785,6 +785,14 @@ export class Type2EditGroupSessionMonthly {
 
 
   updateSession() {
+    if (this.isAnyPlanPriceChanged()) {
+      // A plan price was changed -> warn the admin that existing members are not affected.
+      this.commonService.showPriceChangeNotice(() => {
+        this.updatePostgreSession();
+      });
+      return;
+    }
+
     let confirm = this.alertCtrl.create({
       title: 'Session Update',
       message: 'Are you sure you want to update the session?',
@@ -803,6 +811,22 @@ export class Type2EditGroupSessionMonthly {
       ]
     });
     confirm.present();
+  }
+
+  // Returns true if the member or non-member amount of any day-plan was changed
+  // compared to the original values captured when the page loaded.
+  isAnyPlanPriceChanged(): boolean {
+    for (const plan of this.session_dets.payplans) {
+      const original_member_price = this.payplans.get(plan.plan_id_member);
+      const original_non_member_price = this.payplans.get(plan.plan_id_non_member);
+      if (
+        original_member_price != plan.plan_amount_member ||
+        original_non_member_price != plan.plan_amount_non_member
+      ) {
+        return true;
+      }
+    }
+    return false;
   }
 
   // this.session_dets.payplans.forEach((plan)=>{

@@ -173,11 +173,12 @@ export class MatchdetailsPage {
     return moment(+date).format("DD MMM YYYY, hh:mm A");
   }
 
-  gotoMatchInvitePlayers() {
+  gotoMatchInvitePlayers(side: string = 'home') {
     let profileModal = this.modalCtrl.create("MatchinviteplayersPage", {
       selectedmatchId: this.UserInvitationStatus.MatchId,
       selectedmemberId: this.UserInvitationStatus.MemberId,
-      existed_members: this.participants
+      existed_members: this.participants,
+      side: side
     });
     profileModal.onDidDismiss(data => {
       console.log(data);

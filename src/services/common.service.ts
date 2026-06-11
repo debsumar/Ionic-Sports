@@ -606,6 +606,42 @@ export class CommonService {
     alert.present();
   }
 
+  //<Summary>
+  //
+  //  Shared notice popup shown when an admin changes the price of a session/plan.
+  //  Makes it explicit that price changes only apply to new enrolments and never
+  //  alter the plan of members who are already enrolled.
+  //
+  //  onContinue : invoked when the admin acknowledges and chooses to proceed.
+  //  onCancel   : (optional) invoked when the admin backs out.
+  //
+  //</Summary>
+  showPriceChangeNotice(onContinue: () => void, onCancel?: () => void) {
+    let alert = this.alertCtrl.create({
+      title: "Price Update Notice",
+      message:
+        "The updated prices will apply to new enrolments only. Members who are already enrolled stay on their current plan and will not be affected by this change.",
+      buttons: [
+        {
+          text: "Cancel",
+          role: "cancel",
+          handler: () => {
+            if (onCancel) {
+              onCancel();
+            }
+          },
+        },
+        {
+          text: "Continue",
+          handler: () => {
+            onContinue();
+          },
+        },
+      ],
+    });
+    alert.present();
+  }
+
 
   commonAlter(title, message, callback) {
     let confirm = this.alertCtrl.create({

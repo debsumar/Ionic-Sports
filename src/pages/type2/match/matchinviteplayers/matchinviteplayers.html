@@ -20,7 +20,7 @@
     </div>
   </div>
 
-    <div class="page-scroll-area" #scrollArea (scroll)="onScroll($event)">
+    <div class="page-list-area">
       <app-list-card *ngFor="let member of filteredMembers; let i = index"
         [accentColor]="member.isAlreadyExisted ? '#64748b' : (member.isSelected ? '#10b981' : '#2b92bb')">
         <div class="player-row" (click)="!member.isAlreadyExisted && selectMembers(member)">
@@ -37,20 +37,17 @@
         </div>
       </app-list-card>
 
-    <div class="empty-state" *ngIf="filteredMembers?.length === 0">
-      <ion-icon name="people" class="empty-icon"></ion-icon>
-      <p class="empty-text">No players found</p>
-    </div>
-  </div>
-
-      <div class="loading-more" *ngIf="isLoadingMore">
-        <ion-spinner name="crescent"></ion-spinner>
-        <span>Loading more data...</span>
+      <div class="empty-state" *ngIf="filteredMembers?.length === 0">
+        <ion-icon name="people" class="empty-icon"></ion-icon>
+        <p class="empty-text">No players found</p>
       </div>
     </div>
-  </div>
 
-  <app-glass-button label="Add Players" (btnClick)="inviteUsers()"></app-glass-button>
+    <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="search_term==''">
+      <ion-infinite-scroll-content loadingSpinner="crescent"
+        loadingText="Loading more data..."></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
 </ion-content>
 
 <ion-footer no-border>
