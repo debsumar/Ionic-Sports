@@ -1,19 +1,21 @@
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
-import { RecuringbookingPage } from './recuringbooking';
+import { DeleteVenue } from './deletevenue';
 import { SharedComponentsModule } from '../../../../shared/components/shared-components.module';
 import { ThemeService } from '../../../../services/theme.service';
 
-
 @NgModule({
   declarations: [
-    RecuringbookingPage,
+    DeleteVenue,
   ],
   imports: [
-    IonicPageModule.forChild(RecuringbookingPage),
+    IonicPageModule.forChild(DeleteVenue),
     SharedComponentsModule,
   ],
   providers: [ ThemeService ],
-  schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+  schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
+  exports: [
+    DeleteVenue
+  ]
 })
-export class RecuringbookingPageModule {}
+export class Type2VenueModule {}

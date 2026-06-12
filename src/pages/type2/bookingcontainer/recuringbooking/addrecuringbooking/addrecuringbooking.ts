@@ -1,6 +1,6 @@
 
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, LoadingController } from 'ionic-angular';
+import { Component, Renderer2 } from '@angular/core';
+import { IonicPage, NavController, NavParams, AlertController, LoadingController, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import * as moment from 'moment';
 import { HttpClient } from '@angular/common/http';
@@ -12,6 +12,7 @@ import { HttpService } from '../../../../../services/http.service';
 import { API } from '../../../../../shared/constants/api_constants';
 import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../../shared/dtos/club.dto';
 import { AppType } from '../../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../../services/theme.service';
 /**
  * Generated class for the AddrecuringbookingPage page.
  *
@@ -32,7 +33,6 @@ export class AddrecuringbookingPage {
   currencyDetails:any = "";
   slotsType:boolean = false;loading: any;
   userkey: any;
-  nestUrl: any;
   roletype: any;
 
   clubs:ClubVenueDto[] = [];
@@ -81,18 +81,51 @@ export class AddrecuringbookingPage {
   ]
   minuteValues:any = "00,";
 
+  isDarkTheme: boolean = true; // 🌗 Default dark theme
+
   constructor(public navCtrl: NavController, public loadingCtrl: LoadingController, 
     public http: HttpClient,public navParams: NavParams,
     public storage: Storage,public fb: FirebaseService,
     public commonService: CommonService,public alertCtrl: AlertController,
     public sharedService: SharedServices,public toastCtrl:ToastController,
-    private httpService: HttpService) {
+    private httpService: HttpService,
+    private renderer: Renderer2, private themeService: ThemeService, public events: Events) {
     this.minDate = (((new Date().getFullYear()))).toString();
     this.maxDate = (((new Date().getFullYear()) + 10) + "-" + 12 + "-" + 31).toString();
     
   }
+
+  ionViewWillEnter() {
+    // 🌗 Theme setup
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => this.applyTheme(isDark));
+    this.events.subscribe('theme:changed', (isDark) => this.applyTheme(isDark));
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  // 🌗 Theme: load persisted preference and apply
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  // 🌗 Theme: toggle light-theme class on the page element
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const pageElement = document.querySelector('page-addrecuringbooking');
+    if (pageElement) {
+      isDark ? this.renderer.removeClass(pageElement, 'light-theme')
+             : this.renderer.addClass(pageElement, 'light-theme');
+    }
+  }
  
   ionViewDidLoad() {
+    this.loadTheme();
     let temp = "";
     for(let i = 1 ; i < 60 ; i++){
       if(i % 5 == 0){
@@ -113,7 +146,6 @@ export class AddrecuringbookingPage {
         this.selectedParentClubKey = user.ParentClubKey;
         this.selectedClubKey = user.ClubKey;
         this.memberKey = user.MemberKey;
-        this.nestUrl = this.sharedService.getnestURL()
         this.getClubDetails();
       
         break;

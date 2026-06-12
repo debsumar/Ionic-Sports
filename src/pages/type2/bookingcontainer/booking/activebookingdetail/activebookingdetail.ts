@@ -2,7 +2,6 @@ import { Component } from '@angular/core';
 import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import * as moment from 'moment'
-import * as $ from "jquery";
 import { HttpClient } from '@angular/common/http';
 import { SharedServices } from '../../../../services/sharedservice';
 import { FirebaseService } from '../../../../../services/firebase.service';
@@ -39,7 +38,7 @@ export class ActiveBookingDetail {
   fromnewviewpage: any;
   cancelReason ="n/a";
   userkey: any;
-  nestUrl: string;
+  
   cancelby: any;
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController, public storage: Storage,
@@ -48,7 +47,7 @@ export class ActiveBookingDetail {
     public callNumber: CallNumber, public sharedService: SharedServices, 
     public http: HttpClient, private httpService: HttpService) {
     //this.sharedService.get
-    this.nestUrl = this.sharedService.getnestURL()
+    
     this.ParentClubKey  = this.navParams.get('ParentClubKey'),
     this.selectedClub = this.navParams.get('selectedClub')
     this.ClubKey = this.navParams.get('ClubKey'),

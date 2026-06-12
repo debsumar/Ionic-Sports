@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, ActionSheetController,AlertOptions } from 'ionic-angular';
+import { Component, Renderer2 } from '@angular/core';
+import { IonicPage, NavController, NavParams, AlertController, ActionSheetController,AlertOptions, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import * as moment from 'moment';
 import { SharedServices } from '../../../services/sharedservice';
@@ -11,6 +11,7 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../shared/dtos/club.dto';
 import { AppType } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
 
 /**
  * Generated class for the RecuringbookingPage page.
@@ -45,12 +46,14 @@ export class RecuringbookingPage {
   is_initial:boolean = true;
   recuringBookDetails:any = [];
   daysDetails = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+  isDarkTheme: boolean = true; // 🌗 Default dark theme
   constructor(public navCtrl: NavController,public http: HttpClient, 
     public navParams: NavParams,public storage: Storage,
     public fb: FirebaseService,public commonService: CommonService,
     public alertCtrl: AlertController,public sharedService: SharedServices,
     public actionSheetCtrl: ActionSheetController,
-    public toastCtrl:ToastController, private httpService: HttpService) {
+    public toastCtrl:ToastController, private httpService: HttpService,
+    private renderer: Renderer2, private themeService: ThemeService, public events: Events) {
     // this.storage.get('userObj').then((val) => {
     //   val = JSON.parse(val);
     //   this.userKey = val.$key
@@ -76,6 +79,11 @@ export class RecuringbookingPage {
   
  
   ionViewWillEnter(){
+    // 🌗 Theme setup
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => this.applyTheme(isDark));
+    this.events.subscribe('theme:changed', (isDark) => this.applyTheme(isDark));
+
     this.storage.get('userObj').then((val) => {
       val = JSON.parse(val);
       this.userKey = val.$key
@@ -354,6 +362,28 @@ export class RecuringbookingPage {
         }
       })
     })
+  }
+
+  // 🌗 Theme: load persisted preference and apply
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  // 🌗 Theme: toggle light-theme class on the page element
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const pageElement = document.querySelector('page-recuringbooking');
+    if (pageElement) {
+      isDark ? this.renderer.removeClass(pageElement, 'light-theme')
+             : this.renderer.addClass(pageElement, 'light-theme');
+    }
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
   }
 
 }

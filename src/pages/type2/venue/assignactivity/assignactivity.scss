@@ -1,0 +1,159 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+assignactivity-page {
+    @include android-sdk35-fixes;
+
+    // ===== Dark theme (default) =====
+    // Set background on host page, ion-content AND scroll-content so no white shows.
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+    }
+
+    .activity-list {
+        padding: 12px 12px 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .activity-card-content {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 14px;
+        min-height: 64px;
+    }
+
+    .activity-thumb {
+        width: 60px;
+        flex-shrink: 0;
+
+        .iconStyle {
+            width: 100%;
+            height: 52px;
+            border-radius: 8px;
+            object-fit: contain; // show full image without cropping
+        }
+    }
+
+    .activity-name {
+        flex: 1;
+        min-width: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #f1f5f9;
+    }
+
+    // Checkbox is a visual indicator only; the whole card handles the tap
+    .activity-check {
+        flex-shrink: 0;
+        pointer-events: none;
+    }
+
+    // ===== Confirmation modal =====
+    .modal2 {
+        display: block;
+        position: fixed;
+        z-index: 10;
+        left: 24px;
+        right: 24px;
+        top: 112px;
+        border-radius: 14px;
+        height: 39%;
+        overflow: hidden;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.45);
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        -webkit-animation-name: fadeIn;
+        -webkit-animation-duration: 0.4s;
+        animation-name: fadeIn;
+        animation-duration: 0.4s;
+
+        .p1 {
+            border-bottom: 1px solid rgba(71, 85, 105, 0.5);
+            text-align: center;
+            color: #f1f5f9;
+            font-size: 17px;
+            font-weight: 700;
+            padding-bottom: 8px;
+            margin: 10px auto;
+        }
+        .p2 {
+            margin: 4px 12px;
+            font-size: 14px;
+            color: #94a3b8;
+        }
+        .rowbtn {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+        }
+
+        .modal-cancel-btn {
+            background-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        .modal-confirm-btn {
+            background: linear-gradient(135deg, #2b92bb, #35adff) !important;
+            color: #ffffff !important;
+        }
+    }
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+
+        .cancel-btn {
+            display: block;
+            width: calc(100% - 24px);
+            margin: 12px 12px 0;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        &.light-theme {
+            background: #f8fafc;
+            .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+        }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .activity-name { color: #1e293b; }
+
+        .modal2 {
+            background-color: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+
+            .p1 { color: #1e293b; border-bottom-color: rgba(226, 232, 240, 0.8); }
+            .p2 { color: #64748b; }
+            .modal-cancel-btn { background-color: #e2e8f0 !important; color: #1e293b !important; }
+        }
+
+        ion-footer { background: #f8fafc; }
+        ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+    }
+}

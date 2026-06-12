@@ -1,4 +1,3 @@
-
 export const API = {
     APP_LANGUAGE:'language/getLanguage',
     GET_PARENTCLUB_DETS: 'parentclub/get_parentclub_details',

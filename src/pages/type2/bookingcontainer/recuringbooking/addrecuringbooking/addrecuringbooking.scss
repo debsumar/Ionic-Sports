@@ -3,122 +3,103 @@
 page-addrecuringbooking {
     @include android-sdk35-fixes;
 
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
 
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
 
-    .rows-allign{
-        margin-top: -8px !important;
-        margin-left: -6px !important;
-    }
-    .headitem{
-        background: #ffffff !important;
-        .item-inner {
-             border-bottom:none !important; 
-        }
-    }
-    ion-select {
-        display: -webkit-box;
-        max-width: 100%;
-        width: 100%;
-    }
-    .select-text{
-        padding-top: 10px !important;
-        color:#faae4e !important;
-    }
-    ion-select{
-        padding: 0px 0px 0px 0px !important;
-    }
-    .select-icon {
-        position: relative !important;
-        width: 20px !important;
-        height: 20px !important;
-        background: #f0dcbc !important;
-        border-radius: 50% !important;
-        color: white !important;
-        left: 0px !important;
-        top: 6px;
-        .select-icon-inner{
-            left: 5px !important;
-            top: 46% !important;
-            margin-top: -2px !important;
-            position: absolute !important;
-            width: 0 !important;
-            height: 0 !important;
-            border-top: 5px solid !important;
-            border-right: 5px solid transparent !important;
-            border-left: 5px solid transparent !important;
-            color: white !important;
-            pointer-events: none !important;
-        }
-    }
     .scroll-content {
-        // margin-top: 122px !important;
-        padding: 16px 9px !important;
+        padding: 0 !important;
         background-image: none !important;
+        background: #0f172a !important;
     }
-    ion-label{
-        color:#faae4e !important;
-        font-size: 18px;
+
+    ion-content.dark-theme .scroll-content { background: #0f172a !important; }
+    ion-content.light-theme .scroll-content { background: #f8fafc !important; }
+
+    ion-list {
+        margin: 12px !important;
+        background: transparent !important;
     }
+
+    // Days selector card (standalone, not inside form-field)
+    .days-card {
+        margin: 6px 0;
+        padding: 12px 14px;
+        border-radius: 12px;
+        border: 1px solid #334155;
+        background: #1e293b;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+
+    .days-label {
+        margin: 0 0 10px;
+        color: #94a3b8;
+        font-weight: 700;
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+    }
+
+    .days {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+    }
+
     .rounded {
-        width: 38px;
-        height: 38px;
-        border-radius: 19px;
-        padding-top: 8px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        padding: 0;
         text-align: center;
-        border: 1px solid #76747d;
-        margin-bottom: 10px !important;
+        font-size: 13px;
+        font-weight: 600;
+        color: #94a3b8;
+        background: transparent;
+        border: 1px solid #475569;
+        flex-shrink: 0;
     }
-    .timekare-primary-btn{
-        background-color: #0df50d !important;
-        color: white !important;
-        border: none;
+
+    .timekare-primary-btn {
+        background-color: #10b981 !important;
+        color: #ffffff !important;
+        border: none !important;
     }
-    .card-header-ios{
-        color: #faae4e !important;
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+        &.light-theme { background: #f8fafc; }
     }
-    ion-datetime{
-        padding: 0px !important;
-    }
-    ion-card-content{
-        padding: 0px !important;
-    }
-    .item-inner{
-        padding: 0px !important;
-    }
-    .no-pad{
-        padding: 0px !important;
-    }
-    ion-label{
-        text-align: center !important;
-    }
-    .no-padd{
-        padding: 0px !important;
-    }
-    ion-card{
-        margin-left: 4px !important;
-        width: calc(100% - 8px) !important;
-    }
-    p{
-        margin: 0 0 2px !important;
-        font-size: 1.4rem !important;
-        color: #666 !important;
-        margin-left: 6.1px !important;
-    }
-    .border-bottom-style-color{
-        border-bottom: 1px solid #f6ae4d !important;
-    }
-    .mar-top-15{
-        margin-top: 15px !important;
-    }
-    .days-align{
-        font-size: 1.6rem;
-        color: #222;
-        padding: 0px !important;
-        padding-bottom: 10px !important;
-    }
-    .day-card{
-        border-bottom: 1px solid #dedede !important;
-        -webkit-box-shadow: none !important;
-         box-shadow: none !important;
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+        .scroll-content { background: #f8fafc !important; }
+
+        .days-card {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .days-label { color: #64748b; }
+
+        .rounded {
+            color: #64748b;
+            border-color: #cbd5e1;
+        }
+        .timekare-primary-btn {
+            background-color: #10b981 !important;
+            color: #ffffff !important;
+        }
+
+        ion-footer { background: #f8fafc; }
     }
 }

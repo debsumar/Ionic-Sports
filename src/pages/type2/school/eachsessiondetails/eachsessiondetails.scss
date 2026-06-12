@@ -3,382 +3,67 @@
 page-eachsessiondetails {
     @include android-sdk35-fixes;
 
-
-
-    $themelistotheritemcolor1: #7F7F7F;
-    $themelistheaderitemcolor: #00BED3;
     $themecolor: #35adff;
+
+    // ===== Dark theme (default) =====
+    // Host + ion-content background so no white shows through (mirrors monthly session dets)
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
     .scroll-content {
         background-image: none !important;
         padding: 0px !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
     }
-    .customcard {
-        border-radius: 0px;
+
+    // ---- Session details header card ----
+    .block {
+        background-color: #1e293b;
+        padding: 12px;
+    }
+    .session {
+        font-size: 20px;
+        color: #f1f5f9;
         margin: 0px;
-        width: 100%;
+        font-weight: bold;
     }
-    .customcardcontent {
-        padding: 0px;
+    .themeheaderfont {
+        color: #94a3b8;
+        font-size: 13px;
+        margin: -3px 5px 11px 1px;
+        font-weight: 500;
     }
-    .nopad {
-        padding: 0px;
+    .img1 {
+        width: 50px;
+        height: 50px;
+        border-radius: 30px;
+        margin-left: 9px;
+        border: 1px solid #334155;
     }
-    .passcode{
-        line-height: 10px;
-        font-size: 14px;
-        color: #343434a8;
-        font-style: italic;
+    .coachname {
+        color: #cbd5e1;
+        font-weight: 500;
+        margin: 0px;
     }
-    .trash_icon {
-        margin: 0px 0px 19px 20px !important;
-        background-color: #2b92bb;
-        // margin: 0px 0px 20px 17px;
+    .border-left {
+        border-left: .02em solid #334155;
+        padding: 0px 0px 0px 3px;
     }
-    .button1style {
-        width: 90px;
+    .sessionName {
+        color: #f1f5f9;
+        font-size: 15px;
+        font-weight: 500;
         text-transform: capitalize;
     }
-    .custimage {
-        max-height: 182px;
-        min-height: 179px;
-    }
-    .pmargin {
-        // margin-top: 2px;
-        // margin-bottom: 0px;
-        margin-top: 2px;
-        margin-bottom: 0px;
-        line-height: 1.2;
-    }
-    .boxborder {
-        border: 1px solid black;
-    }
-    .padding3 {
-        padding: 3px;
-    }
-    .borderright {
-        border-right: 1px solid black;
-        text-align: center;
-    }
-    .padleft {
-        padding-left: 5px;
-    }
-    .bordertop {
-        border-top: 1px solid black;
-    }
-    .membercard {
-        border-left: 3px solid $themecardleftbordercolor;
-        ion-card-content {
-            padding: 3px 0px;
-            height: 9vh;
-        }
-    }
-    .checkmark_color {
-        // color: #3ebad1;
-        // font-size: 39px;
-        // margin-top: -16px;
-        // text-align: right;
-        // float: right;
-        // margin-right: 9px;
-        // font-weight: bold;
-        color: #3ebad1;
-        font-size: 26px;
-        margin-top: -8px;
-        text-align: right;
-        float: right;
-        margin-right: 9px;
-        font-weight: bold;
-    }
-    .dueimage {
-        height: 43px;
-        margin-top: -6px;
-        width: 38px;
-        float: right;
-    }
-    .newPost {
-        position: absolute;
-        margin-left: -92px;
-        background-color: #f0f0f3;
-        margin-top: 12px;
-        padding: 6px 12px 2px 11px;
-        /* margin-bottom: 12px; */
-        /* color: #202021; */
-        border-radius: 4px;
-        //box-shadow: -1px 1px 0px 0px #a8a9ad;
-        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
-    }
-    .fabTop {
-        margin-bottom: 13px;
-    }
-    .fabEmailText {
-        // margin-left: -106px;
-        // background-color: #f0f0f3;
-        // margin-top: -48px;
-        // padding: 6px 12px 2px 11px;
-        // margin-bottom: 5px;
-        // color: #202021;
-        // border-radius: 3px;
-        // //box-shadow: -1px 1px 0px 0px #a8a9ad;
-        // margin-right: 36px;
-        // box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
-        
-        background-color:#2b92bb !important ;
-        margin-top: -47px;
-        padding: 7px 18px 7px 18px;
-        margin-bottom: 5px;
-        color: #ffffff;
-        border-radius: 3px;
-        margin-right: 36px;
-        -webkit-box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
-        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
-    }
-    //--------------------------------------------
-    //
-    /* The Modal (background) */
-    .modal {
-        display: none;
-        /* Hidden by default */
-        position: fixed;
-        /* Stay in place */
-        z-index: 1;
-        /* Sit on top */
-        left: 0;
-        top: 0;
-        width: 100%;
-        /* Full width */
-        height: 100%;
-        /* Full height */
-        overflow: auto;
-        /* Enable scroll if needed */
-        background-color: rgb(0, 0, 0);
-        /* Fallback color */
-        background-color: rgba(0, 0, 0, 0.4);
-        /* Black w/ opacity */
-        -webkit-animation-name: fadeIn;
-        /* Fade in the background */
-        -webkit-animation-duration: 0.4s;
-        animation-name: fadeIn;
-        animation-duration: 0.4s
-    }
-    /* Modal Content */
-    .modal-content {
-        // height: 303px;
-        // width: 64% !important;
-        // margin-top: 49% !important;
-        // margin-left: 17%;
-        // background-color: #fefefe;
-        // -webkit-animation-name: slideIn;
-        // -webkit-animation-duration: 0.4s;
-        // animation-name: slideIn;
-        // animation-duration: 0.4s;
-        // border-radius: 16px;
-        // height: 303px;
-        width: 76% !important;
-        margin-top: 39% !important;
-        margin-left: 13%;
-        background-color: #fefefe;
-        -webkit-animation-name: slideIn;
-        -webkit-animation-duration: 0.4s;
-        animation-name: slideIn;
-        animation-duration: 0.4s;
-        border-radius: 16px;
-    }
-    /* The Close Button */
-    .close {
-        color: white;
-        float: right;
-        font-size: 28px;
-        font-weight: bold;
-    }
-    .close:hover,
-    .close:focus {
-        color: #000;
-        text-decoration: none;
-        cursor: pointer;
-    }
-    .modal-header {
-        padding: 2px 16px;
-        background-color: #5cb85c;
-        color: white;
-    }
-    .modal-body {
-        padding: 2px 16px;
-    }
-    .modal-footer {
-        padding: 2px 16px;
-        background-color: #5cb85c;
-        color: white;
-    }
-    /* Add Animation */
-    @-webkit-keyframes slideIn {
-        from {
-            bottom: -300px;
-            opacity: 0
-        }
-        to {
-            bottom: 0;
-            opacity: 1
-        }
-    }
-    @keyframes slideIn {
-        from {
-            bottom: -300px;
-            opacity: 0
-        }
-        to {
-            bottom: 0;
-            opacity: 1
-        }
-    }
-    @-webkit-keyframes fadeIn {
-        from {
-            opacity: 0
-        }
-        to {
-            opacity: 1
-        }
-    }
-    @keyframes fadeIn {
-        from {
-            opacity: 0
-        }
-        to {
-            opacity: 1
-        }
-    }
-    .images {
-        font-size: 25px;
-        margin-left: 10px;
-    }
-    .btn {
-        text-align: right;
-    }
-    .backbtn {
-        color: #585050;
-        font-size: 38px;
-        transform: rotate(43deg);
-        margin-left: 19px;
-        margin-top: -8px;
-        font-weight: bold;
-    }
-    .name {
+    .venuename {
+        color: #94a3b8;
         font-size: 15px;
-        margin-left: 32px;
+        font-weight: 500;
     }
-    .insta {
-        height: 19px;
-        margin-left: 11px;
-    }
-    .borderRight {
-        border-right: 3px solid #af2222;
-    }
-    .installment_header {
-        text-align: center;
-        padding-top: 10px;
-        margin-bottom: 0px;
-        font-size: 20px;
-        margin-left: -24px;
-    }
-    ion-checkbox {
-        // margin: 9px 10px 9px 4px;
-        margin: 0px 6px 0px 8px !important;
-    }
-    ion-list {
-        margin: 0px 0 0px!important;
-    }
-    // .box {
-    //     // border: 1px solid #828282;
-    //     // padding: 10px;
-    //     // text-align: center;
-    //     padding: 13px 10px 13px 10px;
-    //     text-align: center;
-    //     color: white;
-    //     h1 {
-    //         margin: 0px;
-    //     }
-    // }
-    .revenuesession {
-        min-height: 51px;
-        font-size: 16px;
-    }
-    .cardstyle {
-        border-top: 3px solid #FF9800;
-        margin: 0px;
-        width: 100%;
-        color: black;
-    }
-    .nopad {
-        padding: 0px;
-    }
-    .rightborder {
-        border-right: 1px solid black;
-    }
-    .textcenter {
-        text-align: center;
-    }
-    .padtopbottom {
-        padding-top: 10px;
-        padding-bottom: 10px;
-    }
-    // .leftbox {
-    //  //   background-color: #38a7ff;
-    // }
-    // .rightbox {
-    //     background-color: #2ebb81;
-    // }
-    //---------------------------------------
-    .topboxvalue {
-        color: green;
-    }
-    .bottomboxvalue {
-        color: red;
-    }
-    .value1 {
-        font-size: 17px;
-        font-weight: bold;
-        margin-left: 5px;
-    }
-    .value2 {
-        // font-size: 17px;
-        // font-weight: bold;
-        font-size: 15px;
-        font-weight: bold;
-        margin-left: 5px;
-    }
-    .cust_label {
-        font-style: italic;
-        color: #aaada8;
-        line-height: .6;
-    }
-    .box1 {
-        margin-bottom: 6px;
-    }
-    .rightbox {
-        text-align: RIGHT;
-        border-left: 1px solid #cfcfcf;
-        padding: 0px 11px 0px 0px;
-    }
-    .leftbox {
-        padding: 0px 0px 0px 10px;
-    }
-    .ion_row {
-        padding: 7px 0px 9px 0px;
-    }
-    // -------------------------------------
-    // copied from member app session details 
-    //
-    //------------------------------------------
-    card-text {
-        padding-left: 16px;
-        font-size: 16px;
-    }
-    .notification {
-        margin-top: 0px;
-        font-size: 14px;
-    }
-    .camp_details {
-        text-align: left;
-        font-size: 14px;
-    }
+    .cust_margin { margin: 3px; }
     .ellipse {
         display: inline-block;
         width: 95%;
@@ -386,284 +71,220 @@ page-eachsessiondetails {
         overflow: hidden !important;
         text-overflow: ellipsis;
     }
-    .p_class {
-        margin: 2px 0px 2px 0px;
-    }
-    .mar_btm {
-        margin-bottom: 30px;
-    }
-    .btn_success {
-        // background-color: #06326f;
-        background-color: #009046;
-    }
-    ion-card-header {
-        border-bottom: .05em solid gray;
-        padding: 8px 9px 8px 15px !important; // background: #06326f;
-        //background: rgba(96, 104, 197, 0.95);
-        background-color: $themecolor; //background: rgba(63, 74, 204, 0.95);
-        color: white !important;
-        font-size: 15px !important;
-        font-weight: 500;
-    }
-    ion-list {
-        ion-item {
-            margin-left: 0px;
-            padding-left: 0px !important;
-        }
-    }
-    .custom_grid {
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-    .custom_col12 {
-        padding-left: 0px;
-        padding-right: 0px;
-    }
-    .icon_mar {
-        margin-right: 5px;
-        margin-top: -3px;
-    }
-    .outer_box {
-        padding: 0px;
-    }
-    .outer_card_content {
-        padding: 7px;
-    }
-    .inner_card {
-        margin: 8px 0px 4px 0px;
-        width: 100%;
-    }
-    .inner_card_content {
-        padding: 7px 0px 0px 8px;
-    }
-    .p_clr {
-        color: #06326f;
-    }
-    .end_icon {
-        float: right;
-        font-size: 26px;
-        width: 35px;
-    }
-    .session_msg_font {
-        text-align: center;
-        font-size: 13px;
-    }
-    .blue_clrlabel {
-        color: $themelistotheritemcolor1 !important;
-    } // .coachname {
-    .img1 {
-        width: 50px;
-        height: 50px;
-        border-radius: 30px;
-        margin-left: 9px; // border: 1px solid #4babdf;
-        border: 1px solid #d5d7dd;
-    }
-    .coachname {
-        color: #2a5168;
-        font-weight: 500;
-        margin: 0px;
-    }
-    .border-left {
-        border-left: .02em solid #d5d7dd;
-        padding: 0px 0px 0px 3px;
-    }
-    .sessiondetails {
-        color: $themelistheaderitemcolor;
-    }
-    .sessionName {
-        color: #042133;
-        font-size: 15px;
-        font-weight: 500;
-        text-transform: capitalize;
-    }
-    .activity {
-        color: #2a5168;
-        font-size: 15px;
-        font-style: italic;
-        font-weight: 500;
-    }
-    .venuename {
-        color: #2a5168;
-        font-size: 15px;
-        font-weight: 500;
-    }
-    .cust_margin {
-        margin: 3px;
-    }
-    .block {
-        background-color: #F2F5FA;
-        padding: 12px;
-    }
-    .bellowblock {
-        padding: 0px 12px 12px 12px;
-        ion-list {
-            margin: 0px;
-        }
-    }
-    .session {
-        font-size: 20px; // color: #375e6d;
-        color: #114a70;
-        margin: 0px;
-        font-weight: bold;
-    }
-    .sessiondate {
-        font-size: 16px;
-    }
-    .themeheaderfont {
-        color: #021c2e;
-        font-size: 13px;
-        margin: -3px 5px 11px 1px;
-        font-weight: 500;
-    }
-    .comments_color {
-        color: #3f6377;
-    }
-    .payby {
-        color: #0b283b;
-        text-align: right;
-        margin: 0px -4px 0px 0px;
-    }
-    .btn_style {
-        background-color: #53bffe; // background-color: white;
-        color: white;
-        border-color: #53bffe;
-        font-size: 19px;
-        font-weight: bold;
-        margin: 0px 0px 10px 0px;
-    }
     .fabicon {
         margin: -7px !important;
         background-color: #2b92bb;
     }
+
+    // ---- Finance summary card ----
+    .finanace_div { padding: 10px 8px 0; }
+    .cardstyle {
+        border-top: 3px solid #2b92bb;
+        margin: 0px;
+        width: 100%;
+        color: #f1f5f9;
+        background: #1e293b;
+        border-radius: 12px;
+    }
+    .nopad { padding: 0px; }
+    .ion_row { padding: 7px 0px 9px 0px; }
+    .leftbox { padding: 0px 0px 0px 10px; }
+    .rightbox {
+        text-align: right;
+        border-left: 1px solid #334155;
+        padding: 0px 11px 0px 0px;
+    }
+    .value1 {
+        font-size: 17px;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+    .topboxvalue { color: #10b981; }
+    .bottomboxvalue { color: #f87171; }
+    .cust_label {
+        font-style: italic;
+        color: #94a3b8;
+        line-height: .6;
+    }
+
+    // ---- Member cards ----
+    .member-list {
+        padding: 10px 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .membercard ion-card-content {
+        padding: 6px 10px;
+    }
+    .member-name {
+        color: #f1f5f9;
+        font-size: 15px;
+        font-weight: 600;
+        margin: 0;
+    }
+    .passcode {
+        line-height: 14px;
+        font-size: 14px;
+        color: #94a3b8;
+        font-style: italic;
+        margin: 2px 0 0;
+    }
+    .member-age { color: #cbd5e1; font-size: 13px; }
+
+    // Right-side payment block: vertically centered, no extra margins
     .paidBlock {
-        padding: 1px 0px 0px 0px;
+        padding: 0 !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;
+        height: 100%;
+
+        > div { width: 100%; }
+        p { margin: 0 !important; }
     }
     .moneypaid {
-        line-height: 15px;
-        /* float: right; */
+        line-height: 1.2;
         text-align: right;
         font-weight: bold;
-        color: green;
+        color: #10b981;
+        margin: 0 !important;
     }
     .transactiondate {
-        line-height: 14px;
+        line-height: 1.2;
         font-size: 10px;
         text-align: right;
-        color: #aaada8;
+        color: #94a3b8;
         font-style: italic;
-        margin-left: -5px;
+        margin: 0 !important;
     }
-    .fabAttendanceText {
-        margin-left: -115px;
-        background-color: #2b92bb !important ;
+    .pending {
+        line-height: 1.2;
+        font-size: 14px;
+        text-align: right;
+        color: #f87171;
+        font-style: italic;
+        margin: 0 !important;
+    }
+    .dueimage {
+        height: 43px;
+        margin-top: -6px;
+        width: 38px;
+        float: right;
+    }
+    .margin_auto { margin: auto; }
+
+    // ---- Fabs ----
+    .primary-fab {
+        background-color: #2b92bb !important;
+        color: #ffffff !important;
+    }
+    .trash-fab {
+        background-color: #ef4444 !important;
+        color: #ffffff !important;
+    }
+    .bottom_10 { margin-bottom: 10px; }
+    .fabTop { margin-bottom: 13px; }
+    .fabEmailText {
+        background-color: #2b92bb !important;
         margin-top: -47px;
-        padding: 6px 12px 2px 11px;
+        padding: 7px 18px;
         margin-bottom: 5px;
         color: #ffffff;
         border-radius: 3px;
         margin-right: 36px;
+        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
     }
-    .trash_icon {
-        margin: 0px 0px 19px 20px !important;
-        background-color: #2b92bb;
-        // margin: 0px 0px 20px 17px;
+
+    // ---- Installment modal ----
+    .modal {
+        display: none;
+        position: fixed;
+        left: 0; top: 0;
+        width: 100%; height: 100%;
+        overflow: auto;
+        background-color: rgba(0, 0, 0, 0.6);
+        -webkit-animation-name: fadeIn;
+        -webkit-animation-duration: 0.4s;
+        animation-name: fadeIn;
+        animation-duration: 0.4s;
     }
-    .active {
-        // background-color: #f2f5fa;
-        // color: #0467a9;
-        background-color: #a6b9dc !important;
+    .modal-content {
+        width: 76% !important;
+        margin-top: 39% !important;
+        margin-left: 13%;
+        background-color: #1e293b;
+        border: 1px solid #334155;
+        -webkit-animation-name: slideIn;
+        -webkit-animation-duration: 0.4s;
+        animation-name: slideIn;
+        animation-duration: 0.4s;
+        border-radius: 16px;
     }
-    .inactive {
-        // background-color: white;
-        // color: black;
-        background-color: #e8eef9 !important;
-    }
-    //*******************************************************************
-    // installment block
-    //-------------------------------------------------------------
-    .installmentpaymentcardstyle {
-        margin: 0px !important;
-        width: 100% !important;
-    }
-    .installmentbox_session {
-        border-bottom: 1px solid #e3e3e3;
-        padding: 2px;
-        background-color: #e8eef9;
-    }
-    .installmentName {
-        font-weight: bold;
-        color: #114a70;
-        font-size: 16px;
-    }
-    .installmentamount {
-        float: RIGHT;
-        color: #089a08;
-        font-size: 15px;
-    }
-    .installmentcircleblock {
-        height: 25px;
-        width: 25px;
-        border-radius: 50%;
-        display: inline-block;
+    .installment_header {
         text-align: center;
-        padding-top: 3px;
-        margin-top: -8px;
-        color: white;
-        margin-left: 6px;
+        padding-top: 10px;
+        margin-bottom: 0px;
+        font-size: 20px;
+        color: #f1f5f9;
     }
-    .notenrolled {
-        background-color: #bbb;
+    .modal ion-list, .modal ion-item { background: transparent !important; }
+    .modal ion-label { color: #cbd5e1 !important; }
+    .modal-cancel-btn {
+        background-color: #334155 !important;
+        color: #f1f5f9 !important;
     }
-    // .enrolled {
-    //     background-color: green;
-    // }
-    .enrolledButDue {
-        background-color: #f53d3d;
+    .modal-confirm-btn {
+        background: linear-gradient(135deg, #2b92bb, #35adff) !important;
+        color: #ffffff !important;
     }
-    .enrolledButPaid {
-        background-color: #258525;
-    }
-    .paybydateofinstallment {
-        font-size: 12px;
-    }
-    .month-slide {
-        background-color: #53bffe;
-        border-radius: 10px;
-        color: #f8f8f8;
-        margin-left: 4px;
-        padding: 7px;
-        p {
-            margin: 0px;
-            font-size: 13px;
+
+    ion-checkbox { margin: 0px 6px 0px 8px !important; }
+    ion-list { margin: 0px 0 0px !important; }
+
+    @-webkit-keyframes slideIn { from { bottom: -300px; opacity: 0 } to { bottom: 0; opacity: 1 } }
+    @keyframes slideIn { from { bottom: -300px; opacity: 0 } to { bottom: 0; opacity: 1 } }
+    @-webkit-keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
         }
-    }
-    .checkmark_style {
-        transform: translate(0px, -5px);
-        color: #f8f8f8;
-        font-weight: bold;
-        font-size: 16px;
-        float: right;
-    }
-    .selected_checkmark_style{
-        background-color: #f6ba63;
-    }
-    .unselected_checkmark_style{
-        background-color: #53bffe;
-    }
-    .DD{
-        width: 45px;
-        position: absolute;
-       // top: -14px;
-        right: 1px;
-    }
-    .pending{
-        line-height: 25px;
-        font-size: 14px;
-        text-align: right;
-        color: rgba(255, 0, 0,0.85);
-        font-style: italic;
-    }
-    .margin_auto{
-        margin: auto;
+
+        .block { background-color: #ffffff; }
+        .session { color: #114a70; }
+        .themeheaderfont { color: #021c2e; }
+        .img1 { border-color: #d5d7dd; }
+        .coachname { color: #2a5168; }
+        .border-left { border-left-color: #d5d7dd; }
+        .sessionName { color: #042133; }
+        .venuename { color: #2a5168; }
+
+        .cardstyle { background: #ffffff; color: #0f172a; border-top-color: #FF9800; }
+        .rightbox { border-left-color: #cfcfcf; }
+        .topboxvalue { color: green; }
+        .bottomboxvalue { color: red; }
+        .cust_label { color: #aaada8; }
+
+        .member-name { color: #042133; }
+        .passcode { color: #343434a8; }
+        .member-age { color: #475569; }
+        .moneypaid { color: green; }
+        .transactiondate { color: #aaada8; }
+        .pending { color: rgba(255, 0, 0, 0.85); }
+
+        .modal-content { background-color: #fefefe; border: none; }
+        .installment_header { color: #114a70; }
+        .modal ion-label { color: #042133 !important; }
+        .modal-cancel-btn { background-color: #e2e8f0 !important; color: #1e293b !important; }
     }
 }

@@ -1,0 +1,107 @@
+<ion-header *ngIf="themeType == 1">
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Edit Venue</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-header>
+    <ion-navbar *ngIf="themeType == 2">
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+      <ion-icon name="apps"></ion-icon>
+    </button>
+        <ion-title>
+            Edit Venue
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()">
+                 <img src="assets/images/home.svg" class="home_btn">
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <ion-list *ngIf="isVenue_available">
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Venue Name</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.ClubName" required></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Club Short Name</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.ClubShortName"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Description</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.ClubDescription"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>First Line Address</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.FirstLineAddress" required></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>SecondLineAddress</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.SecondLineAddress" required></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>City</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.City" required></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>State</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.State" required></ion-textarea>
+            </ion-item>
+        </app-form-field>
+
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item class="select-item">
+                <ion-label>Country</ion-label>
+                <ion-select [(ngModel)]="clubDets.CountryName" (ionChange)="countryAssign()">
+                    <ion-option *ngFor="let eachcountry of country" value={{eachcountry.CountryName}}>{{eachcountry.CountryName}}</ion-option>
+                </ion-select>
+            </ion-item>
+        </app-form-field>
+
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Post Code</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.PostCode" (keyup)="selectedVenue.PostCode = selectedVenue.PostCode.toUpperCase()"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>MapURL</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.Location"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+    </ion-list>
+</ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <button class="cancel-btn" (click)="cancelVenue()">Cancel</button>
+    <app-glass-button label="Update" (btnClick)="updateVenue()"></app-glass-button>
+</ion-footer>
