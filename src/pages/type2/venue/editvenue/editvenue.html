@@ -95,7 +95,28 @@
         <app-form-field [isDark]="isDarkTheme">
             <ion-item>
                 <ion-label stacked>MapURL</ion-label>
-                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.Location"></ion-textarea>
+                <ion-textarea type="text" rows="1" [(ngModel)]='clubDets.MapUrl'></ion-textarea>
+            </ion-item>
+        </app-form-field>
+
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Website URL</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.WebsiteUrl"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Contact Phone</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.ContactPhone"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Contact Name</ion-label>
+                <ion-textarea type="text" rows="1" [(ngModel)]="clubDets.ClubContactName"></ion-textarea>
             </ion-item>
         </app-form-field>
     </ion-list>

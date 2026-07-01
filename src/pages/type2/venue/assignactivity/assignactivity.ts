@@ -91,6 +91,17 @@ export class AssignActivityPage {
         this.getStorageData();
     }
 
+    /** Firebase key — works whether venue was passed from the REST API (ClubVenueDto with FirebaseId)
+     *  or from the old Firebase query (object with $key). */
+    private get venueFirebaseKey(): string {
+        return (this.selectedVenue && (this.selectedVenue.FirebaseId || this.selectedVenue.$key)) || '';
+    }
+
+    /** Postgres ID — works whether venue came from REST (ClubVenueDto with Id) or old FB object (ClubID). */
+    private get venuePostgreId(): string {
+        return (this.selectedVenue && (this.selectedVenue.Id || this.selectedVenue.ClubID)) || '';
+    }
+
     async getStorageData(){
         const [login_obj,postgre_parentclub] = await Promise.all([
           this.storage.get('userObj'),
@@ -140,7 +151,7 @@ export class AssignActivityPage {
     }
 
     getactivity(){
-        this.fb.getAllWithQuery("/Activity/" + this.selectedParentClub + "/" + this.selectedVenue.$key, { orderByChild: "IsEnable", equalTo: true }).subscribe((data) => {
+        this.fb.getAllWithQuery("/Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey, { orderByChild: "IsEnable", equalTo: true }).subscribe((data) => {
             let activity = data;
             activity.forEach(club => {
                 club['isSelect'] = false
@@ -214,7 +225,7 @@ export class AssignActivityPage {
                 "https://firebasestorage.googleapis.com/v0/b/activityprouk-b5815/o/ActivityPro%2FVenueTab%2Fimage.png?alt=media&token=06632505-8a36-4c3f-9bde-ff9f3fcab722";
 
             this.activityName = act.ActivityName;
-            this.fb.update(act.$key, "Activity/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/", activityObj);
+            this.fb.update(act.$key, "Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/", activityObj);
 
             // Fetch categories from all other venues for this activity and deduplicate
             await this.saveCategoriesFromAllVenues(act.$key);
@@ -241,7 +252,7 @@ export class AssignActivityPage {
        };
 
        const res = await this.httpService.post(API.GET_PARENT_CLUB_VENUES, body, null, 1).pipe(take(1)).toPromise() as GetParentClubVenuesResponseDto;
-       const otherVenues = res.data.filter((club: ClubVenueDto) => club.FirebaseId !== this.selectedVenue.$key);
+       const otherVenues = res.data.filter((club: ClubVenueDto) => club.FirebaseId !== this.venueFirebaseKey);
 
        // Dedup by Firebase Key — same key is shared across venues (see saveCategory in categoryNsubcategory.ts)
        const categoryMap: Map<string, any> = new Map();
@@ -283,7 +294,7 @@ export class AssignActivityPage {
 
        if (categoryMap.size === 0) return;
 
-       const baseCatPath = "Activity/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/" + activityKey + "/ActivityCategory/";
+       const baseCatPath = "Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/" + activityKey + "/ActivityCategory/";
 
        for (const cat of Array.from(categoryMap.values())) {
            const catObj = {
@@ -311,14 +322,14 @@ export class AssignActivityPage {
        }
 
        // Mark activity as having categories
-       this.fb.update(activityKey, "Activity/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/", { IsExistActivityCategory: true });
+       this.fb.update(activityKey, "Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/", { IsExistActivityCategory: true });
    }
 
    Emailsetup(activityKey){
-    this.fb.getAll("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/ActivityEmailSetup/" +activityKey + "/").subscribe((data) => {
+    this.fb.getAll("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/ActivityEmailSetup/" +activityKey + "/").subscribe((data) => {
         if(data.length == 0){
             this.emailSetupObj.EmailSetupName = this.ClubName +" - "+ this.activityName
-            this.fb.saveReturningKey("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.selectedVenue.$key + "/ActivityEmailSetup/" + activityKey + "/", this.emailSetupObj);
+            this.fb.saveReturningKey("/EmailSetup/Type2/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/ActivityEmailSetup/" + activityKey + "/", this.emailSetupObj);
         }
     })              
    }
@@ -327,10 +338,10 @@ export class AssignActivityPage {
         try{
             const assign_activity_payload = {
                 paentclub_key: this.selectedParentClub,
-                club_key: this.selectedVenue.$key,
+                club_key: this.venueFirebaseKey,
                 activities: this.selectedActivity.map(activity => activity.$key),
                 parentclubId : this.postgre_parentclub_id,
-                clubId : this.selectedVenue.ClubID,
+                clubId : this.venuePostgreId,
                 device_id : this.sharedservice.getDeviceId(),
                 device_type : this.sharedservice.getPlatform() == "android" ? 1:2,
                 app_type : AppType.ADMIN_NEW,

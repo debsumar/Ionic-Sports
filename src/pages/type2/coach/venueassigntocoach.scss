@@ -22,6 +22,27 @@ venueassigntocoach-page {
         gap: 10px;
     }
 
+    .coach-header {
+        display: flex;
+        flex-direction: column;
+        padding: 16px 16px 12px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        margin-bottom: 4px;
+    }
+
+    .coach-header-name {
+        font-size: 18px;
+        font-weight: 700;
+        color: #f1f5f9;
+    }
+
+    .coach-header-label {
+        font-size: 13px;
+        font-weight: 400;
+        color: #94a3b8;
+        margin-top: 2px;
+    }
+
     .venue-card-body {
         padding: 4px 14px 10px;
     }
@@ -32,6 +53,37 @@ venueassigntocoach-page {
         justify-content: space-between;
         padding: 12px 0 10px;
         border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+        cursor: pointer;
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    .venue-head-left {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .venue-chevron {
+        font-size: 16px;
+        color: #2b92bb;
+        flex-shrink: 0;
+        transition: transform 0.2s ease;
+    }
+
+    .venue-activity-count {
+        background: #2b92bb;
+        color: #fff;
+        font-size: 10px;
+        font-weight: 700;
+        padding: 2px 7px;
+        border-radius: 10px;
+        flex-shrink: 0;
+    }
+
+    .venue-activities {
+        padding-top: 4px;
     }
 
     .venue-name {
@@ -45,6 +97,7 @@ venueassigntocoach-page {
         align-items: center;
         justify-content: space-between;
         padding: 10px 4px;
+        border-top: 1px solid rgba(148, 163, 184, 0.12);
     }
 
     .activity-name {
@@ -104,6 +157,11 @@ venueassigntocoach-page {
         .activity-name { color: #475569; }
         .no-activity { color: #94a3b8; }
         .venue-head { border-bottom-color: rgba(148, 163, 184, 0.25); }
+
+        .coach-header { border-bottom-color: rgba(148, 163, 184, 0.2); }
+        .coach-header-name { color: #1e293b; }
+        .coach-header-label { color: #64748b; }
+        .activity-row { border-top-color: rgba(148, 163, 184, 0.2); }
 
         ion-footer { background: #f8fafc; }
         ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }

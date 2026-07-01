@@ -112,7 +112,6 @@ export class GroupsessiondetailsPage {
     directdebitInfo: any = "";
     directDebitMap: Map<string, Set<string>> = new Map();
     selectedMonthKey: any;
-    nestUrl: any;
 
     // new id filelds
     user_status_update:user_status_update_v1 = {

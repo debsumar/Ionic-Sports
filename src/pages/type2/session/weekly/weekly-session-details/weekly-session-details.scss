@@ -8,6 +8,143 @@ page-weekly-session-details {
     $themelistotheritemcolor1: #7F7F7F;
     $themelistheaderitemcolor: #00BED3;
     $themecolor: #35adff;
+
+    // Dark Theme Styles (default theme)
+    &.dark-theme {
+        background: #0f172a !important;
+
+        .scroll-content {
+            background: #0f172a !important;
+            background-image: none !important;
+        }
+
+        ion-content {
+            --background: #0f172a !important;
+            background: #0f172a !important;
+        }
+
+        .sticky-header {
+            background: #0f172a !important;
+        }
+
+        .block {
+            background: #1e293b !important;
+            background-color: #1e293b !important;
+        }
+
+        .session {
+            color: #f1f5f9 !important;
+        }
+
+        .themeheaderfont {
+            color: #cbd5e1 !important;
+        }
+
+        .sessionName {
+            color: #e2e8f0 !important;
+        }
+
+        .activity,
+        .coachname {
+            color: #94a3b8 !important;
+        }
+
+        .venuename {
+            color: #cbd5e1 !important;
+        }
+
+        .border-left {
+            border-left-color: #334155 !important;
+        }
+
+        .border_bottom {
+            border-bottom-color: #fab754 !important;
+        }
+
+        .modern-tabs-container {
+            background: #1e293b !important;
+            border-bottom-color: #334155 !important;
+
+            .modern-tab {
+                .tab-icon,
+                .tab-text {
+                    color: #94a3b8;
+                }
+
+                &.active {
+                    .tab-icon,
+                    .tab-text {
+                        color: #fab754;
+                    }
+                }
+            }
+        }
+
+        .containers {
+            ion-card {
+                background: #1e293b !important;
+                background-color: #1e293b !important;
+            }
+
+            ion-card-content {
+                background: #1e293b !important;
+                background-color: #1e293b !important;
+            }
+        }
+
+        #icon1_col {
+            border-right-color: #334155 !important;
+        }
+
+        .leftp,
+        .leftp1 {
+            color: #fab754 !important;
+        }
+
+        .session_name {
+            color: #e2e8f0 !important;
+        }
+
+        .pStyle {
+            color: #94a3b8 !important;
+        }
+
+        .cust_icon,
+        .chevron_right {
+            color: #94a3b8 !important;
+        }
+
+        .expandbtn {
+            color: #e2e8f0 !important;
+            background-color: #334155 !important;
+        }
+
+        .membercard {
+            background: #1e293b !important;
+
+            ion-card-content {
+                background: #1e293b !important;
+            }
+        }
+
+        .cardstyle {
+            background: #1e293b !important;
+            color: #e2e8f0 !important;
+        }
+
+        card-text {
+            color: #e2e8f0 !important;
+        }
+
+        ion-segment {
+            background-color: #1e293b !important;
+        }
+
+        ion-segment-button {
+            background-color: transparent !important;
+        }
+    }
+
     .scroll-content {
         background: #ffffff !important;
         background-image: none !important;

@@ -494,7 +494,17 @@ export class Type2VenueAssignCoach {
                 const activitiesRes: any = await this.httpService
                     .post(API.CLUB_ACTIVITIES, { parentclubId: parentClubId, clubId: venueId, ...commonIds })
                     .pipe(take(1)).toPromise();
-                const clubActivities: any[] = (activitiesRes && activitiesRes.data && activitiesRes.data.club_activities) || [];
+                const rawActivities: any[] = (activitiesRes && activitiesRes.data && activitiesRes.data.club_activities) || [];
+
+                // Deduplicate by activity_key — the API sometimes returns duplicate rows
+                // when multiple records share the same Firebase activity key.
+                const seenKeys = new Set<string>();
+                const clubActivities: any[] = rawActivities.filter((ca: any) => {
+                    const key = ca.activity_key || (ca.activity && (ca.activity.Id || ca.activity.id));
+                    if (!key || seenKeys.has(key)) { return false; }
+                    seenKeys.add(key);
+                    return true;
+                });
 
                 const activities = clubActivities.map((ca: any) => {
                     const activityId = (ca.activity && (ca.activity.Id || ca.activity.id)) || ca.Id || ca.activity_id;
@@ -514,6 +524,8 @@ export class Type2VenueAssignCoach {
                     $key: venue.FirebaseId,
                     ClubName: venue.ClubName,
                     IsSelected: activities.some((a: any) => a.IsSelected),
+                    // Auto-expand venues that already have selections so admin can see them
+                    _expanded: activities.some((a: any) => a.IsSelected),
                     // A venue with no activities cannot be assigned, so it is not selectable.
                     disabled: activities.length === 0,
                     Activities: activities

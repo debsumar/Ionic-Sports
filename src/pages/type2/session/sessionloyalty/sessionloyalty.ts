@@ -71,7 +71,6 @@ export class SessionLoyalty {
   loyaltySetup = {};
   sessionType = '';
   user: any;
-  nestUrl: any;
   isReview:boolean = false;
   coachInfo: any;
   clubName: any;
@@ -112,7 +111,6 @@ export class SessionLoyalty {
             member['IsSelect'] = false
             member['Loyaltyrefund'] = 0
           });   
-          this.nestUrl = sharedservice.getnestURL()
           this.getWallet()
         }
     })

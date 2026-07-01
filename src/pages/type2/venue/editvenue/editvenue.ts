@@ -205,6 +205,7 @@ export class Type2EditVenue {
             CountryName:this.clubDets.CountryName,
             PostCode:this.clubDets.PostCode,
             MapUrl:this.clubDets.MapUrl ? this.clubDets.MapUrl : "",
+            WebsiteUrl:this.clubDets.WebsiteUrl ? this.clubDets.WebsiteUrl : "",
             Sequence:this.clubDets.sequence ? this.clubDets.sequence : 0,
             ContactPhone:this.clubDets.ContactPhone,
             ClubContactName:this.clubDets.ClubContactName

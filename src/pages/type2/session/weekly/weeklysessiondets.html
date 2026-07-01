@@ -6,7 +6,7 @@
     <!-- </ion-toolbar> -->
 </ion-header>
 
-<ion-content class="card-background-page">
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
     <div class="block" *ngIf="weeklyData">
         <p class="session">{{weeklyData.weeklySession.session_name}}</p>
         <p class="session">{{weeklyData.session_day}}, {{weeklyData.start_time}}, {{weeklyData.weeklySession.duration}}mins</p>
@@ -81,6 +81,7 @@
                                     <img *ngIf="memberDetials.amount_pay_status =='3'"
                                         src="assets/images/acknowledgment.png" class="dueimage"
                                         style="margin-top: 3px;height: 13px;">
+                                    <p class="pendingVerification" *ngIf="memberDetials.amount_pay_status =='3'">Verifying</p>
                                   
                                     <p class="pending" *ngIf="memberDetials.amount_pay_status ==0">Pending</p>
                                 </ion-col>
@@ -92,9 +93,7 @@
             </div>
         </div>
         <div *ngIf="enrolmentData.length == 0">
-            <ion-card class="membercard">
-                <p style="color: red;font-size: 16px;padding: 15px;">No member enrolled</p>
-            </ion-card>
+            <app-empty-state icon="people" text="No member enrolled"></app-empty-state>
         </div>
     </div>
 

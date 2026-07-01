@@ -30,22 +30,54 @@
     </ion-navbar>
 </ion-header>
 <ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <div class="coach-header" *ngIf="tempCoachObj">
+        <span class="coach-header-name">{{tempCoachObj.FirstName}} {{tempCoachObj.LastName}}</span>
+        <span class="coach-header-label">Assign Venues &amp; Activities</span>
+    </div>
     <div class="venue-list">
         <primary-card class="venue-card" *ngFor="let item of clubs" accentColor="#2b92bb">
             <div class="venue-card-body">
-                <div class="venue-head">
-                    <span class="venue-name">{{item.ClubName}}</span>
-                    <app-checkbox class="venue-check" [checked]="item.IsSelected" [disabled]="item.disabled" (checkedChange)="onVenueToggle(item, $event)"></app-checkbox>
+
+                <!-- Accordion header — tap to expand/collapse -->
+                <div class="venue-head" (click)="item._expanded = !item._expanded">
+                    <div class="venue-head-left">
+                        <ion-icon
+                            [name]="item._expanded ? 'ios-arrow-down' : 'ios-arrow-forward'"
+                            class="venue-chevron">
+                        </ion-icon>
+                        <span class="venue-name">{{item.ClubName}}</span>
+                        <span class="venue-activity-count" *ngIf="item.Activities?.length">
+                            {{item.Activities.length}}
+                        </span>
+                    </div>
+                    <app-checkbox
+                        class="venue-check"
+                        [checked]="item.IsSelected"
+                        [disabled]="item.disabled"
+                        (checkedChange)="onVenueToggle(item, $event)"
+                        (click)="$event.stopPropagation()">
+                    </app-checkbox>
                 </div>
-                <div class="no-activity" *ngIf="!item.Activities || item.Activities.length === 0">
-                    No activities available
+
+                <!-- Accordion body — only rendered when expanded -->
+                <div class="venue-activities" *ngIf="item._expanded">
+                    <div class="no-activity" *ngIf="!item.Activities || item.Activities.length === 0">
+                        No activities available
+                    </div>
+                    <div class="activity-row" *ngFor="let inneritem of item.Activities">
+                        <span class="activity-name">{{inneritem.ActivityName}}</span>
+                        <app-checkbox
+                            class="activity-check"
+                            [checked]="inneritem.IsSelected"
+                            [disabled]="inneritem.disabled"
+                            (checkedChange)="onActivityToggle(item, inneritem, $event)">
+                        </app-checkbox>
+                    </div>
                 </div>
-                <div class="activity-row" *ngFor="let inneritem of item.Activities">
-                    <span class="activity-name">{{inneritem.ActivityName}}</span>
-                    <app-checkbox class="activity-check" [checked]="inneritem.IsSelected" [disabled]="inneritem.disabled" (checkedChange)="onActivityToggle(item, inneritem, $event)"></app-checkbox>
-                </div>
+
             </div>
         </primary-card>
+        <app-empty-state *ngIf="!clubs || clubs.length === 0" icon="business" text="No venues available"></app-empty-state>
     </div>
 </ion-content>
 
