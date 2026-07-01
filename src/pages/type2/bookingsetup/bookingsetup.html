@@ -1,0 +1,50 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Booking Setup</ion-title>
+  </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+  <div class="booking-list-wrap">
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Venue</ion-label>
+        <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
+          <ion-option *ngFor="let club of allClub" value={{club.$key}}>{{club.ClubName}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Activity</ion-label>
+        <ion-select [(ngModel)]="selectedActivity" (ionChange)="getbookingSetupList()">
+          <ion-option *ngFor="let item of allActivityArr" value={{item.$key}}>{{item.ActivityName}}</ion-option>
+        </ion-select>
+      </ion-item>
+    </app-form-field>
+
+    <primary-card class="booking-card" accentColor="#35adff" *ngFor="let fm of bookingSetupList" (cardClick)="presentActionSheet(fm)">
+      <div class="booking-card-body">
+        <p class="name">{{fm.ActivityName}}</p>
+      </div>
+    </primary-card>
+
+    <div class="empty-state" *ngIf="bookingSetupList.length == 0">
+      <ion-icon name="calendar" class="empty-icon"></ion-icon>
+      <p class="empty-title">{{Nocourtavailable}}</p>
+    </div>
+
+  </div>
+</ion-content>
+
+<!-- below component is displayed when there is no paymentgateway connected for the courtsetup -->
+<page-paymentgatewaysetup *ngIf="isShowPaymentModal" InstructTxt="Please connect to payment gateway for Court Setup"
+(skip)="skip()" (navigate)="GotoPaymentSetup()"></page-paymentgatewaysetup>
+<ion-fab right bottom>
+    <button  *ngIf="canCreate" ion-fab mini style="background-color:#2b92bb !important; color: white !important"
+      (tap)="goToCreateBookingSetup()" style="background-color:#2b92bb !important; color: white !important">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>

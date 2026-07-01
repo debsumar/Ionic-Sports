@@ -1,0 +1,62 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
+addcoach-page {
+    @include android-sdk35-fixes;
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+        padding: 8px 8px 16px !important;
+    }
+
+    ion-list {
+        background: transparent !important;
+        margin: 0;
+    }
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+
+        .cancel-btn {
+            display: block;
+            width: calc(100% - 24px);
+            margin: 12px 12px 0;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        &.light-theme {
+            background: #f8fafc;
+            .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+        }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        ion-footer { background: #f8fafc; }
+        ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+    }
+}

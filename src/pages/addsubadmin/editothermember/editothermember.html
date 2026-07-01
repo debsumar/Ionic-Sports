@@ -1,0 +1,66 @@
+<!--
+  Generated template for the EditothermemberPage page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header>
+
+  <ion-navbar>
+    <ion-title>Edit Team</ion-title>
+  </ion-navbar>
+
+</ion-header>
+
+
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <div class="form-wrap">
+
+    <ion-row>
+      <ion-col col-6>
+        <app-form-field [isDark]="isDarkTheme">
+          <ion-item>
+            <ion-label stacked>First Name</ion-label>
+            <ion-input [(ngModel)]="saveObj.FirstName"></ion-input>
+          </ion-item>
+        </app-form-field>
+      </ion-col>
+      <ion-col col-6>
+        <app-form-field [isDark]="isDarkTheme">
+          <ion-item>
+            <ion-label stacked>Last Name</ion-label>
+            <ion-input [(ngModel)]="saveObj.LastName"></ion-input>
+          </ion-item>
+        </app-form-field>
+      </ion-col>
+    </ion-row>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item class="disabled_cls">
+        <ion-label stacked>Email</ion-label>
+        <ion-input type="email" [disabled]="true" [readonly]="true" [(ngModel)]="saveObj.EmailID" autocomplete="off"></ion-input>
+      </ion-item>
+    </app-form-field>
+
+    <div class="reset-section">
+      <span class="reset_para" (click)="resetAlertConfirmation()">Reset Password ?</span>
+    </div>
+
+    <div class="chip-section" *ngIf="Menus.length > 0">
+      <span class="chip-section-label">Module Access</span>
+      <div class="access-list">
+        <div class="access-row" *ngFor="let menu of Menus;let i=index">
+          <span class="access-name">{{menu.DisplayTitle}}</span>
+          <label class="custom_toggle">
+            <input type="checkbox" [(ngModel)]="menu.MobileAccess">
+            <span data-unchecked="No" data-checked="Yes"></span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <app-glass-button label="Update" (btnClick)="updateUser()"></app-glass-button>
+</ion-footer>

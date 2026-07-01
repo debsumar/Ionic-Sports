@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { IonicPageModule, IonicModule } from 'ionic-angular';
 import { Dashboard } from './dashboard';
 import { NgCircleProgressModule } from 'ng-circle-progress';
+import { SharedComponentsModule } from '../../shared/components/shared-components.module';
 //import { CacheModule } from "ionic-cache";
 @NgModule({
   declarations: [
@@ -11,6 +12,7 @@ import { NgCircleProgressModule } from 'ng-circle-progress';
   imports: [
     //CacheModule.forRoot({ keyPrefix: 'my-app-cache' }),
     IonicModule,IonicPageModule.forChild(Dashboard),
+     SharedComponentsModule,
      NgCircleProgressModule.forRoot({
       // set defaults here
       radius: 100,

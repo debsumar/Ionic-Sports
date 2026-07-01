@@ -1,0 +1,113 @@
+@import '../../theme/android-sdk35-fixes.scss';
+
+page-addsubadmin {
+    @include android-sdk35-fixes;
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+    }
+
+    .form-wrap {
+        padding: 8px 10px 16px;
+    }
+
+    .chip-section {
+        margin: 10px 4px 6px;
+    }
+
+    .chip-section-label,
+    .access-list + .chip-section-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: #94a3b8;
+        margin: 4px 0 8px;
+    }
+
+    .chip-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+    }
+
+    .venue-chip {
+        padding: 8px 14px;
+        border-radius: 20px;
+        font-size: 13px;
+        font-weight: 600;
+        background: #1e293b;
+        border: 1px solid #334155;
+        color: #cbd5e1;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    .venue-chip.selected {
+        background: linear-gradient(135deg, #2b92bb, #35adff);
+        border-color: transparent;
+        color: #fff;
+    }
+
+    .access-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .access-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+        border-radius: 12px;
+        background: #1e293b;
+        border: 1px solid #334155;
+    }
+    .access-name {
+        font-size: 15px;
+        font-weight: 500;
+        color: #f1f5f9;
+    }
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+        &.light-theme { background: #f8fafc; }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .chip-section-label { color: #64748b; }
+        .venue-chip {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            color: #475569;
+        }
+        .venue-chip.selected { color: #fff; }
+        .access-row {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+        .access-name { color: #1e293b; }
+
+        ion-footer { background: #f8fafc; }
+    }
+}

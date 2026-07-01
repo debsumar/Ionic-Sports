@@ -1,0 +1,327 @@
+<ion-header *ngIf="themeType == 1">
+    <ion-navbar>
+        <button ion-button menuToggle>
+            <ion-icon name="menu"></ion-icon>
+        </button>
+        <ion-title>
+           {{IsTable ? 'Table Setup':'Court Setup'}}</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-header>
+    <ion-navbar *ngIf="themeType == 2">
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+            <ion-icon name="apps"></ion-icon>
+        </button>
+        <ion-title>
+            {{IsTable ? 'Table Setup':'Court Setup'}}
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+  <div class="court-form-wrap">
+
+    <ion-row>
+        <ion-col col-6 class="padding-0">
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-select [(ngModel)]="selectedClub" [disabled]="Isupdatecome" (ionChange)="onClubChange()">
+                        <ion-option *ngFor="let club of allClub" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
+                    </ion-select>
+                </ion-item>
+            </app-form-field>
+        </ion-col>
+        <ion-col col-6 class="padding-0">
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-select [disabled]="Isupdatecome" [(ngModel)]="selectedActivity" [disabled]="Isupdatecome"
+                        class="pad-right" (ionChange)="onActChange()">
+                        <ion-option *ngFor="let item of allActivityArr" value={{item.$key}}>{{item.ActivityName}}
+                        </ion-option>
+                    </ion-select>
+                </ion-item>
+            </app-form-field>
+        </ion-col>
+    </ion-row>
+
+    <app-form-field [isDark]="isDarkTheme">
+        <ion-item>
+            <ion-input type="text" [(ngModel)]="courtDetails.CourtName" placeholder="{{IsTable ? 'Table Name' : 'Court Name'}}"></ion-input>
+        </ion-item>
+    </app-form-field>
+    <app-form-field [isDark]="isDarkTheme" *ngIf="IsTable">
+        <ion-item>
+            <ion-input type="number" [(ngModel)]="courtDetails.Capcity" placeholder="Capacity"></ion-input>
+        </ion-item>
+    </app-form-field>
+    <app-form-field [isDark]="isDarkTheme" *ngIf="IsTable">
+        <ion-item>
+            <ion-label>Floor</ion-label>
+            <ion-select [(ngModel)]="courtDetails.Floor">
+                <ion-option *ngFor="let surf of floorList" value={{surf.name}}>{{surf.name}}</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-form-field>
+
+    <ion-row>
+        <ion-col col-6 class="padding-0">
+            <button class="type" [disabled]="Isupdatecome" [class.selected]="courtDetails.CourtType === 'Outdoor'"
+                (click)="courtDetails.CourtType = 'Outdoor'">
+                Outdoor
+                <ion-icon name="md-checkmark" *ngIf="courtDetails.CourtType == 'Outdoor'" class="animate-zoom">
+                </ion-icon>
+            </button>
+        </ion-col>
+        <ion-col col-6 class="padding-0">
+            <button class="type" [disabled]="Isupdatecome" [class.selected]="courtDetails.CourtType === 'Indoor'"
+                (click)="courtDetails.CourtType = 'Indoor'">
+                Indoor
+                <ion-icon name="md-checkmark" *ngIf="courtDetails.CourtType == 'Indoor'" class="animate-zoom">
+                </ion-icon>
+            </button>
+        </ion-col>
+    </ion-row>
+
+    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable">
+        <ion-item>
+            <ion-label>Surface</ion-label>
+            <ion-select [(ngModel)]="courtDetails.Surface">
+                <ion-option *ngFor="let surf of surfaceList" value={{surf.name}}>{{surf.name}}</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-form-field>
+    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable">
+        <ion-item>
+            <ion-label>Flood Light</ion-label>
+            <ion-select [(ngModel)]="courtDetails.FloodLight">
+                <ion-option value="Yes">Yes</ion-option>
+                <ion-option value="No">No</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-form-field>
+    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable && courtDetails.FloodLight == 'Yes'">
+        <ion-item>
+            <ion-label>FloodLightSetup</ion-label>
+            <ion-select [(ngModel)]="courtDetails.FloodLightKey">
+                <ion-option *ngFor="let flood of flooddata" value={{flood.$key}}>{{flood.Title}}</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-form-field>
+
+    <ion-row class="allign-row"
+        *ngIf=" courtDetails.FloodLight == 'Yes' && (courtDetails.PaymentOptionForFloodLight == 'Online' || courtDetails.PaymentOptionForFloodLight == 'Both')">
+        <ion-col col-8 class="padding-0">
+            <ion-label class="labs">Flood light Cost for member</ion-label>
+        </ion-col>
+        <ion-col col-1 class="padding-0">
+            <ion-label class="labs">
+                $
+            </ion-label>
+        </ion-col>
+        <ion-col col-3 class="padding-0 ">
+            <ion-input type="text" [(ngModel)]="courtDetails.FloodLightCostForMember" placeholder=" in hrs"></ion-input>
+        </ion-col>
+    </ion-row>
+
+    <ion-row class="allign-row"
+        *ngIf=" courtDetails.FloodLight == 'Yes' && (courtDetails.PaymentOptionForFloodLight == 'Online' || courtDetails.PaymentOptionForFloodLight == 'Both')">
+        <ion-col col-8 class="padding-0">
+            <ion-label class="labs">Flood light Cost for nonmember</ion-label>
+        </ion-col>
+        <ion-col col-1 class="padding-0">
+            <ion-label class="labs">
+                $
+            </ion-label>
+        </ion-col>
+        <ion-col col-3 class="padding-0 ">
+            <ion-input type="text" [(ngModel)]="courtDetails.FloodLightCostForNonMember" placeholder=" in hrs">
+            </ion-input>
+        </ion-col>
+    </ion-row>
+
+    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable">
+        <ion-item>
+            <ion-label>Shared</ion-label>
+            <ion-select [(ngModel)]="courtDetails.Shared">
+                <ion-option value="Yes">Yes</ion-option>
+                <ion-option value="No">No</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-form-field>
+
+    <div class="day-grid">
+    <ion-row>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>Mon</ion-label>
+                <ion-checkbox [(ngModel)]="isSelectMon" (click)="selectDays('Mon',0)"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="startTime[0]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>-</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="endTime[0]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>Tue</ion-label>
+                <ion-checkbox [(ngModel)]="isSelectTue" (click)="selectDays('Tue',1)"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="startTime[1]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>-</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="endTime[1]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>Wed</ion-label>
+                <ion-checkbox [(ngModel)]="isSelectWed" (click)="selectDays('Wed',2)"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="startTime[2]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>-</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="endTime[2]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>Thu</ion-label>
+                <ion-checkbox [(ngModel)]="isSelectThu" (click)="selectDays('Thu',3)"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="startTime[3]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>-</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="endTime[3]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>Fri</ion-label>
+                <ion-checkbox [(ngModel)]="isSelectFri" (click)="selectDays('Fri',4)"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="startTime[4]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>-</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="endTime[4]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>Sat</ion-label>
+                <ion-checkbox [(ngModel)]="isSelectSat" (click)="selectDays('Sat',5)"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="startTime[5]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>-</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="endTime[5]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    <ion-row>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>Sun</ion-label>
+                <ion-checkbox [(ngModel)]="isSelectSun" (click)="selectDays('Sun',6)"></ion-checkbox>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="startTime[6]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+        <ion-col col-4 class="padding-0">
+            <ion-item>
+                <ion-label>-</ion-label>
+                <ion-datetime displayFormat="HH:mm" [(ngModel)]="endTime[6]" [minuteValues]="minValues"></ion-datetime>
+            </ion-item>
+        </ion-col>
+    </ion-row>
+    </div>
+
+    <ion-row>
+        <ion-col col-6 class="padding-0">
+            <button class="type" [class.selected]="courtDetails.Status === true" (click)="courtDetails.Status = true">
+                Available
+                <ion-icon name="md-checkmark" *ngIf="courtDetails.Status === true" class="animate-zoom"></ion-icon>
+            </button>
+        </ion-col>
+        <ion-col col-6 class="padding-0">
+            <button class="type" [class.selected]="courtDetails.Status === false" (click)="courtDetails.Status = false">
+                Not Available
+                <ion-icon name="md-checkmark" *ngIf="courtDetails.Status === false" class="animate-zoom"></ion-icon>
+            </button>
+        </ion-col>
+    </ion-row>
+
+    <app-form-field [isDark]="isDarkTheme">
+        <ion-item>
+            <ion-textarea type="text" rows="5" placeholder="Comments" [(ngModel)]="courtDetails.Comments"></ion-textarea>
+        </ion-item>
+    </app-form-field>
+
+  </div>
+</ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <button class="cancel-btn" (click)="cancelCourtSetup()">Cancel</button>
+    <app-glass-button *ngIf="!Isupdatecome" label="Save" (btnClick)="saveCourtSetup()"></app-glass-button>
+    <app-glass-button *ngIf="Isupdatecome" label="Update" (btnClick)="updateCourtSetup()"></app-glass-button>
+</ion-footer>
