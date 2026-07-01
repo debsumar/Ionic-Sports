@@ -387,6 +387,8 @@ export class CreatematchPage {
 
   onMapLocationSelected(location: any) {
     this.mapLocationAddress = location.address || '';
+    if (location.lat != null) this.mapLocationLat = location.lat;
+    if (location.lng != null) this.mapLocationLng = location.lng;
   }
 
 

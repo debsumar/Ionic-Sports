@@ -81,8 +81,8 @@
         <div class="section-header">
           <span class="section-title">{{section.title}}</span>
           <span class="section-count">
-            <span *ngIf="sectionIndex==0">Confirmed:</span>
-            <span *ngIf="sectionIndex > 0">Count:</span>
+            <span *ngIf="leagueMatchParticipantInput.leagueTeamPlayerStatusType === 0 && sectionIndex==0">Confirmed:</span>
+            <span *ngIf="!(leagueMatchParticipantInput.leagueTeamPlayerStatusType === 0 && sectionIndex==0)">Count:</span>
             {{getAcceptedCount(section.items, sectionIndex)}}
           </span>
         </div>

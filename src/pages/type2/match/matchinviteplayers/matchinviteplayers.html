@@ -20,32 +20,34 @@
     </div>
   </div>
 
-  <div class="page-list-area">
-    <app-list-card *ngFor="let member of filteredMembers; let i = index"
-      [accentColor]="member.isAlreadyExisted ? '#64748b' : (member.isSelected ? '#10b981' : '#2b92bb')">
-      <div class="player-row" (click)="!member.isAlreadyExisted && selectMembers(member)">
-        <div class="player-avatar">{{member.FirstName?.charAt(0) || '?'}}</div>
-        <div class="player-info">
-          <p class="player-name">{{member.FirstName || 'Unknown'}} {{member.LastName || ''}} ({{getAge(member.DOB)}})</p>
-          <span class="player-tag existing" *ngIf="member.isAlreadyExisted">Already Invited</span>
+    <div class="page-list-area">
+      <app-list-card *ngFor="let member of filteredMembers; let i = index"
+        [accentColor]="member.isAlreadyExisted ? '#64748b' : (member.isSelected ? '#10b981' : '#2b92bb')">
+        <div class="player-row" (click)="!member.isAlreadyExisted && selectMembers(member)">
+          <div class="player-avatar">{{member.FirstName?.charAt(0) || '?'}}</div>
+          <div class="player-info">
+            <p class="player-name">{{member.FirstName || 'Unknown'}} {{member.LastName || ''}} ({{getAge(member.DOB)}})</p>
+            <span class="player-tag existing" *ngIf="member.isAlreadyExisted">Already Invited</span>
+          </div>
+          <ion-checkbox
+            [(ngModel)]="member.isSelected"
+            [disabled]="member.isAlreadyExisted"
+            (ionChange)="selectMembers(member)">
+          </ion-checkbox>
         </div>
-        <ion-checkbox
-          [checked]="member.isSelected"
-          [disabled]="member.isAlreadyExisted">
-        </ion-checkbox>
+      </app-list-card>
+
+      <div class="empty-state" *ngIf="filteredMembers?.length === 0">
+        <ion-icon name="people" class="empty-icon"></ion-icon>
+        <p class="empty-text">No players found</p>
       </div>
-    </app-list-card>
-
-    <div class="empty-state" *ngIf="filteredMembers?.length === 0">
-      <ion-icon name="people" class="empty-icon"></ion-icon>
-      <p class="empty-text">No players found</p>
     </div>
-  </div>
 
-  <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="search_term==''">
-    <ion-infinite-scroll-content loadingSpinner="crescent"
-      loadingText="Loading more data..."></ion-infinite-scroll-content>
-  </ion-infinite-scroll>
+    <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="search_term==''">
+      <ion-infinite-scroll-content loadingSpinner="crescent"
+        loadingText="Loading more data..."></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+
 </ion-content>
 
 <ion-footer no-border>

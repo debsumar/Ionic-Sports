@@ -1,21 +1,21 @@
-import { FirebaseService } from './../../../../services/firebase.service';
-import { CommonService } from './../../../../services/common.service';
-import { NgModule } from '@angular/core';
-import { IonicPageModule } from 'ionic-angular';
-import { MatchinviteplayersPage } from './matchinviteplayers';
-import { SharedComponentsModule } from '../../../../shared/components/shared-components.module';
+import { FirebaseService } from "./../../../../services/firebase.service";
+import { CommonService } from "./../../../../services/common.service";
+//import { HttpService } from './../../../../services/http.service';
+import { NgModule } from "@angular/core";
+import { IonicPageModule } from "ionic-angular";
+import { MatchinviteplayersPage } from "./matchinviteplayers";
+import { SharedComponentsModule } from "../../../../shared/components/shared-components.module";
 
 @NgModule({
-  declarations: [
-    MatchinviteplayersPage,
-  ],
+  declarations: [MatchinviteplayersPage],
   imports: [
     IonicPageModule.forChild(MatchinviteplayersPage),
-    SharedComponentsModule
+    SharedComponentsModule,
   ],
-  providers:[
+  providers: [
     CommonService,
-    FirebaseService
-  ]
+    FirebaseService,
+    //HttpService
+  ],
 })
 export class MatchinviteplayersPageModule {}

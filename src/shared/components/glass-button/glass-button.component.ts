@@ -5,7 +5,7 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
   encapsulation: ViewEncapsulation.None,
   template: `
     <div class="glass-btn-wrap">
-      <button class="glass-btn" (click)="btnClick.emit($event)">{{label}}</button>
+      <button class="glass-btn" [disabled]="disabled" [class.glass-btn-disabled]="disabled" (click)="!disabled && btnClick.emit($event)">{{label}}</button>
     </div>
   `,
   styles: [`
@@ -30,6 +30,17 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
       animation: glassBtnShimmer 3s ease-in-out infinite;
     }
     .glass-btn:active { transform: scale(0.98); }
+    .glass-btn-disabled,
+    .glass-btn[disabled] {
+      opacity: 0.5;
+      cursor: not-allowed;
+      box-shadow: none;
+      filter: grayscale(0.3);
+    }
+    .glass-btn-disabled:active,
+    .glass-btn[disabled]:active { transform: none; }
+    .glass-btn-disabled::after,
+    .glass-btn[disabled]::after { display: none; }
     @keyframes glassBtnShimmer {
       0% { left: -100%; }
       50% { left: 150%; }
@@ -42,5 +53,6 @@ import { Component, Input, Output, EventEmitter, ViewEncapsulation } from '@angu
 })
 export class GlassButtonComponent {
   @Input() label: string = 'Create';
+  @Input() disabled: boolean = false;
   @Output() btnClick = new EventEmitter<any>();
 }

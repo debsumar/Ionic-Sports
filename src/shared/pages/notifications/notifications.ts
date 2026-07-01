@@ -24,9 +24,6 @@ export class NotificationsPage {
   };
   numberOfPeople = '0 People';
   userNames: string[] = [];
-  recipients: { id: any; name: string; payStatus: number; selected: boolean }[] = [];
-  isLeagueTeams: boolean = false;
-  allSelected: boolean = true;
 
   constructor(
     public commonService: CommonService,
@@ -40,21 +37,16 @@ export class NotificationsPage {
     private renderer: Renderer2,
     public events: Events
   ) {
-    const user_ids = navParams.get('users') || [];
-    const user_names = navParams.get('user_names') || [];
-    const pay_status = navParams.get('pay_status') || [];
-    this.isLeagueTeams = navParams.get('isLeagueTeams') || navParams.get('isMatchTeam') || false;
+    const user_ids = navParams.get('users');
     this.notification_input.module_type = navParams.get('type');
     this.notification_input.heading = navParams.get('heading');
     this.notification_input.parentClubId = this.sharedservice.getPostgreParentClubId();
-    this.userNames = user_names;
-    this.recipients = user_names.map((name: string, i: number) => ({
-      id: user_ids[i],
-      name: name,
-      payStatus: pay_status[i],
-      selected: true
-    }));
-    this.updateRecipientCount();
+    const valid_user_ids = user_ids.filter(item => item !== undefined && item !== null && item !== '');
+    if (valid_user_ids.length > 0) {
+      this.notification_input.userIds = Array.from(new Set(valid_user_ids));
+      this.numberOfPeople = this.notification_input.userIds.length + ' recipients';
+    }
+    this.userNames = navParams.get('user_names') || [];
   }
 
   ionViewWillEnter() {
@@ -90,34 +82,10 @@ export class NotificationsPage {
     this.navCtrl.pop();
   }
 
-  toggleRecipient(r: { selected: boolean }) {
-    r.selected = !r.selected;
-    this.allSelected = this.recipients.length > 0 && this.recipients.every(item => item.selected);
-    this.updateRecipientCount();
-  }
-
-  toggleSelectAll() {
-    this.allSelected = !this.allSelected;
-    this.recipients.forEach(r => r.selected = this.allSelected);
-    this.updateRecipientCount();
-  }
-
-  updateRecipientCount() {
-    this.numberOfPeople = this.recipients.filter(r => r.selected).length + ' recipients';
-  }
-
-  getSelectedUserIds() {
-    const ids = this.recipients
-      .filter(r => r.selected)
-      .map(r => r.id)
-      .filter(id => id !== undefined && id !== null && id !== '');
-    return Array.from(new Set(ids));
-  }
-
   sendNotification() {
     let confirm = this.alertCtrl.create({
       title: 'Notification Alert',
-      message: 'Are you sure you want to send the notification to the selected members?',
+      message: 'Are you sure you want to send the notification to all the members?',
       buttons: [
         { text: 'No', role: 'cancel' },
         { text: 'Yes', handler: () => { this.notify(); } }
@@ -132,12 +100,6 @@ export class NotificationsPage {
       return false;
     }
 
-    const selectedUserIds = this.getSelectedUserIds();
-    if (selectedUserIds.length === 0) {
-      this.commonService.toastMessage('Please select at least one recipient', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-      return false;
-    }
-
     const body = {
       parentclub_id: this.sharedservice.getPostgreParentClubId(),
       device_type: this.sharedservice.getPlatform() === 'android' ? 1 : 2,
@@ -146,7 +108,7 @@ export class NotificationsPage {
       updated_by: this.sharedservice.getLoggedInUserId(),
       subject: this.notification_input.heading,
       message: this.notification_input.message,
-      user_ids: selectedUserIds,
+      user_ids: this.notification_input.userIds,
       module_type: this.notification_input.module_type,
       module_id: this.navParams.get('module_id'),
       sub_module_id: this.navParams.get('sub_module_id') || null,

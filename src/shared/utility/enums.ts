@@ -64,17 +64,17 @@ export enum LineupVisibility {
 }
 
 export enum TransactionType {
-  COURTBOOKING = 100,
-  TERMSESSION = 105, //for firebase it's termsession 100,monthly 101,weekly 102
-  MONTHLYSESSION = 106,
-  WEEKLYSESSION = 107,
-  SCHOOLSESSION = 108,
-  MEMBERSHIP = 116,
-  HOLIDAYCAMP = 500,
-  APPLAYSUBSCRIPTION = 600,
-  WALLETTOPUP = 200,
-  LEAGUE = 700,
-  LEAGUE_TEAM = 125,
-  EVENTS = 800,
-  SHOP = 900,
+    COURTBOOKING = 100,
+    TERMSESSION = 105, //for firebase it's termsession 100,monthly 101,weekly 102
+    MONTHLYSESSION = 106,
+    WEEKLYSESSION = 107,
+    SCHOOLSESSION = 108,
+    MEMBERSHIP = 116,
+    HOLIDAYCAMP = 500,
+    APPLAYSUBSCRIPTION = 600,
+    WALLETTOPUP = 200,
+    LEAGUE = 700,
+    LEAGUE_TEAM = 125,
+    EVENTS = 800,
+    SHOP = 900,
 }

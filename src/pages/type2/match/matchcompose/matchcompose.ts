@@ -216,7 +216,6 @@ export class Matchcompose {
       let members = [];
       members = this.memberList;
       let pc = this.parentClubKey;
-      let url = this.sharedservice.getEmailUrl();
       $.ajax({
         // url: url + "umbraco/surface/ActivityProSurface/SendEmailNotification/",
         //https://activitypro-nest-261607.appspot.com
