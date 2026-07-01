@@ -2,16 +2,12 @@ import { Component, NgZone, } from '@angular/core';
 import { IonicPage, NavController, NavParams, LoadingController, ToastController, Events, ActionSheetController, Alert, AlertController, FabContainer } from 'ionic-angular';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
-import { TSMap } from 'typescript-map';
 import { CommonService, ToastPlacement, ToastMessageType } from '../../../../../services/common.service';
 import { FirebaseService } from '../../../../../services/firebase.service';
 import { ViewChild } from '@angular/core';
 import { Content } from 'ionic-angular';
-import { RequestOptions } from '@angular/http';
 import { HttpClient } from '@angular/common/http';
 import { SharedServices } from '../../../../services/sharedservice';
-import * as $ from 'jquery';
-import { dateValueRange } from 'ionic-angular/umd/util/datetime-util';
 import { HttpService } from '../../../../../services/http.service';
 import { API } from '../../../../../shared/constants/api_constants';
 import { GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto, ClubVenueDto } from '../../../../../shared/dtos/club.dto';
@@ -366,7 +362,19 @@ export class NewViewcourtPage {
 
 
 
+  // Returns true when the court is marked unavailable (Status === false).
+  isCourtUnavailable(courtInfo: any): boolean {
+    return !!courtInfo && (courtInfo.Status === false || courtInfo.Status === 'false');
+  }
+
   bookslot(court, slideInfo) {
+    // Unavailable courts cannot be booked/selected. Show the court's comment if available.
+    if (this.isCourtUnavailable(slideInfo && slideInfo.courtInfo)) {
+      const comment = slideInfo && slideInfo.courtInfo && slideInfo.courtInfo.Comments;
+      const message = (comment && String(comment).trim()) ? comment : "Slots not available for this court";
+      this.commonService.toastMessage(message, 3000, ToastMessageType.Info, ToastPlacement.Bottom);
+      return;
+    }
     // if(court.IsEnable == false && court.Purpose != ''){
     //   this.commonService.toastMessage(court.Purpose, 3000)
     // }else if(court.IsEnable == false && (court.Purpose == '' || !court.Purpose)){

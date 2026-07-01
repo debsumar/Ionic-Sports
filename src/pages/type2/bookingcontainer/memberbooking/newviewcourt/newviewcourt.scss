@@ -96,6 +96,31 @@ page-newviewcourt {
 
     // ── Shared styles (theme-independent) ──
     .toolbar-title { color: white !important; }
+
+    // ── Court Unavailable (Status === false) ──
+    .unavailable-badge {
+        display: inline-block;
+        margin-left: 6px;
+        font-size: 10px;
+        font-weight: 600;
+        color: #ef4444;
+        background: rgba(239, 68, 68, 0.15);
+        padding: 1px 6px;
+        border-radius: 4px;
+        vertical-align: middle;
+        text-transform: uppercase;
+        letter-spacing: 0.02em;
+    }
+    .court-unavailable {
+        .head:first-of-type { color: #ffd1d1; }
+    }
+    // Greyed-out slot cards for unavailable courts (still clickable to show the court comment)
+    .court-unavailable-slot {
+        opacity: 0.4;
+        cursor: not-allowed;
+        filter: grayscale(0.6);
+    }
+
     .padding-0 { padding: 0px !important; }
     .admin_back { background: rgba(43, 146, 187, 0.5) !important; }
     .head { color: white; width: 112px; padding-bottom: 5px !important; margin-top: -7px; font-weight: 600; z-index: 3 !important; display: block; margin: auto; }
