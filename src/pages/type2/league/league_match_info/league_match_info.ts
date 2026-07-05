@@ -176,6 +176,10 @@ export class LeagueMatchInfoPage {
   teamSheetIsHome: boolean = true;
   showTeamActionDropdown: boolean = false;
   teamActionIsHome: boolean = true;
+  // Tracks whether the view has been entered at least once. Used to trigger a
+  // participant refresh on RE-entry (e.g. returning from a popped MatchpaymentPage)
+  // while skipping the first entry, which the constructor already loads.
+  private hasEntered: boolean = false;
 
   constructor(
     public navCtrl: NavController,
@@ -288,7 +292,16 @@ export class LeagueMatchInfoPage {
     this.events.subscribe("team:refresh", () => {
       this.getLeagueParticipantForMatch();
     });
-    
+
+    // On RE-entry (e.g. after MatchpaymentPage pops), re-fetch GetLeagueMatchParticipant
+    // for the current team/filter so updated payment status is reflected. The first
+    // entry is skipped because the constructor performs the initial load once the
+    // request inputs are initialized from storage.
+    if (this.hasEntered) {
+      this.loadAllParticipantsForCounts();
+      this.getLeagueMatchParticipant(this.leagueMatchParticipantInput.leagueTeamPlayerStatusType as LeagueTeamPlayerStatusType);
+    }
+    this.hasEntered = true;
   }
 
   ionViewDidEnter() {
@@ -532,11 +545,15 @@ export class LeagueMatchInfoPage {
     const member = this.selectedPlayer;
     if (!member) return;
     switch (action) {
+      case 'payment': this.gotoPayment(member); break;
       case 'confirmed': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminAccepted); break;
       case 'maybe': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminMaybe); break;
       case 'declined': this.updateLeagueMatchInviteStatus(member, LeaguePlayerInviteStatus.AdminDeclined); break;
       case 'role': this.showRoles(member); break;
     }
+  }
+  gotoPayment(member: LeagueMatchParticipantModel) {
+    this.navCtrl.push('MatchpaymentPage', { SelectedMember: member, MatchDetails: { activityId: this.activityId } });
   }
   showRoles(member: LeagueMatchParticipantModel): void {
     if (this.roles.length > 0) {
