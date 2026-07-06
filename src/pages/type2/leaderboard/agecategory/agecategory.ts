@@ -41,8 +41,12 @@ export class AgecategoryPage {
     this.storage.get('userObj').then((val) => {
       val = JSON.parse(val);
       if (val.$key != "") {
-        this.parentClubKey = val.UserInfo[0].ParentClubKey;
-        this.getAgeCategories();
+        // Use postgres parentclub key (not Firebase key) for getAgeCategories
+        this.storage.get('loggedin_user').then((lu) => {
+          const loggedInUser = lu ? JSON.parse(lu) : null;
+          this.parentClubKey = loggedInUser ? loggedInUser.postgres_parentclubkey : val.UserInfo[0].ParentClubKey;
+          this.getAgeCategories();
+        });
       }
     })
   }

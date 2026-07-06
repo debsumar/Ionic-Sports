@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
-import { NavController, PopoverController, LoadingController, NavParams } from 'ionic-angular';
+import { Component, Renderer2 } from '@angular/core';
+import { NavController, PopoverController, LoadingController, NavParams, Events } from 'ionic-angular';
 import { SharedServices } from '../../services/sharedservice';
 import { FirebaseService } from '../../../services/firebase.service';
 import { Storage } from '@ionic/storage';
 import {IonicPage } from 'ionic-angular';
 import { ToastController } from 'ionic-angular';
+import { ThemeService } from '../../../services/theme.service';
 @IonicPage()
 @Component({
     selector: 'recurringcourtbook-page',
@@ -13,6 +14,7 @@ import { ToastController } from 'ionic-angular';
 
 export class Type2RecurringCourtBook {
     themeType: number;
+    isDarkTheme: boolean = true;
     parentClubKey: string;
     allClub = [];
     selectedClub: any;
@@ -37,9 +39,10 @@ export class Type2RecurringCourtBook {
     isSelectSun = false;
     days = [];
     courtBookKey: any;
-    constructor(public toastCtrl: ToastController, public loadingCtrl: LoadingController, storage: Storage,
+    constructor(public toastCtrl: ToastController, public loadingCtrl: LoadingController, public storage: Storage,
         public navCtrl: NavController, public sharedservice: SharedServices,
-         public fb: FirebaseService, public popoverCtrl: PopoverController, public navParams: NavParams) {
+         public fb: FirebaseService, public popoverCtrl: PopoverController, public navParams: NavParams,
+         private renderer: Renderer2, private themeService: ThemeService, public events: Events) {
 
         this.themeType = sharedservice.getThemeType();
         storage.get('userObj').then((val) => {
@@ -52,6 +55,32 @@ export class Type2RecurringCourtBook {
                     //this.getAllDiscount();
                 }
         })
+    }
+
+    ionViewWillEnter() {
+        this.loadTheme();
+        this.themeService.isDarkTheme$.subscribe(isDark => this.applyTheme(isDark));
+        this.events.subscribe('theme:changed', (isDark) => this.applyTheme(isDark));
+    }
+
+    ionViewWillLeave() {
+        this.events.unsubscribe('theme:changed');
+    }
+
+    async loadTheme() {
+        const isDarkTheme = await this.storage.get('dashboardTheme');
+        const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+        this.isDarkTheme = isDark;
+        this.applyTheme(isDark);
+    }
+
+    applyTheme(isDark: boolean) {
+        this.isDarkTheme = isDark;
+        const pageElement = document.querySelector('recurringcourtbook-page');
+        if (pageElement) {
+            isDark ? this.renderer.removeClass(pageElement, 'light-theme')
+                   : this.renderer.addClass(pageElement, 'light-theme');
+        }
     }
 
 

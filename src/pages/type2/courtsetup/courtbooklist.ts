@@ -1,11 +1,11 @@
-import { Component } from '@angular/core';
-import { NavController, PopoverController, LoadingController } from 'ionic-angular';
+import { Component, Renderer2 } from '@angular/core';
+import { NavController, PopoverController, LoadingController, Events } from 'ionic-angular';
 import { SharedServices } from '../../services/sharedservice';
 import { FirebaseService } from '../../../services/firebase.service';
 import { Storage } from '@ionic/storage';
 import { ToastController } from 'ionic-angular';
-import {IonicPage } from 'ionic-angular';
-
+import { IonicPage } from 'ionic-angular';
+import { ThemeService } from '../../../services/theme.service';
 @IonicPage()
 @Component({
     selector: 'courtbooklist-page',
@@ -14,6 +14,7 @@ import {IonicPage } from 'ionic-angular';
 
 export class Type2CourtBookList {
     themeType: number;
+    isDarkTheme: boolean = true;
     parentClubKey: string;
     menus: Array<{ DisplayTitle: string; 
         OriginalTitle:string;
@@ -38,9 +39,10 @@ export class Type2CourtBookList {
     allCourtArr = [];
     selectedCoat: any;
     allBookedCourtArr = [];
-    constructor(public toastCtrl: ToastController, public loadingCtrl: LoadingController, storage: Storage,
+    constructor(public toastCtrl: ToastController, public loadingCtrl: LoadingController, public storage: Storage,
         public navCtrl: NavController, public sharedservice: SharedServices,
-         public fb: FirebaseService, public popoverCtrl: PopoverController) {
+         public fb: FirebaseService, public popoverCtrl: PopoverController,
+         private renderer: Renderer2, private themeService: ThemeService, public events: Events) {
 
         this.themeType = sharedservice.getThemeType();
         this.menus = sharedservice.getMenuList();
@@ -54,7 +56,31 @@ export class Type2CourtBookList {
         })
     }
 
-   
+    ionViewWillEnter() {
+        this.loadTheme();
+        this.themeService.isDarkTheme$.subscribe(isDark => this.applyTheme(isDark));
+        this.events.subscribe('theme:changed', (isDark) => this.applyTheme(isDark));
+    }
+
+    ionViewWillLeave() {
+        this.events.unsubscribe('theme:changed');
+    }
+
+    async loadTheme() {
+        const isDarkTheme = await this.storage.get('dashboardTheme');
+        const isDark = isDarkTheme !== null && isDarkTheme !== undefined ? isDarkTheme : true;
+        this.isDarkTheme = isDark;
+        this.applyTheme(isDark);
+    }
+
+    applyTheme(isDark: boolean) {
+        this.isDarkTheme = isDark;
+        const pageElement = document.querySelector('courtbooklist-page');
+        if (pageElement) {
+            isDark ? this.renderer.removeClass(pageElement, 'light-theme')
+                   : this.renderer.addClass(pageElement, 'light-theme');
+        }
+    }
     presentPopover(myEvent) {
         let popover = this.popoverCtrl.create("PopoverPage");
         popover.present({

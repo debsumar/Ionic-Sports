@@ -31,23 +31,23 @@
   <div class="court-list-wrap">
 
     <!-- 🔽 Venue / Activity selectors -->
-    <app-form-field [isDark]="isDarkTheme">
+    <app-select-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>{{LangObj.bkg_court_venue}}</ion-label>
         <ion-select [(ngModel)]="selectedClubKey" (ionChange)="onClubChange()">
           <ion-option *ngFor="let club of allClub" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
         </ion-select>
       </ion-item>
-    </app-form-field>
+    </app-select-field>
 
-    <app-form-field [isDark]="isDarkTheme">
+    <app-select-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>{{LangObj.bkg_court_activity}}</ion-label>
         <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourtSetup()">
           <ion-option *ngFor="let item of allActivityArr" value={{item.$key}}>{{item.ActivityName}}</ion-option>
         </ion-select>
       </ion-item>
-    </app-form-field>
+    </app-select-field>
 
     <!-- 🎾 Court cards -->
     <primary-card class="court-card" accentColor="#35adff" *ngFor="let fm of allCourtSetup" (cardClick)="presentActionSheet(fm)">

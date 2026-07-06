@@ -361,9 +361,69 @@ export class Type2CourtSetupList {
       .subscribe((data) => {
         this.allCourtSetup = [];
         if (data.length > 0) {
-          this.allCourtSetup = data;
-          this.allCourtSetup = this.allCourtSetup.filter((priceband) => {
-            return priceband.IsActive;
+          this.allCourtSetup = data.filter((court) => court.IsActive);
+
+          // Resolve Postgres IDs needed by GET_ALL_COURTS_WITH_POSTGRE.
+          // selectedClubKey and selectedActivity are Firebase keys;
+          // the API expects Postgres venue + activity IDs.
+          const venueObj = (this.allClub || []).find(
+            (c: any) => c.FirebaseId === this.selectedClubKey || c.$key === this.selectedClubKey
+          );
+          const postgresVenueId: string = venueObj ? (venueObj.Id || '') : '';
+
+          if (!postgresVenueId) {
+            console.warn('Could not resolve Postgres venue ID; courts will not have Id enriched');
+            return;
+          }
+
+          // Resolve Postgres activity ID via CLUB_ACTIVITIES for this venue.
+          const parentClubId = this.sharedservice.getPostgreParentClubId();
+          this.httpService.post(
+            API.CLUB_ACTIVITIES,
+            { parentclubId: parentClubId, clubId: postgresVenueId,
+              device_type: this.sharedservice.getPlatform() == 'android' ? 1 : 2,
+              app_type: 10 },
+            null, 1
+          ).subscribe({
+            next: (actRes: any) => {
+              const clubActivities: any[] = (actRes && actRes.data && actRes.data.club_activities) || [];
+              // Match selected Firebase activity key → Postgres activity ID
+              const activityMatch = clubActivities.find(
+                (ca: any) => ca.activity_key === this.selectedActivity
+              );
+              const postgresActivityId: string = activityMatch
+                ? (activityMatch.activity && (activityMatch.activity.Id || activityMatch.activity.id)) || ''
+                : '';
+
+              if (!postgresActivityId) {
+                console.warn('Could not resolve Postgres activity ID; courts will not have Id enriched');
+                return;
+              }
+
+              // Now call with Postgres IDs
+              const params = {
+                parentClubId: parentClubId,
+                clubId: postgresVenueId,
+                activityId: postgresActivityId,
+              };
+              this.httpService.get(API.GET_ALL_COURTS_WITH_POSTGRE, params, null, 1).subscribe({
+                next: (res: any) => {
+                  const pgCourts: any[] = (res && res.data) ? res.data : [];
+                  this.allCourtSetup = this.allCourtSetup.map(court => {
+                    const pg = pgCourts.find(
+                      (c: any) => c.firebasekey === court.$key || c.firebase_key === court.$key
+                    );
+                    return pg ? { ...court, Id: pg.id } : court;
+                  });
+                },
+                error: () => {
+                  console.warn('Could not enrich courts with Postgres Id');
+                }
+              });
+            },
+            error: () => {
+              console.warn('Could not resolve Postgres activity ID for court enrichment');
+            }
           });
         }
       });

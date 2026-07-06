@@ -1,0 +1,160 @@
+<ion-header class="no-month-toolbar">
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>{{LangObj.scl_payment_title || 'School Payment Report'}}</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+
+  <ion-toolbar no-border-top>
+    <ion-segment [(ngModel)]="reportType">
+      <ion-segment-button value="Paid" (click)="paymentTabClick('Paid')">
+        Paid
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+
+  <ion-toolbar class="month-toolbar" no-border-top>
+    <div class="month-slider">
+      <ion-slides
+        [slidesPerView]="6"
+        [spaceBetween]="8"
+        pager="false"
+        #myslider>
+        <ion-slide
+          *ngFor="let month of trnsMonths;let i=index;"
+          (click)="SelectedMonth(i)"
+          [ngClass]="{'active':month.IsActive}">
+          <div class="month-item">
+            <p class="month-text">{{month.month}}</p>
+            <p class="year-text">{{month.year}}</p>
+          </div>
+        </ion-slide>
+      </ion-slides>
+    </div>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="sticky-wrapper">
+    <!-- Date range -->
+    <div *ngIf="isDateRange" class="date-range-section">
+      <ion-row>
+        <ion-col col-5>
+          <ion-item class="date-item">
+            <ion-label stacked>From</ion-label>
+            <ion-datetime
+              displayFormat="DD/MM/YY"
+              pickerFormat="DD MM YYYY"
+              [(ngModel)]="startDate"></ion-datetime>
+          </ion-item>
+        </ion-col>
+        <ion-col col-5>
+          <ion-item class="date-item">
+            <ion-label stacked>To</ion-label>
+            <ion-datetime
+              displayFormat="DD/MM/YY"
+              pickerFormat="DD MM YYYY"
+              [(ngModel)]="endDate"></ion-datetime>
+          </ion-item>
+        </ion-col>
+        <ion-col col-2 class="search-btn-col">
+          <button ion-button class="custom-go-btn" (click)="Search()">Go</button>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <!-- Filters and Search -->
+    <div class="filter-section">
+      <div class="filter-row">
+        <div class="filter-content" *ngIf="!isSearchEnabled">
+          <ion-select
+            [(ngModel)]="selectedClub"
+            (ionChange)="onChangeOfClub()"
+            placeholder="Select School">
+            <ion-option value="All">{{LangObj.scl_payment_allscls || 'All Schools'}}</ion-option>
+            <ion-option *ngFor="let club of clubs" value="{{club.Id}}">{{club.ClubName}}</ion-option>
+          </ion-select>
+        </div>
+        <div class="search-content" *ngIf="isSearchEnabled">
+          <ion-searchbar
+            placeholder="Search payments"
+            (ionInput)="getFilterItems($event)"
+            autocorrect="off"></ion-searchbar>
+        </div>
+        <button
+          type="button"
+          class="search-toggle"
+          (click)="isSearchEnabled=!isSearchEnabled; $event.stopPropagation()">
+          <ion-icon name="ios-search"></ion-icon>
+        </button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-section">
+      <ion-row>
+        <ion-col col-6>
+          <div class="summary-card">
+            <div class="amount">
+              <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>
+              {{total_txns_amount | number: '1.2-2'}}
+            </div>
+            <div class="label">{{LangObj.scl_payment_totamt || 'Total Amount'}}</div>
+          </div>
+        </ion-col>
+        <ion-col col-6>
+          <div class="summary-card">
+            <div class="count">{{total_txns}}</div>
+            <div class="label">{{LangObj.scl_payment_trns || 'Transactions'}}</div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+
+  <div class="scrollable-wrapper">
+    <div class="list-section">
+      <!-- Paid Payments -->
+      <div class="payment-list">
+        <div class="payment-card" *ngFor="let payment of paidMemberListtemp">
+          <div class="pay-card-row">
+            <div class="pay-left">
+              <div class="pay-name">{{payment.FirstName}} {{payment.LastName}}</div>
+              <div class="pay-session">{{payment.session_name}}</div>
+              <div class="pay-time" *ngIf="payment.days || payment.start_time">
+                {{payment.days}}<span *ngIf="payment.start_time"> - {{payment.start_time}}hrs</span>
+              </div>
+              <div class="pay-venue">
+                <span *ngIf="payment.coach_name">{{payment.coach_name}} @ </span>{{payment.SchoolName}}
+              </div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-date">{{getDay(payment.transaction_date)}}</div>
+              <div class="pay-amount pay-amount--paid">
+                <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>{{payment.amount_paid | number: '1.2-2'}}
+              </div>
+              <div class="pay-paid-by" *ngIf="payment.paid_by_text">{{payment.paid_by_text}}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="paidMemberListtemp.length == 0">
+      <img src="assets/images/menu/payment.svg" class="empty-icon">
+      <p>{{LangObj.scl_payment_norecfound || 'No paid payments found'}}</p>
+    </div>
+  </div>
+</ion-content>
+
+<ion-fab bottom right *ngIf="paidMemberListtemp.length > 0">
+  <button ion-fab mini class="fab-btn" (click)="goToPrintPage()">
+    <ion-icon name="ios-print-outline"></ion-icon>
+  </button>
+</ion-fab>

@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import {
   IonicPage,
-  LoadingController,
   NavController,
   NavParams,
   PopoverController,
@@ -52,6 +51,7 @@ export class CreatematchPage {
   selectedDuration: number;
   currency: string;
   isRecurring: boolean = false;
+  isChecked: boolean = false;
   recurringUntilWhen: string = moment().add(1, 'week').format('YYYY-MM-DD');
   teamList: TeamsForParentClubModel[] = [];
   selectedHomeTeamId: string = '';
@@ -139,7 +139,6 @@ export class CreatematchPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     public commonService: CommonService,
-    public loadingCtrl: LoadingController,
     public storage: Storage,
     public fb: FirebaseService,
     public sharedservice: SharedServices,
@@ -198,7 +197,6 @@ export class CreatematchPage {
     this.themeService.isDarkTheme$.subscribe(isDark => {
       this.applyTheme(isDark);
     });
-    console.log("ionViewDidLoad CreatematchPage");
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
       this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
@@ -248,7 +246,6 @@ export class CreatematchPage {
     this.httpService.post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput).subscribe({
       next: (res: any) => {
         this.leagueCategory = res["data"]
-        console.table(`${this.leagueCategory}`);
         if (this.leagueCategory.length > 0) this.createMatchInput.GameType = 0;
       }
     });
@@ -259,9 +256,6 @@ export class CreatematchPage {
       next: (res: any) => {
         if (res) {
           this.roundTypes = res.data || [];
-          console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
-        } else {
-          console.log("error in fetching")
         }
       }
     });
@@ -274,18 +268,18 @@ export class CreatematchPage {
     });
   }
 
-  changeType(val) {
-    this.publicType = val == "public" ? true : false;
-    //this.privateType = 'private'? true : false;
-    this.createMatchInput.MatchVisibility = val == "private" ? 1 : 0;
+  changeType(isPublic: boolean): void {
+    this.publicType = isPublic;
+    this.createMatchInput.MatchVisibility = isPublic ? 0 : 1;
   }
 
   selectClubName() {
     this.club_activities = [];
   }
 
-  updateMatchPaymentType(isChecked: boolean): void {
-    this.createMatchInput.MatchPaymentType = isChecked ? 1 : 0;
+  updateMatchPaymentType(val: boolean): void {
+    this.isChecked = val;
+    this.createMatchInput.MatchPaymentType = val ? 1 : 0;
   }
 
   getRecurringDayName(): string {
@@ -397,11 +391,9 @@ export class CreatematchPage {
     this.commonInput.clubId = this.selectedClub;
     this.httpService.post(`${API.CLUB_ACTIVITIES}`, this.commonInput).subscribe({
       next: (res: any) => {
-        console.log("club activities", JSON.stringify(res.data.club_activities));
         if (res.data.club_activities.length > 0) {
           this.activities = res.data.club_activities;
           this.activityId = this.activities[0].id;
-          console.log("activity", this.activityId);
           if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
         }
       }
@@ -452,7 +444,6 @@ export class CreatematchPage {
       try {
         this.commonService.showLoader("Please wait...");
         const postgreClub = this.clubs.find(clubName => clubName.Id === this.selectedClub);
-        console.log("club", postgreClub);
         this.createMatchInput.MatchVenueKey = postgreClub.FirebaseId;
         this.createMatchInput.MatchVenueName = postgreClub.ClubName;
         this.createMatchInput.MatchVenueId = postgreClub.Id;
@@ -468,13 +459,10 @@ export class CreatematchPage {
         this.createMatchInput.MatchEndDate = moment(
           new Date(this.startDate + " " + '23:59').getTime()
         ).format("YYYY-MM-DD HH:mm");
-        console.log(JSON.stringify(this.createMatchInput));
-        console.log(new Date(this.startDate + " " + 'this.startTime').getTime());
         this.createMatchInput.GameType = Number(this.createMatchInput.GameType);
         this.createMatchInput.MatchType = +this.createMatchInput.MatchType;
         const selectedDur = this.durations.find(d => d.id === this.selectedDuration);
         this.createMatchInput.MatchDuration = selectedDur ? String(selectedDur.duration) : '';
-        console.log("MATCH Input", JSON.stringify(this.createMatchInput));
 
         const restPayload = {
           parentclubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
@@ -538,7 +526,6 @@ export class CreatematchPage {
           this.commonService.hideLoader();
           const msg = (err.error && err.error.message) ? err.error.message : "Match creation failed";
           this.commonService.toastMessage(msg, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-          console.error("Error:", err);
         })
       } catch (e) {
         this.commonService.hideLoader();
@@ -604,4 +591,3 @@ export class UserDeviceMetadataField {
   UserDeviceType: number
   UpdatedBy: number
 }
-

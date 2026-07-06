@@ -101,7 +101,7 @@
     </app-form-field>
 
     <app-form-field [isDark]="isDarkTheme">
-      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event ? 'public' : 'private')"
+      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event)"
         label="Match Access">
       </app-access-toggle>
     </app-form-field>

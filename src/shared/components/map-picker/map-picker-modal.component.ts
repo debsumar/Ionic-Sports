@@ -833,58 +833,125 @@ export class MapPickerModalComponent {
 
   initMap() {
     if (!this.mapEl || !this.mapEl.nativeElement) { return; }
-    const center = { lat: 51.5074, lng: -0.1278 };
 
-    // IMPORTANT: create the map OUTSIDE the Angular zone. zone.js 0.8.26 patches
-    // ResizeObserver in a way that is incompatible with the modern Google Maps
-    // renderer, throwing "parameter 1 is not of type 'Element'" when the map is
-    // constructed inside the zone. We re-enter the zone only to update UI state.
-    this.zone.runOutsideAngular(() => {
-      this.map = new google.maps.Map(this.mapEl.nativeElement, {
-        center, zoom: 14,
-        disableDefaultUI: true, zoomControl: true,
-        styles: [{ featureType: 'poi', stylers: [{ visibility: 'off' }] }]
-      });
+    const initialLat    = this.navParams.get('initialLat');
+    const initialLng    = this.navParams.get('initialLng');
+    const initialAddress = this.navParams.get('initialAddress') || '';
+    const startCenter   = (initialLat && initialLng)
+      ? { lat: +initialLat, lng: +initialLng }
+      : { lat: 51.5074, lng: -0.1278 };
+    const startZoom     = (initialLat && initialLng) ? 16 : 14;
 
-      this.geocoder = new google.maps.Geocoder();
+    // ── REUSE path ──
+    // modalCtrl.create() gives a new instance every open, but the map instance
+    // is stored on window so we can re-attach it instead of rebuilding.
+    // Rebuilding with loading=async triggers zone.js/IO issues → dark screen.
+    const cached: any = (window as any)['__apMapPicker__'];
+    if (cached && cached.map) {
+      const mapDiv = cached.map.getDiv ? cached.map.getDiv() : null;
+      if (mapDiv) {
+        // Move the SDK div from the parking element into this modal's container
+        try { if (mapDiv.parentNode) { mapDiv.parentNode.removeChild(mapDiv); } } catch (_) {}
+        this.mapEl.nativeElement.appendChild(mapDiv);
+        this.map      = cached.map;
+        this.geocoder = cached.geocoder;
 
-      // Reverse geocode on map idle
-      this.map.addListener('idle', () => {
-        const c = this.map.getCenter();
-        this.selectedLat = c.lat();
-        this.selectedLng = c.lng();
-        this.geocoder.geocode({ location: { lat: this.selectedLat, lng: this.selectedLng } }, (results, status) => {
-          this.zone.run(() => {
+        this.zone.runOutsideAngular(() => {
+          google.maps.event.trigger(this.map, 'resize');
+          this.map.setCenter(startCenter);
+          this.map.setZoom(startZoom);
+
+          // Re-wire idle to this instance
+          google.maps.event.clearListeners(this.map, 'idle');
+          this.map.addListener('idle', () => this.onIdle());
+        });
+
+        this.zone.run(() => { this.mapReady = true; });
+        return;
+      }
+      // mapDiv unavailable — fall through to fresh build
+      (window as any)['__apMapPicker__'] = null;
+    }
+
+    // ── FIRST-BUILD path ──
+    // loading=async requires importLibrary before new google.maps.Map().
+    const buildMap = (MapsLib: any) => {
+      this.zone.runOutsideAngular(() => {
+        this.map = new MapsLib.Map(this.mapEl.nativeElement, {
+          center: startCenter,
+          zoom: startZoom,
+          disableDefaultUI: true,
+          zoomControl: true,
+          gestureHandling: 'greedy',
+        });
+
+        this.geocoder = new google.maps.Geocoder();
+        (window as any)['__apMapPicker__'] = { map: this.map, geocoder: this.geocoder };
+
+        this.map.addListener('idle', () => this.onIdle());
+
+        this.zone.run(() => { this.mapReady = true; });
+
+        if (!initialLat && !initialLng && initialAddress) {
+          this.geocoder.geocode({ address: initialAddress }, (results: any, status: any) => {
             if (status === 'OK' && results[0]) {
-              this.selectedAddress = results[0].formatted_address;
-            } else {
-              this.selectedAddress = this.selectedLat.toFixed(5) + ', ' + this.selectedLng.toFixed(5);
+              this.map.panTo(results[0].geometry.location);
+              this.map.setZoom(16);
             }
           });
-        });
+        } else if (!initialLat && !initialLng && navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(
+            pos => this.map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+            () => {}
+          );
+        }
       });
+    };
 
-      // Center on initial lat/lng if provided, else address, else geolocation
-      const initialLat = this.navParams.get('initialLat');
-      const initialLng = this.navParams.get('initialLng');
-      const initialAddress = this.navParams.get('initialAddress');
-      if (initialLat && initialLng) {
-        this.map.panTo({ lat: initialLat, lng: initialLng });
-        this.map.setZoom(16);
-      } else if (initialAddress) {
-        this.geocoder.geocode({ address: initialAddress }, (results, status) => {
-          if (status === 'OK' && results[0]) {
-            this.map.panTo(results[0].geometry.location);
-            this.map.setZoom(16);
-          }
-        });
-      } else if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (pos) => this.map.panTo({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
-          () => {}
-        );
-      }
+    // Use importLibrary if available (loading=async SDK), otherwise fall back
+    // to direct constructor (legacy SDK without loading=async).
+    if (google.maps.importLibrary) {
+      google.maps.importLibrary('maps').then((lib: any) => buildMap(lib));
+    } else {
+      buildMap(google.maps);
+    }
+  }
+
+  private onIdle() {
+    if (!this.map || !this.geocoder) { return; }
+    const c = this.map.getCenter();
+    if (!c) { return; }
+    this.selectedLat = c.lat();
+    this.selectedLng = c.lng();
+    this.geocoder.geocode({ location: { lat: this.selectedLat, lng: this.selectedLng } }, (results: any, status: any) => {
+      this.zone.run(() => {
+        this.selectedAddress = (status === 'OK' && results && results[0])
+          ? results[0].formatted_address
+          : this.selectedLat.toFixed(5) + ', ' + this.selectedLng.toFixed(5);
+      });
     });
+  }
+
+  /** Park the map div in a hidden body element before the modal is destroyed,
+   *  so the next instance can re-attach it via getDiv(). */
+  private parkMapDiv() {
+    const cached: any = (window as any)['__apMapPicker__'];
+    if (!cached || !cached.map) { return; }
+    try {
+      const mapDiv = cached.map.getDiv && cached.map.getDiv();
+      if (!mapDiv) { return; }
+      let park = document.getElementById('__apMapPickerPark__');
+      if (!park) {
+        park = document.createElement('div');
+        park.id = '__apMapPickerPark__';
+        park.style.cssText = 'position:fixed;top:-9999px;left:-9999px;width:1px;height:1px;overflow:hidden;pointer-events:none;';
+        document.body.appendChild(park);
+      }
+      if (mapDiv.parentNode !== park) {
+        if (mapDiv.parentNode) { mapDiv.parentNode.removeChild(mapDiv); }
+        park.appendChild(mapDiv);
+      }
+    } catch (_) {}
   }
 
   onSearchInput() {
@@ -970,6 +1037,7 @@ export class MapPickerModalComponent {
   }
 
   confirm() {
+    this.parkMapDiv();
     this.viewCtrl.dismiss({
       address: this.selectedAddress,
       lat: this.selectedLat,
@@ -978,6 +1046,7 @@ export class MapPickerModalComponent {
   }
 
   dismiss() {
+    this.parkMapDiv();
     this.viewCtrl.dismiss(null);
   }
 }

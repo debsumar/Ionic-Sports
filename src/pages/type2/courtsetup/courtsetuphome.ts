@@ -45,6 +45,7 @@ export class Type2CourtSetupHome {
   allClub:ClubVenueDto[] = [];
   allActivityArr = [];
   courtDetails = {
+    Id: '',
     CourtName: '',
     Surface: '',
     FloodLight: '',
@@ -188,7 +189,7 @@ export class Type2CourtSetupHome {
     } else {
       
         this.courtDetails = {
-          SurfaceCode:0,Floor : '',
+          Id: '', SurfaceCode:0,Floor : '',
           CourtName: '', Surface: 'Hardcourt', FloodLightKey:'', Capcity:'', FloodLight: 'No', CourtType: 'Outdoor', Shared: 'No', Status: true, Comments: '', IsActive: true, IsEnable: true, CreatedDate: '', UpdatedDate: '', ParentClubkey: '', ClubKey: '', ClubName: '', ActivityKey: '', ActivityName: '', FloodLightCostForMember: '', FloodLightCostForNonMember: '', Days: '', BookedTime: '', BookingInFo: ''
         };
       
@@ -254,7 +255,7 @@ export class Type2CourtSetupHome {
     if(this.selectedActivity == '-MCMaUe_FtFh1RZuIqtG'){
       this.IsTable = true
         this.courtDetails = {
-          SurfaceCode:0,Floor : '',
+          Id: '', SurfaceCode:0,Floor : '',
           CourtName: '', Surface: 'Others',  Capcity:'', FloodLightKey:'', FloodLight: 'No', CourtType: 'Outdoor', Shared: 'No', Status: true, Comments: '', IsActive: true, IsEnable: true, CreatedDate: '', UpdatedDate: '', ParentClubkey: '', ClubKey: '', ClubName: '', ActivityKey: '', ActivityName: '', FloodLightCostForMember: '', FloodLightCostForNonMember: '', Days: '', BookedTime: '', BookingInFo: ''
         };
       
@@ -658,12 +659,21 @@ export class Type2CourtSetupHome {
           table_capacity: Number(this.courtDetails.Capcity) || 0
         };
         const updateCourtV2Payload = {
-          courtId: this.courtDetails['Id'],
+          courtId: this.courtDetails.Id,
           parentClubKey: this.parentClubKey,
           clubKey: this.selectedClub,
           activityKey: this.selectedActivity,
-          updateData: updateData
+          updateData: updateData,
+          parentclub_id: this.sharedservice.getPostgreParentClubId(),
+          device_id: this.sharedservice.getDeviceId() || 'web',
+          device_type: this.sharedservice.getPlatform() === 'android' ? 1 : 2,
+          app_type: AppType.ADMIN_NEW,
+          updated_by: this.sharedservice.getLoggedInUserId() || "admin",
         };
+        if (!this.courtDetails.Id) {
+          this.commonService.toastMessage("Court ID missing — please close and re-open this court to retry.", 3500, ToastMessageType.Error);
+          return;
+        }
         this.commonService.showLoader('Please wait...');
         this.httpService.post(API.UPDATE_COURT_V2, updateCourtV2Payload, null, 1).subscribe(
           (res: any) => {

@@ -268,7 +268,8 @@ export class NewViewcourtPage {
           isMember: this.isMember,
           day: day,
           startDate: startDate,
-          endDate: endDate
+          endDate: endDate,
+          app_type: AppType.ADMIN_NEW,
         };
         
         this.httpService.get(API.GET_MULTI_COURT_SLOT, params, null, 1).subscribe({

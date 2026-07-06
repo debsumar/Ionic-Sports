@@ -10,7 +10,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content>
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
   <div class="sticky-header">
     <div class="block" *ngIf="weeklyDets" [ngClass]="{'border_bottom': true}">
       <p class="session">{{weeklyDets.days}}<br />{{weeklyDets.start_time}} - {{weeklyDets.end_time}}</p>
@@ -128,8 +128,8 @@
               </ion-card-content>
             </ion-card>
           </div>
-          <div *ngIf="waitingListData.length === 0" style="text-align: center; padding: 20px;">
-            <p>No waiting list entries found</p>
+          <div *ngIf="waitingListData.length === 0">
+            <app-empty-state icon="time" text="No waiting list entries found"></app-empty-state>
           </div>
         </div>
       </ion-col>

@@ -113,7 +113,7 @@ export class MatchladderPage {
           if (val.$key != "") {}
           this.fetchLadderInput.ParentClubId = this.sharedservice.getPostgreParentClubId();
           this.parentClubId = this.sharedservice.getPostgreParentClubId();
-          this.parentclubKey = val.UserInfo[0].ParentClubKey;
+          this.parentclubKey = this.sharedservice.getPostgreParentClubId(); // postgre key, not Firebase
           this.getAgeCategories();
           this.loadLadderOptions();
         });

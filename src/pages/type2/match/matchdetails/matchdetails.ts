@@ -987,12 +987,6 @@ export class MatchdetailsPage {
             team_type: side,
             teamId: p.team_id || p.TeamId || '',
             name: (p.first_name ? (p.first_name + ' ' + (p.last_name || '')).trim() : (p.FirstName ? (p.FirstName + ' ' + (p.LastName || '')).trim() : 'Unknown')),
-            firstName: p.first_name || p.FirstName || '',
-            lastName: p.last_name || p.LastName || '',
-            email: p.email || p.email_id || p.EmailID || p.Email || '',
-            isChild: p.is_child || p.IsChild || false,
-            parentId: p.parent_id || p.ParentId || p.parent_key || '',
-            parentEmail: p.parent_email || p.ParentEmailID || p.ParentEmail || '',
             userId: p.user_id || p.UserId || ''
           };
         });

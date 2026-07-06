@@ -32,28 +32,23 @@
 <ion-content>
   <div class="court-form-wrap">
 
-    <ion-row>
-        <ion-col col-6 class="padding-0">
-            <app-form-field [isDark]="isDarkTheme">
-                <ion-item>
-                    <ion-select [(ngModel)]="selectedClub" [disabled]="Isupdatecome" (ionChange)="onClubChange()">
-                        <ion-option *ngFor="let club of allClub" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
-                    </ion-select>
-                </ion-item>
-            </app-form-field>
-        </ion-col>
-        <ion-col col-6 class="padding-0">
-            <app-form-field [isDark]="isDarkTheme">
-                <ion-item>
-                    <ion-select [disabled]="Isupdatecome" [(ngModel)]="selectedActivity" [disabled]="Isupdatecome"
-                        class="pad-right" (ionChange)="onActChange()">
-                        <ion-option *ngFor="let item of allActivityArr" value={{item.$key}}>{{item.ActivityName}}
-                        </ion-option>
-                    </ion-select>
-                </ion-item>
-            </app-form-field>
-        </ion-col>
-    </ion-row>
+    <app-select-field [isDark]="isDarkTheme">
+        <ion-item>
+            <ion-label>Venue</ion-label>
+            <ion-select [(ngModel)]="selectedClub" [disabled]="Isupdatecome" (ionChange)="onClubChange()">
+                <ion-option *ngFor="let club of allClub" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-select-field>
+    <app-select-field [isDark]="isDarkTheme">
+        <ion-item>
+            <ion-label>Activity</ion-label>
+            <ion-select [disabled]="Isupdatecome" [(ngModel)]="selectedActivity" (ionChange)="onActChange()">
+                <ion-option *ngFor="let item of allActivityArr" value={{item.$key}}>{{item.ActivityName}}
+                </ion-option>
+            </ion-select>
+        </ion-item>
+    </app-select-field>
 
     <app-form-field [isDark]="isDarkTheme">
         <ion-item>
@@ -65,14 +60,14 @@
             <ion-input type="number" [(ngModel)]="courtDetails.Capcity" placeholder="Capacity"></ion-input>
         </ion-item>
     </app-form-field>
-    <app-form-field [isDark]="isDarkTheme" *ngIf="IsTable">
+    <app-select-field [isDark]="isDarkTheme" *ngIf="IsTable">
         <ion-item>
             <ion-label>Floor</ion-label>
             <ion-select [(ngModel)]="courtDetails.Floor">
                 <ion-option *ngFor="let surf of floorList" value={{surf.name}}>{{surf.name}}</ion-option>
             </ion-select>
         </ion-item>
-    </app-form-field>
+    </app-select-field>
 
     <ion-row>
         <ion-col col-6 class="padding-0">
@@ -93,15 +88,15 @@
         </ion-col>
     </ion-row>
 
-    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable">
+    <app-select-field [isDark]="isDarkTheme" *ngIf="!IsTable">
         <ion-item>
             <ion-label>Surface</ion-label>
             <ion-select [(ngModel)]="courtDetails.Surface">
                 <ion-option *ngFor="let surf of surfaceList" value={{surf.name}}>{{surf.name}}</ion-option>
             </ion-select>
         </ion-item>
-    </app-form-field>
-    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable">
+    </app-select-field>
+    <app-select-field [isDark]="isDarkTheme" *ngIf="!IsTable">
         <ion-item>
             <ion-label>Flood Light</ion-label>
             <ion-select [(ngModel)]="courtDetails.FloodLight">
@@ -109,15 +104,15 @@
                 <ion-option value="No">No</ion-option>
             </ion-select>
         </ion-item>
-    </app-form-field>
-    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable && courtDetails.FloodLight == 'Yes'">
+    </app-select-field>
+    <app-select-field [isDark]="isDarkTheme" *ngIf="!IsTable && courtDetails.FloodLight == 'Yes'">
         <ion-item>
             <ion-label>FloodLightSetup</ion-label>
             <ion-select [(ngModel)]="courtDetails.FloodLightKey">
                 <ion-option *ngFor="let flood of flooddata" value={{flood.$key}}>{{flood.Title}}</ion-option>
             </ion-select>
         </ion-item>
-    </app-form-field>
+    </app-select-field>
 
     <ion-row class="allign-row"
         *ngIf=" courtDetails.FloodLight == 'Yes' && (courtDetails.PaymentOptionForFloodLight == 'Online' || courtDetails.PaymentOptionForFloodLight == 'Both')">
@@ -150,7 +145,7 @@
         </ion-col>
     </ion-row>
 
-    <app-form-field [isDark]="isDarkTheme" *ngIf="!IsTable">
+    <app-select-field [isDark]="isDarkTheme" *ngIf="!IsTable">
         <ion-item>
             <ion-label>Shared</ion-label>
             <ion-select [(ngModel)]="courtDetails.Shared">
@@ -158,7 +153,7 @@
                 <ion-option value="No">No</ion-option>
             </ion-select>
         </ion-item>
-    </app-form-field>
+    </app-select-field>
 
     <div class="day-grid">
     <ion-row>

@@ -197,9 +197,9 @@ export class Type2EditVenue {
             PostgreId:this.clubId,
             ClubName:this.clubDets.ClubName,
             ClubShortName:this.clubDets.ClubShortName,
-            ClubDescription:this.clubDets.ClubDescription,
+            ClubDescription:this.clubDets.ClubDescription ? this.clubDets.ClubDescription : "",
             FirstLineAddress:this.clubDets.FirstLineAddress,
-            SecondLineAddress:this.clubDets.SecondLineAddress,
+            SecondLineAddress:this.clubDets.SecondLineAddress ? this.clubDets.SecondLineAddress : "",
             City:this.clubDets.City,
             State:this.clubDets.State,
             CountryName:this.clubDets.CountryName,
@@ -207,8 +207,12 @@ export class Type2EditVenue {
             MapUrl:this.clubDets.MapUrl ? this.clubDets.MapUrl : "",
             WebsiteUrl:this.clubDets.WebsiteUrl ? this.clubDets.WebsiteUrl : "",
             Sequence:this.clubDets.sequence ? this.clubDets.sequence : 0,
-            ContactPhone:this.clubDets.ContactPhone,
-            ClubContactName:this.clubDets.ClubContactName
+            ContactPhone:this.clubDets.ContactPhone ? this.clubDets.ContactPhone : "",
+            ClubContactName:this.clubDets.ClubContactName ? this.clubDets.ClubContactName : "",
+            device_type: this.sharedservice.getPlatform() === 'android' ? 1 : 2,
+            app_type: 10,
+            device_id: this.sharedservice.getDeviceId() || 'web',
+            updated_by: this.sharedservice.getLoggedInUserId() || 'admin',
         }
         this.httpService.put(API.UPDATE_VENUE, venue_updateInput, null, 1).subscribe(
           (res: any) => {
