@@ -173,11 +173,12 @@ export class MatchdetailsPage {
     return moment(+date).format("DD MMM YYYY, hh:mm A");
   }
 
-  gotoMatchInvitePlayers() {
+  gotoMatchInvitePlayers(side: string = 'home') {
     let profileModal = this.modalCtrl.create("MatchinviteplayersPage", {
       selectedmatchId: this.UserInvitationStatus.MatchId,
       selectedmemberId: this.UserInvitationStatus.MemberId,
-      existed_members: this.participants
+      existed_members: this.participants,
+      side: side
     });
     profileModal.onDidDismiss(data => {
       console.log(data);
@@ -739,11 +740,14 @@ export class MatchdetailsPage {
     var homeSets = this.getHomeSets();
     var awaySets = this.getAwaySets();
 
-    // Get player IDs from loaded participants
+    // Get TEAM ids from loaded participants. The backend (createResult) resolves
+    // WinnerId / TEAM_IDs against the match's Team entities, NOT user ids — so we
+    // must send team_id here. Falling back to userId would make teamRepo.findOne
+    // return null and crash with "Cannot read properties of null (reading 'Participants')".
     var homePlayer = this.homePlayers.find(function(p) { return p.ParticipationStatus === 1; }) || this.homePlayers[0];
     var awayPlayer = this.awayPlayers.find(function(p) { return p.ParticipationStatus === 1; }) || this.awayPlayers[0];
-    var homeId = homePlayer ? homePlayer.userId : (this.match.homeUserId || '');
-    var awayId = awayPlayer ? awayPlayer.userId : (this.match.awayUserId || '');
+    var homeId = homePlayer ? (homePlayer.teamId || homePlayer.userId) : (this.match.TeamId || this.match.homeUserId || '');
+    var awayId = awayPlayer ? (awayPlayer.teamId || awayPlayer.userId) : (this.match.awayUserId || '');
     var homeName = homePlayer ? homePlayer.name : (this.match.homeUserName || '');
     var awayName = awayPlayer ? awayPlayer.name : (this.match.awayUserName || '');
 
@@ -754,12 +758,18 @@ export class MatchdetailsPage {
 
     var setScores = this.sets.filter(s => s.home && s.away).map(function(s, i) {
       var homeWon = parseInt(s.home) > parseInt(s.away);
-      return { SET_NUMBER: String(i + 1), SCORE: s.home + '-' + s.away, WINNER: homeWon ? homeName : awayName };
+      return {
+        SET_NUMBER: String(i + 1),
+        SCORE: s.home + '-' + s.away,
+        WINNER: homeWon ? homeName : awayName,
+        WINNER_TEAM_ID: homeWon ? homeId : awayId
+      };
     });
 
     var resultJson = {
       RESULT: {
         RESULT_STATUS: String(resultStatus),
+        WINNER_ID: winnerId,
         LOSER_ID: loserId,
         DESCRIPTION: this.resultType === 'retired'
           ? (this.retiredPlayer === 'home' ? homeName : awayName) + ' retired'
@@ -773,7 +783,7 @@ export class MatchdetailsPage {
         DOUBLE_FAULTS: '0', FIRST_SERVE_PERCENTAGE: '0', UNFORCED_ERRORS: '0', BREAK_POINTS_WON: '0'
       },
       AWAY_TEAM: {
-        TEAM_NAME: awayName,
+        TEAM_NAME: awayName, TEAM_ID: awayId,
         SETS_WON: String(awaySets), GAMES_WON: '0', ACES: '0',
         DOUBLE_FAULTS: '0', FIRST_SERVE_PERCENTAGE: '0', UNFORCED_ERRORS: '0', BREAK_POINTS_WON: '0'
       },
@@ -788,8 +798,12 @@ export class MatchdetailsPage {
       ResultStatus: resultStatus,
       ResultDetails: JSON.stringify(resultJson),
       resultDescription: '',
-      app_type: AppType.ADMIN_NEW,
-      device_type: this.sharedservice.getPlatform() === 'android' ? 1 : 2,
+      // PublishResultStandAlone is served by the web-admin backend, which expects
+      // the web client envelope (Web.AppType = 15, Web.DeviceType = 3). The web app
+      // injects these via an HTTP interceptor; we send them explicitly here. The
+      // mobile values (ADMIN_NEW / platform device type) are rejected by this endpoint.
+      app_type: 15,
+      device_type: 3,
       parentclubId: this.sharedservice.getPostgreParentClubId()
     };
 
@@ -826,15 +840,41 @@ export class MatchdetailsPage {
   }
 
   gotoEmailPage() {
-    if (this.participants.length > 0) {
-      const member_list = this.participants.map(p => ({
-        IsChild: (p.User as any).IsChild || false,
-        ParentId: (p.User as any).IsChild ? ((p.User as any).ParentId || "") : "",
-        MemberId: p.User.Id,
-        MemberEmail: (p.User as any).EmailID && (p.User as any).EmailID !== "" && (p.User as any).EmailID !== "-" && (p.User as any).EmailID !== "n/a"
-          ? (p.User as any).EmailID
-          : ((p.User as any).IsChild ? ((p.User as any).ParentEmailID || "") : ""),
-        MemberName: p.User.FirstName + " " + p.User.LastName
+    // if (this.participants.length > 0) {
+    //   const member_list = this.participants.map(p => ({
+    //     IsChild: (p.User as any).IsChild || false,
+    //     ParentId: (p.User as any).IsChild ? ((p.User as any).ParentId || "") : "",
+    //     MemberId: p.User.Id,
+    //     MemberEmail: (p.User as any).EmailID && (p.User as any).EmailID !== "" && (p.User as any).EmailID !== "-" && (p.User as any).EmailID !== "n/a"
+    //       ? (p.User as any).EmailID
+    //       : ((p.User as any).IsChild ? ((p.User as any).ParentEmailID || "") : ""),
+    //     MemberName: p.User.FirstName + " " + p.User.LastName
+    //   }));
+    //   const email_modal = {
+    //     module_info: {
+    //       module_id: this.match.MatchId,
+    //       module_booking_club_name: this.match.VenueName,
+    //       module_booking_name: this.match.MatchTitle,
+    //       module_booking_start_date: this.match.MatchStartDate,
+    //     },
+    //     email_users: member_list,
+    //     type: ModuleTypeForEmail.MEMBER
+    //   };
+    //   this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    // } else {
+    //   this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    // }
+
+    const matchPlayers = [...this.homePlayers, ...this.awayPlayers];
+    if (matchPlayers.length > 0) {
+      const member_list = matchPlayers.map(p => ({
+        IsChild: p.isChild || false,
+        ParentId: p.isChild ? (p.parentId || "") : "",
+        MemberId: p.userId,
+        MemberEmail: p.email && p.email !== "" && p.email !== "-" && p.email !== "n/a"
+          ? p.email
+          : (p.isChild ? (p.parentEmail || "") : ""),
+        MemberName: p.name
       }));
       const email_modal = {
         module_info: {
@@ -945,6 +985,7 @@ export class MatchdetailsPage {
             ParticipationId: p.participationid || p.id,
             ParticipationStatus: p.participation_status || 0,
             team_type: side,
+            teamId: p.team_id || p.TeamId || '',
             name: (p.first_name ? (p.first_name + ' ' + (p.last_name || '')).trim() : (p.FirstName ? (p.FirstName + ' ' + (p.LastName || '')).trim() : 'Unknown')),
             userId: p.user_id || p.UserId || ''
           };
@@ -1004,6 +1045,11 @@ export class MatchdetailsPage {
   }
 
   updatePlayerStatus(player: any, status: number) {
+    // Enforce confirmed-roster cap (matches web admin behaviour).
+    if (status === 1 && this.confirmedCount >= this.maxConfirmed) {
+      this.commonService.toastMessage('Maximum confirmed players reached', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      return;
+    }
     this.httpService.post(API.UPDATE_STANDALONE_PARTICIPATION_STATUS, {
       ParticipationId: player.ParticipationId || player.id,
       ParticipationStatus: status
@@ -1011,6 +1057,52 @@ export class MatchdetailsPage {
       next: () => { this.loadMatchParticipants(); },
       error: () => { this.commonService.toastMessage('Failed to update status', 2500, ToastMessageType.Error, ToastPlacement.Bottom); }
     });
+  }
+
+  getStatusLabel(status: number): string {
+    switch (status) {
+      case 1: return 'Confirmed';
+      case 2: return 'Declined';
+      default: return 'Pending';
+    }
+  }
+
+  // ─── Result Display (parsed from result_json, mirrors web admin) ───
+  get parsedResult(): any {
+    const m: any = this.match;
+    const raw = m && (m.result_json || m.ResultDetails);
+    if (!raw) return null;
+    try { return typeof raw === 'string' ? JSON.parse(raw) : raw; } catch (e) { return null; }
+  }
+
+  get resultWinnerSide(): string {
+    const r = this.parsedResult;
+    if (!r || !r.RESULT || !r.RESULT.WINNER_ID) return '';
+    const homeId = r.HOME_TEAM && r.HOME_TEAM.TEAM_ID;
+    return r.RESULT.WINNER_ID === homeId ? 'home' : 'away';
+  }
+
+  get resultWinnerName(): string {
+    const side = this.resultWinnerSide;
+    const m: any = this.match;
+    if (!side || !m) return '';
+    return side === 'home' ? (m.homeUserName || '') : (m.awayUserName || '');
+  }
+
+  get resultScoreText(): string {
+    const r = this.parsedResult;
+    if (!r || !r.SET_SCORES || !r.SET_SCORES.length) return '';
+    return r.SET_SCORES
+      .filter((s: any) => s.SCORE && s.SCORE !== '0-0')
+      .map((s: any) => s.SCORE)
+      .join('  ');
+  }
+
+  getResultSetsWon(side: string): string {
+    const r = this.parsedResult;
+    if (!r) return '0';
+    const team = side === 'home' ? r.HOME_TEAM : r.AWAY_TEAM;
+    return (team && team.SETS_WON) || '0';
   }
 
 }

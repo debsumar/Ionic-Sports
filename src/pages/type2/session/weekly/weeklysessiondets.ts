@@ -17,6 +17,7 @@ import { FirebaseService } from '../../../../services/firebase.service';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { PaymentStatusText } from '../../../../shared/constants/payment.constants';
 import { ModuleTypes } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
 
 /**
  * Generated class for the WeeklysessiondetsPage page.
@@ -40,6 +41,7 @@ export class WeeklysessiondetsPage {
   MemberListsForDeviceToken = [];
   Session: any;
   themeType: number;
+  isDarkTheme: boolean = true;
   isAndroid: boolean = false;
   campDetails: any;
   memberLists: any;
@@ -75,7 +77,7 @@ export class WeeklysessiondetsPage {
   loggedin_type:number = 2;
   can_coach_see_revenue:boolean = true;
   constructor(private callNumber: CallNumber, private graphqlService: GraphqlService, platform: Platform, public sharedservice: SharedServices, public modalCtrl: ModalController, public alertCtrl: AlertController, public commonService: CommonService, private viewCtrl: ViewController, public toastCtrl: ToastController, public popoverCtrl: PopoverController,
-    public navCtrl: NavController, public storage: Storage, public loadingCtrl: LoadingController, public actionSheetCtrl: ActionSheetController, public fb: FirebaseService, public navParams: NavParams) {
+    public navCtrl: NavController, public storage: Storage, public loadingCtrl: LoadingController, public actionSheetCtrl: ActionSheetController, public fb: FirebaseService, public navParams: NavParams, private themeService: ThemeService) {
     this.themeType = sharedservice.getThemeType();
     this.isAndroid = platform.is('android');
     
@@ -115,6 +117,7 @@ export class WeeklysessiondetsPage {
   }
 
   ionViewWillEnter(){
+    this.loadTheme();
     this.loggedin_type = this.sharedservice.getLoggedInType();
     if(this.loggedin_type == 4){
         this.can_coach_see_revenue = this.sharedservice.getCanCoachSeeRevenue();
@@ -176,6 +179,20 @@ export class WeeklysessiondetsPage {
     console.log("WeeklyDetails Page Called!");
 
   }
+
+  loadTheme() {
+    this.isDarkTheme = this.themeService.getCurrentTheme();
+    this.applyTheme();
+  }
+
+  applyTheme() {
+    const pageElement = document.querySelector('page-weeklysessiondets');
+    if (pageElement) {
+      pageElement.classList.remove('dark-theme', 'light-theme');
+      pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
+  }
+
 
   
 

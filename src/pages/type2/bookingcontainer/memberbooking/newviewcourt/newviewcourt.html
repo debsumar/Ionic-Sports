@@ -74,15 +74,18 @@
 
 <ion-slides [slidesPerView]="3.2" >
 
-  <ion-slide *ngFor="let slideInfo of slotofAllCourt"  class="slot-slider">
+  <ion-slide *ngFor="let slideInfo of slotofAllCourt"  class="slot-slider" [ngClass]="{'court-unavailable': isCourtUnavailable(slideInfo.courtInfo)}">
     <div style="background: rgba(43, 146, 187, 0.85);    border-right: 1px solid rgba(255, 255, 255, 0.65);">
-      <p class="head">{{slideInfo.courtInfo.CourtName}}</p>
+      <p class="head">
+        {{slideInfo.courtInfo.CourtName}}
+        <span class="unavailable-badge" *ngIf="isCourtUnavailable(slideInfo.courtInfo)">Unavailable</span>
+      </p>
       <p *ngIf="!slideInfo.courtInfo.Capcity" style="color: rgba(255, 255, 255, 0.85);font-weight: normal;" class="head">  {{slideInfo.courtInfo.Surface}}</p>
       <p *ngIf="slideInfo.courtInfo.Capcity" style="color: rgba(255, 255, 255, 0.85);font-weight: normal;" class="head">Capacity {{slideInfo.courtInfo.Capcity}}</p>
     </div>
    
     <div style="overflow: scroll !important;height: 84vh !important;">
-    <ion-card class="court" *ngFor="let court of slideInfo.slotData.slots" (click)="bookslot(court,slideInfo)"  [ngClass]="{'selected-court':court.IsBooked == true}" >
+    <ion-card class="court" *ngFor="let court of slideInfo.slotData.slots" (click)="bookslot(court,slideInfo)"  [ngClass]="{'selected-court':court.IsBooked == true, 'court-unavailable-slot': isCourtUnavailable(slideInfo.courtInfo)}" >
       <ion-card-content class="padding-0 slots" [ngClass]="{'booked-court':court.IsEnable == false, 'admin_back': court.MemberKey == 'admin'}" >
 
        <span class="time-range">{{court.StartHour}}:{{court.StartMin}} - {{court.EndHour}}:{{court.EndMin}}</span>

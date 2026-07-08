@@ -1,5 +1,5 @@
-import { Component } from '@angular/core';
-import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController } from 'ionic-angular';
+import { Component, Renderer2 } from '@angular/core';
+import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import * as moment from 'moment'
 import * as $ from "jquery";
@@ -11,6 +11,7 @@ import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../shared/dtos/club.dto';
 import { AppType } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
 /**
  * Generated class for the BookingPage page.
  *
@@ -46,16 +47,17 @@ export class BookingPage {
   selectedActivity = "";
   selectedCourt = "all";
   loading: any;
-  nestUrl: string = "";
   selectedTabInd = 0;
   Todayslots: any[];
   isClearStorage = false;
+  isDarkTheme: boolean = true; // 🌗 Default dark theme
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController, public storage: Storage,
     public fb: FirebaseService, public commonService: CommonService,
     public alertCtrl: AlertController, public loadingCtrl: LoadingController, public sharedService: SharedServices, 
-    public http: HttpClient, private httpService: HttpService) {
+    public http: HttpClient, private httpService: HttpService,
+    private renderer: Renderer2, private themeService: ThemeService, public events: Events) {
     //this.sharedService.get
 
 
@@ -63,7 +65,11 @@ export class BookingPage {
 
 
   ionViewWillEnter() {
-    this.nestUrl = this.sharedService.getnestURL();
+    // 🌗 Theme setup
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => this.applyTheme(isDark));
+    this.events.subscribe('theme:changed', (isDark) => this.applyTheme(isDark));
+
     this.storage.get('userObj').then((val) => {
       val = JSON.parse(val);
 
@@ -178,7 +184,6 @@ export class BookingPage {
   //     this.loading.present();
   //     let startDate = new Date(new Date().setHours(0, 0, 0, 0)).getTime();
   //     let lasttDate = new Date(new Date().setHours(23, 59, 59)).getTime();
-  //     this.http.get(`${this.nestUrl}/courtbooking/bookingHistory?parentClubKey=${this.selectedParentClubKey}&activitykey=${this.selectedActivity}&courtkey=${this.selectedCourt}&clubKey=${this.selectedClubKey}&startDate=${startDate}&endDate=${lasttDate}`)
   //       .subscribe(async (data: any) => {
   //         this.loading.dismiss()
   //         if(this.selectedCourt == 'all'){
@@ -242,7 +247,6 @@ export class BookingPage {
   //     let startDate = new Date(new Date().setHours(0, 0, 0, 0)).getTime();
   //     let tempDate: any = moment().add(30, 'days');
   //     let lasttDate = new Date(new Date(tempDate).setHours(23, 59, 59)).getTime();
-  //     this.http.get(`${this.nestUrl}/courtbooking/bookingHistory?parentClubKey=${this.selectedParentClubKey}&activitykey=${this.selectedActivity}&courtkey=${this.selectedCourt}&clubKey=${this.selectedClubKey}&startDate=${startDate}&endDate=${lasttDate}`)
   //       .subscribe((data: any) => {
   //         this.loading.dismiss()
   //         if(this.selectedCourt == 'all'){
@@ -452,6 +456,28 @@ export class BookingPage {
 
   goTofilterpage() {
     this.navCtrl.push("FilterbookingsPage");
+  }
+
+  // 🌗 Theme: load persisted preference and apply
+  async loadTheme() {
+    const isDarkTheme = await this.storage.get('dashboardTheme');
+    const isDark = isDarkTheme !== null ? isDarkTheme : true;
+    this.isDarkTheme = isDark;
+    this.applyTheme(isDark);
+  }
+
+  // 🌗 Theme: toggle light-theme class on the page element
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
+    const pageElement = document.querySelector('page-booking');
+    if (pageElement) {
+      isDark ? this.renderer.removeClass(pageElement, 'light-theme')
+             : this.renderer.addClass(pageElement, 'light-theme');
+    }
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
   }
 
 }

@@ -1,0 +1,74 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+editvenue-page {
+    @include android-sdk35-fixes;
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        padding: 0 !important;
+        background-image: none !important;
+        background: #0f172a !important;
+    }
+
+    ion-content.light-theme .scroll-content { background: #f8fafc !important; }
+
+    ion-list {
+        margin: 12px !important;
+        background: transparent !important;
+    }
+
+    // Stacked label text fields: full-width, left-aligned inputs (override form-field right-align)
+    app-form-field .form-field {
+        ion-textarea, ion-input, ion-datetime {
+            text-align: left !important;
+            max-width: 100% !important;
+            width: 100% !important;
+        }
+        .text-input, .textarea-text { text-align: left !important; }
+        ion-label[stacked] { margin-bottom: 4px; }
+    }
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+
+        .cancel-btn {
+            display: block;
+            width: calc(100% - 24px);
+            margin: 12px 12px 0;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        &.light-theme {
+            background: #f8fafc;
+
+            .cancel-btn {
+                border-color: #e2e8f0;
+                color: #64748b;
+            }
+        }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+        .scroll-content { background: #f8fafc !important; }
+        ion-footer { background: #f8fafc; }
+        ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+    }
+}

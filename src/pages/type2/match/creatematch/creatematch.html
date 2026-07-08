@@ -42,7 +42,7 @@
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>Activity</ion-label>
-        <ion-select (ionChange)="onActivityChange()" [(ngModel)]="activityId">
+        <ion-select (ionChange)="onActivityChange()" [(ngModel)]="activityId" placeholder="Select activity">
           <ion-option *ngFor="let type of activities" value="{{type.id}}">{{type.activity_name}}</ion-option>
         </ion-select>
       </ion-item>
@@ -101,7 +101,7 @@
     </app-form-field>
 
     <app-form-field [isDark]="isDarkTheme">
-      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event ? 'public' : 'private')"
+      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event)"
         label="Match Access">
       </app-access-toggle>
     </app-form-field>

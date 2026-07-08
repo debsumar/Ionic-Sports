@@ -1,0 +1,107 @@
+<ion-header *ngIf="themeType == 1">
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Manage Team</ion-title>   
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)"> 
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-header>
+    <ion-navbar *ngIf="themeType == 2">
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+      <ion-icon name="apps"></ion-icon>
+    </button>
+        <ion-title>
+            Manage Team
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()">
+                 <img src="assets/images/home.svg" class="home_btn">
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)"> 
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+
+    <app-search-bar placeholder="Search team members..." [(value)]="searchTerm"
+        [count]="(filteredCoachList?.length || 0) + (filteredSubAdminList?.length || 0)"
+        (search)="filterLists()"></app-search-bar>
+
+    <!-- 👥 Coaches -->
+    <div class="section-heading coach-heading" *ngIf="filteredCoachList?.length > 0">Coaches</div>
+    <div class="member-list">
+        <app-list-card class="member-card" *ngFor="let item of filteredCoachList" accentColor="#2b92bb"
+            (cardClick)="presentActionSheet(item)">
+            <div class="member-row">
+                <img [src]="item.ProfileImageUrl" class="avatar">
+                <div class="member-info">
+                    <div class="member-top">
+                        <h2 class="member-name">{{item.FirstName}} {{item.LastName}}</h2>
+                        <span class="level-badge" *ngIf="getCoachLevel(item)">{{getCoachLevel(item)}}</span>
+                    </div>
+                    <p class="member-sub">
+                        <ion-icon name="pin" class="sub-icon"></ion-icon>
+                        <span class="sub-text">{{getVenuesText(item)}}</span>
+                    </p>
+                </div>
+                <ion-icon name="ios-arrow-forward" class="chevron"></ion-icon>
+            </div>
+        </app-list-card>
+    </div>
+
+    <!-- 🧑‍💼 Support team members -->
+    <div class="section-heading" *ngIf="filteredSubAdminList?.length > 0">Support Team Members</div>
+    <div class="member-list">
+        <app-list-card class="member-card" *ngFor="let item of filteredSubAdminList" accentColor="#f6ae4d"
+            (cardClick)="presentActionSheetOtherUser(item)" [class.deleted]="item.IsActive == false">
+            <div class="member-row">
+                <img src="assets/images/user2.png" class="avatar avatar-support">
+                <div class="member-info">
+                    <div class="member-top">
+                        <h2 class="member-name">{{item.Name}}</h2>
+                        <span class="role-badge">Team</span>
+                    </div>
+                    <p class="member-sub">
+                        <ion-icon name="pin" class="sub-icon"></ion-icon>
+                        <span class="sub-text">{{getSubAdminVenuesText(item)}}</span>
+                    </p>
+                </div>
+                <ion-icon name="ios-arrow-forward" class="chevron"></ion-icon>
+            </div>
+        </app-list-card>
+    </div>
+
+    <!-- 🗂️ Empty state -->
+    <div class="empty-state" *ngIf="(filteredCoachList?.length || 0) + (filteredSubAdminList?.length || 0) === 0">
+        <ion-icon name="people" class="empty-icon"></ion-icon>
+        <p class="empty-text">No team members found</p>
+    </div>
+
+    <ion-fab mini right bottom #fab>
+        <button ion-fab mini style="background-color:#2b92bb !important; color: white !important">
+            <ion-icon name="add"></ion-icon>
+        </button>
+        <ion-fab-list side="top">
+            <p class="fabEmailText"  style="background-color:#2b92bb !important; color: white !important;margin-left: -115px;" (click)="addCoach()">Add Coach</p>
+            <button style="background-color:#2b92bb !important; color: white !important" ion-fab class="fabTop" (click)="addCoach()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+
+            <p class="fabEmailText" style="background-color:#2b92bb !important; color: white !important" (click)="addSubAdmin()">Add Team</p>
+            <button style="background-color:#2b92bb !important; color: white !important" ion-fab class="fabTop" (click)="addSubAdmin()">
+                <ion-icon name="add"></ion-icon>
+            </button>
+        </ion-fab-list>
+
+    </ion-fab>
+</ion-content>

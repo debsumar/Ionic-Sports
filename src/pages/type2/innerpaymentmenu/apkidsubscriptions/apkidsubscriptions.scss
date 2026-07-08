@@ -1,0 +1,115 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-apkidsubscriptions {
+    @include android-sdk35-fixes;
+
+    .scroll-content {
+        padding: 6px !important;
+        background-image: none !important;
+        background: #0f172a !important;
+    }
+
+    .circleProgress{
+        border: 8px solid #334155;
+        border-radius: 50%;
+        width: 135px;
+        height: 135px;
+        padding: 5px;
+        margin: auto;
+        position: relative;
+        border-bottom-color: transparent;
+        p{
+            font-size: 18px;
+            color: #f1f5f9;
+            text-align: center;
+            margin: 34px 0 0 0;
+            font-weight: 600;
+        }
+        img{
+            width: 30px;
+            height: 30px;
+            position: absolute;
+            bottom: 2px;
+            right: 0;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+    }
+
+    .progress_txt{
+        font-size: 14px;
+        margin: 4px 0;
+        color: #94a3b8;
+    }
+
+    .innercard_style{
+        height: 9vh;
+        border-left: 2px solid #35adff;
+        padding: 3px 5px 0px 0px;
+        margin: 0px 10px 4px 0px;
+        width: 100%;
+        background: #1e293b;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    }
+
+    .sub-card { display: block; margin: 0 10px 8px 0; }
+    .sub-card-body { padding: 6px 5px 3px 0; }
+
+    .margin-auto{
+        margin:auto;
+    }
+
+    .member_name{
+        font-weight: 500;
+        font-size: 18px;
+        color: #f1f5f9;
+    }
+
+    .amt{
+        font-size: 14px;
+        color: #f1f5f9;
+        margin:0px 0px 3px 0px;
+    }
+
+    .sub_para{
+        font-size: 14px;
+        color: #94a3b8;
+        margin:0px 0px 3px 0px;
+    }
+
+    .mem_col{
+        padding: 5px 0px 0px 10px;
+        p{
+            margin:0px 0px 3px 0px;
+        }
+    }
+
+    .forward_icon {
+        color: #94a3b8 !important;
+        font-size: 25px !important;
+    }
+
+    // ── Light Theme ──
+    &.light-theme {
+        .scroll-content {
+            background: #f7f7f7 !important;
+        }
+
+        .circleProgress {
+            border-color: #e4e4e4;
+            p { color: #00000099; }
+        }
+
+        .progress_txt { color: #000000ad; }
+
+        .innercard_style {
+            background: #fff;
+            box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0);
+        }
+
+        .member_name { color: rgba(0, 0, 0, 0.85); }
+        .amt { color: rgba(0, 0, 0, 0.85); }
+        .sub_para { color: rgba(0, 0, 0, 0.50); }
+        .forward_icon { color: #7a7878 !important; }
+    }
+}

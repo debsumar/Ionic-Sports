@@ -18,6 +18,9 @@
           <button class="action-btn" (click)="gotoEditMatch()">
             <ion-icon name="create"></ion-icon>
           </button>
+          <button class="action-btn" (click)="gotoEmailPage()">
+            <ion-icon name="mail"></ion-icon>
+          </button>
           <button class="action-btn danger" (click)="deleteConfirm()">
             <ion-icon name="trash"></ion-icon>
           </button>
@@ -37,6 +40,26 @@
         <span class="result-score" *ngIf="match.home_team_score || match.away_team_score">{{match.home_team_score || '0'}} - {{match.away_team_score || '0'}}</span>
       </div>
 
+      <!-- Result Card (winner + score), mirrors web admin -->
+      <div class="result-card" *ngIf="match.ResultStatus === 1 && parsedResult">
+        <div class="result-header"><ion-icon name="trophy"></ion-icon> Result</div>
+        <div class="result-scoreboard">
+          <div class="result-player" [class.winner]="resultWinnerSide === 'home'">
+            <span class="result-name">{{match.homeUserName || 'Home'}}</span>
+            <span class="result-sets">{{getResultSetsWon('home')}}</span>
+          </div>
+          <span class="result-vs">vs</span>
+          <div class="result-player" [class.winner]="resultWinnerSide === 'away'">
+            <span class="result-name">{{match.awayUserName || 'Away'}}</span>
+            <span class="result-sets">{{getResultSetsWon('away')}}</span>
+          </div>
+        </div>
+        <div class="result-score-line" *ngIf="resultScoreText">{{resultScoreText}}</div>
+        <div class="result-winner-badge" *ngIf="resultWinnerName">
+          <ion-icon name="trophy"></ion-icon> {{resultWinnerName}} wins
+        </div>
+      </div>
+
       <!-- Home vs Away Scoreboard -->
       <div class="vs-header" *ngIf="match.homeUserName || match.awayUserName">
         <span class="vs-name home">{{match.homeUserName || 'TBD'}}</span>
@@ -52,19 +75,26 @@
         <div class="mp-side">
           <div class="mp-side-header">
             <span class="mp-side-label">HOME</span>
-            <button class="mp-add-btn" (click)="gotoMatchInvitePlayers()">
+            <button class="mp-add-btn" (click)="gotoMatchInvitePlayers('home')">
               <ion-icon name="add"></ion-icon> Add
             </button>
           </div>
           <div class="mp-player-row" *ngFor="let p of homePlayers">
             <span class="mp-player-name">{{p.name}}</span>
-            <span class="mp-status" [class.confirmed]="p.ParticipationStatus === 1" [class.pending]="p.ParticipationStatus !== 1"
-              (click)="updatePlayerStatus(p, p.ParticipationStatus === 1 ? 0 : 1)">
-              {{p.ParticipationStatus === 1 ? 'Confirmed' : 'Pending'}}
+            <span class="mp-status" [class.confirmed]="p.ParticipationStatus === 1" [class.declined]="p.ParticipationStatus === 2"
+              [class.pending]="p.ParticipationStatus !== 1 && p.ParticipationStatus !== 2">
+              {{getStatusLabel(p.ParticipationStatus)}}
             </span>
-            <button class="mp-remove-btn" (click)="updatePlayerStatus(p, 2)">
-              <ion-icon name="close"></ion-icon>
-            </button>
+            <div class="mp-actions">
+              <button class="mp-action confirm" *ngIf="p.ParticipationStatus !== 1 && confirmedCount < maxConfirmed"
+                (click)="updatePlayerStatus(p, 1)" title="Confirm">
+                <ion-icon name="checkmark"></ion-icon>
+              </button>
+              <button class="mp-action decline" *ngIf="p.ParticipationStatus !== 2"
+                (click)="updatePlayerStatus(p, 2)" title="Decline">
+                <ion-icon name="close"></ion-icon>
+              </button>
+            </div>
           </div>
           <p class="mp-empty" *ngIf="homePlayers.length === 0">No players added</p>
         </div>
@@ -73,19 +103,26 @@
         <div class="mp-side">
           <div class="mp-side-header">
             <span class="mp-side-label">AWAY</span>
-            <button class="mp-add-btn" (click)="gotoMatchInvitePlayers()">
+            <button class="mp-add-btn" (click)="gotoMatchInvitePlayers('away')">
               <ion-icon name="add"></ion-icon> Add
             </button>
           </div>
           <div class="mp-player-row" *ngFor="let p of awayPlayers">
             <span class="mp-player-name">{{p.name}}</span>
-            <span class="mp-status" [class.confirmed]="p.ParticipationStatus === 1" [class.pending]="p.ParticipationStatus !== 1"
-              (click)="updatePlayerStatus(p, p.ParticipationStatus === 1 ? 0 : 1)">
-              {{p.ParticipationStatus === 1 ? 'Confirmed' : 'Pending'}}
+            <span class="mp-status" [class.confirmed]="p.ParticipationStatus === 1" [class.declined]="p.ParticipationStatus === 2"
+              [class.pending]="p.ParticipationStatus !== 1 && p.ParticipationStatus !== 2">
+              {{getStatusLabel(p.ParticipationStatus)}}
             </span>
-            <button class="mp-remove-btn" (click)="updatePlayerStatus(p, 2)">
-              <ion-icon name="close"></ion-icon>
-            </button>
+            <div class="mp-actions">
+              <button class="mp-action confirm" *ngIf="p.ParticipationStatus !== 1 && confirmedCount < maxConfirmed"
+                (click)="updatePlayerStatus(p, 1)" title="Confirm">
+                <ion-icon name="checkmark"></ion-icon>
+              </button>
+              <button class="mp-action decline" *ngIf="p.ParticipationStatus !== 2"
+                (click)="updatePlayerStatus(p, 2)" title="Decline">
+                <ion-icon name="close"></ion-icon>
+              </button>
+            </div>
           </div>
           <p class="mp-empty" *ngIf="awayPlayers.length === 0">No players added</p>
         </div>

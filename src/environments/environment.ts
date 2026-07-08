@@ -1,5 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   email_url: "http://54.84.255.41:8121/",
   //emailUrl: "http://localhost:32683/";
   node_url: "https://activitypro-node.appspot.com",
@@ -15,6 +15,7 @@ export const environment = {
   SuperAdminKey: "-KoGLONcroK1vB02b9Gg",
   graphql_url: "https://api-dev.activitypro.co.uk/graphql",
   new_graphql_url: "https://api-dev.activitypro.co.uk:1026/graphql",
+  gateway_secured: "https://api-dev-sec.activitypro.co.uk",
   // new_graphql_url: "http://localhost:9000/graphql",
   android_onesignal_id: "",
   ios_onesignal_id: "",

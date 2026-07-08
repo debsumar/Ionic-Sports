@@ -30,7 +30,6 @@ export class SessionMonthlyCreationList {
   postgre_session_input:MonthlySessionCreate;
   installmentObj = {}; ///added by vinod
   ParentClubName:string = "";
-  nestUrl:string = "";
   feesObject = {
     AmountForOneDayPerWeekForMember: '10.00',
     AmountForOneDayPerWeekForNonMember: '12.00',
@@ -135,7 +134,6 @@ export class SessionMonthlyCreationList {
     this.postgre_session_input = new MonthlySessionCreate(session_part1);
     this.postgre_session_input.session_postgre_fields.parentclub_id = this.sharedservice.getPostgreParentClubId();
     console.log(this.postgre_session_input);
-    this.nestUrl = sharedservice.getnestURL();
     //this.days = this.postgre_session_input.days;
     console.log(this.sessionDetailsObject);
     this.sessionDetailsObject.PaymentOption = this.sessionDetailsObject.PaymentOption;

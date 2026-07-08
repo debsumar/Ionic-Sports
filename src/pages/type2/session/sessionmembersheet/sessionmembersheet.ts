@@ -21,7 +21,6 @@ import { ReportMembers, ReportModel_V1 } from '../../../../shared/model/report.m
 })
 export class SessionmembersheetPage {
   sessionInfo: any = "";
-  nestUrl = "";
   actionSheet: any = {
     StartDate: '',
     EndDate: '',
@@ -78,7 +77,6 @@ export class SessionmembersheetPage {
     public navParams: NavParams,public storage:Storage, 
     public commonService: CommonService,
     private graphqlService:GraphqlService) {
-    this.nestUrl = this.sharedservice.getnestURL();
     
     this.checkedFilterBoxes.add('FirstName');
     this.checkedFilterBoxes.add('LastName');
@@ -239,7 +237,6 @@ export class SessionmembersheetPage {
       this.commonService.showLoader("Please wait")
       this.report_obj.msg_body = `<p> Hello ${this.report_obj.parentclub_name},</p><p style="margin:1px">Please find below the link for the report.</p><p>Note: The link will be disabled after 3 days. </p>`;
       this.report_obj.attachment_name = `Member Session@${this.report_obj.parentclub_name+ new Date().getTime()}`;
-      let url = this.sharedservice.getEmailUrl();
       //this.selectOBj.toAddress="akkellivinod@gmail.com";//need to remove
       
       const report_mutation = gql`

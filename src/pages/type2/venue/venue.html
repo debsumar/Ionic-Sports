@@ -1,0 +1,52 @@
+<ion-header>
+    <ion-navbar>
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+            <ion-icon name="apps"></ion-icon>
+        </button>
+        <ion-title>
+            Venue
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()">
+                <img src="assets/images/home.svg" class="home_btn">
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)">
+                <ion-icon name="more"></ion-icon>
+            </button>
+            <button ion-button icon-only (click)="enableReorder()">
+                {{navText}}
+            </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+    <div class="venue-list-wrap">
+        <!-- 📋 Venue listing (reorder preserved on ion-item-group) -->
+        <ion-list>
+            <ion-item-group *ngIf="clubs.length>0" [reorder]=reOrderToggle (ionItemReorder)="reorderItems($event)">
+                <div *ngFor="let item of clubs; let i =index;" (click)="presentActionSheet(item)" class="venue-card">
+                    <ion-item>
+                        <div class="venue-accent"></div>
+                        <h2 class="venue-name">{{item.ClubName}} <span class="venue-short">({{item.ClubShortName}})</span></h2>
+                        <p class="venue-desc">{{item.ClubDescription}}</p>
+                    </ion-item>
+                </div>
+            </ion-item-group>
+        </ion-list>
+
+        <!-- 🈳 Empty state -->
+        <div class="empty-state" *ngIf="clubs.length == 0">
+            <ion-icon name="pin" class="empty-icon"></ion-icon>
+            <p class="empty-title">No Venues Yet</p>
+            <p class="empty-sub">Tap + to add your first venue</p>
+        </div>
+    </div>
+
+    <ion-fab right bottom (tap)="this.navCtrl.push('AddNewVenue')">
+        <button ion-fab mini class="add-fab">
+            <ion-icon name="add"></ion-icon>
+        </button>
+    </ion-fab>
+</ion-content>

@@ -31,7 +31,7 @@ import { API } from "../../../../shared/constants/api_constants";
 import { UpdateTeamMemberFieldsModel } from "../team.model";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { LeaguePlayerInviteStatus } from "../../../../shared/utility/enums";
-
+import { ModuleTypeForEmail } from "../../mailtomemberbyadmin/mailtomemberbyadmin";
 
 /**
  * Generated class for the TeamdetailsPage page.
@@ -286,13 +286,60 @@ export class TeamdetailsPage {
   }
 
   gotoMemberemailPage() {
-    this.navCtrl.push("MemberemailPage", { "staff": this.staffs });
-
+    //this.navCtrl.push("MemberemailPage", { "staff": this.staffs });
+    if (this.staffs && this.staffs.length > 0) {
+      const member_list = this.staffs.map(s => ({
+        IsChild: false,
+        ParentId: "",
+        MemberId: s.postgres_user_id || s.id,
+        MemberEmail: s.StaffDetail && s.StaffDetail.email && s.StaffDetail.email !== "" && s.StaffDetail.email !== "-" && s.StaffDetail.email !== "n/a"
+          ? s.StaffDetail.email
+          : "",
+        MemberName: (s.StaffDetail && s.StaffDetail.name) ? s.StaffDetail.name : ""
+      }));
+      const email_modal = {
+        module_info: {
+          module_id: this.team.Id,
+          module_booking_club_name: this.team.club ? this.team.club.ClubName : "",
+          module_booking_name: this.team.TeamName,
+          module_booking_start_date: ""
+        },
+        email_users: member_list,
+        type: ModuleTypeForEmail.MEMBER
+      };
+      this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No staff member(s) found", 2500, ToastMessageType.Error);
+    }
   }
 
 
   gotoMultiplayeremailPage() {
-    this.navCtrl.push("MultiplayeremailPage", { "players": this.participants })
+    //this.navCtrl.push("MultiplayeremailPage", { "players": this.participants })
+    if (this.participants && this.participants.length > 0) {
+      const member_list = this.participants.map(p => ({
+        IsChild: p.user.is_child || false,
+        ParentId: p.user.is_child ? (p.user.parent_key || "") : "",
+        MemberId: p.user.Id,
+        MemberEmail: p.user.EmailID && p.user.EmailID !== "" && p.user.EmailID !== "-" && p.user.EmailID !== "n/a"
+          ? p.user.EmailID
+          : "",
+        MemberName: p.user.FirstName + " " + p.user.LastName
+      }));
+      const email_modal = {
+        module_info: {
+          module_id: this.team.Id,
+          module_booking_club_name: this.team.club ? this.team.club.ClubName : "",
+          module_booking_name: this.team.TeamName,
+          module_booking_start_date: ""
+        },
+        email_users: member_list,
+        type: ModuleTypeForEmail.MEMBER
+      };
+      this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
+    } else {
+      this.commonService.toastMessage("No player(s) found", 2500, ToastMessageType.Error);
+    }
   }
 
   get activeTabIndex(): number { return this.playerType ? 0 : 1; }

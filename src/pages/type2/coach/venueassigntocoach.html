@@ -1,0 +1,87 @@
+<ion-header *ngIf="themeType == 1">
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Manage Coach</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)"> 
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-header>
+    <ion-navbar *ngIf="themeType == 2">
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+      <ion-icon name="apps"></ion-icon>
+    </button>
+        <ion-title>
+            Manage Coach
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()">
+                 <img src="assets/images/home.svg" class="home_btn">
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)"> 
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <div class="coach-header" *ngIf="tempCoachObj">
+        <span class="coach-header-name">{{tempCoachObj.FirstName}} {{tempCoachObj.LastName}}</span>
+        <span class="coach-header-label">Assign Venues &amp; Activities</span>
+    </div>
+    <div class="venue-list">
+        <primary-card class="venue-card" *ngFor="let item of clubs" accentColor="#2b92bb">
+            <div class="venue-card-body">
+
+                <!-- Accordion header — tap to expand/collapse -->
+                <div class="venue-head" (click)="item._expanded = !item._expanded">
+                    <div class="venue-head-left">
+                        <ion-icon
+                            [name]="item._expanded ? 'ios-arrow-down' : 'ios-arrow-forward'"
+                            class="venue-chevron">
+                        </ion-icon>
+                        <span class="venue-name">{{item.ClubName}}</span>
+                        <span class="venue-activity-count" *ngIf="item.Activities?.length">
+                            {{item.Activities.length}}
+                        </span>
+                    </div>
+                    <app-checkbox
+                        class="venue-check"
+                        [checked]="item.IsSelected"
+                        [disabled]="item.disabled"
+                        (checkedChange)="onVenueToggle(item, $event)"
+                        (click)="$event.stopPropagation()">
+                    </app-checkbox>
+                </div>
+
+                <!-- Accordion body — only rendered when expanded -->
+                <div class="venue-activities" *ngIf="item._expanded">
+                    <div class="no-activity" *ngIf="!item.Activities || item.Activities.length === 0">
+                        No activities available
+                    </div>
+                    <div class="activity-row" *ngFor="let inneritem of item.Activities">
+                        <span class="activity-name">{{inneritem.ActivityName}}</span>
+                        <app-checkbox
+                            class="activity-check"
+                            [checked]="inneritem.IsSelected"
+                            [disabled]="inneritem.disabled"
+                            (checkedChange)="onActivityToggle(item, inneritem, $event)">
+                        </app-checkbox>
+                    </div>
+                </div>
+
+            </div>
+        </primary-card>
+        <app-empty-state *ngIf="!clubs || clubs.length === 0" icon="business" text="No venues available"></app-empty-state>
+    </div>
+</ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <button class="cancel-btn" (click)="cancelVenueToCoach()">Cancel</button>
+    <app-glass-button label="Save" (btnClick)="assignVenueToCoach()"></app-glass-button>
+</ion-footer>

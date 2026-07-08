@@ -1,0 +1,76 @@
+
+<ion-header *ngIf="themeType == 1">
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Assign Activity</ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-header>
+    <ion-navbar *ngIf="themeType == 2">
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+      <ion-icon name="apps"></ion-icon>
+    </button>
+        <ion-title>
+            Assign Activity
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()">
+                 <img src="assets/images/home.svg" class="home_btn">
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+
+    <!-- 📋 Activity selection list -->
+    <div class="activity-list">
+        <primary-card class="activity-card" *ngFor="let item of activity;let i = index" accentColor="#2b92bb"
+            (cardClick)="onActivityToggle(item)">
+            <div class="activity-card-content">
+                <div class="activity-thumb">
+                    <img class="iconStyle" [src]="item.ActivityImageURL">
+                </div>
+                <span class="activity-name">{{item.ActivityName}}</span>
+                <ion-checkbox class="activity-check" color="primary" id="card{{i}}"
+                    [disabled]=item.isForUpdate [(ngModel)]="item.isSelect"></ion-checkbox>
+            </div>
+        </primary-card>
+    </div>
+
+    <!-- ✅ Confirmation modal -->
+    <div id="myModal1" class="modal2" *ngIf="showMembershipModal">
+        <ion-row>
+            <ion-col>
+                <p class="p1">Selected Activities</p>
+                <p class="p2" *ngFor="let act of selectedActivity ">
+                    {{act.ActivityName}}
+                </p>
+            </ion-col>
+        </ion-row>
+        <ion-row class="rowbtn">
+            <ion-col col-6>
+                <button ion-button block class="modal-cancel-btn" (click)="this.showMembershipModal = false">cancel</button>
+            </ion-col>
+            <ion-col col-6>
+                <button ion-button block class="modal-confirm-btn" (click)="save()">confirm</button>
+            </ion-col>
+        </ion-row>
+    </div>
+</ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <button class="cancel-btn" (click)="cancelVenue()">Cancel</button>
+    <app-glass-button label="Save" (btnClick)="prompt()"></app-glass-button>
+</ion-footer>

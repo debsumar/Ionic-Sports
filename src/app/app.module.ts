@@ -31,6 +31,7 @@ import { CommonLeagueService } from "../pages/type2/league/commonleague.service"
 import { ThemeService } from "../services/theme.service";
 import { HttpService } from "../services/http.service";
 import { ParentClubService } from "../services/parentclub.service";
+import { FeatureAnnouncementService } from "../services/feature-announcement.service";
   
        
 
@@ -80,6 +81,7 @@ import { MapPickerModalComponent } from '../shared/components/map-picker/map-pic
     ThemeService,
     HttpService,
     ParentClubService,
+    FeatureAnnouncementService,
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,

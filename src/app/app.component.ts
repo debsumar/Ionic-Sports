@@ -18,8 +18,6 @@ import { OneSignal } from "@ionic-native/onesignal";
 import { Device } from "@ionic-native/device";
 //import { Keyboard } from '@ionic-native/keyboard';
 
-
-
 @Component({
   templateUrl: "app.html",
   providers: [SharedServices, FirebaseService, CommonService, LanguageService],
@@ -43,9 +41,9 @@ export class MyApp {
     //private keyboard: Keyboard,
     //private androidPermissions: AndroidPermissions,
     private oneSignal: OneSignal,
-    private device: Device // public cache: CacheService
+    private device: Device, // public cache: CacheService
   ) {
-    let isProduction = true;
+    let isProduction = false;
     let emailUrl = "";
     let nodeURL = "";
     let nestURL = "";
@@ -67,20 +65,23 @@ export class MyApp {
       group_sessionsUrl = "https://ap-prod-sessions-api.activitypro.co.uk";
       group_session_apikey = "XzLw7GFdClJWa2vO3lwm8V6y2FGxdPO40KxsrJO4";
       aws_cloudfrontURL = "https://d1ybtjfafmsyx2.cloudfront.net";
-      aws_presignedUrl = "https://k26gihyg2c.execute-api.eu-west-2.amazonaws.com/prod/generatesignedurl";
+      aws_presignedUrl =
+        "https://k26gihyg2c.execute-api.eu-west-2.amazonaws.com/prod/generatesignedurl";
       SuperAdminKey = "-KxumnfpRwRV--yZ5PVu";
-      graphql_url = "https://applus-api.activitypro.co.uk/graphql"
+      graphql_url = "https://applus-api.activitypro.co.uk/graphql";
     } else {
       emailUrl = "http://54.84.255.41:8121/";
       //  emailUrl = "http://localhost:32683/";
       nodeURL = "https://activitypro-node.appspot.com";
-      nestURL = "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV"
-      group_sessionsUrl = "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV";
+      nestURL = "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV";
+      group_sessionsUrl =
+        "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV";
       group_session_apikey = "";
       aws_cloudfrontURL = "https://d2ert9om2cv970.cloudfront.net";
-      aws_presignedUrl = "https://i97kakk5tk.execute-api.eu-west-2.amazonaws.com/Dev/generatesignedurl";
+      aws_presignedUrl =
+        "https://i97kakk5tk.execute-api.eu-west-2.amazonaws.com/Dev/generatesignedurl";
       SuperAdminKey = "-KoGLONcroK1vB02b9Gg";
-      graphql_url = "https://api-dev.activitypro.co.uk/graphql"
+      graphql_url = "https://api-dev.activitypro.co.uk/graphql";
     }
 
     //intialize url
@@ -99,37 +100,39 @@ export class MyApp {
   }
 
   initializeApp() {
-    this.platform.ready().then(() => {
-      //this.fb.loginToFirebaseAuth().then((val)=>{
-      this.statusBar.backgroundColorByHexString("#f7f7f7"); //#f7f7f7
-      this.statusBar.styleDefault();
-      //this.keyboard.disableScroll(false);
-      //this.splashScreen.hide();
-      // this.androidPermissions.requestPermissions([
-      //   this.androidPermissions.PERMISSION.CALL_PHONE,
-      // ]);
-      this.setRootPage();//need to remove this while build
-      this.getAppVersion();
-      this.ga
-        .startTrackerWithId("UA-92902306-1")
-        .then(() => {
-          console.log("analytics working");
-        })
-        .catch((e) => console.log("Error starting GoogleAnalytics == " + e));
-      // this.fb.update("StripeConfigDetails", "ActivityPro", {
-      //   AuthURL: 'https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_FmNovlkp34sE0FGQ2jQe68tbkywu8kBi&scope=read_write',
-      //   IsActive: true,
-      //   IsEnable: true,
-      //   CreatedDate: new Date().getTime()
-      // })
-      // }).catch((err)=>{
-      //   console.log(err);
-      // });
-    }).catch((err) => {
-      console.log(err);
-    })
+    this.platform
+      .ready()
+      .then(() => {
+        //this.fb.loginToFirebaseAuth().then((val)=>{
+        this.statusBar.backgroundColorByHexString("#f7f7f7"); //#f7f7f7
+        this.statusBar.styleDefault();
+        //this.keyboard.disableScroll(false);
+        //this.splashScreen.hide();
+        // this.androidPermissions.requestPermissions([
+        //   this.androidPermissions.PERMISSION.CALL_PHONE,
+        // ]);
+        this.setRootPage(); //need to remove this while build
+        this.getAppVersion();
+        this.ga
+          .startTrackerWithId("UA-92902306-1")
+          .then(() => {
+            console.log("analytics working");
+          })
+          .catch((e) => console.log("Error starting GoogleAnalytics == " + e));
+        // this.fb.update("StripeConfigDetails", "ActivityPro", {
+        //   AuthURL: 'https://connect.stripe.com/oauth/authorize?response_type=code&client_id=ca_FmNovlkp34sE0FGQ2jQe68tbkywu8kBi&scope=read_write',
+        //   IsActive: true,
+        //   IsEnable: true,
+        //   CreatedDate: new Date().getTime()
+        // })
+        // }).catch((err)=>{
+        //   console.log(err);
+        // });
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   }
-
 
   //comparing app version
   getAppVersion() {
@@ -175,7 +178,8 @@ export class MyApp {
           if (data.length > 0 && data[0].version_switch) {
             this.appVersion.getVersionNumber().then((appversion) => {
               let presentVersion = appversion.toString().split(".").join("0");
-              let appstoreVersion = data[0].new_admin_version.toString()
+              let appstoreVersion = data[0].new_admin_version
+                .toString()
                 .split(".")
                 .join("0");
               if (appversion) {
@@ -324,11 +328,11 @@ export class MyApp {
   async initializeOnesignal() {
     this.oneSignal.startInit(
       "8f298d26-1615-428d-95a5-3efed91ef927",
-      "61019039619"
+      "61019039619",
     );
 
     this.oneSignal.inFocusDisplaying(
-      this.oneSignal.OSInFocusDisplayOption.InAppAlert
+      this.oneSignal.OSInFocusDisplayOption.InAppAlert,
     );
 
     this.oneSignal.handleNotificationReceived().subscribe(() => {
@@ -349,5 +353,3 @@ export class MyApp {
     });
   }
 }
-
-

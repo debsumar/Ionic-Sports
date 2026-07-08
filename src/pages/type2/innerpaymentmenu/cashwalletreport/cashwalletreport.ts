@@ -1,0 +1,129 @@
+import { Component, ViewChildren, ViewChild } from '@angular/core';
+import { IonicPage, NavController, NavParams, Slides, AlertController, ActionSheetController, Platform, Label, ModalController, ToastController, FabContainer, LoadingController, Events } from 'ionic-angular';
+// import * as moment from 'moment';
+import { Storage } from '@ionic/storage';
+import { FirebaseService } from '../../../../services/firebase.service';
+import { SharedServices } from '../../../services/sharedservice';
+import { CommonService } from '../../../../services/common.service';
+import { HttpClient } from '@angular/common/http';
+import { HttpService } from '../../../../services/http.service';
+import { API } from '../../../../shared/constants/api_constants';
+import { ThemeService } from '../../../../services/theme.service';
+
+@IonicPage()
+@Component({
+    selector: 'page-cashwalletreport',
+    templateUrl: 'cashwalletreport.html',
+})
+export class CashWalletReport {
+    @ViewChild('fab')fab : FabContainer;
+    platform:string = "";
+    ParentClubKey: any;
+   
+    currencyDetails: any;
+    
+    loading: any;
+    totalParentClubBalance: any;
+    totalParentClubData = [];
+    isDarkTheme: boolean = true;
+
+    constructor(
+        public alertCtrl: AlertController,
+        public navCtrl: NavController,
+        public modalController: ModalController,
+        private fb: FirebaseService,
+        public actionSheetCtrl: ActionSheetController,
+        public storage: Storage,
+        public loadingCtrl : LoadingController,
+        public http:  HttpClient,
+        public sharedservice: SharedServices,
+        public commonService: CommonService,
+        private httpService: HttpService,
+        private events: Events,
+        private themeService: ThemeService
+
+    ) {
+        this.platform = this.sharedservice.getPlatform();
+        storage.get('userObj').then((val) => {
+            val = JSON.parse(val);
+            if (val.$key != "") {
+                this.ParentClubKey = val.UserInfo[0].ParentClubKey;
+                this.getTotalBalance()
+                this.getTotalBalanceReport()
+          
+            }
+
+        })
+        storage.get('Currency').then((val) => {
+            this.currencyDetails = JSON.parse(val);
+        })
+        this.loadTheme();
+    }
+
+
+    getTotalBalance(){
+        this.commonService.showLoader('Please wait...')
+        const url = `${API.WALLET_TOTAL_BALANCE}/${this.ParentClubKey}`;
+        this.httpService.get(url, null, null, 1).subscribe({
+          next: (res) => {
+            this.commonService.hideLoader();
+            if (res['data']){
+              this.totalParentClubBalance = res['data']['totalparentclubBalance'] || 0
+            } else {
+              this.totalParentClubBalance = 0
+            }
+          },
+          error: (err) => {
+            this.commonService.hideLoader()
+            this.totalParentClubBalance = 0
+          }
+        })
+    }
+
+    getTotalBalanceReport(){
+        const url = `${API.WALLET_PAYMENT_REPORT}/${this.ParentClubKey}`;
+        this.httpService.get(url, null, null, 1).subscribe({
+          next: (res) => {
+            if (res['data']){
+              this.totalParentClubData = res['data']
+            }
+          },
+          error: (err) => {
+            this.totalParentClubData = []
+          }
+        })
+    }
+
+    gotoMainReport(){
+      this.navCtrl.push('WalletReportByDate', {totalParentClubBalance:this.totalParentClubBalance})
+    }
+    getRound(number){
+      return parseFloat(number).toFixed(2)
+    }
+
+    loadTheme() {
+      this.storage.get('dashboardTheme').then((isDarkTheme) => {
+        this.isDarkTheme = isDarkTheme !== null ? isDarkTheme : true;
+        this.applyTheme();
+      }).catch(() => {
+        this.isDarkTheme = true;
+        this.applyTheme();
+      });
+      this.events.subscribe('theme:changed', (isDark) => {
+        this.isDarkTheme = isDark;
+        this.applyTheme();
+      });
+    }
+
+    applyTheme() {
+      const el = document.querySelector('page-cashwalletreport');
+      if (el) {
+        if (this.isDarkTheme) {
+          el.classList.remove('light-theme');
+        } else {
+          el.classList.add('light-theme');
+        }
+      }
+    }
+    
+}

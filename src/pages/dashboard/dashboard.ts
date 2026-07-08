@@ -1,5 +1,6 @@
 import { FirebaseService } from "../../services/firebase.service";
-import { Component } from "@angular/core";
+import { Component, ViewChild } from "@angular/core";
+import { FeatureAnnouncementModalComponent } from "../../shared/components/feature-announcement-modal/feature-announcement-modal.component";
 import { Events, Platform } from "ionic-angular";
 import {
   NavController,
@@ -30,6 +31,8 @@ import { AppType } from "../../shared/constants/module.constants";
   templateUrl: "dashboard.html",
 })
 export class Dashboard {
+  @ViewChild(FeatureAnnouncementModalComponent)
+  featureAnnouncementModal: FeatureAnnouncementModalComponent;
   footermenu: Array<any> = [];
   Tempfootermenu: Array<any> = [
     { DisplayName: "Home", Icon: "home", Component: "Dashboard" },
@@ -957,12 +960,19 @@ export class Dashboard {
     });          
   }
 
+  checkFeatureAnnouncements(parentClubId: string) {
+    if (this.featureAnnouncementModal && parentClubId) {
+      this.featureAnnouncementModal.check(parentClubId);
+    }
+  }
+
   getPostgreParentclub(){
     this.parentClubService.getParentClubDetails(1,this.userData.UserInfo[0].ParentClubKey).subscribe({
       next: (res: any) => {
         if (res && res.data) {
           this.sharedService.setPostgreParentClubId(res.data["Id"]);
           this.storage.set("postgre_parentclub", res.data);
+          this.checkFeatureAnnouncements(res.data["Id"]);
           this.getSessionDetails();
           this.getTermSessionEnrolDetails();
           this.getSchoolSessionEnrolDets();

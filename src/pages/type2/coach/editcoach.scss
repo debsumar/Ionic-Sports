@@ -1,0 +1,129 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
+editcoach-page {
+    @include android-sdk35-fixes;
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+    }
+
+    .form-wrap {
+        padding: 8px 10px 16px;
+    }
+
+    // ===== Center select / datetime values vertically =====
+    app-form-field ion-select,
+    app-form-field ion-datetime {
+        display: flex !important;
+        align-items: center !important;
+        min-height: 24px;
+    }
+    app-form-field ion-select .select-text,
+    app-form-field ion-select .select-icon,
+    app-form-field ion-datetime .datetime-text {
+        align-self: center !important;
+    }
+    app-form-field ion-item .item-inner,
+    app-form-field ion-item .input-wrapper {
+        align-items: center !important;
+    }
+
+    .help_btn {
+        padding: 0px !important;
+        font-size: 24px !important;
+        margin: 0px !important;
+        height: 42px !important;
+        width: 42px;
+        color: #35adff !important;
+    }
+
+    // ===== Toggle rows =====
+    .toggle-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 12px 4px 6px;
+    }
+    .access-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 8px 14px;
+        border-radius: 12px;
+        background: #1e293b;
+        border: 1px solid #334155;
+    }
+    .access-name {
+        font-size: 15px;
+        font-weight: 500;
+        color: #f1f5f9;
+    }
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+        &.light-theme { background: #f8fafc; }
+    }
+    .footer-actions {
+        display: flex;
+        align-items: center;
+        padding: 6px 10px;
+        gap: 10px;
+    }
+    .ghost-btn {
+        flex: 1;
+        height: 48px;
+        border-radius: 8px;
+        font-weight: 700;
+        font-size: 16px;
+        letter-spacing: 0.5px;
+        background: transparent;
+        color: #cbd5e1;
+        border: 1px solid #334155;
+        cursor: pointer;
+    }
+    .ghost-btn:active { transform: scale(0.98); }
+    .update-btn {
+        flex: 1;
+        .glass-btn-wrap {
+            position: static !important;
+            padding: 0 !important;
+        }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .access-row {
+            background: #ffffff;
+            border-color: #e2e8f0;
+        }
+        .access-name { color: #1e293b; }
+
+        .help_btn { color: #2b92bb !important; }
+
+        .ghost-btn {
+            color: #475569;
+            border-color: #cbd5e1;
+        }
+
+        ion-footer { background: #f8fafc; }
+    }
+}

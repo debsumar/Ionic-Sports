@@ -1,7 +1,6 @@
 import { Component } from "@angular/core";
 import {
   IonicPage,
-  LoadingController,
   NavController,
   NavParams,
   PopoverController,
@@ -52,6 +51,7 @@ export class CreatematchPage {
   selectedDuration: number;
   currency: string;
   isRecurring: boolean = false;
+  isChecked: boolean = false;
   recurringUntilWhen: string = moment().add(1, 'week').format('YYYY-MM-DD');
   teamList: TeamsForParentClubModel[] = [];
   selectedHomeTeamId: string = '';
@@ -139,7 +139,6 @@ export class CreatematchPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     public commonService: CommonService,
-    public loadingCtrl: LoadingController,
     public storage: Storage,
     public fb: FirebaseService,
     public sharedservice: SharedServices,
@@ -198,7 +197,6 @@ export class CreatematchPage {
     this.themeService.isDarkTheme$.subscribe(isDark => {
       this.applyTheme(isDark);
     });
-    console.log("ionViewDidLoad CreatematchPage");
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
       this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
@@ -248,7 +246,6 @@ export class CreatematchPage {
     this.httpService.post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput).subscribe({
       next: (res: any) => {
         this.leagueCategory = res["data"]
-        console.table(`${this.leagueCategory}`);
         if (this.leagueCategory.length > 0) this.createMatchInput.GameType = 0;
       }
     });
@@ -259,9 +256,6 @@ export class CreatematchPage {
       next: (res: any) => {
         if (res) {
           this.roundTypes = res.data || [];
-          console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
-        } else {
-          console.log("error in fetching")
         }
       }
     });
@@ -274,18 +268,18 @@ export class CreatematchPage {
     });
   }
 
-  changeType(val) {
-    this.publicType = val == "public" ? true : false;
-    //this.privateType = 'private'? true : false;
-    this.createMatchInput.MatchVisibility = val == "private" ? 1 : 0;
+  changeType(isPublic: boolean): void {
+    this.publicType = isPublic;
+    this.createMatchInput.MatchVisibility = isPublic ? 0 : 1;
   }
 
   selectClubName() {
     this.club_activities = [];
   }
 
-  updateMatchPaymentType(isChecked: boolean): void {
-    this.createMatchInput.MatchPaymentType = isChecked ? 1 : 0;
+  updateMatchPaymentType(val: boolean): void {
+    this.isChecked = val;
+    this.createMatchInput.MatchPaymentType = val ? 1 : 0;
   }
 
   getRecurringDayName(): string {
@@ -336,9 +330,11 @@ export class CreatematchPage {
   fetchTeamsForMatch() {
     if (this.teamList.length > 0) return;
     const selectedActivity = this.activities.find(a => a.id === this.activityId);
-    const realActivityId = selectedActivity ? selectedActivity.activity.Id : '';
+    // 🏷️ guard null activity (e.g. club_activity with activity: null) + missing selection
+    const realActivityId = selectedActivity && selectedActivity.activity ? selectedActivity.activity.Id : '';
+    // 🚫 no activity selected yet -> silently skip. This is an auto-trigger (recurring/match-type/init),
+    // not an explicit "load teams" action, so no error toast. Selection is enforced on submit.
     if (!realActivityId) {
-      this.commonService.toastMessage("Select an activity first", 2500, ToastMessageType.Error);
       return;
     }
     const body = {
@@ -359,6 +355,13 @@ export class CreatematchPage {
   }
 
   onRecurringToggle(expanded: boolean) {
+    // 🏷️ require an activity before enabling recurring — revert toggle if none selected
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
+    if (expanded && (!this.activityId || !selectedActivity || !selectedActivity.activity)) {
+      this.commonService.toastMessage("Please select an activity", 2500, ToastMessageType.Error);
+      this.isRecurring = false; // ⛔ keep recurring toggle inactive (pushes expanded=false back to component)
+      return;
+    }
     if (expanded && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
   }
 
@@ -387,6 +390,8 @@ export class CreatematchPage {
 
   onMapLocationSelected(location: any) {
     this.mapLocationAddress = location.address || '';
+    if (location.lat != null) this.mapLocationLat = location.lat;
+    if (location.lng != null) this.mapLocationLng = location.lng;
   }
 
 
@@ -395,11 +400,16 @@ export class CreatematchPage {
     this.commonInput.clubId = this.selectedClub;
     this.httpService.post(`${API.CLUB_ACTIVITIES}`, this.commonInput).subscribe({
       next: (res: any) => {
-        console.log("club activities", JSON.stringify(res.data.club_activities));
         if (res.data.club_activities.length > 0) {
           this.activities = res.data.club_activities;
+<<<<<<< HEAD
           this.activityId = this.activities[0].id;
-          console.log("activity", this.activityId);
+=======
+          // ⛔ Do NOT default to activities[0] — that caused the team API to fetch the first
+          // activity's id (Bar n Restaurant / 522ce10a) instead of the user-selected one.
+          // Keep activityId empty so the placeholder shows and team fetch waits for a real pick.
+          this.activityId = '';
+>>>>>>> dcb505e (reccuring match bug fix teams not getting assigned while creting)
           if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
         }
       }
@@ -407,6 +417,12 @@ export class CreatematchPage {
   }
 
   validateInput() {
+    // 🏷️ activity must be selected (no default anymore) — prevents NPE in saveMatchDetails
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
+    if (!this.activityId || !selectedActivity || !selectedActivity.activity) {
+      this.commonService.toastMessage("Please select an activity", 2500, ToastMessageType.Error);
+      return false;
+    }
     if (this.startTime == "" || this.startTime == undefined) {
       const message = "Please enter a valid start date";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
@@ -450,7 +466,6 @@ export class CreatematchPage {
       try {
         this.commonService.showLoader("Please wait...");
         const postgreClub = this.clubs.find(clubName => clubName.Id === this.selectedClub);
-        console.log("club", postgreClub);
         this.createMatchInput.MatchVenueKey = postgreClub.FirebaseId;
         this.createMatchInput.MatchVenueName = postgreClub.ClubName;
         this.createMatchInput.MatchVenueId = postgreClub.Id;
@@ -466,13 +481,10 @@ export class CreatematchPage {
         this.createMatchInput.MatchEndDate = moment(
           new Date(this.startDate + " " + '23:59').getTime()
         ).format("YYYY-MM-DD HH:mm");
-        console.log(JSON.stringify(this.createMatchInput));
-        console.log(new Date(this.startDate + " " + 'this.startTime').getTime());
         this.createMatchInput.GameType = Number(this.createMatchInput.GameType);
         this.createMatchInput.MatchType = +this.createMatchInput.MatchType;
         const selectedDur = this.durations.find(d => d.id === this.selectedDuration);
         this.createMatchInput.MatchDuration = selectedDur ? String(selectedDur.duration) : '';
-        console.log("MATCH Input", JSON.stringify(this.createMatchInput));
 
         const restPayload = {
           parentclubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
@@ -536,7 +548,6 @@ export class CreatematchPage {
           this.commonService.hideLoader();
           const msg = (err.error && err.error.message) ? err.error.message : "Match creation failed";
           this.commonService.toastMessage(msg, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
-          console.error("Error:", err);
         })
       } catch (e) {
         this.commonService.hideLoader();
@@ -602,4 +613,3 @@ export class UserDeviceMetadataField {
   UserDeviceType: number
   UpdatedBy: number
 }
-

@@ -1,0 +1,149 @@
+<ion-header *ngIf="themeType == 1">
+    <ion-navbar>
+        <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+        <ion-title>Add </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="presentPopover($event)"> 
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+<ion-header>
+    <ion-navbar *ngIf="themeType == 2">
+        <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+      <ion-icon name="apps"></ion-icon>
+    </button>
+        <ion-title>
+                Add Coach
+        </ion-title>
+        <ion-buttons end>
+            <button ion-button icon-only (click)="goToDashboardMenuPage()">
+                 <img src="assets/images/home.svg" class="home_btn">
+            </button>
+            <button ion-button icon-only (click)="presentPopover($event)"> 
+        <ion-icon name="more"></ion-icon>
+      </button>
+        </ion-buttons>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <ion-list>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>First Name</ion-label>
+                <ion-input type="text" rows="1" [(ngModel)]="coachDetailsObj.FirstName"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Last Name</ion-label>
+                <ion-input type="text" rows="1" [(ngModel)]="coachDetailsObj.LastName"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label>Gender</ion-label>
+                <ion-select [(ngModel)]="coachDetailsObj.Gender">
+                    <ion-option value="male">Male</ion-option>
+                    <ion-option value="female">Female</ion-option>
+                </ion-select>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label>DOB</ion-label>
+                <ion-datetime rows="1" displayFormat="MMMM/YYYY" pickerFormat="MMMM YYYY" [(ngModel)]="coachDetailsObj.DOB"></ion-datetime>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label>Language</ion-label>
+                <ion-select [(ngModel)]="selectedLanguageCode">
+                    <ion-option *ngFor="let item of language" value={{item.LanguageCode}}>{{item.LanguageName}}</ion-option>
+                </ion-select>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Email ID</ion-label>
+                <ion-input type="email" rows="1" [(ngModel)]="coachDetailsObj.EmailID"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Phone Number</ion-label>
+                <ion-input type="number" rows="1" [(ngModel)]="coachDetailsObj.PhoneNumber"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>DBS Number</ion-label>
+                <ion-input type="text" rows="1" [(ngModel)]="coachDetailsObj.DBSNumber"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Regd No</ion-label>
+                <ion-input type="text" rows="1" [(ngModel)]="coachDetailsObj.RegistrationNumber"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Recognition</ion-label>
+                <ion-textarea rows="1" [(ngModel)]="coachDetailsObj.Recognition"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Qualification</ion-label>
+                <ion-input type="text" rows="1" [(ngModel)]="coachDetailsObj.Qualification"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Title</ion-label>
+                <ion-input type="text" rows="1" [(ngModel)]="coachDetailsObj.Title"></ion-input>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Coaching Experience</ion-label>
+                <ion-textarea type="text" rows="5" [(ngModel)]="coachDetailsObj.CoachingExperience"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Playing Experience</ion-label>
+                <ion-textarea type="text" rows="5" [(ngModel)]="coachDetailsObj.PlayingExperience"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Strengths</ion-label>
+                <ion-textarea type="text" rows="5" [(ngModel)]="coachDetailsObj.Strengths"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label stacked>Favourite Shot/Move/Position</ion-label>
+                <ion-textarea type="text" rows="3" [(ngModel)]="coachDetailsObj.FavouriteShots"></ion-textarea>
+            </ion-item>
+        </app-form-field>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-label>Allow Loyalty</ion-label>
+                <ion-toggle [(ngModel)]="coachDetailsObj.AllowLoyalty"></ion-toggle>
+            </ion-item>
+        </app-form-field>
+    </ion-list>
+</ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <button class="cancel-btn" (click)="cancelCoach()">Cancel</button>
+    <app-glass-button label="Save" (btnClick)="checkCoachCanSave()"></app-glass-button>
+</ion-footer>

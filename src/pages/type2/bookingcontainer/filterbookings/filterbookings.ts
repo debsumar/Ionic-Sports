@@ -29,7 +29,6 @@ export class FilterbookingsPage {
   currentmonth: string;
   showCalender = false;
   loading: any;
-  nestUrl: any;
   selectedParentClubKey: any;
   selectedClubKey: any;
   clubs: any[];
@@ -51,7 +50,6 @@ export class FilterbookingsPage {
       val = JSON.parse(val);
       for (let user of val.UserInfo) {
         this.selectedParentClubKey = user.ParentClubKey;
-        this.nestUrl = this.sharedService.getnestURL()
       
        
        

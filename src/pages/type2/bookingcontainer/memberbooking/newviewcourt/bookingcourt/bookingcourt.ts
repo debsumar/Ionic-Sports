@@ -30,7 +30,6 @@ import { ThemeService } from '../../../../../../services/theme.service';
 export class BookingCourt {
   @ViewChild(Content) content: Content;
   loading: any;
-  nestUrl: string;
   parentClubKey: any;
   selectedClubKey: any;
   courtSelected: any;
@@ -80,7 +79,6 @@ export class BookingCourt {
   isDarkTheme: boolean = false;
   constructor(public sharedService: SharedServices, public alertCtrl: AlertController, public actionSheetCtrl: ActionSheetController, public toastCtrl: ToastController, public navCtrl: NavController, public navParams: NavParams, public fb: FirebaseService, public storage: Storage, public commonService: CommonService, public http: HttpClient, public loadingCtrl: LoadingController, private httpService: HttpService, private themeService: ThemeService, public events: Events) {
    
-    this.nestUrl = sharedService.getnestURL();
     
   }
 

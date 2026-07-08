@@ -1,0 +1,148 @@
+<ion-header [class.no-month-toolbar]="reportType == 'Due'">
+  <ion-navbar>
+    <button ion-button menuToggle>
+      <ion-icon name="menu"></ion-icon>
+    </button>
+    <ion-title>Membership Report</ion-title>
+    <ion-buttons end>
+      <button ion-button icon-only (click)="presentPopover($event)">
+        <ion-icon name="more"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+  
+  <ion-toolbar no-border-top>
+    <ion-segment [(ngModel)]="reportType">
+      <ion-segment-button value="Paid" (click)="paymentTabClick('Paid')">
+        Paid
+      </ion-segment-button>
+      <ion-segment-button value="Due" (click)="paymentTabClick('Due')">
+        Pending
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="sticky-wrapper">
+    <!-- Date range for Paid tab -->
+    <div *ngIf="reportType == 'Paid'" class="date-range-section">
+      <ion-row>
+        <ion-col col-5>
+          <ion-item class="date-item">
+            <ion-label stacked>From</ion-label>
+            <ion-datetime displayFormat="DD/MM/YY" pickerFormat="DD MM YYYY" [(ngModel)]="startDate"></ion-datetime>
+          </ion-item>
+        </ion-col>
+        <ion-col col-5>
+          <ion-item class="date-item">
+            <ion-label stacked>To</ion-label>
+            <ion-datetime displayFormat="DD/MM/YY" pickerFormat="DD MM YYYY" [(ngModel)]="endDate"></ion-datetime>
+          </ion-item>
+        </ion-col>
+        <ion-col col-2 class="search-btn-col">
+          <button ion-button class="custom-go-btn" (click)="Search()">Go</button>
+        </ion-col>
+      </ion-row>
+    </div>
+
+    <!-- Filters -->
+    <div class="filter-section" *ngIf="reportType == 'Paid'">
+      <div class="filter-row">
+        <div class="filter-content">
+          <ion-select [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()" placeholder="Select Club">
+            <ion-option value="All">{{LangObj.ses_payment_all}}</ion-option>
+            <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
+          </ion-select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-section">
+      <ion-row>
+        <ion-col col-6>
+          <div class="summary-card">
+            <div class="amount">
+              <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>
+              {{reportType == 'Paid' ? TotTrnsAmt : TotDueTrnsAmt}}
+            </div>
+          </div>
+        </ion-col>
+        <ion-col col-6>
+          <div class="summary-card">
+            <div class="count">{{reportType == 'Paid' ? TotTransc : TotDueTransc}}</div>
+            <div class="label">Transactions</div>
+          </div>
+        </ion-col>
+      </ion-row>
+    </div>
+  </div>
+
+  <div class="scrollable-wrapper">
+    <div class="list-section">
+      <!-- Paid Payments -->
+      <div *ngIf="reportType == 'Paid'" class="payment-list">
+        <div class="payment-card" *ngFor="let payment of paidMemberListtemp">
+          <div class="pay-card-row">
+            <div class="pay-left">
+              <div class="pay-name">{{payment.user.FirstName}} {{payment.user.LastName}}</div>
+              <div class="pay-session">{{payment.membership.membership_name}}</div>
+              <div class="pay-time">{{payment.membership_status_text}}</div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-date">{{payment.membership_expiry_date}}</div>
+              <div class="pay-amount pay-amount--paid">
+                <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>{{payment.amount}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Due Payments -->
+      <div *ngIf="reportType == 'Due'" class="payment-list">
+        <div class="payment-card" *ngFor="let payment of dueMemberListtemp">
+          <div class="pay-card-row">
+            <div class="pay-left">
+              <div class="pay-name">{{payment.user.FirstName}} {{payment.user.LastName}}</div>
+              <div class="pay-session">{{payment.membership.membership_name}}</div>
+              <div class="pay-time">{{payment.membership_type_text}}</div>
+            </div>
+            <div class="pay-right">
+              <div class="pay-amount pay-amount--due">
+                <span *ngIf="currencyDetails">{{currencyDetails.CurrencySymbol}}</span>{{payment.amount}}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty States -->
+    <div class="empty-state" *ngIf="reportType == 'Paid' && paidMemberListtemp.length == 0">
+      <img src="assets/images/menu/payment.svg" class="empty-icon">
+      <p>No paid memberships found</p>
+    </div>
+
+    <div class="empty-state" *ngIf="reportType == 'Due' && dueMemberListtemp.length == 0">
+      <img src="assets/images/paymentdue.png" class="empty-icon">
+      <p>No due memberships found</p>
+    </div>
+  </div>
+</ion-content>
+
+<!-- FABs -->
+<ion-fab bottom right *ngIf="paidMemberList.length > 0 || dueMemberList.length > 0">
+  <button ion-fab mini class="fab-btn">
+    <ion-icon name="ios-add"></ion-icon>
+  </button>
+  <ion-fab-list side="top">
+    <button ion-fab class="fab-btn" (click)="sendMailStatus()">
+      <ion-icon name="ios-mail-outline"></ion-icon>
+    </button>
+    <button ion-fab class="fab-btn" (click)="goToPrint()">
+      <ion-icon name="ios-print-outline"></ion-icon>
+    </button>
+  </ion-fab-list>
+</ion-fab>

@@ -1,0 +1,64 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
+page-bookingsetup {
+    @include android-sdk35-fixes;
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+    }
+
+    .booking-list-wrap {
+        padding: 12px 12px 90px;
+    }
+
+    .booking-card {
+        display: block;
+        margin-bottom: 8px;
+    }
+
+    .booking-card-body {
+        padding: 16px;
+
+        .name {
+            text-transform: capitalize;
+            font-weight: 700;
+            color: #f1f5f9 !important;
+            font-size: 18px;
+            margin: 0 !important;
+        }
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+
+        .empty-icon { font-size: 54px; color: #475569; }
+        .empty-title { color: #f1f5f9; font-size: 15px; font-weight: 600; margin-top: 12px; }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .booking-card-body .name { color: #1e293b !important; }
+
+        .empty-state .empty-icon { color: #cbd5e1; }
+        .empty-state .empty-title { color: #1e293b; }
+    }
+}

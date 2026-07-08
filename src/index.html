@@ -49,8 +49,8 @@
   <!-- The main bundle js is generated during the build process -->
   <script src="build/main.js"></script>
 
-  <!-- googleapis -->
-  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpcFMCrpkNA_WXypfOPcBqEgqAr6_DRbE&libraries=places" async defer></script>
+  <!-- googleapis — loading=async matches web app and avoids ApiNotActivatedMapError -->
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDpcFMCrpkNA_WXypfOPcBqEgqAr6_DRbE&libraries=places&loading=async" async defer></script>
 
 </body>
 </html>

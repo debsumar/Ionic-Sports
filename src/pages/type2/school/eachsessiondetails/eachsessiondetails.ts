@@ -1,7 +1,7 @@
 import { FirebaseService } from '../../../../services/firebase.service';
 // import { Member } from './../../Model/MemberModel';
-import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, AlertController, Platform, ActionSheetController, LoadingController, FabContainer } from 'ionic-angular';
+import { Component, ViewChild, Renderer2 } from '@angular/core';
+import { IonicPage, NavController, NavParams, AlertController, Platform, ActionSheetController, LoadingController, FabContainer, Events } from 'ionic-angular';
 import { CommonService, ToastMessageType,ToastPlacement } from '../../../../services/common.service';
 import { Storage } from '@ionic/storage';
 import { CallNumber } from '@ionic-native/call-number';
@@ -12,6 +12,7 @@ import { GraphqlService } from '../../../../services/graphql.service';
 import gql from 'graphql-tag';
 import { SchoolSesEnrolDets } from '../addmembertoschoolsession';
 import { ModuleTypes } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
 /**
  * Generated class for the GroupsessiondetailsPage page.
  *
@@ -63,6 +64,7 @@ export class EachSessionDetailsPage {
     loggedin_key:string;
     loggedin_type:number = 2;
     can_coach_see_revenue:boolean = true;
+    isDarkTheme: boolean = true; // 🌗 Default dark theme
     constructor(
         public loadingCtrl: LoadingController,
         public callNumber: CallNumber,
@@ -76,12 +78,20 @@ export class EachSessionDetailsPage {
         public navParams: NavParams,
         public commonService: CommonService,
         public sharedServices: SharedServices,
-        private graphqlService: GraphqlService
+        private graphqlService: GraphqlService,
+        private renderer: Renderer2,
+        private themeService: ThemeService,
+        public events: Events
     ) {
        
     }
 
     ionViewWillEnter(){
+        // 🌗 Theme setup
+        this.loadTheme();
+        this.themeService.isDarkTheme$.subscribe(isDark => this.applyTheme(isDark));
+        this.events.subscribe('theme:changed', (isDark) => this.applyTheme(isDark));
+
         this.school_session_id = this.navParams.get("sessionObj").id;
         this.loggedin_type = this.sharedServices.getLoggedInType();
         if(this.loggedin_type === 4){
@@ -644,6 +654,25 @@ export class EachSessionDetailsPage {
     ionViewWillLeave(){
         if (this.fab) {
             this.fab.close();
+        }
+        this.events.unsubscribe('theme:changed');
+    }
+
+    // 🌗 Theme: load persisted preference and apply
+    async loadTheme() {
+        const isDarkTheme = await this.storage.get('dashboardTheme');
+        const isDark = isDarkTheme !== null ? isDarkTheme : true;
+        this.isDarkTheme = isDark;
+        this.applyTheme(isDark);
+    }
+
+    // 🌗 Theme: toggle light-theme class on the page element
+    applyTheme(isDark: boolean) {
+        this.isDarkTheme = isDark;
+        const pageElement = document.querySelector('page-eachsessiondetails');
+        if (pageElement) {
+            isDark ? this.renderer.removeClass(pageElement, 'light-theme')
+                   : this.renderer.addClass(pageElement, 'light-theme');
         }
     }
       
