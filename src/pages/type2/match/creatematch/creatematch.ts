@@ -330,9 +330,11 @@ export class CreatematchPage {
   fetchTeamsForMatch() {
     if (this.teamList.length > 0) return;
     const selectedActivity = this.activities.find(a => a.id === this.activityId);
-    const realActivityId = selectedActivity ? selectedActivity.activity.Id : '';
+    // 🏷️ guard null activity (e.g. club_activity with activity: null) + missing selection
+    const realActivityId = selectedActivity && selectedActivity.activity ? selectedActivity.activity.Id : '';
+    // 🚫 no activity selected yet -> silently skip. This is an auto-trigger (recurring/match-type/init),
+    // not an explicit "load teams" action, so no error toast. Selection is enforced on submit.
     if (!realActivityId) {
-      this.commonService.toastMessage("Select an activity first", 2500, ToastMessageType.Error);
       return;
     }
     const body = {
@@ -353,6 +355,13 @@ export class CreatematchPage {
   }
 
   onRecurringToggle(expanded: boolean) {
+    // 🏷️ require an activity before enabling recurring — revert toggle if none selected
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
+    if (expanded && (!this.activityId || !selectedActivity || !selectedActivity.activity)) {
+      this.commonService.toastMessage("Please select an activity", 2500, ToastMessageType.Error);
+      this.isRecurring = false; // ⛔ keep recurring toggle inactive (pushes expanded=false back to component)
+      return;
+    }
     if (expanded && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
   }
 
@@ -393,7 +402,14 @@ export class CreatematchPage {
       next: (res: any) => {
         if (res.data.club_activities.length > 0) {
           this.activities = res.data.club_activities;
+<<<<<<< HEAD
           this.activityId = this.activities[0].id;
+=======
+          // ⛔ Do NOT default to activities[0] — that caused the team API to fetch the first
+          // activity's id (Bar n Restaurant / 522ce10a) instead of the user-selected one.
+          // Keep activityId empty so the placeholder shows and team fetch waits for a real pick.
+          this.activityId = '';
+>>>>>>> dcb505e (reccuring match bug fix teams not getting assigned while creting)
           if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
         }
       }
@@ -401,6 +417,12 @@ export class CreatematchPage {
   }
 
   validateInput() {
+    // 🏷️ activity must be selected (no default anymore) — prevents NPE in saveMatchDetails
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
+    if (!this.activityId || !selectedActivity || !selectedActivity.activity) {
+      this.commonService.toastMessage("Please select an activity", 2500, ToastMessageType.Error);
+      return false;
+    }
     if (this.startTime == "" || this.startTime == undefined) {
       const message = "Please enter a valid start date";
       this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
