@@ -15,10 +15,7 @@ export const environment = {
   new_graphql_url: "https://applus-api.activitypro.co.uk:1026/graphql",
   apigateway_url1:
     "https://k26gihyg2c.execute-api.eu-west-2.amazonaws.com/prod",
-<<<<<<< HEAD
   gateway_secured: "https://api-dev-sec.activitypro.co.uk",
-=======
->>>>>>> dcb505e (reccuring match bug fix teams not getting assigned while creting)
   android_onesignal_id: "",
   ios_onesignal_id: "",
   // nodeURL : "https://activitypro-node-266406.appspot.com";
