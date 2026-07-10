@@ -42,7 +42,8 @@
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>Activity</ion-label>
-        <ion-select (ionChange)="onActivityChange()" [(ngModel)]="activityId" placeholder="Select activity">
+        <!-- <ion-select (ionChange)="onActivityChange()" [(ngModel)]="activityId"> -->
+          <ion-select (ionChange)="onActivityChange()" [(ngModel)]="activityId" placeholder="Select activity">
           <ion-option *ngFor="let type of activities" value="{{type.id}}">{{type.activity_name}}</ion-option>
         </ion-select>
       </ion-item>
@@ -101,10 +102,9 @@
     </app-form-field>
 
     <app-form-field [isDark]="isDarkTheme">
-      <!-- <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event)"
+      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event ? 'public' : 'private')"
         label="Match Access">
-      </app-access-toggle> -->
-      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event)" label="Match Access"></app-access-toggle>
+      </app-access-toggle>
     </app-form-field>
 
     <app-expandable-section label="FEE" [(expanded)]="isChecked" (expandedChange)="updateMatchPaymentType($event)">
@@ -130,19 +130,25 @@
           [min]="startDate" [max]="maxDate"></ion-datetime>
       </ion-item>
       <p class="recurring-hint" *ngIf="recurringUntilWhen">
-        Match will be created every week on <strong>{{getRecurringDayName()}}</strong> until <strong>{{recurringUntilWhen | date:'dd MMM yyyy'}}</strong>
+        <!-- Match will be created every week on <strong>{{getRecurringDayName()}}</strong> until <strong>{{recurringUntilWhen | date:'dd MMM yyyy'}}</strong> -->
+         Match will be created every week on <strong>{{getRecurringDayName()}}</strong> until
+        <strong>{{recurringUntilWhen | date:'dd MMM yyyy'}}</strong>
       </p>
       <ng-container *ngIf="+createMatchInput.MatchType === 3">
         <ion-item>
           <ion-label>Home Team</ion-label>
           <ion-select [(ngModel)]="selectedHomeTeamId" placeholder="Select home team">
-            <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedAwayTeamId">{{t.teamName}}</ion-option>
+            <!-- <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedAwayTeamId">{{t.teamName}}</ion-option> -->
+             <ion-option *ngFor="let t of teamList" [value]="t.id"
+              [disabled]="t.id === selectedAwayTeamId">{{t.teamName}}</ion-option>
           </ion-select>
         </ion-item>
         <ion-item>
           <ion-label>Away Team</ion-label>
           <ion-select [(ngModel)]="selectedAwayTeamId" placeholder="Select away team">
-            <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedHomeTeamId">{{t.teamName}}</ion-option>
+            <!-- <ion-option *ngFor="let t of teamList" [value]="t.id" [disabled]="t.id === selectedHomeTeamId">{{t.teamName}}</ion-option> -->
+             <ion-option *ngFor="let t of teamList" [value]="t.id"
+              [disabled]="t.id === selectedHomeTeamId">{{t.teamName}}</ion-option>
           </ion-select>
         </ion-item>
       </ng-container>

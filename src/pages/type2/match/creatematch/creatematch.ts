@@ -1,10 +1,11 @@
 import { Component } from "@angular/core";
 import {
   IonicPage,
+  LoadingController,
   NavController,
   NavParams,
   PopoverController,
-  Events,
+  Events
 } from "ionic-angular";
 import { ThemeService } from "../../../../services/theme.service";
 import {
@@ -18,18 +19,10 @@ import { Storage } from "@ionic/storage";
 import { MatchModel } from "../models/match.model";
 import moment from "moment";
 import { ClubVenue, SchoolVenue } from "../models/venue.model";
-import {
-  Activities,
-  Activity,
-  ClubActivityInput,
-  IClubDetails,
-} from "../../../../shared/model/club.model";
+import { Activities, Activity, ClubActivityInput, IClubDetails } from "../../../../shared/model/club.model";
 import { HttpService } from "../../../../services/http.service";
 import { API } from "../../../../shared/constants/api_constants";
-import {
-  RoundTypeInput,
-  RoundTypesModel,
-} from "../../../../shared/model/league.model";
+import { RoundTypeInput, RoundTypesModel } from "../../../../shared/model/league.model";
 import { AppType } from "../../../../shared/constants/module.constants";
 import { LeagueVenueType, MatchType } from "../../../../shared/utility/enums";
 import { CatandType } from "../../league/models/location.model";
@@ -46,7 +39,7 @@ import { MatchDuration } from "../../../../shared/model/match.model";
 @Component({
   selector: "page-creatematch",
   templateUrl: "creatematch.html",
-  providers: [HttpService],
+  providers: [HttpService]
 })
 export class CreatematchPage {
   isDarkTheme: boolean = false;
@@ -59,31 +52,31 @@ export class CreatematchPage {
   selectedDuration: number;
   currency: string;
   isRecurring: boolean = false;
-  isChecked: boolean = false;
-  recurringUntilWhen: string = moment().add(1, "week").format("YYYY-MM-DD");
+  recurringUntilWhen: string = moment().add(1, 'week').format('YYYY-MM-DD');
   teamList: TeamsForParentClubModel[] = [];
-  selectedHomeTeamId: string = "";
-  selectedAwayTeamId: string = "";
+  selectedHomeTeamId: string = '';
+  selectedAwayTeamId: string = '';
+  
 
   roundTypeInput: RoundTypeInput = {
-    parentclubId: "",
-    clubId: "",
-    activityId: "",
-    memberId: "",
+    parentclubId: '',
+    clubId: '',
+    activityId: '',
+    memberId: '',
     action_type: 0,
     device_type: 0,
     app_type: 0,
-    device_id: "",
-    updated_by: "",
-  };
+    device_id: '',
+    updated_by: ''
+  }
   leagueType: CatandType[] = [];
   leagueCategory: CatandType[] = [];
-  ActivityKey: string;
+  ActivityKey: string
   createMatchInput: CreateMatchInput = {
     Round: 0,
     MatchType: 1,
     MatchVenueName: "",
-    MatchVenueId: "",
+    MatchVenueId: '',
     MatchVenueKey: "",
     GameType: 0,
     MatchTitle: "",
@@ -95,18 +88,18 @@ export class CreatematchPage {
     MatchStatus: 0,
     MatchDetails: "",
     MatchPaymentType: 0,
-    MemberFees: "0.00",
-    NonMemberFees: "0.00",
+    MemberFees: '0.00',
+    NonMemberFees: '0.00',
     Hosts: {
       UserId: "",
       RoleType: 2,
-      UserType: 2,
+      UserType: 2
     },
-    user_postgre_metadata: new UserPostgreMetadataField(),
-    user_device_metadata: new UserDeviceMetadataField(),
-    location_id: "",
+    user_postgre_metadata: new UserPostgreMetadataField,
+    user_device_metadata: new UserDeviceMetadataField,
+    location_id: '',
     location_type: 0,
-    MatchDuration: "",
+    MatchDuration: ''
   };
   saveMatches: MatchModel[] = [];
   clubVenues: ClubVenue[] = [];
@@ -139,22 +132,23 @@ export class CreatematchPage {
     device_type: 0,
     app_type: 0,
     device_id: "",
-    updated_by: "",
-  };
+    updated_by: ""
+  }
 
   constructor(
     public navCtrl: NavController,
     public navParams: NavParams,
     public commonService: CommonService,
+    public loadingCtrl: LoadingController,
     public storage: Storage,
     public fb: FirebaseService,
     public sharedservice: SharedServices,
     public popoverCtrl: PopoverController,
     private httpService: HttpService,
     private themeService: ThemeService,
-    private events: Events,
+    private events: Events
   ) {
-    this.events.subscribe("theme:changed", (isDark) => {
+    this.events.subscribe('theme:changed', (isDark) => {
       this.isDarkTheme = isDark;
       this.applyTheme(isDark);
     });
@@ -165,15 +159,10 @@ export class CreatematchPage {
     // let now = moment().add(10, 'year');
     // this.maxDate = moment(now).format("YYYY-MM-DD");
     // this.minDate = moment().format("YYYY-MM-DD");
-    this.createMatchInput.CreatedBy =
-      this.sharedservice.getLoggedInUserId() ||
-      this.sharedservice.getLoggedInId();
-    this.createMatchInput.Hosts.UserId =
-      this.sharedservice.getLoggedInUserId() ||
-      this.sharedservice.getLoggedInId();
-    this.createMatchInput.user_postgre_metadata.UserParentClubId =
-      this.sharedservice.getPostgreParentClubId();
-    this.createMatchInput.user_device_metadata.UserActionType = 2;
+    this.createMatchInput.CreatedBy = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
+    this.createMatchInput.Hosts.UserId = this.sharedservice.getLoggedInUserId() || this.sharedservice.getLoggedInId();
+    this.createMatchInput.user_postgre_metadata.UserParentClubId = this.sharedservice.getPostgreParentClubId();
+    this.createMatchInput.user_device_metadata.UserActionType = 2
   }
 
   ionViewDidLoad() {
@@ -181,11 +170,11 @@ export class CreatematchPage {
   }
 
   ionViewWillLeave() {
-    this.events.unsubscribe("theme:changed");
+    this.events.unsubscribe('theme:changed');
   }
 
   private loadTheme() {
-    this.storage.get("dashboardTheme").then((isDarkTheme) => {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
       const isDark = isDarkTheme !== null ? isDarkTheme : true;
       this.isDarkTheme = isDark;
       this.applyTheme(isDark);
@@ -194,33 +183,31 @@ export class CreatematchPage {
 
   private applyTheme(isDark: boolean) {
     this.isDarkTheme = isDark;
-    const pageElement = document.querySelector("page-creatematch");
+    const pageElement = document.querySelector('page-creatematch');
     if (pageElement) {
       if (isDark) {
-        pageElement.classList.remove("light-theme");
+        pageElement.classList.remove('light-theme');
       } else {
-        pageElement.classList.add("light-theme");
+        pageElement.classList.add('light-theme');
       }
     }
   }
 
   ionViewWillEnter() {
     this.loadTheme();
-    this.themeService.isDarkTheme$.subscribe((isDark) => {
+    this.themeService.isDarkTheme$.subscribe(isDark => {
       this.applyTheme(isDark);
     });
+    console.log("ionViewDidLoad CreatematchPage");
     this.storage.get("userObj").then((val) => {
       val = JSON.parse(val);
-      this.roundTypeInput.parentclubId =
-        this.sharedservice.getPostgreParentClubId();
+      this.roundTypeInput.parentclubId = this.sharedservice.getPostgreParentClubId();
       this.roundTypeInput.clubId = val.$key;
       this.roundTypeInput.action_type = 0;
-      this.roundTypeInput.device_type =
-        this.sharedservice.getPlatform() == "android" ? 1 : 2;
+      this.roundTypeInput.device_type = this.sharedservice.getPlatform() == "android" ? 1 : 2;
       this.roundTypeInput.app_type = AppType.ADMIN_NEW;
 
-      this.commonInput.parentclubId =
-        this.sharedservice.getPostgreParentClubId();
+      this.commonInput.parentclubId = this.sharedservice.getPostgreParentClubId();
 
       // this.getAllActivities();
       // this.getClubVenues();
@@ -231,11 +218,8 @@ export class CreatematchPage {
       this.getLeagueCategory();
       this.getDurations();
     });
-    this.storage.get("Currency").then((currency) => {
-      if (currency) {
-        const c = JSON.parse(currency);
-        this.currency = c.CurrencySymbol;
-      }
+    this.storage.get('Currency').then((currency) => {
+      if (currency) { const c = JSON.parse(currency); this.currency = c.CurrencySymbol; }
     });
   }
 
@@ -253,79 +237,72 @@ export class CreatematchPage {
   }
 
   getMatchTypes() {
-    this.httpService
-      .post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, this.commonInput)
-      .subscribe({
-        next: (res: any) => {
-          this.leagueType = res["data"];
-        },
-      });
+    this.httpService.post(`${API.GET_LEAGUE_OR_MATCH_TYPES}`, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.leagueType = res["data"];
+      }
+    });
   }
 
   getLeagueCategory() {
-    this.httpService
-      .post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput)
-      .subscribe({
-        next: (res: any) => {
-          this.leagueCategory = res["data"];
-          if (this.leagueCategory.length > 0)
-            this.createMatchInput.GameType = 0;
-        },
-      });
+    this.httpService.post(`${API.GET_LEAGUE_CATEGORIES}`, this.commonInput).subscribe({
+      next: (res: any) => {
+        this.leagueCategory = res["data"]
+        console.table(`${this.leagueCategory}`);
+        if (this.leagueCategory.length > 0) this.createMatchInput.GameType = 0;
+      }
+    });
   }
 
   getRoundTypes() {
-    this.httpService
-      .post(`${API.Get_Round_Types}`, this.roundTypeInput)
-      .subscribe({
-        next: (res: any) => {
-          if (res) {
-            this.roundTypes = res.data || [];
-          }
-        },
-      });
+    this.httpService.post(`${API.Get_Round_Types}`, this.roundTypeInput).subscribe({
+      next: (res: any) => {
+        if (res) {
+          this.roundTypes = res.data || [];
+          console.log("Get_Round_Types RESPONSE", JSON.stringify(res.data));
+        } else {
+          console.log("error in fetching")
+        }
+      }
+    });
   }
 
   getDurations() {
     const input = { ...this.commonInput, app_type: AppType.ADMIN_NEW };
     this.httpService.post(`${API.GET_DURATIONS}`, input).subscribe({
-      next: (res: any) => {
-        this.durations = res.data || [];
-        if (this.durations.length > 0)
-          this.selectedDuration = this.durations[0].id;
-      },
+      next: (res: any) => { this.durations = res.data || []; if (this.durations.length > 0) this.selectedDuration = this.durations[0].id; }
     });
   }
 
-  changeType(isPublic: boolean): void {
-    this.publicType = isPublic;
-    this.createMatchInput.MatchVisibility = isPublic ? 0 : 1;
+  changeType(val) {
+    this.publicType = val == "public" ? true : false;
+    //this.privateType = 'private'? true : false;
+    this.createMatchInput.MatchVisibility = val == "private" ? 1 : 0;
   }
 
   selectClubName() {
     this.club_activities = [];
   }
 
-  updateMatchPaymentType(val: boolean): void {
-    this.isChecked = val;
-    this.createMatchInput.MatchPaymentType = val ? 1 : 0;
+  updateMatchPaymentType(isChecked: boolean): void {
+    this.createMatchInput.MatchPaymentType = isChecked ? 1 : 0;
   }
 
   getRecurringDayName(): string {
-    return moment(this.startDate).format("dddd");
+    return moment(this.startDate).format('dddd');
   }
 
   getListOfClub() {
     const body = {
       parentclub_id: this.sharedservice.getPostgreParentClubId(),
-      club_id: "",
-      activity_id: "",
+      club_id: '',
+      activity_id: '',
       member_id: this.sharedservice.getLoggedInUserId(),
       action_type: 0,
       device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
       app_type: AppType.ADMIN_NEW,
-      device_id: this.sharedservice.getDeviceId() || "web",
-      updated_by: this.sharedservice.getLoggedInUserId(),
+      device_id: this.sharedservice.getDeviceId() || 'web',
+      updated_by: this.sharedservice.getLoggedInUserId()
     };
     this.httpService.post(API.GET_PARENT_CLUB_VENUES, body, null, 1).subscribe({
       next: (res: any) => {
@@ -337,14 +314,11 @@ export class CreatematchPage {
         }
       },
       error: () => {
-        this.commonService.toastMessage(
-          "No venues found",
-          2500,
-          ToastMessageType.Error,
-        );
-      },
+        this.commonService.toastMessage("No venues found", 2500, ToastMessageType.Error);
+      }
     });
   }
+
 
   onChangeOfClub() {
     this.club_activities = [];
@@ -355,63 +329,48 @@ export class CreatematchPage {
 
   resetTeams() {
     this.teamList = [];
-    this.selectedHomeTeamId = "";
-    this.selectedAwayTeamId = "";
+    this.selectedHomeTeamId = '';
+    this.selectedAwayTeamId = '';
   }
 
   fetchTeamsForMatch() {
     if (this.teamList.length > 0) return;
-    const selectedActivity = this.activities.find(
-      (a) => a.id === this.activityId,
-    );
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
+    //const realActivityId = selectedActivity ? selectedActivity.activity.Id : '';
     // 🏷️ guard null activity (e.g. club_activity with activity: null) + missing selection
-    const realActivityId =
-      selectedActivity && selectedActivity.activity
-        ? selectedActivity.activity.Id
-        : "";
+    const realActivityId = selectedActivity && selectedActivity.activity ? selectedActivity.activity.Id : '';
     // 🚫 no activity selected yet -> silently skip. This is an auto-trigger (recurring/match-type/init),
     // not an explicit "load teams" action, so no error toast. Selection is enforced on submit.
     if (!realActivityId) {
+      //this.commonService.toastMessage("Select an activity first", 2500, ToastMessageType.Error);
       return;
     }
     const body = {
       parentclubId: this.sharedservice.getPostgreParentClubId(),
-      clubId: "",
+      clubId: '',
       activityId: realActivityId,
       memberId: this.sharedservice.getLoggedInUserId(),
       action_type: 1,
       device_type: this.sharedservice.getPlatform() == "android" ? 1 : 2,
       app_type: AppType.ADMIN_NEW,
-      device_id: "",
-      updated_by: "",
-      isExternal: false,
+      device_id: '',
+      updated_by: '',
+      isExternal: false
     };
     this.httpService.post(`${API.GET_ACTIVIY_SPECIFIC_TEAM}`, body).subscribe({
-      next: (res: any) => {
-        this.teamList = res.data || [];
-      },
+      next: (res: any) => { this.teamList = res.data || []; }
     });
   }
 
   onRecurringToggle(expanded: boolean) {
     // 🏷️ require an activity before enabling recurring — revert toggle if none selected
-    const selectedActivity = this.activities.find(
-      (a) => a.id === this.activityId,
-    );
-    if (
-      expanded &&
-      (!this.activityId || !selectedActivity || !selectedActivity.activity)
-    ) {
-      this.commonService.toastMessage(
-        "Please select an activity",
-        2500,
-        ToastMessageType.Error,
-      );
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
+    if (expanded && (!this.activityId || !selectedActivity || !selectedActivity.activity)) {
+      this.commonService.toastMessage("Please select an activity", 2500, ToastMessageType.Error);
       this.isRecurring = false; // ⛔ keep recurring toggle inactive (pushes expanded=false back to component)
       return;
     }
-    if (expanded && +this.createMatchInput.MatchType === MatchType.TEAM)
-      this.fetchTeamsForMatch();
+    if (expanded && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
   }
 
   onMatchTypeChange() {
@@ -421,86 +380,62 @@ export class CreatematchPage {
 
   onActivityChange() {
     this.resetTeams();
-    if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM)
-      this.fetchTeamsForMatch();
+    if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
   }
 
   autoFillLocation() {
-    const club = this.clubs.find((c) => c.Id === this.selectedClub);
-    if (!club) {
-      this.mapLocationAddress = "";
-      this.mapLocationLat = null;
-      this.mapLocationLng = null;
-      return;
-    }
+    const club = this.clubs.find(c => c.Id === this.selectedClub);
+    if (!club) { this.mapLocationAddress = ''; this.mapLocationLat = null; this.mapLocationLng = null; return; }
     const parts = [club.FirstLineAddress, club.PostCode].filter(Boolean);
-    this.mapLocationAddress = parts.join(", ");
-    this.mapLocationLat = club.MapLatitude
-      ? parseFloat(club.MapLatitude)
-      : null;
-    this.mapLocationLng = club.MapLongitude
-      ? parseFloat(club.MapLongitude)
-      : null;
+    this.mapLocationAddress = parts.join(', ');
+    this.mapLocationLat = club.MapLatitude ? parseFloat(club.MapLatitude) : null;
+    this.mapLocationLng = club.MapLongitude ? parseFloat(club.MapLongitude) : null;
   }
 
-  mapLocationAddress: string = "";
+  mapLocationAddress: string = '';
   mapLocationLat: number = null;
   mapLocationLng: number = null;
 
   onMapLocationSelected(location: any) {
-    this.mapLocationAddress = location.address || "";
+    this.mapLocationAddress = location.address || '';
     if (location.lat != null) this.mapLocationLat = location.lat;
     if (location.lng != null) this.mapLocationLng = location.lng;
   }
 
+
   getClubActivity() {
     this.commonInput.parentclubId = this.sharedservice.getPostgreParentClubId();
     this.commonInput.clubId = this.selectedClub;
-    this.httpService
-      .post(`${API.CLUB_ACTIVITIES}`, this.commonInput)
-      .subscribe({
-        next: (res: any) => {
-          if (res.data.club_activities.length > 0) {
-            this.activities = res.data.club_activities;
-            this.activityId = this.activities[0].id;
-
-            // ⛔ Do NOT default to activities[0] — that caused the team API to fetch the first
-            // activity's id (Bar n Restaurant / 522ce10a) instead of the user-selected one.
-            // Keep activityId empty so the placeholder shows and team fetch waits for a real pick.
-            this.activityId = "";
-            if (
-              this.isRecurring &&
-              +this.createMatchInput.MatchType === MatchType.TEAM
-            )
-              this.fetchTeamsForMatch();
-          }
-        },
-      });
+    this.httpService.post(`${API.CLUB_ACTIVITIES}`, this.commonInput).subscribe({
+      next: (res: any) => {
+        console.log("club activities", JSON.stringify(res.data.club_activities));
+        if (res.data.club_activities.length > 0) {
+          this.activities = res.data.club_activities;
+          // ⛔ Do NOT default to activities[0] — that caused the team API to fetch the first
+          // activity's id (Bar n Restaurant / 522ce10a) instead of the user-selected one.
+          // Keep activityId empty so the placeholder shows and team fetch waits for a real pick.
+          this.activityId = '';
+          if (this.isRecurring && +this.createMatchInput.MatchType === MatchType.TEAM) this.fetchTeamsForMatch();
+        }
+      }
+    });
   }
 
   validateInput() {
     // 🏷️ activity must be selected (no default anymore) — prevents NPE in saveMatchDetails
-    const selectedActivity = this.activities.find(
-      (a) => a.id === this.activityId,
-    );
+    const selectedActivity = this.activities.find(a => a.id === this.activityId);
     if (!this.activityId || !selectedActivity || !selectedActivity.activity) {
-      this.commonService.toastMessage(
-        "Please select an activity",
-        2500,
-        ToastMessageType.Error,
-      );
+      this.commonService.toastMessage("Please select an activity", 2500, ToastMessageType.Error);
       return false;
     }
     if (this.startTime == "" || this.startTime == undefined) {
       const message = "Please enter a valid start date";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
-    } else if (
-      this.createMatchInput.MatchTitle == "" ||
-      this.createMatchInput.MatchTitle == undefined
-    ) {
+    }
+    else if (this.createMatchInput.MatchTitle == "" || this.createMatchInput.MatchTitle == undefined) {
       let message = "Please enter match title";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
     }
     //  if(this.createMatchInput.location_id==""||this.createMatchInput.location_id==undefined){
@@ -508,38 +443,23 @@ export class CreatematchPage {
     //   this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
     //   return false;
     // }
-    else if (
-      this.createMatchInput.MatchPaymentType == 1 &&
-      (parseFloat(this.createMatchInput.MemberFees) <= 0.0 ||
-        this.createMatchInput.MemberFees == undefined)
-    ) {
+
+    else if ((this.createMatchInput.MatchPaymentType == 1) && (parseFloat(this.createMatchInput.MemberFees) <= 0.00 || this.createMatchInput.MemberFees == undefined)) {
       const message = "Enter member fee";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
-    } else if (
-      this.createMatchInput.MatchPaymentType == 1 &&
-      (parseFloat(this.createMatchInput.NonMemberFees) <= 0.0 ||
-        this.createMatchInput.NonMemberFees == undefined)
-    ) {
+    }
+    else if ((this.createMatchInput.MatchPaymentType == 1) && (parseFloat(this.createMatchInput.NonMemberFees) <= 0.00 || this.createMatchInput.NonMemberFees == undefined)) {
       const message = "Enter non-member fee";
-      this.commonService.toastMessage(message, 2500, ToastMessageType.Error);
+      this.commonService.toastMessage(message, 2500, ToastMessageType.Error)
       return false;
-    } else if (this.isRecurring && !this.recurringUntilWhen) {
-      this.commonService.toastMessage(
-        "Select until when date",
-        2500,
-        ToastMessageType.Error,
-      );
+    }
+    else if (this.isRecurring && !this.recurringUntilWhen) {
+      this.commonService.toastMessage("Select until when date", 2500, ToastMessageType.Error);
       return false;
-    } else if (
-      this.isRecurring &&
-      moment(this.recurringUntilWhen).isSameOrBefore(moment(this.startDate))
-    ) {
-      this.commonService.toastMessage(
-        "Until when must be after start date",
-        2500,
-        ToastMessageType.Error,
-      );
+    }
+    else if (this.isRecurring && moment(this.recurringUntilWhen).isSameOrBefore(moment(this.startDate))) {
+      this.commonService.toastMessage("Until when must be after start date", 2500, ToastMessageType.Error);
       return false;
     }
 
@@ -550,49 +470,42 @@ export class CreatematchPage {
     if (this.validateInput()) {
       try {
         this.commonService.showLoader("Please wait...");
-        const postgreClub = this.clubs.find(
-          (clubName) => clubName.Id === this.selectedClub,
-        );
+        const postgreClub = this.clubs.find(clubName => clubName.Id === this.selectedClub);
+        console.log("club", postgreClub);
         this.createMatchInput.MatchVenueKey = postgreClub.FirebaseId;
         this.createMatchInput.MatchVenueName = postgreClub.ClubName;
         this.createMatchInput.MatchVenueId = postgreClub.Id;
-        const selected_activity = this.activities.find(
-          (activity) => activity.id === this.activityId,
-        );
-        this.createMatchInput.user_postgre_metadata.UserActivityId =
-          selected_activity.activity.Id;
+        const selected_activity = this.activities.find(activity => activity.id === this.activityId);
+        this.createMatchInput.user_postgre_metadata.UserActivityId = selected_activity.activity.Id;
         this.createMatchInput.location_id = postgreClub.Id;
         this.createMatchInput.location_type = LeagueVenueType.Club;
 
         this.createMatchInput.Round = Number(this.createMatchInput.Round);
         this.createMatchInput.MatchStartDate = moment(
-          new Date(this.startDate + " " + this.startTime).getTime(),
+          new Date(this.startDate + " " + this.startTime).getTime()
         ).format("YYYY-MM-DD HH:mm");
         this.createMatchInput.MatchEndDate = moment(
-          new Date(this.startDate + " " + "23:59").getTime(),
+          new Date(this.startDate + " " + '23:59').getTime()
         ).format("YYYY-MM-DD HH:mm");
+        console.log(JSON.stringify(this.createMatchInput));
+        console.log(new Date(this.startDate + " " + 'this.startTime').getTime());
         this.createMatchInput.GameType = Number(this.createMatchInput.GameType);
         this.createMatchInput.MatchType = +this.createMatchInput.MatchType;
-        const selectedDur = this.durations.find(
-          (d) => d.id === this.selectedDuration,
-        );
-        this.createMatchInput.MatchDuration = selectedDur
-          ? String(selectedDur.duration)
-          : "";
+        const selectedDur = this.durations.find(d => d.id === this.selectedDuration);
+        this.createMatchInput.MatchDuration = selectedDur ? String(selectedDur.duration) : '';
+        console.log("MATCH Input", JSON.stringify(this.createMatchInput));
 
         const restPayload = {
-          parentclubId:
-            this.createMatchInput.user_postgre_metadata.UserParentClubId,
-          clubId: "",
-          activityId: "",
+          parentclubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
+          clubId: '',
+          activityId: '',
           memberId: this.createMatchInput.CreatedBy,
           action_type: 0,
-          device_type:
-            this.createMatchInput.user_device_metadata.UserDeviceType,
+          device_type: this.createMatchInput.user_device_metadata.UserDeviceType,
           app_type: AppType.ADMIN_NEW,
-          device_id: "",
+          device_id: '',
           updated_by: this.createMatchInput.CreatedBy,
-          parentclubTeamId: "",
+          parentclubTeamId: '',
           Round: this.createMatchInput.Round,
           MatchType: this.createMatchInput.MatchType,
           MatchVenueName: this.createMatchInput.MatchVenueName,
@@ -613,70 +526,42 @@ export class CreatematchPage {
           NonMemberFees: Number(this.createMatchInput.NonMemberFees) || 0,
           location_type: this.createMatchInput.location_type,
           location_id: this.createMatchInput.location_id,
-          location: this.mapLocationAddress || "",
+          location: this.mapLocationAddress || '',
           MatchDuration: this.createMatchInput.MatchDuration,
-          UserParentClubId:
-            this.createMatchInput.user_postgre_metadata.UserParentClubId,
-          UserActivityId:
-            this.createMatchInput.user_postgre_metadata.UserActivityId,
+          UserParentClubId: this.createMatchInput.user_postgre_metadata.UserParentClubId,
+          UserActivityId: this.createMatchInput.user_postgre_metadata.UserActivityId,
           user_postgre_metadata: this.createMatchInput.user_postgre_metadata,
           user_device_metadata: this.createMatchInput.user_device_metadata,
-          UserActionType: 2,
-          UpdatedBy: this.createMatchInput.CreatedBy,
+          UserActionType:2,
+          UpdatedBy: this.createMatchInput.CreatedBy
         };
 
         if (this.isRecurring) {
-          restPayload["untilWhen"] = moment(this.recurringUntilWhen).format(
-            "YYYY-MM-DD",
-          );
+          restPayload['untilWhen'] = moment(this.recurringUntilWhen).format("YYYY-MM-DD");
           if (+this.createMatchInput.MatchType === MatchType.TEAM) {
-            restPayload["HomeParentclubTeamId"] = this.selectedHomeTeamId || "";
-            restPayload["AwayParentclubTeamId"] = this.selectedAwayTeamId || "";
+            restPayload['HomeParentclubTeamId'] = this.selectedHomeTeamId || '';
+            restPayload['AwayParentclubTeamId'] = this.selectedAwayTeamId || '';
           }
         }
 
-        const apiUrl = this.isRecurring
-          ? API.CREATE_RECURRING_MATCHES
-          : API.CREATE_MATCH;
-        const successMsg = this.isRecurring
-          ? "Recurring matches created successfully"
-          : "Match created successfully";
+        const apiUrl = this.isRecurring ? API.CREATE_RECURRING_MATCHES : API.CREATE_MATCH;
+        const successMsg = this.isRecurring ? "Recurring matches created successfully" : "Match created successfully";
 
-        this.httpService.post(`${apiUrl}`, restPayload).subscribe(
-          (res: any) => {
-            this.commonService.hideLoader();
-            this.commonService.updateCategory("match");
-            this.events.publish("match:refresh");
-            this.commonService.toastMessage(
-              successMsg,
-              2500,
-              ToastMessageType.Success,
-              ToastPlacement.Bottom,
-            );
-            this.navCtrl.pop();
-          },
-          (err) => {
-            this.commonService.hideLoader();
-            const msg =
-              err.error && err.error.message
-                ? err.error.message
-                : "Match creation failed";
-            this.commonService.toastMessage(
-              msg,
-              2500,
-              ToastMessageType.Error,
-              ToastPlacement.Bottom,
-            );
-          },
-        );
+        this.httpService.post(`${apiUrl}`, restPayload).subscribe((res: any) => {
+          this.commonService.hideLoader();
+          this.commonService.updateCategory("match");
+          this.events.publish('match:refresh');
+          this.commonService.toastMessage(successMsg, 2500, ToastMessageType.Success, ToastPlacement.Bottom);
+          this.navCtrl.pop();
+        }, (err) => {
+          this.commonService.hideLoader();
+          const msg = (err.error && err.error.message) ? err.error.message : "Match creation failed";
+          this.commonService.toastMessage(msg, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+          console.error("Error:", err);
+        })
       } catch (e) {
         this.commonService.hideLoader();
-        this.commonService.toastMessage(
-          "Match creation failed",
-          2500,
-          ToastMessageType.Error,
-          ToastPlacement.Bottom,
-        );
+        this.commonService.toastMessage("Match creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
     }
   }
@@ -692,12 +577,13 @@ export class CreatematchPage {
   }
 }
 export class CreateMatchInput {
-  Round: number;
+  Round: number
   Hosts: {
     UserId: string;
     RoleType: number;
     UserType: number;
   };
+
 
   MatchType: number;
   MatchVenueName: string;
@@ -716,23 +602,25 @@ export class CreateMatchInput {
   MatchPaymentType: number;
   MemberFees: string;
   NonMemberFees: string;
-  user_postgre_metadata: UserPostgreMetadataField;
+  user_postgre_metadata: UserPostgreMetadataField
   user_device_metadata: UserDeviceMetadataField;
   location_id: string;
   location_type: number;
   MatchDuration: string;
 }
 
+
 export class UserPostgreMetadataField {
-  UserParentClubId: string;
-  UserClubId: string;
-  UserMemberId: string;
-  UserActivityId: string;
+  UserParentClubId: string
+  UserClubId: string
+  UserMemberId: string
+  UserActivityId: string
 }
 
 export class UserDeviceMetadataField {
-  UserAppType: number;
-  UserActionType: number;
-  UserDeviceType: number;
-  UpdatedBy: number;
+  UserAppType: number
+  UserActionType: number
+  UserDeviceType: number
+  UpdatedBy: number
 }
+

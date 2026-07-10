@@ -874,8 +874,7 @@ export class MatchdetailsPage {
         MemberEmail: p.email && p.email !== "" && p.email !== "-" && p.email !== "n/a"
           ? p.email
           : (p.isChild ? (p.parentEmail || "") : ""),
-        MemberName: p.name,
-        payStatus: p.ParticipationStatus === 1 ? 1 : 0
+        MemberName: p.name
       }));
       const email_modal = {
         module_info: {
@@ -885,9 +884,7 @@ export class MatchdetailsPage {
           module_booking_start_date: this.match.MatchStartDate,
         },
         email_users: member_list,
-        subject: `${this.match.MatchTitle}: `,
-        type: ModuleTypeForEmail.MEMBER,
-        isLeagueTeams: true
+        type: ModuleTypeForEmail.MEMBER
       };
       this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
     } else {

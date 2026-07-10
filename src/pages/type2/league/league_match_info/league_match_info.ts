@@ -552,9 +552,11 @@ export class LeagueMatchInfoPage {
       case 'role': this.showRoles(member); break;
     }
   }
+
   gotoPayment(member: LeagueMatchParticipantModel) {
     this.navCtrl.push('MatchpaymentPage', { SelectedMember: member, MatchDetails: { activityId: this.activityId } });
   }
+  
   showRoles(member: LeagueMatchParticipantModel): void {
     if (this.roles.length > 0) {
 
