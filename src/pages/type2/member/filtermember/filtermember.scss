@@ -1,0 +1,95 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-filtermember {
+  @include android-sdk35-fixes;
+
+  // ── Base (Dark Theme) ──
+  .scroll-content {
+    padding: 0 !important;
+    background-color: #0f172a !important;
+    background-image: none !important;
+  }
+
+  .toolbar-background { background-color: #2b92bb !important; }
+  .toolbar-title { color: #ffffff; font-weight: 400; }
+  .pop-over ion-icon { color: #ffffff; }
+
+  // Search row
+  .sub-container {
+    border-bottom: 1px solid #334155;
+    padding: 8px 12px;
+    margin-top: 0;
+
+    button {
+      width: 90%; height: 86%; margin-top: 4px;
+      background: #2b92bb; border-radius: 8px;
+      color: white; border: none;
+    }
+
+    ion-icon { font-size: 20px; }
+
+    .searchbar, .searchbar-input {
+      background: #1e293b !important;
+      color: #f1f5f9 !important;
+      border-radius: 8px !important;
+      box-shadow: none !important;
+    }
+
+    .searchbar-search-icon { display: none !important; }
+    .searchbar-clear-icon { margin: 0; box-shadow: none; }
+  }
+
+  // Member list
+  ion-list {
+    background: transparent !important;
+
+    ion-item {
+      background: #1e293b !important;
+      border-bottom: 1px solid #334155 !important;
+      padding-left: 12px !important;
+
+      .item-inner { border-bottom: none !important; }
+
+      ion-label {
+        color: #f1f5f9 !important;
+        font-size: 14px !important;
+        font-weight: 600 !important;
+      }
+    }
+
+    ion-icon { color: #64748b !important; }
+  }
+
+  ion-checkbox {
+    --background: #334155; --background-checked: #2b92bb;
+    --border-color: #475569; --border-color-checked: #2b92bb;
+    --checkmark-color: #fff;
+  }
+
+  // Footer
+  ion-footer {
+    button[ion-button] {
+      background: linear-gradient(135deg, rgba(43,146,187,0.85), rgba(53,173,255,0.75)) !important;
+      color: white !important; font-weight: 700 !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    }
+  }
+
+  // ── Light Theme ──
+  &.light-theme {
+    .scroll-content { background-color: #f8fafc !important; }
+
+    .sub-container {
+      border-bottom-color: #e2e8f0;
+      .searchbar, .searchbar-input { background: #ffffff !important; color: #0f172a !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; }
+    }
+
+    ion-list ion-item {
+      background: #ffffff !important;
+      border-bottom-color: #e2e8f0 !important;
+      ion-label { color: #1e293b !important; }
+    }
+
+    ion-checkbox { --background: #fff; --border-color: #d1d5db; }
+  }
+}

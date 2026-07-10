@@ -1,0 +1,94 @@
+<!--
+  ShowfamilymemberPage — family member listing
+-->
+<ion-header>
+  <ion-navbar>
+    <ion-title>Family Members</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="family-wrapper">
+
+    <!-- Parent / account summary -->
+    <div class="summary-card" *ngIf="memberInfo">
+      <div class="summary-avatar">
+        <ion-icon name="people"></ion-icon>
+      </div>
+      <div class="summary-info">
+        <p class="summary-name">{{memberInfo.parent_firstname}} {{memberInfo.parent_lastname}}</p>
+        <p class="summary-sub">
+          {{activeFamilyCount}}
+          <span *ngIf="activeFamilyCount === 1">family member</span>
+          <span *ngIf="activeFamilyCount !== 1">family members</span>
+        </p>
+      </div>
+    </div>
+
+    <!-- Member list -->
+    <div class="member-list" *ngIf="activeFamilyCount > 0">
+      <ng-container *ngFor="let member of familyInfo; let i = index">
+        <div class="member-card"
+             *ngIf="member.IsActive"
+             [class.disabled]="false === member.IsEnable">
+
+          <div class="member-card-body">
+            <!-- Avatar with initials -->
+            <div class="member-avatar">{{getInitials(member)}}</div>
+
+            <!-- Main info -->
+            <div class="member-details">
+              <p class="member-name">
+                {{member.FirstName}} {{member.LastName}}
+                <span class="member-age" *ngIf="member.DOB">
+                  {{this.commonService.calculateAgeFromDOB(member.DOB)}} yrs
+                </span>
+              </p>
+
+              <p class="member-line" *ngIf="member.PhoneNumber">
+                <ion-icon name="ios-call-outline"></ion-icon>
+                <span>{{member.PhoneNumber}}</span>
+              </p>
+              <p class="member-line" *ngIf="member.EmailID">
+                <ion-icon name="ios-mail-outline"></ion-icon>
+                <span>{{member.EmailID}}</span>
+              </p>
+
+              <!-- Payment chips -->
+              <div class="member-chips" *ngIf="member.SetupName || member.CurrentPayment">
+                <span class="chip chip-setup" *ngIf="member.SetupName">
+                  <ion-icon name="ios-card-outline"></ion-icon> {{member.SetupName}}
+                </span>
+                <span class="chip chip-payment" *ngIf="member.CurrentPayment">
+                  <ion-icon name="cash"></ion-icon> {{member.CurrentPayment}}
+                  <span *ngIf="member.Validity">
+                    &middot; <ion-icon ios="ios-timer-outline" md="md-timer"></ion-icon> {{member.Validity}}
+                  </span>
+                </span>
+              </div>
+            </div>
+
+            <!-- Edit action -->
+            <button class="edit-btn" (click)="goToEditfamilyPage(member, i)">
+              <ion-icon name="md-create"></ion-icon>
+            </button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+
+    <!-- Empty state -->
+    <div class="empty-state" *ngIf="activeFamilyCount === 0">
+      <ion-icon name="ios-people-outline" class="empty-icon"></ion-icon>
+      <p class="empty-title">No family members yet</p>
+      <p class="empty-sub">Tap the + button to add a family member.</p>
+    </div>
+
+  </div>
+
+  <ion-fab right bottom>
+    <button ion-fab class="fab-add" (click)="addFamilyMember()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
+</ion-content>

@@ -188,8 +188,8 @@ export class MailToMemberByAdminPage {
         Message: this.emailObj.Message,
       }
 
-      emailFormembers.Members = members;
-
+      emailFormembers.Members = members.map(({ selected, payStatus, ...rest }) => rest);
+      this.commonService.showLoader("Sending email...");
       const email_mutation = gql`
       mutation sendNotificationEmail($emailInput: EmailNotification!) {
         sendNotificationEmail(emailInput: $emailInput)
@@ -197,6 +197,7 @@ export class MailToMemberByAdminPage {
 
       const email_variable = { emailInput: emailFormembers };
       this.graphqlService.mutate(email_mutation, email_variable, 0).subscribe((response) => {
+        this.commonService.hideLoader();
         this.commonService.toastMessage("Mail sent successfully", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
         this.emailObj.Message = "Dear All,\n\n\n\nSincerely Yours,\n" + this.parentClubDetails.ParentClubName + "\n" + this.parentClubDetails.ParentClubAdminEmailID;
         this.emailObj.Subject = "";
@@ -213,7 +214,7 @@ export class MailToMemberByAdminPage {
   }
 
   validateEmail() {
-    if (this.emailObj.Subject.trim() == "") {
+    if (!this.emailObj.Subject || this.emailObj.Subject.trim() === "") {
       this.commonService.toastMessage("Please enter subject", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
       return false;
     }

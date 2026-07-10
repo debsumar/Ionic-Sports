@@ -874,7 +874,8 @@ export class MatchdetailsPage {
         MemberEmail: p.email && p.email !== "" && p.email !== "-" && p.email !== "n/a"
           ? p.email
           : (p.isChild ? (p.parentEmail || "") : ""),
-        MemberName: p.name
+        MemberName: p.name,
+        payStatus: p.ParticipationStatus === 1 ? 1 : 0
       }));
       const email_modal = {
         module_info: {
@@ -884,7 +885,9 @@ export class MatchdetailsPage {
           module_booking_start_date: this.match.MatchStartDate,
         },
         email_users: member_list,
-        type: ModuleTypeForEmail.MEMBER
+        subject: `${this.match.MatchTitle}: `,
+        type: ModuleTypeForEmail.MEMBER,
+        isLeagueTeams: true
       };
       this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
     } else {
@@ -893,21 +896,23 @@ export class MatchdetailsPage {
   }
 
   gotoNotificationPage() {
-    if (this.participants.length > 0) {
-      const user_ids = this.participants.map(p =>
-        (p.User as any).IsChild ? ((p.User as any).ParentId || p.User.Id) : p.User.Id
-      );
-      const user_names = this.participants.map(p => p.User.FirstName + ' ' + p.User.LastName);
-      this.navCtrl.push("NotificationsPage", {
+    const matchPlayers = [...this.homePlayers, ...this.awayPlayers];
+    if (matchPlayers.length > 0) {
+      const user_ids = matchPlayers.map(p => p.userId);
+      const user_names = matchPlayers.map(p => p.name);
+      const pay_status = matchPlayers.map(p => p.ParticipationStatus === 1 ? 1 : 0);
+      this.navCtrl.push('NotificationsPage', {
         users: user_ids,
         user_names: user_names,
+        pay_status: pay_status,
+        isLeagueTeams: true,
         type: ModuleTypes.Match,
         heading: `Match: ${this.match.MatchTitle}`,
         module_id: this.match.MatchId,
-        page_id: "MATCHDETAILS"
+        page_id: 'MATCHDETAILS'
       });
     } else {
-      this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+      this.commonService.toastMessage('No participant(s) found', 2500, ToastMessageType.Error);
     }
   }
 

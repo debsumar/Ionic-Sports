@@ -24,6 +24,9 @@ export class NotificationsPage {
   };
   numberOfPeople = '0 People';
   userNames: string[] = [];
+  isLeagueTeams: boolean = false;
+  allUsers: { id: string; name: string; payStatus: number; selected: boolean }[] = [];
+  allSelected: boolean = true;
 
   constructor(
     public commonService: CommonService,
@@ -37,16 +40,34 @@ export class NotificationsPage {
     private renderer: Renderer2,
     public events: Events
   ) {
-    const user_ids = navParams.get('users');
+    const user_ids: string[] = navParams.get('users') || [];
+    const user_names: string[] = navParams.get('user_names') || [];
+    const pay_status: number[] = navParams.get('pay_status') || [];
     this.notification_input.module_type = navParams.get('type');
     this.notification_input.heading = navParams.get('heading');
     this.notification_input.parentClubId = this.sharedservice.getPostgreParentClubId();
+    this.isLeagueTeams = navParams.get('isLeagueTeams') || false;
+
     const valid_user_ids = user_ids.filter(item => item !== undefined && item !== null && item !== '');
-    if (valid_user_ids.length > 0) {
-      this.notification_input.userIds = Array.from(new Set(valid_user_ids));
+    const skipDedup = this.notification_input.module_type === ModuleTypes.Match
+      || this.notification_input.module_type === ModuleTypes.LEAGUE
+      || this.notification_input.module_type === ModuleTypes.LEAGUE_TEAM;
+    const resolved_user_ids: string[] = skipDedup
+      ? valid_user_ids
+      : Array.from(new Set(valid_user_ids));
+
+    if (this.isLeagueTeams) {
+      // Build selectable user list, carry payStatus for chip colour
+      resolved_user_ids.forEach((id, i) => {
+        this.allUsers.push({ id, name: user_names[i] || id, payStatus: pay_status[i] != null ? pay_status[i] : -1, selected: true });
+      });
+      this.allSelected = true;
+      this.updateSelectedIds();
+    } else {
+      this.notification_input.userIds = resolved_user_ids;
+      this.userNames = user_names;
       this.numberOfPeople = this.notification_input.userIds.length + ' recipients';
     }
-    this.userNames = navParams.get('user_names') || [];
   }
 
   ionViewWillEnter() {
@@ -82,7 +103,29 @@ export class NotificationsPage {
     this.navCtrl.pop();
   }
 
+  toggleUser(u: { id: string; name: string; payStatus: number; selected: boolean }) {
+    u.selected = !u.selected;
+    this.allSelected = this.allUsers.length > 0 && this.allUsers.every(item => item.selected);
+    this.updateSelectedIds();
+  }
+
+  toggleSelectAll() {
+    this.allSelected = !this.allSelected;
+    this.allUsers.forEach(u => u.selected = this.allSelected);
+    this.updateSelectedIds();
+  }
+
+  updateSelectedIds() {
+    const selected = this.allUsers.filter(u => u.selected);
+    this.notification_input.userIds = selected.map(u => u.id);
+    this.numberOfPeople = selected.length + ' recipients';
+  }
+
   sendNotification() {
+    if (this.isLeagueTeams && this.notification_input.userIds.length === 0) {
+      this.commonService.toastMessage('Please select at least one recipient', 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      return;
+    }
     let confirm = this.alertCtrl.create({
       title: 'Notification Alert',
       message: 'Are you sure you want to send the notification to all the members?',

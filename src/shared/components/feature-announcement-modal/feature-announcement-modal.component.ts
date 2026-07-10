@@ -25,8 +25,8 @@ import {
             currentFeature.badge_text
           }}</span>
 
-          <div class="fam-icon-wrap">
-            <ion-icon [name]="currentFeature.icon || 'star'"></ion-icon>
+          <div class="fam-icon-wrap" *ngIf="currentFeature.icon && isImageUrl(currentFeature.icon)">
+            <img class="fam-icon-img" [src]="currentFeature.icon" alt="" />
           </div>
 
           <h2 class="fam-title">{{ currentFeature.title }}</h2>
@@ -45,6 +45,13 @@ import {
 
         <!-- Actions -->
         <div class="fam-actions">
+          <button
+            class="fam-btn-secondary"
+            *ngIf="!isSingle && activeIndex > 0"
+            (click)="prev()"
+          >
+            Back
+          </button>
           <button
             class="fam-btn-primary"
             *ngIf="isLast || isSingle"
@@ -84,9 +91,9 @@ import {
         background: #1e293b;
         border: 1px solid rgba(43, 146, 107, 0.15);
         border-radius: 16px;
-        padding: 2rem;
-        width: 90%;
-        max-width: 420px;
+        padding: 24px 20px 20px;
+        width: 92%;
+        max-width: 440px;
         text-align: center;
         box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6),
           0 0 20px rgba(43, 146, 107, 0.1);
@@ -111,39 +118,43 @@ import {
         display: inline-block;
         background: linear-gradient(135deg, #10b981, #059669);
         color: #fff;
-        font-size: 0.7rem;
+        font-size: 12px;
         font-weight: 600;
-        padding: 0.2rem 0.6rem;
+        padding: 4px 10px;
         border-radius: 20px;
         text-transform: uppercase;
         letter-spacing: 0.05em;
-        margin-bottom: 1rem;
+        margin-bottom: 14px;
       }
       .fam-icon-wrap {
-        width: 64px;
-        height: 64px;
+        width: 72px;
+        height: 72px;
         border-radius: 16px;
-        background: rgba(43, 146, 107, 0.12);
+        background: rgba(43, 146, 107, 0.08);
         display: flex;
         align-items: center;
         justify-content: center;
-        margin: 0 auto 1.25rem;
+        margin: 0 auto 16px;
+        overflow: hidden;
       }
-      .fam-icon-wrap ion-icon {
-        font-size: 1.8rem;
-        color: #10b981;
+      .fam-icon-img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        border-radius: 14px;
       }
       .fam-title {
-        font-size: 1.25rem;
-        font-weight: 600;
+        font-size: 20px;
+        font-weight: 700;
         color: #f1f5f9;
-        margin: 0 0 0.5rem;
+        margin: 0 0 10px;
         letter-spacing: -0.01em;
+        line-height: 1.3;
       }
       .fam-description {
-        font-size: 0.875rem;
+        font-size: 15px;
         color: #cbd5e1;
-        line-height: 1.5;
+        line-height: 1.6;
         margin: 0;
       }
       .fam-dots {
@@ -165,28 +176,41 @@ import {
         transform: scale(1.25);
       }
       .fam-actions {
-        margin-top: 1rem;
+        margin-top: 16px;
+        display: flex;
+        gap: 10px;
       }
       .fam-btn-primary {
-        width: 100%;
-        padding: 0.7rem 1.5rem;
+        flex: 1;
+        padding: 13px 16px;
         border: none;
         border-radius: 10px;
         background: linear-gradient(135deg, #10b981, #059669);
         color: #fff;
-        font-size: 0.9rem;
+        font-size: 15px;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      .fam-btn-secondary {
+        flex: 1;
+        padding: 13px 16px;
+        border: 1px solid rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.06);
+        color: #cbd5e1;
+        font-size: 15px;
         font-weight: 600;
         cursor: pointer;
       }
       .fam-suppress {
         display: block;
-        margin: 0.75rem auto 0;
+        margin: 12px auto 0;
         background: none;
         border: none;
         color: #94a3b8;
-        font-size: 0.78rem;
+        font-size: 13px;
         cursor: pointer;
-        padding: 0.25rem;
+        padding: 4px;
         text-decoration: underline;
       }
 
@@ -208,6 +232,11 @@ import {
       }
       .light-theme .fam-suppress {
         color: #9ca3af;
+      }
+      .light-theme .fam-btn-secondary {
+        background: rgba(0, 0, 0, 0.04);
+        border-color: rgba(0, 0, 0, 0.12);
+        color: #374151;
       }
       .light-theme .fam-dot {
         background: #d1d5db;
@@ -278,6 +307,17 @@ export class FeatureAnnouncementModalComponent implements OnDestroy {
       }
     );
     this.subscriptions.push(sub);
+  }
+
+  isImageUrl(value: string): boolean {
+    if (!value) return false;
+    const lower = value.toLowerCase();
+    return (
+      lower.startsWith('http://') ||
+      lower.startsWith('https://') ||
+      lower.startsWith('data:image/') ||
+      /\.(png|jpg|jpeg|gif|webp|svg)(\?|$)/.test(lower)
+    );
   }
 
   next(): void {

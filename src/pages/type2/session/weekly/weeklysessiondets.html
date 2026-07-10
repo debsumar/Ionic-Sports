@@ -58,7 +58,7 @@
                                 <ion-col col-6 style="margin: auto;">
                                     <p>{{memberDetials.member.FirstName}} {{memberDetials.member.LastName}}</p>
                                     <p class="passcode">{{memberDetials.member.IsEnable ? "Member":"Non Member"}}</p>
-                                    <p class="passcode" style="margin-top:8px">{{memberDetials.passcode}}</p>
+                                    <p class="passcode">{{memberDetials.passcode}}</p>
                                 </ion-col>
                                 <ion-col col-1 style="margin: auto;">
                                     <img src="assets/images/protection.svg" class="medical_img" *ngIf="!this.inclusionSet.has(memberDetials.member.MedicalCondition)">

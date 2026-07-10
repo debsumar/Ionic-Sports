@@ -1,0 +1,287 @@
+<ion-header>
+    <ion-navbar>
+        <ion-title>ActivityPro-File</ion-title>
+    </ion-navbar>
+</ion-header>
+
+
+<ion-content>
+  <div class="bh-wrap">
+    <p class="member-name">{{historyObj.Name}}</p>
+
+    <div class="due-row">
+        <ion-row>
+            <ion-col *ngIf="isPendingPaymentsMode" col-6 class="discount-col">
+                <p class="font-25 due-amount">{{currencyDetails.CurrencySymbol}}{{getCurrentTotalAmount()}}</p>
+                <p class="font-17">Due</p>
+            </ion-col>
+            <ion-col *ngIf="!isPendingPaymentsMode" col-6 class="paid-col">
+                <p class="font-25"><span>{{currencyDetails.CurrencySymbol}}</span>{{this.historyObj.PaidAmount}}</p>
+                <p class="font-17">Paid</p>
+            </ion-col>
+
+            <ion-col *ngIf="!isPendingPaymentsMode" col-6 class="discount-col">
+                <p class="font-25"><span>£</span>{{this.historyObj.Discount}}</p>
+                <p class="font-17">Discount</p>
+            </ion-col>
+        </ion-row>
+    </div>
+
+    <app-select-field [isDark]="isDarkTheme">
+        <ion-item>
+            <ion-select [(ngModel)]="selectedType" (ionChange)="onModuleChange($event)">
+                <ion-option *ngFor="let menu of menus" value={{menu.module}}>{{menu.name}}</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-select-field>
+
+    <div class="filter-wrap">
+        <button ion-button class="select-filter" [class.active]="isPendingPaymentsMode"
+            (click)="togglePendingPayments()">
+            {{getPendingPaymentsButtonText()}}
+        </button>
+    </div>
+
+    <!-- 📋 PENDING PAYMENTS DISPLAY -->
+    <div *ngIf="isPendingPaymentsMode">
+
+        <!-- Term Sessions -->
+        <div *ngIf="selectedType==0 && termPendingPaymentsRes.length> 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of termPendingPaymentsRes" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.user_first_name}} {{data.user_last_name}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.session_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.session_days}} - {{data.session_start_time}}, {{data.calculated_end_time}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.coach_first_name}} {{data.coach_last_name}} @ {{data.club_name}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line"><span *ngIf="data.amount_due" class="amount-due">{{currencyDetails.CurrencySymbol}}{{getAmountAfterDecimal(data.amount_due)}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- Monthly Sessions -->
+        <div *ngIf="selectedType == 5 && monthlyPendingPaymentRes.pending_sessions.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of monthlyPendingPaymentRes.pending_sessions" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.FirstName}} {{data.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.session_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.days}} - {{data.start_time}}, {{data.start_date | date: 'dd-MMM-yyyy'}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.coach_first_name}} {{data.coach_last_name}} @ {{data.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line amount-paid" *ngIf="data.amount_paid">{{data.paidby_text}}</p>
+                            <p class="row-line"><span *ngIf="data.amount_due" class="amount-due">{{currencyDetails.CurrencySymbol}}{{data.amount_due}}</span></p>
+                            <p class="row-line"><span class="amount-discount">({{data.month}})</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- Weekly Sessions -->
+        <div *ngIf="selectedType == 1 && weeklyPendingPaymentsRes.pending_sessions.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of weeklyPendingPaymentsRes.pending_sessions" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.FirstName}} {{data.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.session_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.days}} - {{data.start_time}}, {{data.start_date | date: 'dd-MMM-yyyy'}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.coach_first_name}} {{data.coach_last_name}} @{{data.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line"><span *ngIf="data.amount_due" class="amount-due">{{currencyDetails.CurrencySymbol}}{{data.amount_due}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- Holiday Camps -->
+        <div *ngIf="selectedType == 2 && holidaycampPendingPaymentRes.pending_sessions.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of holidaycampPendingPaymentRes.pending_sessions" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.username}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.campname}}</span> <span class="session_name">({{data.sessionname}})</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.holidaycampdays}} - {{data.starttime}}, {{data.sessiondate | date: 'dd-MMM-yyyy'}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.coachname}}@{{data.venuename}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line"><span *ngIf="data.amountdue" class="amount-due">{{currencyDetails.CurrencySymbol}}{{data.amountdue}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- School Sessions -->
+        <div *ngIf="selectedType == 4 && schoolSessionPendingPaymentRes.pending_sessions.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of schoolSessionPendingPaymentRes.pending_sessions" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.FirstName}} {{data.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.school_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.days}} - {{data.start_time}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.coach_first_name}} {{data.coach_last_name}} @ {{data.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line"><span *ngIf="data.amount_due" class="amount-due">{{currencyDetails.CurrencySymbol}}{{data.amount_due}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+    </div>
+
+
+    <!-- 📋 REGULAR (PAID) SESSIONS DISPLAY -->
+    <div *ngIf="!isPendingPaymentsMode">
+
+        <!-- Term sessions -->
+        <div *ngIf=" selectedType==0 && term_session_list.length> 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of term_session_list" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.member.FirstName}} {{data.member.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.session.session_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.session.days}} - {{data.session.start_time}}, {{data.session.start_date}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.session.coach[0].coach.first_name}} {{data.session.coach[0].coach.last_name}} @ {{data.session.ClubDetails.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line amount-paid" *ngIf="data.paid_amount">{{data.transaction.paidby_text}}</p>
+                            <p class="row-line"><span *ngIf="data.paid_amount" class="amount-paid">{{currencyDetails.CurrencySymbol}}{{getAmountAfterDecimal(data.paid_amount)}}</span></p>
+                            <p class="row-line"><span class="amount-discount">({{currencyDetails.CurrencySymbol}}{{data.transaction.total_discount}})</span></p>
+                            <p class="row-line txn-date" *ngIf="data.transaction.transaction_date"><span>{{data.transaction.transaction_date | date: 'dd-MMM-yyyy'}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- Monthly sessions -->
+        <div *ngIf="selectedType == 5 && monthly_session_list.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of monthly_session_list" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.session_member.user.FirstName}} {{data.session_member.user.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.session_member.session.session_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.session_member.session.days}} - {{data.session_member.session.start_time}}, {{data.session_member.session.start_date}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.session_member.session.monthly_session_coaches[0].coach.first_name}} {{data.session_member.session.monthly_session_coaches[0].coach.last_name}} @ {{data.session_member.session.ClubDetails.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line amount-paid" *ngIf="data.amount_paid">{{data.paidby_text}}</p>
+                            <p class="row-line"><span *ngIf="data.amount_paid" class="amount-paid">{{currencyDetails.CurrencySymbol}}{{data.amount_paid}}</span></p>
+                            <p class="row-line"><span class="amount-discount">({{data.paid_month}})</span></p>
+                            <p class="row-line txn-date" *ngIf="data.transaction_date"><span>{{data.transaction_date | date: 'dd-MMM-yyyy'}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- Weekly sessions -->
+        <div *ngIf="selectedType == 1 && weekly_session_list.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of weekly_session_list" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.weeklySessionTransactionItems[0].sessionMember.member.FirstName}} {{data.weeklySessionTransactionItems[0].sessionMember.member.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.weeklySessionTransactionItems[0].sessionMember.weeklySession.session_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.weeklySessionTransactionItems[0].sessionMember.weeklySession.days}} - {{data.weeklySessionTransactionItems[0].sessionMember.weeklySession.start_time}}, {{data.weeklySessionTransactionItems[0].sessionMember.weeklySessionDate.session_date}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.weeklySessionTransactionItems[0].sessionMember.weeklySession.coaches[0].coach.first_name}} {{data.weeklySessionTransactionItems[0].sessionMember.weeklySession.coaches[0].coach.last_name}} @{{data.weeklySessionTransactionItems[0].sessionMember.weeklySession.club.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line amount-paid" *ngIf="data.amount_paid">{{data.payment_method_name}}</p>
+                            <p class="row-line"><span *ngIf="data.amount_paid" class="amount-paid">{{currencyDetails.CurrencySymbol}}{{data.amount_paid}}</span></p>
+                            <p class="row-line"><span class="amount-discount">({{currencyDetails.CurrencySymbol}}{{data.total_discount}})</span></p>
+                            <p class="row-line txn-date" *ngIf="data.transaction_date"><span>{{data.transaction_date | date: 'dd-MMM-yyyy'}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- Holiday camps -->
+        <div *ngIf="selectedType == 2 && holidaycamp_list.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of holidaycamp_list" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.enrollments[0].user.FirstName}} {{data.enrollments[0].user.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.enrollments[0].holidaycamp.camp_name}}</span> <span class="session_name">({{data.enrollments[0].session.session_name}})</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.enrollments[0].holidaycamp.days}} - {{data.enrollments[0].session.start_time}}, {{data.enrollments[0].session.session_date}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.enrollments[0].holidaycamp.camp_coach[0].coach.first_name}} {{data.enrollments[0].holidaycamp.camp_coach[0].coach.first_name}}@{{data.enrollments[0].holidaycamp.club.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line amount-paid" *ngIf="data.amount_paid">{{data.paid_by_status_text}}</p>
+                            <p class="row-line"><span *ngIf="data.amount_paid" class="amount-paid">{{currencyDetails.CurrencySymbol}}{{data.amount_paid}}</span></p>
+                            <p class="row-line"><span class="amount-discount">({{currencyDetails.CurrencySymbol}}{{data.total_discount}})</span></p>
+                            <p class="row-line txn-date" *ngIf="data.transaction_date"><span>{{data.transaction_date | date: 'dd-MMM-yyyy'}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- School sessions -->
+        <div *ngIf="selectedType == 4 && school_session_list.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let data of school_session_list" (cardClick)="gotoDetails(data)">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{data.school_session_member[0].member?.FirstName}} {{data.school_session_member[0].member?.LastName}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{data.school_session_member[0].school_session.school_session_name}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.school_session_member[0].school_session.days}} - {{data.school_session_member[0].school_session.start_time}}</span></p>
+                            <p class="row-line para_overflow"><span class="coach-name">{{data.school_session_member[0].school_session.school_session_coach[0].coach.first_name}} {{data.school_session_member[0].school_session.school_session_coach[0].coach.last_name}} @ {{data.school_session_member[0].school_session.ClubDetails.ClubName}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col" margin-auto>
+                            <p class="row-line amount-paid" *ngIf="data.amount_paid">{{data.paid_by_status_text}}</p>
+                            <p class="row-line"><span *ngIf="data.amount_paid" class="amount-paid">{{currencyDetails.CurrencySymbol}}{{data.amount_paid}}</span></p>
+                            <p class="row-line"><span class="amount-discount">({{currencyDetails.CurrencySymbol}}{{data.total_discount}})</span></p>
+                            <p class="row-line txn-date" *ngIf="data.transaction_date"><span>{{data.transaction_date | date: 'dd-MMM-yyyy'}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+
+        <!-- Court bookings -->
+        <div *ngIf="selectedType === 3 && court_booking_list.length > 0">
+            <primary-card class="bh-card" accentColor="#35adff" *ngFor="let slot of court_booking_list">
+                <ion-card-content>
+                    <ion-row>
+                        <ion-col col-8 class="session-col">
+                            <p class="row-line"><span class="name">{{slot.name}}</span></p>
+                            <p class="row-line elipsesdot"><span class="name">{{slot.courtname}}</span></p>
+                            <p class="row-line"><span class="coach-name">{{slot.slot_start_time}} {{slot.slot_end_time}}</span></p>
+                        </ion-col>
+                        <ion-col col-4 class="amount-col">
+                            <p class="row-line"><span class="amount-paid">{{currencyDetails.CurrencySymbol}}{{slot.price}}</span></p>
+                            <p class="row-line txn-date"><span>{{slot.booking_date}}</span> <span>{{commonService.getdate(slot.Member[0].TransactionDate)}}</span></p>
+                        </ion-col>
+                    </ion-row>
+                </ion-card-content>
+            </primary-card>
+        </div>
+    </div>
+
+    <app-empty-state *ngIf="isNoBookings && no_bookings_text!=''" icon="document" [text]="no_bookings_text"></app-empty-state>
+
+    <ion-infinite-scroll (ionInfinite)="doInfinite($event)" *ngIf="search_term==''">
+        <ion-infinite-scroll-content loadingSpinner="crescent"
+            loadingText="Loading more data..."></ion-infinite-scroll-content>
+    </ion-infinite-scroll>
+  </div>
+</ion-content>

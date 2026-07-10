@@ -1,0 +1,403 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
+page-camprelateddetails {
+    @include android-sdk35-fixes;
+
+    // =========================================================
+    //  Dark theme (DEFAULT) — colors. Layout rules below apply
+    //  to both themes; light overrides live in &.light-theme.
+    // =========================================================
+    background: #0f172a !important;
+
+    ion-content,
+    .card-background-page,
+    .content-md,
+    .content-ios {
+        background: #0f172a !important;
+    }
+
+    .scroll-content {
+        background-image: none !important;
+        background: #0f172a !important;
+    }
+
+    .toolbarheader {
+        background: #1e293b;
+    }
+
+    // ---- Header ----
+    .header {
+        background: #1e293b;
+        color: #e2e8f0;
+    }
+    .name {
+        font-size: 25px;
+        color: #f1f5f9;
+    }
+    .headerp {
+        margin: 5px 5px 5px 0px !important;
+        font-size: 15px;
+        color: #cbd5e1;
+    }
+    .grp_size_div {
+        display: flex;
+        position: relative;
+        button {
+            top: -10px;
+            right: 10px;
+            ion-icon {
+                font-size: 2.2em;
+                color: #fff;
+            }
+        }
+    }
+    .check-button {
+        margin: 3% 3%;
+        border: 1px solid #2b92bb;
+        background-color: transparent;
+        height: 3.6rem;
+        font-size: 1.3rem;
+        border-radius: 5px;
+        text-transform: capitalize;
+        color: #ffffff !important;
+        ion-icon {
+            margin-left: 5px;
+            margin-top: 1px;
+        }
+    }
+
+    // ---- Containers / cards ----
+    .containers {
+        margin-left: 2%;
+        margin-right: 2%;
+        background: rgba(30, 41, 59, 0.55);
+        border-radius: 9px;
+        -webkit-transform: translate(0px, -27px);
+        transform: translate(0px, -27px);
+        padding: 2px 7px 28px 8px;
+    }
+
+    .width-100 { width: 100%; }
+
+    .membercard {
+        border-left: 3px solid #35adff;
+        background: #1e293b;
+        color: #e2e8f0;
+        ion-card-content {
+            padding: 0px 0px;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            min-height: 60px;
+        }
+        ion-grid { width: 100%; }
+    }
+
+    // First-block member name / age (override Ionic default card <p> color)
+    .mem-name {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: #e2e8f0 !important;
+    }
+    .mem-age {
+        color: #cbd5e1 !important;
+        font-size: 13px;
+        span { color: #cbd5e1 !important; }
+    }
+
+    // Member name / passcode within the (first block) session member card
+    .person_name {
+        padding-top: 10px;
+        font-size: 14px !important;
+        color: #e2e8f0 !important;
+        font-family: "Oswald", sans-serif !important;
+        font-weight: bold;
+    }
+    .session_name {
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        color: #e2e8f0 !important;
+        font-family: "Oswald", sans-serif !important;
+        margin: 4px;
+    }
+    .passode {
+        line-height: 10px;
+        font-size: 14px;
+        color: #94a3b8;
+        font-style: italic;
+    }
+    .pStyle {
+        font-family: "Roboto Slab", serif !important;
+        color: #94a3b8;
+    }
+    .paymenttype {
+        color: #cbd5e1;
+        font-weight: 500;
+    }
+
+    // ---- Right-side payment block (first block / session members) ----
+    // Vertically centered, right-aligned — fixes the "messed up" layout.
+    .paidBlock {
+        padding: 0 5px 0 0 !important;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: flex-end;
+        height: 100%;
+        width: 100%;
+        min-width: 0;
+
+        > div { width: 100%; }
+        p { margin: 0 !important; }
+    }
+    .paid_div {
+        text-align: right;
+    }
+
+    // ----- Payment status colors (work in BOTH themes) -----
+    // Paid -> green
+    .moneypaid {
+        line-height: 1.2;
+        text-align: right;
+        font-weight: bold;
+        color: #10b981;
+        margin: 0 !important;
+    }
+    // Pending Verification -> teal (distinct from paid & pending)
+    .pendingverification {
+        line-height: 1.3;
+        font-size: 13px;
+        text-align: right;
+        font-weight: 600;
+        color: #14b8a6;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        margin: 0 !important;
+        width: 100%;
+        max-width: 100%;
+        display: block;
+    }
+    // Pending / Due -> red
+    .pending {
+        line-height: 1.3;
+        font-size: 13px;
+        text-align: right;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        color: #f87171;
+        font-style: italic;
+        margin: 0 !important;
+    }
+    .transactiondate {
+        line-height: 1.2;
+        font-size: 10px;
+        text-align: right;
+        color: #94a3b8;
+        font-style: italic;
+        margin: 0 !important;
+    }
+    .transactiondate1 {
+        line-height: 14px;
+        font-size: 12px;
+        color: #fff;
+        font-style: italic;
+        margin-left: -5px;
+    }
+    .dueimage {
+        height: 43px;
+        margin-top: -6px;
+        width: 38px;
+        float: right;
+    }
+
+    // Legacy status icons (kept for compatibility)
+    .due { color: #f87171; font-size: 25px; margin-top: 4px; }
+    .pv { color: #14b8a6; font-size: 25px; margin-top: 4px; }
+    .paid { color: #10b981; font-size: 25px; margin-top: 4px; }
+    .dangerRed { color: #f87171 !important; }
+    .leftp {
+        line-height: 20px;
+        font-weight: bold;
+        color: #8bd34a;
+        font-size: 16px;
+        font-family: "Bree Serif", serif;
+    }
+    .leftp1 { margin-top: 13px; }
+
+    // ---- Inner (camp) session card ----
+    .innerblock { margin: 3px 3px 6px 17px; }
+    .membersessioncard {
+        margin: 7px 0px 0px 0px;
+        width: 100%;
+        background: linear-gradient(to right, #3ebbd1, #c5e0e7);
+        color: white;
+    }
+
+    // ---- Extra info / facilities ----
+    .extra_info_div {
+        padding: 20px 10px;
+        border-radius: 10px;
+        border: 0.5px solid #334155;
+        .ticket_card {
+            transition: max-height 0.4s ease-in-out;
+            margin: 2px !important;
+            background: #1e293b;
+            ion-card-header {
+                border-bottom: 0.5px solid #334155;
+                color: #e2e8f0;
+                p { color: #e2e8f0; }
+            }
+            .card_content {
+                padding: 10px 10px !important;
+                margin: auto;
+                div {
+                    padding-top: 5px;
+                    p {
+                        font-size: 16px;
+                        margin-right: 5px;
+                        padding: 5px 5px;
+                        border-radius: 18px;
+                        color: #e2e8f0;
+                        text-align: left;
+                        text-overflow: ellipsis;
+                        overflow: hidden;
+                        white-space: nowrap;
+                    }
+                }
+            }
+        }
+    }
+
+    .para_overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    .discount_hint {
+        position: absolute;
+        color: #f87171 !important;
+        bottom: -14px;
+        padding-bottom: 5px;
+    }
+    .card_action_icon {
+        margin: auto;
+        color: rgba(226, 232, 240, 0.6);
+        font-size: 1.4em;
+    }
+    .users_count {
+        color: rgba(226, 232, 240, 0.6);
+        font-size: 1.2em;
+    }
+    .card_head { padding: 12px !important; }
+    .medical_img { height: 20px; width: 20px; }
+    .card { border-radius: 5px; }
+
+    #icon1_col {
+        border-right: 2px solid #334155;
+        line-height: 61px;
+        vertical-align: middle;
+        text-align: center;
+    }
+    .cust_icon {
+        font-size: 31px !important;
+        color: #94a3b8 !important;
+    }
+    .chevron_right {
+        margin-top: 11px;
+        color: #94a3b8 !important;
+    }
+
+    // ---- Fabs ----
+    .centerfab { text-align: center; }
+    .fabstyle { position: relative !important; }
+    .nomargin {
+        margin: -19% -19% -12% 23% !important;
+        background-color: #128fa5;
+    }
+    .fabTop { margin-bottom: 13px; }
+    .fabAttendanceText,
+    .fabEmailText {
+        background-color: #2b92bb !important;
+        margin-top: -47px;
+        padding: 6px 12px 6px 11px;
+        margin-bottom: 5px;
+        color: #ffffff;
+        border-radius: 3px;
+        margin-right: 36px;
+    }
+    .fabEmailText {
+        -webkit-box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    // =========================================================
+    //  Light theme overrides
+    // =========================================================
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .card-background-page,
+        .content-md,
+        .content-ios {
+            background: #f8fafc !important;
+        }
+        .scroll-content {
+            background: #f8fafc !important;
+        }
+        .toolbarheader { background: #2b92bb; }
+
+        .header {
+            background: #ffffff;
+            color: #042133;
+        }
+        .name { color: #042133; }
+        .headerp { color: #505050; }
+        .check-button { color: #2b92bb !important; }
+
+        .containers { background: rgba(231, 222, 222, 0.55); }
+
+        .membercard {
+            background: #ffffff;
+            color: rgba(0, 0, 0, 0.85);
+        }
+        .mem-name { color: #042133 !important; }
+        .mem-age { color: #475569 !important; span { color: #475569 !important; } }
+        .person_name { color: #505050 !important; }
+        .session_name { color: #505050 !important; }
+        .passode { color: #343434a8; }
+        .pStyle { color: rgba(0, 0, 0, 0.55); }
+        .paymenttype { color: #050a29; }
+
+        // Payment status colors (light)
+        .moneypaid { color: green; }
+        .pendingverification { color: #128fa5; }
+        .pending { color: rgba(255, 0, 0, 0.85); }
+        .transactiondate { color: #aaada8; }
+        .leftp { color: #72b70c; }
+
+        .extra_info_div {
+            border: 0.5px solid grey;
+            .ticket_card {
+                background: #ffffff;
+                ion-card-header {
+                    border-bottom: 0.5px solid grey;
+                    color: rgba(0, 0, 0, 0.85);
+                    p { color: rgba(0, 0, 0, 0.85); }
+                }
+                .card_content div p { color: rgba(0, 0, 0, 0.85); }
+            }
+        }
+
+        .discount_hint { color: red !important; }
+        .card_action_icon { color: rgba(0, 0, 0, 0.50); }
+        .users_count { color: rgba(0, 0, 0, 0.50); }
+        #icon1_col { border-right: 2px solid #b7b5b5; }
+        .cust_icon { color: #7a7878 !important; }
+        .chevron_right { color: #7a7878 !important; }
+    }
+}

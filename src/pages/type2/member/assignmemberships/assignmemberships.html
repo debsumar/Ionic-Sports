@@ -1,0 +1,87 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Membership</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-pad" *ngIf="memberShipData">
+    <!-- Summary hero -->
+    <app-list-card class="summary" accentColor="#2b92bb">
+      <div class="m-card">
+        <div class="m-icon">
+          <ion-icon name="card"></ion-icon>
+        </div>
+        <div class="m-head">
+          <p class="m-name">{{memberShipData?.membership_tier?.name}}</p>
+          <p class="m-cat" *ngIf="memberShipData?.membership_tier?.name">
+            <ion-icon name="pricetag"></ion-icon>
+            <span class="val">{{memberShipData?.membership_tier?.name}}</span>
+          </p>
+        </div>
+      </div>
+    </app-list-card>
+
+    <!-- Payment option -->
+    <app-section-header title="Select Payment Option"></app-section-header>
+    <ion-list radio-group [(ngModel)]="Duration" class="opt-list">
+      <ion-item *ngIf="monthly" class="opt-card" [class.active]="Duration === 'monthly'">
+        <ion-label>
+          <span class="opt-title">Monthly</span>
+          <span class="opt-price"><span class="price" *ngIf="currencyDetails!=undefined">{{currencyDetails.CurrencySymbol}}</span>{{memberShipData.monthly_price}}</span>
+        </ion-label>
+        <ion-radio [value]="'monthly'"></ion-radio>
+      </ion-item>
+      <ion-item *ngIf="yearly" class="opt-card" [class.active]="Duration === 'yearly'">
+        <ion-label>
+          <span class="opt-title">Yearly</span>
+          <span class="opt-price"><span class="price" *ngIf="currencyDetails!=undefined">{{currencyDetails.CurrencySymbol}}</span>{{memberShipData.yearly_price}}</span>
+          <span class="disc" *ngIf="memberShipData.yearly_discount_absolute != 0 || memberShipData.yearly_discount_percentage != 0">
+            Save
+            <span *ngIf="memberShipData.yearly_discount_absolute != 0">{{currencyDetails?.CurrencySymbol}}{{memberShipData.yearly_discount_absolute}}</span>
+            <span *ngIf="memberShipData.yearly_discount_absolute != 0 && memberShipData.yearly_discount_percentage != 0"> or </span>
+            <span *ngIf="memberShipData.yearly_discount_percentage != 0">{{memberShipData.yearly_discount_percentage}}%</span>
+          </span>
+        </ion-label>
+        <ion-radio [value]="'yearly'"></ion-radio>
+      </ion-item>
+    </ion-list>
+
+    <!-- Members -->
+    <app-section-header title="Select Members"></app-section-header>
+    <div class="member-list" *ngIf="familyMemberInfo.length > 0">
+      <div class="member-item" *ngFor="let member of familyMemberInfo" [class.selected]="member.IsSelect">
+        <div class="avatar">
+          {{ (member.FirstName ? member.FirstName.charAt(0) : '') + (member.LastName ? member.LastName.charAt(0) : '') }}
+        </div>
+        <span class="member-name">{{member.FirstName}} {{member.LastName}}</span>
+        <ion-checkbox [(ngModel)]="member.IsSelect" (ionChange)="selectMember(member)"></ion-checkbox>
+      </div>
+    </div>
+
+    <app-empty-state *ngIf="is_no_members" icon="people" text="No member(s) left" [danger]="true"></app-empty-state>
+
+    <!-- Start date -->
+    <ng-container *ngIf="!is_no_members">
+      <app-section-header title="Start Date"></app-section-header>
+      <app-form-field [isDark]="isDarkTheme">
+        <ion-item>
+          <ion-label>Select Start Date</ion-label>
+          <ion-datetime displayFormat="DD MMM YYYY" pickerFormat="DD MMM YYYY" [(ngModel)]="startDate"
+            min={{minDate}} max={{maxDate}}></ion-datetime>
+        </ion-item>
+      </app-form-field>
+    </ng-container>
+  </div>
+</ion-content>
+
+<ion-footer no-border [class.light-theme]="!isDarkTheme">
+  <div class="action-bar">
+    <ng-container *ngIf="isAssigned">
+      <button class="secondary-btn" (click)="remove()">Remove Membership</button>
+      <app-glass-button label="Update" (btnClick)="addUserIntoMemberShip()"></app-glass-button>
+    </ng-container>
+    <app-glass-button *ngIf="!isAssigned" label="Confirm" [disabled]="!isFormValid"
+      (btnClick)="assignmember()"></app-glass-button>
+  </div>
+</ion-footer>

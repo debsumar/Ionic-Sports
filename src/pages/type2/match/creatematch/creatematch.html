@@ -101,9 +101,10 @@
     </app-form-field>
 
     <app-form-field [isDark]="isDarkTheme">
-      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event)"
+      <!-- <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event)"
         label="Match Access">
-      </app-access-toggle>
+      </app-access-toggle> -->
+      <app-access-toggle [(isPublic)]="publicType" (isPublicChange)="changeType($event)" label="Match Access"></app-access-toggle>
     </app-form-field>
 
     <app-expandable-section label="FEE" [(expanded)]="isChecked" (expandedChange)="updateMatchPaymentType($event)">
