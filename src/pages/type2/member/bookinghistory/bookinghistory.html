@@ -30,7 +30,7 @@
     <app-select-field [isDark]="isDarkTheme">
         <ion-item>
             <ion-select [(ngModel)]="selectedType" (ionChange)="onModuleChange($event)">
-                <ion-option *ngFor="let menu of menus" value={{menu.module}}>{{menu.name}}</ion-option>
+                <ion-option *ngFor="let menu of menus" [value]="menu.module">{{menu.name}}</ion-option>
             </ion-select>
         </ion-item>
     </app-select-field>

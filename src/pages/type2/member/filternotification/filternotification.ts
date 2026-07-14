@@ -1,16 +1,14 @@
 import { Component, Input } from '@angular/core';
-import { LoadingController, AlertController, ModalController, ToastController, NavController, } from 'ionic-angular';
+import { LoadingController, AlertController, ModalController, ToastController, NavController, Events } from 'ionic-angular';
 import { PopoverController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 // import { Dashboard } from './../../dashboard/dashboard';
-import * as $ from 'jquery';
 import { IonicPage } from 'ionic-angular';
 import { SharedServices } from '../../../services/sharedservice';
 import { FirebaseService } from '../../../../services/firebase.service';
 import { CommonService, ToastPlacement, ToastMessageType } from '../../../../services/common.service';
 import gql from "graphql-tag";
 import { GraphqlService } from '../../../../services/graphql.service';
-import { IClubDetails } from '../../../../shared/model/club.model';
 import { UsersModel } from '../../../../shared/model/users_list.model';
 import { UsersListInput } from '../model/member';
 import { AppType, ModuleTypes } from '../../../../shared/constants/module.constants';
@@ -69,6 +67,7 @@ export class Filternotification {
   }
 
   copiedText: any = "";
+  isDarkTheme: boolean = true;
   constructor(public commonService: CommonService,
      public modalCtrl: ModalController, 
       public alertCtrl: AlertController, 
@@ -76,7 +75,8 @@ export class Filternotification {
       public fb: FirebaseService, private storage: Storage,
       public navCtrl: NavController, public sharedservice: SharedServices, 
       public popoverCtrl: PopoverController,
-      private httpService: HttpService) {
+      private httpService: HttpService,
+      public events: Events) {
 
     this.themeType = sharedservice.getThemeType();
     this.parentClubKey = this.sharedservice.getParentclubKey();
@@ -85,6 +85,7 @@ export class Filternotification {
     this.venus_user_input.parentclub_id = this.sharedservice.getPostgreParentClubId();
     this.getClubList();
     this.selectedEmailCategory = 0;
+    this.loadTheme();
   }
 
   ionViewDidLoad() {
@@ -340,9 +341,23 @@ export class Filternotification {
     });
   }
 
+  loadTheme() {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      this.isDarkTheme = isDarkTheme !== null ? isDarkTheme : true;
+      this.applyTheme();
+    }).catch(() => { this.isDarkTheme = true; this.applyTheme(); });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
+  }
 
+  applyTheme() {
+    const el = document.querySelector('page-filternotification');
+    if (el) {
+      if (this.isDarkTheme) { el.classList.remove('light-theme'); }
+      else { el.classList.add('light-theme'); }
+    }
+  }
 
-
-
-  
 }

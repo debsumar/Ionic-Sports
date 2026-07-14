@@ -229,107 +229,92 @@
                 <ion-input type="number" [(ngModel)]="cash.Available_Balance"
                     placeholder="Available Balance"></ion-input>
             </ion-item> -->
-            <ion-item>
-                <ion-label>
-                    Debit Amount
-                </ion-label>
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-label>Debit Amount</ion-label>
+                    <ion-input type="number" [(ngModel)]="cash.Debit_Amount" placeholder="Debit Amount"></ion-input>
+                </ion-item>
+            </app-form-field>
 
-                <ion-input type="number" [(ngModel)]="cash.Debit_Amount" placeholder="Debit Amount"></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label>
-                    Reason
-                </ion-label>
-                <ion-select [(ngModel)]="cash.Type">
-                    <ion-option *ngFor="let item of TypeListBackup"
-                        [value]="item.Code">{{item.DisplayName}}</ion-option>
-                </ion-select>
-            </ion-item>
-            <ion-item style="margin-top: 20px;">
+            <app-select-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-select [(ngModel)]="cash.Type" placeholder="Reason">
+                        <ion-option *ngFor="let item of TypeListBackup" [value]="item.Code">{{item.DisplayName}}</ion-option>
+                    </ion-select>
+                </ion-item>
+            </app-select-field>
 
-                <ion-textarea type="text" rows="3" [(ngModel)]="cash.Comment" placeholder="Comments..."></ion-textarea>
-            </ion-item>
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-textarea type="text" rows="3" [(ngModel)]="cash.Comment" placeholder="Comments..."></ion-textarea>
+                </ion-item>
+            </app-form-field>
 
+            <div class="debitcheck-row">
+                <span class="debitcheck-label">Discussed and agreed with member</span>
+                <app-checkbox [(checked)]="CashChecked"></app-checkbox>
+            </div>
 
-            <ion-item class="debitcheck">
-                <ion-label>Discussed and agreed with member</ion-label>
-                <ion-checkbox [(ngModel)]="CashChecked" item-left></ion-checkbox>
-            </ion-item>
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-input type="text" placeholder="Type 'CONFIRM' here..." [(ngModel)]="confirmText"></ion-input>
+                </ion-item>
+            </app-form-field>
 
-            <ion-row style=" margin-top: 10px;">
-                <ion-col col-12>
-                    <ion-input type="text" class="ion_input" placeholder="Type 'CONFIRM' here..."
-                        [(ngModel)]="confirmText"></ion-input>
-                </ion-col>
-            </ion-row>
+            <app-glass-button label="Adjust Cash" (btnClick)="callAdjustCashPoint()"></app-glass-button>
 
 
         </div>
 
         <div *ngIf="!adjustCashPointsOpened">
-            <ion-item>
-                <ion-label>
-                    Point
-                </ion-label>
-                <ion-input type="number" [(ngModel)]="reward.Point" placeholder="Points to be debited"
-                    (ionChange)="calculateAmount($event)"></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label>
-                    Amount({{currencyDetails.CurrencySymbol}})
-                </ion-label>
-                <ion-input type="number" [(ngModel)]="reward.Amount" disabled></ion-input>
-            </ion-item>
-            <ion-item>
-                <ion-label>
-                    Type
-                </ion-label>
-                <ion-select [(ngModel)]="reward.Type">
-                    <ion-option *ngFor="let item of TypeListBackup"
-                        value={{item.Code}}>{{item.DisplayName}}</ion-option>
-                </ion-select>
-            </ion-item>
-            <ion-item>
-                <!-- <ion-label>
-                    Comments
-                </ion-label> -->
-                <ion-textarea type="text" rows="3" [(ngModel)]="reward.Comment" placeholder="Comments"></ion-textarea>
-            </ion-item>
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-label>Point</ion-label>
+                    <ion-input type="number" [(ngModel)]="reward.Point" placeholder="Points to be debited"
+                        (ionChange)="calculateAmount($event)"></ion-input>
+                </ion-item>
+            </app-form-field>
+
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-label>Amount({{currencyDetails.CurrencySymbol}})</ion-label>
+                    <ion-input type="number" [(ngModel)]="reward.Amount" disabled></ion-input>
+                </ion-item>
+            </app-form-field>
+
+            <app-select-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-select [(ngModel)]="reward.Type" placeholder="Type">
+                        <ion-option *ngFor="let item of TypeListBackup" [value]="item.Code">{{item.DisplayName}}</ion-option>
+                    </ion-select>
+                </ion-item>
+            </app-select-field>
+
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-textarea type="text" rows="3" [(ngModel)]="reward.Comment" placeholder="Comments"></ion-textarea>
+                </ion-item>
+            </app-form-field>
+        </div>
+
+        <div *ngIf="!debitPageOpened && !adjustCashPointsOpened">
+            <app-glass-button label="Reward" (btnClick)="callRewardPointApi()"></app-glass-button>
         </div>
 
         <div *ngIf="debitPageOpened">
-            <ion-item class="debitcheck">
-                <ion-label>Discussed and agreed with member</ion-label>
-                <ion-checkbox [(ngModel)]="DebitChecked" item-left></ion-checkbox>
-            </ion-item>
+            <div class="debitcheck-row">
+                <span class="debitcheck-label">Discussed and agreed with member</span>
+                <app-checkbox [(checked)]="DebitChecked"></app-checkbox>
+            </div>
 
-            <ion-row style=" margin-top: 10px;">
-                <ion-col col-12>
-                    <ion-input type="text" class="ion_input" placeholder="Type 'DEBIT' here..."
-                        [(ngModel)]="debitText"></ion-input>
-                </ion-col>
-            </ion-row>
+            <app-form-field [isDark]="isDarkTheme">
+                <ion-item>
+                    <ion-input type="text" placeholder="Type 'DEBIT' here..." [(ngModel)]="debitText"></ion-input>
+                </ion-item>
+            </app-form-field>
 
+            <app-glass-button label="Debit" (btnClick)="callDebitPointApi()"></app-glass-button>
         </div>
     </div>
 
 </ion-content>
-
-<ion-footer *ngIf="openReward">
-    <ion-row *ngIf="!debitPageOpened && !adjustCashPointsOpened">
-        <ion-col col-12>
-            <button ion-button block class="timekare-primary-btn" (click)="callRewardPointApi()">Reward</button>
-        </ion-col>
-        </ion-row>
-    <ion-row *ngIf="debitPageOpened && !adjustCashPointsOpened">
-        <ion-col col-12>
-            <button ion-button block class="timekare-primary-btn" (click)="callDebitPointApi()">Debit</button>
-        </ion-col>
-    </ion-row>
-    <ion-row *ngIf="adjustCashPointsOpened">
-        <ion-col col-12>
-            <button ion-button block class="timekare-primary-btn" (click)="callAdjustCashPoint()">Adjust
-                        Cash</button>
-         </ion-col>
-    </ion-row>        
-</ion-footer>

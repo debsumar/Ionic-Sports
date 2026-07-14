@@ -80,16 +80,16 @@ export class MonthlyMembershipSetupPage {
    
     fetchMonth(){
         try{
-            const params = new HttpParams()
-                .set('clubKey', this.eachSetup.ClubKey)
-                .set('parentClubKey', this.ParentClubKey);
-            this.httpService.get(API.LEGACY_MEMBERSHIP_MONTHLY_MONTHS, params, null, 2).subscribe(data =>{
-                this.monthArr = data['data']
-                this.monthArr.forEach(eachdata => {
-                    eachdata['isSelect'] = false
-                });
+            // const params = new HttpParams()
+            //     .set('clubKey', this.eachSetup.ClubKey)
+            //     .set('parentClubKey', this.ParentClubKey);
+            // this.httpService.get(API.LEGACY_MEMBERSHIP_MONTHLY_MONTHS, params, null, 2).subscribe(data =>{
+            //     this.monthArr = data['data']
+            //     this.monthArr.forEach(eachdata => {
+            //         eachdata['isSelect'] = false
+            //     });
                 
-            })
+            // })
         }catch(error){
 
         }
@@ -104,27 +104,27 @@ export class MonthlyMembershipSetupPage {
             this.selectedmember.forEach(eachMember => {
                 memberKeys.push(eachMember.key)
             });
-            this.httpService.post(API.LEGACY_MEMBERSHIP_ASSIGN_MONTHLY, {
-                parentClubKey: this.ParentClubKey,
-                clubKey: this.eachSetup.ClubKey,
-                memberKeys: memberKeys,
-                membershipSetupKey: this.setupKey,    
-                startMonth: selectedmonth[0],
-                email: this.email,
-                paymentOptionKey: this.PaymentOptionkey   
-            }, null, 2).subscribe(data =>{
-                this.comonService.hideLoader();
-                console.log(data)
-                if(data['status'] == 200){
-                    this.comonService.toastMessage('membership assigned successfully...', 2500,ToastMessageType.Success);
-                    this.navCtrl.pop().then(() => this.navCtrl.pop())
-                }
+            // this.httpService.post(API.LEGACY_MEMBERSHIP_ASSIGN_MONTHLY, {
+            //     parentClubKey: this.ParentClubKey,
+            //     clubKey: this.eachSetup.ClubKey,
+            //     memberKeys: memberKeys,
+            //     membershipSetupKey: this.setupKey,    
+            //     startMonth: selectedmonth[0],
+            //     email: this.email,
+            //     paymentOptionKey: this.PaymentOptionkey   
+            // }, null, 2).subscribe(data =>{
+            //     this.comonService.hideLoader();
+            //     console.log(data)
+            //     if(data['status'] == 200){
+            //         this.comonService.toastMessage('membership assigned successfully...', 2500,ToastMessageType.Success);
+            //         this.navCtrl.pop().then(() => this.navCtrl.pop())
+            //     }
                 
-            },
-            error => {
-                this.comonService.hideLoader();
-                this.comonService.toastMessage(error.message, 2500,ToastMessageType.Error);
-            })
+            // },
+            // error => {
+            //     this.comonService.hideLoader();
+            //     this.comonService.toastMessage(error.message, 2500,ToastMessageType.Error);
+            // })
         }catch(error){
             this.comonService.hideLoader();
         }

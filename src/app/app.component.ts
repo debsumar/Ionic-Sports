@@ -43,10 +43,9 @@ export class MyApp {
     private oneSignal: OneSignal,
     private device: Device, // public cache: CacheService
   ) {
-    let isProduction = true;
+    let isProduction = false;
     let emailUrl = "";
     let nodeURL = "";
-    let nestURL = "";
     let SuperAdminKey = "";
     let aws_cloudfrontURL = "";
     let aws_presignedUrl = "";
@@ -61,7 +60,6 @@ export class MyApp {
       emailUrl = "https://modernemailap.activitypro.co.uk/";
       // nodeURL = "https://activitypro-node-266406.appspot.com";
       nodeURL = "https://activitypro-node-admin.appspot.com";
-      nestURL = "https://activitypro-nest-261607.appspot.com";
       group_sessionsUrl = "https://ap-prod-sessions-api.activitypro.co.uk";
       group_session_apikey = "XzLw7GFdClJWa2vO3lwm8V6y2FGxdPO40KxsrJO4";
       aws_cloudfrontURL = "https://d1ybtjfafmsyx2.cloudfront.net";
@@ -73,7 +71,6 @@ export class MyApp {
       emailUrl = "http://54.84.255.41:8121/";
       //  emailUrl = "http://localhost:32683/";
       nodeURL = "https://activitypro-node.appspot.com";
-      nestURL = "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV";
       group_sessionsUrl =
         "https://oonxvy0hcd.execute-api.eu-west-2.amazonaws.com/DEV";
       group_session_apikey = "";
@@ -88,7 +85,6 @@ export class MyApp {
 
     this.sharedservice.setEmailUrl(emailUrl);
     this.sharedservice.setnodeURL(nodeURL);
-    this.sharedservice.setnestURL(nestURL);
     this.sharedservice.setgraphqlURL(graphql_url);
     this.sharedservice.setSuperAdminKey(SuperAdminKey);
     this.sharedservice.setCloudfrontURL(aws_cloudfrontURL);

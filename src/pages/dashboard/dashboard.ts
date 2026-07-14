@@ -910,16 +910,17 @@ export class Dashboard {
   //   })
 
   // }
+  
   getMemberDetails() {
-    this.http
-      .get(
-        `${this.nestUrl}/user/usercount/${this.userData.UserInfo[0].ParentClubKey}`
+    this.httpService.get(
+        `${API.GET_USER_COUNT}/${this.sharedService.getPostgreParentClubId()}`
       )
       .subscribe((resp) => {
         this.memberDetails = resp["data"];
         this.storage.set("memberDetails", this.memberDetails);
       });
   }
+
 
 
   getCoachDetails() {

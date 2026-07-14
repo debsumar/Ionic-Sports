@@ -579,30 +579,35 @@ export class AssignmembershipsPage {
 
     selectMember(member: FamilyMember) {
         if (member.IsSelect) {
-            // if (!this.validateMaxSelection()) {
-            //     member.IsSelect = false;
-            //     return;
-            // }
             if (this.enrolInput.user_ids.length >= this.maxMember) {
                 this.comonService.toastMessage(`You can only select up to ${this.maxMember} members.`, 2500, ToastMessageType.Error, ToastPlacement.Bottom);
                 setTimeout(() => {
                     member.IsSelect = false;
+                    this.updateSelectedCount();
                 }, 0);
-               // member.IsSelect = false; // Prevent the selection by reverting the checkbox
                 return;
             }
-            this.enrolInput.user_ids.push(member.Id)
+            this.enrolInput.user_ids.push(member.Id);
         } else {
             this.enrolInput.user_ids = this.enrolInput.user_ids.filter(id => id !== member.Id);
             if (!this.validateMinSelection()) {
-               // member.IsSelect = true;
-               setTimeout(() => {
-                member.IsSelect = true;
-            }, 0);
+                setTimeout(() => {
+                    member.IsSelect = true;
+                    this.updateSelectedCount();
+                }, 0);
                 return;
             }
         }
+        this.updateSelectedCount();
     }
+
+    updateSelectedCount() {
+        // Force re-evaluation of isFormValid by updating a tracked counter
+        this._selectedMemberCount = this.familyMemberInfo.filter(m => m.IsSelect).length;
+    }
+
+    // Tracked counter — updated on every member select/deselect
+    _selectedMemberCount: number = 0;
 
     //To check the maximum selection
 
@@ -628,16 +633,9 @@ export class AssignmembershipsPage {
     //check confirm button that every thing should be selected 
 
     get isFormValid(): boolean {
-        // Check if a payment option is selected
         const isPaymentOptionSelected = !!this.Duration;
-    
-        // Check if at least one member is selected
-        const isMemberSelected = this.familyMemberInfo.some(member => member.IsSelect);
-    
-        // Check if a start date is selected (if required)
+        const isMemberSelected = this._selectedMemberCount > 0;
         const isDateSelected = !!this.startDate;
-    
-        // Return true if all conditions are met
         return isPaymentOptionSelected && isMemberSelected && isDateSelected;
     }
 

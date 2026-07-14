@@ -54,7 +54,6 @@ export class MemberprofilePage implements OnInit {
   SetupDisplay: any[];
   time: number;
   Duration: string;
-  nodeUrl: string;
   AllowHandicap:boolean = false;
   courtbookingstatus = false;
   goldMemberStatus = false;
@@ -100,7 +99,6 @@ export class MemberprofilePage implements OnInit {
         } else{
           this.membertype = "SchoolMember";
         }
-        this.nodeUrl = "https://activitypro-nest-261607.appspot.com";
       }
     })    
   }
@@ -228,84 +226,40 @@ export class MemberprofilePage implements OnInit {
 
 
   getMemberships(){
-    const memberkeys = [];
-    //memberkeys.push(this.memberInfo.parentFirebaseKey);
-    this.family_members.forEach((member) => {memberkeys.push(member.FirebaseKey)});
+    // Single call using the parent member's postgres ID — covers all family members.
+    const payload = {
+      parentclubId: this.sharedservice.getPostgreParentClubId(),
+      clubId:       '',   // not required for this endpoint
+      activityId:   '',
+      memberId:     this.memberInfo.Id || '',  // parent postgres ID
+      action_type:  0,
+      device_type:  this.sharedservice.getPlatform() === 'android' ? 1 : 2,
+      app_type:     10, // AppType.ADMIN_NEW
+      device_id:    this.sharedservice.getDeviceId(),
+      updated_by:   this.sharedservice.getLoggedInUserId(),
+    };
 
-    this.httpService
-        //.get(`${API.MEMBERSHIP_INFO}?parentClubKey=${this.sharedservice.getParentclubKey()}&clubKey=${this.memberInfo.clubkey}&memberKeys=${memberkeys}`,)
-        .get(`${API.MEMBERSHIP_INFO}?parentClubKey=${this.sharedservice.getParentclubKey()}&clubKey=${this.memberInfo.clubkey}&memberKeys=${memberkeys}`,null,null,0)
-        .subscribe((res: any) => {
-          console.table(`memberships:${res}`);
-         for(const member of this.family_members){
-            if(res.data.memberShipDetailsForMember[member.FirebaseKey] && res.data.memberShipDetailsForMember[member.FirebaseKey].length > 0){
-              member["MembershipName"] = res.data.memberShipDetailsForMember[member.FirebaseKey].SetupName;
+    this.httpService.post(API.MEMBERSHIP_USER, payload, null, 1).subscribe(
+      (res: any) => {
+        if (res && res.data && res.data.memberships && res.data.memberships.length > 0) {
+          // Map membership name back to each family member by Id
+          res.data.memberships.forEach((m: any) => {
+            const match = this.family_members.find(fm => fm.Id === (m.member_id || m.memberId || m.Id));
+            if (match) {
+              match['MembershipName'] = m.SetupName || m.membership_name || m.setup_name || '';
             }
-         }
-        });
-  }
-
-  getMembership() {
-    // //for.getUserDetails
-    this.activeMembeships = JSON.parse(
-      JSON.stringify(this.family_members)
-    );
-    this.fb
-      .getAllWithQuery(`Membership/MembershipAssigned/${this.sharedservice.getParentclubKey()}`,{ orderByKey: true, equalTo: this.memberInfo.clubkey })
-      .subscribe((data) => {
-        if (data.length > 0) {
-          data.forEach((selectedConfig) => {
-            this.commonService
-              .convertFbObjectToArray(selectedConfig)
-              .forEach((config) => {
-                let configuration =
-                  this.commonService.convertFbObjectToArray1(config);
-                this.activeMembeships.forEach((member) => {
-                  for (let i = 0; i < configuration.length - 1; i++) {
-                    if (
-                      configuration[i].IsActive &&
-                      this.memberInfo.parentFirebaseKey ==
-                        configuration[configuration.length - 1] &&
-                      configuration[i].Validity >= new Date().getTime()
-                    ) {
-                      this.memberInfo["MembershipName"] =
-                        configuration[i].SetupName;
-                    }
-                    if (
-                      configuration[i].IsActive &&
-                      configuration[i].ParentKey == this.memberInfo.parentFirebaseKey &&
-                      member.FirebaseKey == configuration[configuration.length - 1] &&
-                      configuration[i].IsChild &&
-                      configuration[i].Validity >= new Date().getTime()
-                    ) {
-                      (member["SetupName"] = configuration[i].SetupName),
-                        (member["CurrentPayment"] =
-                          configuration[i].PaymentOptions),
-                        (member["Validity"] = moment(
-                          configuration[i].Validity
-                        ).format("YYYY/MM/DD")),
-                        this.activeMembeships.splice(
-                          this.activeMembeships.indexOf(member),
-                          1,
-                          member
-                        );
-                      this.membershipAssigned = true;
-                    } else if (
-                      configuration[i].IsChild == false &&
-                      configuration[i].IsActive &&
-                      configuration[configuration.length - 1] ==
-                        this.memberInfo.parentFirebaseKey
-                    ) {
-                      this.membershipAssigned = true;
-                    }
-                  }
-                });
-              });
           });
+          // Fallback: if the parent itself is in family_members, set on first match
+          const parentMember = this.family_members.find(fm => fm.Id === payload.memberId);
+          if (parentMember && !parentMember['MembershipName']) {
+            const active = res.data.memberships.find((m: any) => m.IsActive || m.is_active) || res.data.memberships[0];
+            if (active) parentMember['MembershipName'] = active.SetupName || active.membership_name || active.setup_name || '';
+          }
         }
-      });
+      },
+      (err) => { console.warn('getMembershipsForUser failed', err); }
+    );
   }
-
   //   getAllSetup() {
   //     let MemberKey
   //     let key

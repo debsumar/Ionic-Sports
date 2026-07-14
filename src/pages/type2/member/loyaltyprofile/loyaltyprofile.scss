@@ -53,10 +53,37 @@ page-loyaltyprofile {
         }
         ion-select { color: #f1f5f9 !important; }
     }
-    .ion_input {
-        border-color: rgba(148, 163, 184, 0.4) !important;
-        color: #f1f5f9 !important;
+
+    // Form field spacing — consistent gap between each input
+    app-form-field,
+    app-select-field {
+        display: block;
+        margin: 0 16px 10px !important;
     }
+
+    app-glass-button {
+        display: block;
+        margin-top: 8px;
+    }
+
+    // Discussed & agreed row
+    .debitcheck-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin: 4px 16px 10px;
+        padding: 12px 14px;
+        border-radius: 8px;
+        background: #1a2740;
+        border: 1px solid #2d3f55;
+    }
+    .debitcheck-label {
+        color: #94a3b8;
+        font-size: 14px;
+        flex: 1;
+        padding-right: 12px;
+    }
+
 
     .walletCard {
         padding: 10px 10px 10px 15px;
@@ -135,18 +162,16 @@ page-loyaltyprofile {
 
     .debitcheck {
         background: rgba(255, 255, 255, 0%);
+        margin: 8px 0;
 
         .item-inner {
             border-bottom: none !important;
         }
-    }
 
-    .ion_input {
-        border: 1px solid rgba(0, 0, 0, 0.34902);
-        padding: 4px 8px;
-        border-radius: 5px;
-        width: 85%;
-        margin: auto;
+        ion-label {
+            color: #94a3b8 !important;
+            font-size: 14px !important;
+        }
     }
 
     .debitTxt {
@@ -386,9 +411,13 @@ page-loyaltyprofile {
             ion-input, ion-textarea, .text-input, textarea { color: #000 !important; }
             ion-select { color: #000 !important; }
         }
-        .ion_input {
-            border-color: rgba(0, 0, 0, 0.34902) !important;
-            color: #000 !important;
+        .debitcheck-row {
+            background: #f1f5f9;
+            border-color: #cbd5e1;
+        }
+        .debitcheck-label { color: rgba(0,0,0,0.6); }
+        .debitcheck {
+            ion-label { color: rgba(0, 0, 0, 0.6) !important; }
         }
     }
 

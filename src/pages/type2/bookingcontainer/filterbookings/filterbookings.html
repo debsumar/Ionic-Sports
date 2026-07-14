@@ -18,19 +18,22 @@
     <ion-row style="margin-top: -13px;border-bottom: 1px solid #FBC27A;" class="rows-allign">
 
       <ion-col col-7>
-        <ion-item style="background-color: #efefefd9;" class="headitem">
-          <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
-            <ion-option *ngFor="let club of clubs" value={{club.$key}}>{{club.ClubName}}</ion-option>
-          </ion-select>
-        </ion-item>
+        <app-select-field [isDark]="false">
+          <ion-item class="headitem">
+            <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
+              <ion-option *ngFor="let club of clubs" [value]="club.$key">{{club.ClubName}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-select-field>
       </ion-col>
       <ion-col col-5>
-        <ion-item style="background-color: #efefefd9;" class="headitem">
-          <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourts()">
-            <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}}>{{Activity.ActivityName}}
-            </ion-option>
-          </ion-select>
-        </ion-item>
+        <app-select-field [isDark]="false">
+          <ion-item class="headitem">
+            <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourts()">
+              <ion-option *ngFor="let Activity of ActivityList" [value]="Activity.$key">{{Activity.ActivityName}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-select-field>
       </ion-col>
     </ion-row>
 

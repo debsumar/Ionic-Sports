@@ -100,6 +100,11 @@ page-assignmemberships {
     color: #f53d3d; font-weight: 700; font-size: 15px;
   }
 
+  /* ion-datetime selected value text */
+  .datetime-text { color: #f1f5f9 !important; }
+  .item-ios .datetime-text,
+  .item-md .datetime-text { color: #f1f5f9 !important; }
+
   &.light-theme {
     .scroll-content { background: #f8fafc !important; }
     ion-content { background: #f8fafc !important; }
@@ -133,5 +138,8 @@ page-assignmemberships {
     .member-name { color: #334155; }
     ion-checkbox { --background: #fff; --border-color: #cbd5e1; }
     ion-footer { background: #f8fafc; }
+    .datetime-text { color: #0f172a !important; }
+    .item-ios .datetime-text,
+    .item-md .datetime-text { color: #0f172a !important; }
   }
 }

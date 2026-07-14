@@ -5,70 +5,70 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
   encapsulation: ViewEncapsulation.None,
   template: `<div class="form-field" [class.light]="!isDark"><ng-content></ng-content></div>`,
   styles: [`
-    .form-field {
-      margin: 6px 0;
+    .form-field { margin: 6px 0; }
 
-      ion-item {
-        border-radius: 12px !important;
-        border: 1px solid #334155 !important;
-        background: #1e293b !important;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
-        padding-left: 16px;
-        align-items: center;
-      }
-      ion-item .item-inner {
-        border-bottom: none !important;
-        padding: 6px 16px 6px 0;
-        box-shadow: none !important;
-      }
-      ion-label {
-        color: #94a3b8 !important;
-        font-weight: 700 !important;
-        font-size: 11px !important;
-        text-transform: uppercase !important;
-        letter-spacing: 0.6px !important;
-        white-space: normal !important;
-        overflow: visible !important;
-        margin-right: 12px;
-      }
-      ion-select { max-width: 70% !important; }
-      .select-text { max-width: none !important; }
-      ion-select .select-icon { margin-left: 2px !important; }
-      ion-input, ion-select, ion-datetime, ion-textarea {
-        font-size: 16px !important;
-        font-weight: 600 !important;
-        color: #fff !important;
-        text-align: right !important;
-      }
-      .text-input, .datetime-text, .select-text { color: #fff !important; }
-      .text-input::placeholder { color: #475569 !important; font-weight: 500 !important; }
-
-      // Toggle
-      ion-toggle {
-        .toggle-inner { background: #fff !important; }
-        .toggle-icon { background: #334155 !important; }
-        &[checked] .toggle-icon { background: #2b92bb !important; }
-      }
-
-      // Access toggle / expandable inside form-field
-      app-access-toggle, app-expandable-section {
-        display: block; margin: 0;
-      }
+    /* Target Ionic 3's compiled .item-ios / .item-md class on the host element */
+    .form-field .item-ios,
+    .form-field .item-md {
+      border-radius: 8px !important;
+      border: 1px solid #2d3f55 !important;
+      background-color: #1a2740 !important;
+      box-shadow: none !important;
+      padding-left: 14px !important;
+      min-height: 52px !important;
+    }
+    .form-field .item-ios .item-inner,
+    .form-field .item-md .item-inner {
+      border-bottom: none !important;
+      padding-right: 14px !important;
+      box-shadow: none !important;
+    }
+    /* Labels */
+    .form-field .label-ios,
+    .form-field .label-md {
+      color: #94a3b8 !important;
+      font-weight: 500 !important;
+      font-size: 13px !important;
+      text-transform: none !important;
+      letter-spacing: 0 !important;
+      margin-bottom: 2px !important;
+    }
+    /* Input text */
+    .form-field .text-input {
+      color: #f1f5f9 !important;
+      font-size: 15px !important;
+    }
+    .form-field .text-input::placeholder {
+      color: #4a5c72 !important;
+    }
+    /* Also target native input directly (Ionic wraps in .text-input but some browsers need this) */
+    .form-field input.text-input,
+    .form-field input {
+      color: #f1f5f9 !important;
+    }
+    /* Textarea */
+    .form-field textarea {
+      color: #f1f5f9 !important;
+      font-size: 15px !important;
+      padding-top: 8px !important;
+    }
+    .form-field textarea::placeholder {
+      color: #4a5c72 !important;
     }
 
-    .form-field.light {
-      ion-item {
-        background: #fff !important;
-        border-color: #e2e8f0 !important;
-        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05) !important;
-      }
-      ion-label { color: #64748b !important; }
-      ion-input, ion-select, ion-datetime, ion-textarea { color: #0f172a !important; }
-      .text-input, .datetime-text, .select-text { color: #0f172a !important; }
-      .text-input::placeholder { color: #94a3b8 !important; }
-      ion-toggle .toggle-icon { background: #cbd5e1 !important; }
-      ion-toggle[checked] .toggle-icon { background: #2b92bb !important; }
+    /* Light variant */
+    .form-field.light .item-ios,
+    .form-field.light .item-md {
+      background-color: #f8fafc !important;
+      border-color: #cbd5e1 !important;
+      box-shadow: none !important;
     }
+    .form-field.light .label-ios,
+    .form-field.light .label-md { color: #475569 !important; }
+    .form-field.light .text-input { color: #0f172a !important; }
+    .form-field.light .text-input::placeholder { color: #94a3b8 !important; }
+    .form-field.light textarea { color: #0f172a !important; }
+    .form-field.light textarea::placeholder { color: #94a3b8 !important; }
   `]
 })
 export class FormFieldComponent {
