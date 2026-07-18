@@ -1,5 +1,5 @@
 import { Component,ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams,AlertController, ActionSheetController, Platform, Label, ModalController, ToastController, FabContainer, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, AlertController, ActionSheetController, Platform, Label, ModalController, ToastController, FabContainer, LoadingController, Events } from 'ionic-angular';
 // import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
@@ -39,6 +39,7 @@ export class membershipMemberListing {
     pending_member_count:number = 0;
     paid_member_count:number = 0;
     membership_type:number = 1;
+    isDarkTheme: boolean = true;
     constructor(
         public alertCtrl: AlertController,
         public navCtrl: NavController,
@@ -52,11 +53,13 @@ export class membershipMemberListing {
         public comonService: CommonService,
         private httpService:HttpService,
         private graphqlService:GraphqlService,
+        public events_subscription: Events,
     ) {
         
     }
 
     ionViewWillEnter(){
+        this.loadTheme();
         this.platformType = this.sharedservice.getPlatform();
         this.storage.get('userObj').then((val) => {
             val = JSON.parse(val);
@@ -115,6 +118,66 @@ export class membershipMemberListing {
         this.storage.get('Currency').then((val) => {
             this.currencyDetails = JSON.parse(val);
         });
+    }
+
+    ionViewWillLeave() {
+        this.events_subscription.unsubscribe('theme:changed');
+    }
+
+    loadTheme() {
+        this.storage
+            .get("dashboardTheme")
+            .then((isDarkTheme) => {
+                console.log("membershipmemberlisting - loaded theme from storage:", isDarkTheme);
+                if (isDarkTheme !== null) {
+                    this.isDarkTheme = isDarkTheme;
+                } else {
+                    this.isDarkTheme = true;
+                }
+                this.applyTheme();
+            })
+            .catch((error) => {
+                console.log("membershipmemberlisting - error loading theme:", error);
+                this.isDarkTheme = true;
+                this.applyTheme();
+            });
+
+        this.events_subscription.subscribe("theme:changed", (isDark) => {
+            console.log("membershipmemberlisting - received theme change event:", isDark);
+            this.isDarkTheme = isDark;
+            this.applyTheme();
+        });
+    }
+
+    applyTheme() {
+        const membershipElement = document.querySelector("page-membershipmemberlisting");
+        console.log("membershipmemberlisting - applying theme:", this.isDarkTheme ? "dark" : "light");
+
+        if (membershipElement) {
+            if (this.isDarkTheme) {
+                membershipElement.classList.remove("light-theme");
+                document.body.classList.remove("light-theme");
+                console.log("membershipmemberlisting - applied dark theme");
+            } else {
+                membershipElement.classList.add("light-theme");
+                document.body.classList.add("light-theme");
+                console.log("membershipmemberlisting - applied light theme");
+            }
+        } else {
+            setTimeout(() => {
+                const retryElement = document.querySelector("page-membershipmemberlisting");
+                if (retryElement) {
+                    if (this.isDarkTheme) {
+                        retryElement.classList.remove("light-theme");
+                        document.body.classList.remove("light-theme");
+                    } else {
+                        retryElement.classList.add("light-theme");
+                        document.body.classList.add("light-theme");
+                    }
+                    console.log("membershipmemberlisting - theme applied on retry");
+                }
+            }, 100);
+        }
     }
 
     getMembershipEnrols(selected_type:number){

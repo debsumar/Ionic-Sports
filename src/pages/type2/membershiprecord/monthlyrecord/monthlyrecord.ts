@@ -1,10 +1,9 @@
 import { Component, ViewChild } from '@angular/core';
-import { IonicPage, NavController, NavParams, Slides, AlertController, ActionSheetController, Platform, Label, ModalController, ToastController, FabContainer, LoadingController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, Slides, AlertController, ActionSheetController, Platform, Label, ModalController, ToastController, FabContainer, LoadingController, Events } from 'ionic-angular';
 // import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { SharedServices } from '../../../services/sharedservice';
-import { HttpClient } from '@angular/common/http';
 //import moment from 'moment'
 import { Membership, MembershipEnrolUsers, UserMembershipMonths } from '../../membership/dto/membershi.dto';
 import { HttpService } from '../../../../services/http.service';
@@ -69,6 +68,10 @@ export class MonthlyRecord {
     membership_user:MembershipEnrolUsers;
     postgre_parentclub_id:string = "";
     membershipMonths:UserMembershipMonths[] = [];
+
+    // THEME
+    isDarkTheme: boolean = true;
+
     constructor(
         public alertCtrl: AlertController,
         public navCtrl: NavController,
@@ -77,10 +80,10 @@ export class MonthlyRecord {
         public actionSheetCtrl: ActionSheetController,
         public storage: Storage,
         public loadingCtrl : LoadingController,
-        public http:  HttpClient,
         public sharedservice: SharedServices,
          public comonService: CommonService,
          private httpService:HttpService,
+         public events_subscription: Events,
     ) {
         this.platformType = this.sharedservice.getPlatform();
         this.membership_user = this.navParam.get('enrol_info') 
@@ -125,6 +128,52 @@ export class MonthlyRecord {
         })
 
        
+    }
+
+    ionViewWillEnter() {
+        this.loadTheme();
+    }
+
+    ionViewWillLeave() {
+        this.events_subscription.unsubscribe('theme:changed');
+    }
+
+    loadTheme() {
+        this.storage.get('dashboardTheme').then((isDarkTheme) => {
+            this.isDarkTheme = isDarkTheme !== null ? isDarkTheme : true;
+            this.applyTheme();
+        }).catch(() => {
+            this.isDarkTheme = true;
+            this.applyTheme();
+        });
+        this.events_subscription.subscribe('theme:changed', (isDark) => {
+            this.isDarkTheme = isDark;
+            this.applyTheme();
+        });
+    }
+
+    applyTheme() {
+        const el = document.querySelector('page-monthlyrecord');
+        if (el) {
+            if (this.isDarkTheme) {
+                el.classList.remove('light-theme');
+                document.body.classList.remove('light-theme');
+            } else {
+                el.classList.add('light-theme');
+                document.body.classList.add('light-theme');
+            }
+        } else {
+            setTimeout(() => {
+                const retryEl = document.querySelector('page-monthlyrecord');
+                if (retryEl) {
+                    if (this.isDarkTheme) {
+                        retryEl.classList.remove('light-theme');
+                    } else {
+                        retryEl.classList.add('light-theme');
+                    }
+                }
+            }, 100);
+        }
     }
 
     async getStorageDetails(){
@@ -198,14 +247,14 @@ export class MonthlyRecord {
     
     renewMembership() {
         try{
-            this.comonService.showLoader("Please wait");
-            this.assignMembership().then((mem_assignedkey:any)=>{
-                this.paymentObj.membershipAssignedKeys.push(mem_assignedkey);
-                this.renew();
-            }).catch((err)=>{
-                this.comonService.hideLoader();
-                this.comonService.toastMessage("renewal failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
-            }) 
+            // this.comonService.showLoader("Please wait");
+            // this.assignMembership().then((mem_assignedkey:any)=>{
+            //     this.paymentObj.membershipAssignedKeys.push(mem_assignedkey);
+            //     this.renew();
+            // }).catch((err)=>{
+            //     this.comonService.hideLoader();
+            //     this.comonService.toastMessage("renewal failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+            // }) 
         }catch(err){
             this.comonService.hideLoader();
             this.comonService.toastMessage("renewal failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
@@ -213,26 +262,26 @@ export class MonthlyRecord {
     }
 
     assignMembership(){ //it's like enrol
-        return new Promise((resolve, reject) => {
-            this.httpService.post(API.LEGACY_MEMBERSHIP_ASSIGN_MONTHLY, this.MonthlyAssignmentObj, null, 2).subscribe((res:any) => {
-                resolve(res.data);
-            },  
-            err => {
-                this.comonService.hideLoader();
-                reject(err)
-                this.comonService.toastMessage("renewal failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
-            }) 
-        })        
+        // return new Promise((resolve, reject) => {
+        //     this.httpService.post(API.LEGACY_MEMBERSHIP_ASSIGN_MONTHLY, this.MonthlyAssignmentObj, null, 2).subscribe((res:any) => {
+        //         resolve(res.data);
+        //     },  
+        //     err => {
+        //         this.comonService.hideLoader();
+        //         reject(err)
+        //         this.comonService.toastMessage("renewal failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+        //     }) 
+        // })        
     }
 
     renew(){ //it's renewal
-        this.httpService.post(API.LEGACY_MEMBERSHIP_RENEW_MONTHLY, this.paymentObj, null, 2).subscribe((res) => {
-            this.cancelMembership(); 
-        },  
-        err => {
-            this.comonService.hideLoader();
-            this.comonService.toastMessage("renewal failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
-        })                  
+        // this.httpService.post(API.LEGACY_MEMBERSHIP_RENEW_MONTHLY, this.paymentObj, null, 2).subscribe((res) => {
+        //     this.cancelMembership(); 
+        // },  
+        // err => {
+        //     this.comonService.hideLoader();
+        //     this.comonService.toastMessage("renewal failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+        // })                  
     }
 
     cancelMembership() {

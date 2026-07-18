@@ -190,8 +190,9 @@ export class Dashboard {
       
       // Handle first login actions
       if (loginWhen === "first" && this.userData) {
-        this.getMemberDetails();
-        //this.getPostgreParentclub();
+        // getMemberDetails() is called inside getPostgreParentclub() after the
+        // postgres ID is set — calling it here would fire before the ID is ready
+        // and produce user/usercount/undefined
         this.storage.set("LoginWhen", "notFirst");
       }
       
@@ -201,8 +202,6 @@ export class Dashboard {
         
         if (diff >= this.CACHE_REFRESH_MINUTES && this.userData) {
           this.getPostgreParentclub();
-          this.getMemberDetails();
-          this.getEvents();
         }
       }
     })
@@ -746,42 +745,36 @@ export class Dashboard {
   }
 
   getEvents() {
-    let reqObj = {
-      parentCLubKey: this.userData.UserInfo[0].ParentClubKey,
-      loggedInType: "admin",
-      loggedInKey: this.userData.UserInfo[0].Key,
-      filterType: "present",
+    const reqObj = {
+      parentclub_id:  this.sharedService.getPostgreParentClubId(),
+      club_id:        "",
+      activity_id:    "",
+      member_id:      this.sharedService.getLoggedInId(),
+      action_type:    1,
+      device_type:    this.sharedService.getPlatform() === 'android' ? 1 : 2,
+      app_type:       AppType.ADMIN_NEW,
+      device_id:      this.sharedService.getDeviceId(),
+      updated_by:     this.sharedService.getLoggedInId(),
+      start_date:     "",
+      end_date:       "",
     };
-    this.fb.$post(`${this.nodeUrl}/event/history`, reqObj).subscribe(
-      (data) => {
-        // console.log(`events:${data}`);
-
-        console.log(this.EventObj);
-        this.EventObj.TotalEvents = data.events.length;
-        this.EventObj.TicketsSold = data.bookings;
-        this.EventObj.TotRevenue = parseFloat(data.totalPaidAmount).toFixed(2);
-        this.storage.set("eventDetails", this.EventObj);
-        // this.storage.get("eventDetails").then((data) => {
-        //   if (data != null) {
-        //     this.storage.remove("eventDetails").then(() => {
-        //       this.EventObj.TotalEvents = data.events.length;
-        //       this.EventObj.TicketsSold = data.bookings;
-        //       this.EventObj.TotRevenue = data.totalPaidAmount;
-        //       this.storage.set('eventDetails', this.EventObj);
-        //     });
-        //   } else {
-        //     this.EventObj.TotalEvents = data.events.length;
-        //     this.EventObj.TicketsSold = data.bookings;
-        //     this.EventObj.TotRevenue = data.totalPaidAmount;
-        //     this.storage.set('eventDetails', this.EventObj);
-        //   }
-        // })
-      },
-      (err) => {
-        console.log("err", err);
-        //this.showToast("There is some problem,Please try again",2500);
-      }
-    );
+    this.httpService.post<GetEventPaymentHistoryResponse>(
+        API.GET_EVENT_PAYMENT_HISTORY,
+        reqObj,
+        undefined,
+        1
+      )
+      .subscribe(
+        (data) => {
+          this.EventObj.TotalEvents = data.total_events;
+          this.EventObj.TicketsSold = data.total_tickets_sold;
+          this.EventObj.TotRevenue = parseFloat(data.total_revenue).toFixed(2);
+          this.storage.set("eventDetails", this.EventObj);
+        },
+        (err) => {
+          console.log("err", err);
+        }
+      );
   }
 
   //Navigate to events
@@ -974,11 +967,13 @@ export class Dashboard {
           this.sharedService.setPostgreParentClubId(res.data["Id"]);
           this.storage.set("postgre_parentclub", res.data);
           this.checkFeatureAnnouncements(res.data["Id"]);
+          this.getMemberDetails();
           this.getSessionDetails();
           this.getTermSessionEnrolDetails();
           this.getSchoolSessionEnrolDets();
           this.getMonthlySessionEnrolDets();
           this.getCoachDetails();
+          this.getEvents();
         }
       },
       error: (err) => {
@@ -1137,6 +1132,12 @@ interface ISessionPendingPayments{
   TotalAmountDue:string;
   TotalCount:string;
   VenueDetails:[]
+}
+
+interface GetEventPaymentHistoryResponse {
+  total_events: number;
+  total_tickets_sold: number;
+  total_revenue: string;
 }
 
 interface IPendingSessionVenues{

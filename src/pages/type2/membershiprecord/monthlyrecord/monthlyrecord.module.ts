@@ -1,8 +1,8 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
+import { CommonModule } from '@angular/common';
 import { MonthlyRecord } from './monthlyrecord';
-
-
+import { SharedComponentsModule } from '../../../../shared/components/shared-components.module';
 
 @NgModule({
   declarations: [
@@ -10,6 +10,8 @@ import { MonthlyRecord } from './monthlyrecord';
   ],
   imports: [
     IonicPageModule.forChild(MonthlyRecord),
+    CommonModule,
+    SharedComponentsModule,
   ],
   exports: [
     MonthlyRecord

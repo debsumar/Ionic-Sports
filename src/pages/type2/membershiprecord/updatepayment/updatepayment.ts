@@ -95,58 +95,58 @@ export class UpdatePayment {
 
     async updatePaymentInfo() {
         try {
-            if (this.validate()) {
-                this.comonService.showLoader('Please wait, Dont press back or close button...');
-                this.MemberShipPayment.description = 'Membership Payment for ' + this.member['DisplayName']
-                this.MemberShipPayment.amount = this.paymentDetails.PaymentAmount
-                this.MemberShipPayment.clubKey = this.membership.ClubKey
-                this.MemberShipPayment.setupKey = this.membership.SetupKey
-                this.MemberShipPayment.parentclubKey = this.ParentClubKey
-                this.MemberShipPayment.extraCharge = 0.00
-                this.MemberShipPayment.currency = '_blank'
-                this.MemberShipPayment.source = '_blank'
-                this.MemberShipPayment.activityKey = '_blank'
-                let activemember = { FirstName: '', LastName: '', EmailID: '', key: '', Key: '',MemberKey:'' }
+            // if (this.validate()) {
+            //     this.comonService.showLoader('Please wait, Dont press back or close button...');
+            //     this.MemberShipPayment.description = 'Membership Payment for ' + this.member['DisplayName']
+            //     this.MemberShipPayment.amount = this.paymentDetails.PaymentAmount
+            //     this.MemberShipPayment.clubKey = this.membership.ClubKey
+            //     this.MemberShipPayment.setupKey = this.membership.SetupKey
+            //     this.MemberShipPayment.parentclubKey = this.ParentClubKey
+            //     this.MemberShipPayment.extraCharge = 0.00
+            //     this.MemberShipPayment.currency = '_blank'
+            //     this.MemberShipPayment.source = '_blank'
+            //     this.MemberShipPayment.activityKey = '_blank'
+            //     let activemember = { FirstName: '', LastName: '', EmailID: '', key: '', Key: '',MemberKey:'' }
                
                 
-                let eachmembership = { eachDiscount:0,DiscountType:'', IsRenewed:'', SetupKey:'', SetupName:'', PaymentOptions:'', activeMembers:[]} 
-                eachmembership['eachDiscount'] = this.paymentDetails.Discount
-                eachmembership['DiscountType'] = this.paymentDetails.DiscountType
-                eachmembership['IsRenewed'] = this.member.IsRenewed
-                eachmembership['SetupKey'] = this.member.SetupKey
-                eachmembership['SetupName'] = this.member.SetupName
-                eachmembership['PaymentOptions'] = this.member.PaymentOptions
+            //     let eachmembership = { eachDiscount:0,DiscountType:'', IsRenewed:'', SetupKey:'', SetupName:'', PaymentOptions:'', activeMembers:[]} 
+            //     eachmembership['eachDiscount'] = this.paymentDetails.Discount
+            //     eachmembership['DiscountType'] = this.paymentDetails.DiscountType
+            //     eachmembership['IsRenewed'] = this.member.IsRenewed
+            //     eachmembership['SetupKey'] = this.member.SetupKey
+            //     eachmembership['SetupName'] = this.member.SetupName
+            //     eachmembership['PaymentOptions'] = this.member.PaymentOptions
 
-                this.memberofSameMembership.forEach(member => {
-                    activemember = {
-                        FirstName: member.DisplayName.split(' ')[0],
-                        LastName: member.DisplayName.split(' ')[1],
-                        EmailID: member.EmailID,
-                        key: member.MemberKey,
-                        Key: member.MembershipAssignedKey,
-                        MemberKey: member.MemberKey
-                    }
+            //     this.memberofSameMembership.forEach(member => {
+            //         activemember = {
+            //             FirstName: member.DisplayName.split(' ')[0],
+            //             LastName: member.DisplayName.split(' ')[1],
+            //             EmailID: member.EmailID,
+            //             key: member.MemberKey,
+            //             Key: member.MembershipAssignedKey,
+            //             MemberKey: member.MemberKey
+            //         }
 
-                    eachmembership['activeMembers'].push(activemember)
-                });
-                this.MemberShipPayment.memberShipInfo.push(eachmembership)
-                let payment = {
-                    PaymentAmount: this.paymentDetails.PaymentAmount,
-                    PaymentMode: this.paymentDetails.PaymentMode,
-                    PaymentStatus: this.paymentDetails.PaymentStatus,
-                    Comments: this.paymentDetails.Comments,
-                }
-                this.PaymentModel.PaymentUpdate = payment
-                this.PaymentModel.MemberShipPayment = this.MemberShipPayment
-                let response = await this.callupdatepayment()
-                this.comonService.toastMessage('Payment successful', 3000, ToastMessageType.Success, ToastPlacement.Bottom, true);
-                this.comonService.hideLoader();
-                this.navCtrl.popTo(this.navCtrl.getByIndex(this.navCtrl.length()-4));
-            } else {
+            //         eachmembership['activeMembers'].push(activemember)
+            //     });
+            //     this.MemberShipPayment.memberShipInfo.push(eachmembership)
+            //     let payment = {
+            //         PaymentAmount: this.paymentDetails.PaymentAmount,
+            //         PaymentMode: this.paymentDetails.PaymentMode,
+            //         PaymentStatus: this.paymentDetails.PaymentStatus,
+            //         Comments: this.paymentDetails.Comments,
+            //     }
+            //     this.PaymentModel.PaymentUpdate = payment
+            //     this.PaymentModel.MemberShipPayment = this.MemberShipPayment
+            //     let response = await this.callupdatepayment()
+            //     this.comonService.toastMessage('Payment successful', 3000, ToastMessageType.Success, ToastPlacement.Bottom, true);
+            //     this.comonService.hideLoader();
+            //     this.navCtrl.popTo(this.navCtrl.getByIndex(this.navCtrl.length()-4));
+            // } else {
 
-            }
+            // }
         } catch (err) {
-            this.comonService.hideLoader();
+            //this.comonService.hideLoader();
             this.comonService.toastMessage(err, 2500, ToastMessageType.Error, ToastPlacement.Bottom, true);
         }
 
@@ -175,20 +175,20 @@ export class UpdatePayment {
     }
 
     callupdatepayment() {
-        return new Promise((resolve, reject) => {
-            this.httpService.post(API.LEGACY_MEMBERSHIP_ADMIN_PAYMENT_UPDATE, this.PaymentModel, null, 2).subscribe(
-                (res: any) => {
-                    if (res && res['type'] == "SUCCESS") {
-                        resolve(res);
-                    } else {
-                        reject(res);
-                    }
-                },
-                (err) => {
-                    reject(err);
-                }
-            );
-        })
+        // return new Promise((resolve, reject) => {
+        //     this.httpService.post(API.LEGACY_MEMBERSHIP_ADMIN_PAYMENT_UPDATE, this.PaymentModel, null, 2).subscribe(
+        //         (res: any) => {
+        //             if (res && res['type'] == "SUCCESS") {
+        //                 resolve(res);
+        //             } else {
+        //                 reject(res);
+        //             }
+        //         },
+        //         (err) => {
+        //             reject(err);
+        //         }
+        //     );
+        // })
     }
 
     cancel() {

@@ -92,93 +92,93 @@ export class membershipHistoryInfo {
     }
 
     getBookingHistory(){
-        try {
-            this.loading = this.loadingCtrl.create({
-              content: 'Please wait...'
-            });
-            this.loading.present();
+        // try {
+        //     this.loading = this.loadingCtrl.create({
+        //       content: 'Please wait...'
+        //     });
+        //     this.loading.present();
       
          
-            this.nestUrl = "https://activitypro-nest-261607.appspot.com";
+        //     this.nestUrl = "https://activitypro-nest-261607.appspot.com";
             
-            if(this.membership == 'All'){
-                const paramsAll = new HttpParams()
-                    .set('parentClubKey', this.ParentClubKey)
-                    .set('clubKey', this.ClubKey)
-                    .set('setupKey', this.membership);
-                this.httpService.get(API.LEGACY_MEMBERSHIP_HISTORY_INFO, paramsAll, null, 2).subscribe((res) => {
-                    this.loading.dismiss()
-                    if(res['data'].length > 0){
-                        res['data'].forEach(data => {
-                            if(data['allAvailableMembershipHistory'].length > 0){
+        //     if(this.membership == 'All'){
+        //         const paramsAll = new HttpParams()
+        //             .set('parentClubKey', this.ParentClubKey)
+        //             .set('clubKey', this.ClubKey)
+        //             .set('setupKey', this.membership);
+        //         this.httpService.get(API.LEGACY_MEMBERSHIP_HISTORY_INFO, paramsAll, null, 2).subscribe((res) => {
+        //             this.loading.dismiss()
+        //             if(res['data'].length > 0){
+        //                 res['data'].forEach(data => {
+        //                     if(data['allAvailableMembershipHistory'].length > 0){
                         
-                                data['allAvailableMembershipHistory'].forEach(membership =>  {
-                                    membership.SameGroupMember = []
-                                    if(data['primaryMemberShipDetails']){
+        //                         data['allAvailableMembershipHistory'].forEach(membership =>  {
+        //                             membership.SameGroupMember = []
+        //                             if(data['primaryMemberShipDetails']){
             
-                                        data['primaryMemberShipDetails'][membership.primaryMembershipKey].forEach(member => {
+        //                                 data['primaryMemberShipDetails'][membership.primaryMembershipKey].forEach(member => {
                                             
-                                            membership.SameGroupMember.push(member)
-                                        });
-                                    }
+        //                                     membership.SameGroupMember.push(member)
+        //                                 });
+        //                             }
                                   
-                                    membership.ValidityDate = moment(new Date(membership.Validity)).format('DD MMM YYYY')
-                                    this.expiredMembership.push(membership)
-                                });
+        //                             membership.ValidityDate = moment(new Date(membership.Validity)).format('DD MMM YYYY')
+        //                             this.expiredMembership.push(membership)
+        //                         });
             
-                            }
-                        });
+        //                     }
+        //                 });
                       
                       
-                    }
+        //             }
                     
-                  },
-                  err =>{
-                    this.loading.dismiss();
+        //           },
+        //           err =>{
+        //             this.loading.dismiss();
                   
-                  })
-            }else{
-                const paramsOne = new HttpParams()
-                    .set('parentClubKey', this.ParentClubKey)
-                    .set('clubKey', this.ClubKey)
-                    .set('setupKey', this.membership.SetupKey);
-                this.httpService.get(API.LEGACY_MEMBERSHIP_HISTORY_INFO, paramsOne, null, 2).subscribe((res) => {
-                    this.loading.dismiss()
-                    if(res['data'].length > 0){
-                        res['data'].forEach(data => {
-                            if(data['allAvailableMembershipHistory'].length > 0){
+        //           })
+        //     }else{
+        //         const paramsOne = new HttpParams()
+        //             .set('parentClubKey', this.ParentClubKey)
+        //             .set('clubKey', this.ClubKey)
+        //             .set('setupKey', this.membership.SetupKey);
+        //         this.httpService.get(API.LEGACY_MEMBERSHIP_HISTORY_INFO, paramsOne, null, 2).subscribe((res) => {
+        //             this.loading.dismiss()
+        //             if(res['data'].length > 0){
+        //                 res['data'].forEach(data => {
+        //                     if(data['allAvailableMembershipHistory'].length > 0){
                         
-                                this.membershipCount = data['allAvailableMembershipHistory'].length
-                                data['allAvailableMembershipHistory'].forEach(membership =>  {
-                                    membership.SameGroupMember = []
-                                    if(data['primaryMemberShipDetails']){
+        //                         this.membershipCount = data['allAvailableMembershipHistory'].length
+        //                         data['allAvailableMembershipHistory'].forEach(membership =>  {
+        //                             membership.SameGroupMember = []
+        //                             if(data['primaryMemberShipDetails']){
             
-                                        data['primaryMemberShipDetails'][membership.primaryMembershipKey].forEach(member => {
+        //                                 data['primaryMemberShipDetails'][membership.primaryMembershipKey].forEach(member => {
                                             
-                                            membership.SameGroupMember.push(member)
-                                        });
-                                    }
+        //                                     membership.SameGroupMember.push(member)
+        //                                 });
+        //                             }
                                   
-                                    membership.ValidityDate = moment(new Date(membership.Validity)).format('DD MMM YYYY')
-                                    this.expiredMembership.push(membership)
-                                });
+        //                             membership.ValidityDate = moment(new Date(membership.Validity)).format('DD MMM YYYY')
+        //                             this.expiredMembership.push(membership)
+        //                         });
             
-                            }
-                        });
+        //                     }
+        //                 });
                       
                       
-                    }
+        //             }
                   
-                  },
-                  err =>{
-                    this.loading.dismiss();
+        //           },
+        //           err =>{
+        //             this.loading.dismiss();
                   
-                  })
-            }
+        //           })
+        //     }
            
-          } catch (err) {
-            this.loading.dismiss();
-          }
+        //   } catch (err) {
+        //     this.loading.dismiss();
+        //   }
     }
 
     

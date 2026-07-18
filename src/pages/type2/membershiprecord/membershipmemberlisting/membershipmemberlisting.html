@@ -6,7 +6,7 @@
 
 </ion-header>
 
-<ion-content >
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
    
   <div [ngStyle]="{'margin-top.px': this.platformType=='ios' ? 30 : 0 }" style="margin-bottom: 60px;">
     <ion-row>

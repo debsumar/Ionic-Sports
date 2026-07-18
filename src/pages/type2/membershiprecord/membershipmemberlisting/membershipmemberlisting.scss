@@ -3,6 +3,18 @@
 page-membershipmemberlisting {
     @include android-sdk35-fixes;
 
+    background: #0f172a !important;
+
+    .scroll-content {
+        padding: 6px !important;
+        background-image: none !important;
+        background: #0f172a !important;
+    }
+
+    ion-grid {
+        background: #0f172a;
+    }
+
 
 
     .toolbar-title{
@@ -34,15 +46,15 @@ page-membershipmemberlisting {
         width: 102%;
         margin: 0px !important;
         //color: #fab754 !important;
-        color:rgba(0,0,0,0.85) !important;
+        color:#f1f5f9 !important;
         border-radius: 0px !important;
         box-shadow: none;
     }
     .tab_header{
-        color:rgba(0,0,0,0.85) !important;
+        color:#f1f5f9 !important;
     }
     .trns_count{
-        color:rgba(0,0,0,0.65) !important;
+        color:#94a3b8 !important;
     }
      .para-overflow-hidden{
         // padding: 0px 0px 0px 0px;
@@ -195,7 +207,7 @@ page-membershipmemberlisting {
         border-bottom-color: transparent;
         p{
             font-size: 18px;
-            color: #00000099;
+            color: #f1f5f9;
             text-align: center;
             margin: 34px 0 0 0;
             font-weight: 600;
@@ -219,19 +231,19 @@ page-membershipmemberlisting {
     .member_name{
         font-weight: 500;
         font-size: 18px;
-        color: rgba(0, 0, 0, 0.85);
+        color: #f1f5f9;
     }
     .paymentOption{
         font-weight: 500;
         font-size: 14px;
-        color: rgba(0, 0, 0, 0.65);
+        color: #94a3b8;
     }
     .margin-auto{
         margin:auto;
     }
     .amt{
         font-size: 18px;
-        color: rgba(0, 0, 0, 0.85);
+        color: #f1f5f9;
         margin:0px 0px 3px 0px;
     }
     .mem_col{
@@ -242,11 +254,12 @@ page-membershipmemberlisting {
     }
     .innercard_style{
         height: 9vh;
+        border: 1px solid #334155;
         border-left: 2px solid #35adff;
         padding: 3px 5px 0px 0px;
         margin: 0px 10px 4px 0px;
         width: 100%;
-        background: #fff;
+        background: #1e293b;
         -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0);
         box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.14), 0 1px 1px -2px rgba(0, 0, 0, 0.2), 0 1px 2px 0 rgba(0, 0, 0, 0);
        // border-bottom: 1px solid orange;
@@ -266,7 +279,7 @@ page-membershipmemberlisting {
         width: 102%;
         margin: 0px !important;
         //color: #fab754 !important;
-        color:rgba(0, 0, 0, 0.85) !important;
+        color:#f1f5f9 !important;
         border-radius: 0px !important;
         box-shadow: none;
     }
@@ -274,7 +287,7 @@ page-membershipmemberlisting {
         //background: #fab754 !important;
         background-color:transparent !important;
         border-bottom: 1.5px solid #fab754;
-        color:rgba(0, 0, 0, 0.85) !important;
+        color:#f1f5f9 !important;
         box-shadow: none;
     }
     .paidBlock {
@@ -294,6 +307,7 @@ page-membershipmemberlisting {
         /* text-align: left; */
         /* color: #aaada8; */
         //font-style: italic;
+        color: #94a3b8;
         margin: 3px;
     }
     .border-left {
@@ -321,7 +335,64 @@ page-membershipmemberlisting {
         //margin-top: 65px !important; 
         padding: 6px !important;
         background-image: none !important; // background: white !important;
-        background: #f7f7f7 !important;
+        background: #0f172a !important;
+    }
+
+    &.light-theme {
+        background: #f8fafc !important;
+
+        .scroll-content {
+            background: #f8fafc !important;
+        }
+
+        ion-grid {
+            background: #f8fafc;
+        }
+
+        .innercard_style {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-left: 2px solid #35adff;
+        }
+
+        .member_name {
+            color: rgba(0, 0, 0, 0.85);
+        }
+
+        .paymentOption {
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+        .transactiondate {
+            color: rgba(0, 0, 0, 0.65);
+        }
+
+        .amt {
+            color: rgba(0, 0, 0, 0.85);
+        }
+
+        .circleProgress {
+            p {
+                color: #00000099;
+            }
+        }
+
+        .select-type {
+            color: rgba(0, 0, 0, 0.85) !important;
+        }
+
+        .tab_header {
+            color: rgba(0, 0, 0, 0.85) !important;
+        }
+
+        .trns_count {
+            color: rgba(0, 0, 0, 0.65) !important;
+        }
+
+        .selected {
+            border-bottom: 1.5px solid #fab754;
+            color: rgba(0, 0, 0, 0.85) !important;
+        }
     }
  
    
