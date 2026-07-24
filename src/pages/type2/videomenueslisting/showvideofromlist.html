@@ -1,0 +1,76 @@
+<ion-header [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <ion-navbar>
+    <ion-title>{{activityName}}
+      <img src="assets/images/share.png" class="shareimg" (click)="showShare()">
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <ion-slides (ionSlideDidChange)="slideChanged()">
+
+    <ion-slide>
+      <div class="slide-content">
+        <div class="video-player-wrap">
+          <iframe [src]="url" frameborder="0" allow="encrypted-media" allowfullscreen></iframe>
+        </div>
+        <div class="video-info-card" *ngIf="HeaderInfo.video_title != undefined">
+          <h2 class="vid-title">{{HeaderInfo.video_title}}</h2>
+          <div class="vid-meta">
+            <span class="time-text">{{HeaderInfo.created_at}} ago</span>
+            <span class="meta-sep"> | </span>
+            <span class="activity-text">{{HeaderInfo.associated_activity}}</span>
+          </div>
+          <div class="vid-description">{{HeaderInfo.video_description}}</div>
+        </div>
+      </div>
+    </ion-slide>
+
+    <ion-slide *ngFor="let vid of VideoMenuList; let i = index">
+      <div class="slide-content">
+        <div class="video-player-wrap">
+          <iframe [src]="vid.VideoURL" frameborder="0" allowfullscreen></iframe>
+        </div>
+        <div class="video-info-card" *ngIf="HeaderInfo.video_title != undefined">
+          <h2 class="vid-title">{{vid.video_title}}</h2>
+          <div class="vid-meta">
+            <span class="time-text">{{vid.created_at}} ago</span>
+            <span class="meta-sep"> | </span>
+            <span class="activity-text">{{vid.associated_activity}}</span>
+          </div>
+          <div class="vid-description">{{vid.video_description}}</div>
+        </div>
+      </div>
+    </ion-slide>
+
+  </ion-slides>
+
+  <!-- Share modal — preserved verbatim -->
+  <div id="myModal4" class="modal" (click)="closeModal()">
+    <div class="modal-content">
+      <ion-grid>
+        <ion-row>
+          <ion-col col-9><h3>Share</h3></ion-col>
+          <ion-col col-3><ion-icon name="add" class="backbtn" (click)="close()"></ion-icon></ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col col-12 (click)="shareViaWhatsApp()">
+            <ion-icon name="logo-whatsapp" class="images" style="color: #3caf3c"></ion-icon><span class="name">WhatsApp</span>
+          </ion-col>
+          <ion-col col-12 (click)="shareViaFacebook()">
+            <ion-icon name="logo-facebook" class="images" style="color: #1c71b9"></ion-icon><span class="name">Facebook</span>
+          </ion-col>
+          <ion-col col-12 (click)="shareViaTwitter()">
+            <ion-icon name="logo-twitter" class="images" style="color: #2cc1e2"></ion-icon><span class="name">Twitter</span>
+          </ion-col>
+          <ion-col col-12 (click)="shareViaInstagram()">
+            <img src="https://www.designpieces.com/wp-content/uploads/2016/05/Instagram-v051916-150x150.png" class="insta"><span class="name">Instagram</span>
+          </ion-col>
+          <ion-col col-12 (click)="shareViaEmail()">
+            <ion-icon name="mail" class="images" style="color: #9e1d1d; font-size: 31px;"></ion-icon><span class="name">Email</span>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </div>
+  </div>
+</ion-content>

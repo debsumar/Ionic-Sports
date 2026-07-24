@@ -9,11 +9,11 @@
   <page-match *ngIf="selectedFooterIndex == 1"></page-match>
   <page-matchladder *ngIf="selectedFooterIndex == 2"></page-matchladder>
   <page-matchhistory *ngIf="selectedFooterIndex == 3"></page-matchhistory>
-
-  <button class="glass-fab" *ngIf="selectedFooterIndex == 4 || selectedFooterIndex == 1" (click)="onFabClick()">
-    <ion-icon name="add"></ion-icon>
-  </button>
 </ion-content>
+
+<button class="glass-fab" *ngIf="selectedFooterIndex == 4 || selectedFooterIndex == 1" (click)="onFabClick()">
+    <ion-icon name="add"></ion-icon>
+</button>
 
 <ion-footer>
   <div class="footer_div">

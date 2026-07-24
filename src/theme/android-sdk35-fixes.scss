@@ -41,21 +41,21 @@
 
     // FAB positioning for different scenarios
     ion-fab[bottom] {
-      bottom: calc(16px + env(safe-area-inset-bottom, 32px)) !important;
+      bottom: calc(24px + env(safe-area-inset-bottom, 48px)) !important;
     }
 
     // FAB with custom bottom positioning
     ion-fab.bottom_10 {
-      bottom: calc(10% + env(safe-area-inset-bottom, 32px)) !important;
+      bottom: calc(10% + env(safe-area-inset-bottom, 48px)) !important;
     }
 
     ion-fab.margintop-10 {
-      bottom: calc(10% + env(safe-area-inset-bottom, 32px)) !important;
+      bottom: calc(10% + env(safe-area-inset-bottom, 48px)) !important;
     }
 
     // FAB in pages with footers
     .footer_div ~ ion-fab {
-      bottom: calc(60px + env(safe-area-inset-bottom, 50px)) !important;
+      bottom: calc(60px + env(safe-area-inset-bottom, 64px)) !important;
     }
 
     // Modal fixes

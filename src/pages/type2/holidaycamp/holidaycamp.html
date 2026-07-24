@@ -184,16 +184,12 @@
             </div>
         </div>
     </div>
-
-
-
     <!-- <page-paymentgatewaysetup *ngIf="this.isShowPaymentModal" InstructTxt="Please connect to payment gateway for sessions" (skip)="skip()" (navigate)="GotoPaymentSetup()"></page-paymentgatewaysetup> -->
+</ion-content>
 
-    <ion-fab bottom right *ngIf="loggedin_type!=4">
-        <button ion-fab mini style="background-color: #2b92bb;" (click)="gotoCreateHolidayCamp()"
+<ion-fab mini right bottom #fab [hidden]="loggedin_type == 4" class="safe-fab">
+        <button ion-fab mini (click)="gotoCreateHolidayCamp()"
             style="background-color:#2b92bb !important; color: white !important">
             <ion-icon name="add"></ion-icon>
         </button>
-    </ion-fab>
-
-</ion-content>
+</ion-fab>

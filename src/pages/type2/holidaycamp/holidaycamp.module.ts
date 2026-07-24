@@ -3,6 +3,7 @@ import { IonicPageModule } from 'ionic-angular';
 import { Type2HolidayCamp } from './holidaycamp';
 import { NgCircleProgressModule } from 'ng-circle-progress';
 import { SharedmoduleModule } from '../../../pages/sharedmodule/sharedmodule.module'
+import { SharedComponentsModule } from '../../../shared/components/shared-components.module';
 
 @NgModule({
   declarations: [
@@ -11,6 +12,7 @@ import { SharedmoduleModule } from '../../../pages/sharedmodule/sharedmodule.mod
   imports: [
     IonicPageModule.forChild(Type2HolidayCamp),
     SharedmoduleModule,
+    SharedComponentsModule,
     NgCircleProgressModule.forRoot({
       radius: 100,
       outerStrokeWidth:8,

@@ -8,6 +8,20 @@ page-updateprofile {
     padding: 0 !important;
     background-color: #0f172a !important;
     background-image: none !important;
+    padding-bottom: 80px !important;
+  }
+
+  // Extra specificity to beat android-sdk35-fixes mixin override
+  ion-content .scroll-content {
+    padding-bottom: 80px !important;
+  }
+
+  // On SDK35 devices the mixin sets padding-bottom via env() — override it here
+  .android-sdk35 &,
+  &.android-sdk35 {
+    ion-content .scroll-content {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom, 32px)) !important;
+    }
   }
 
   .con { background: transparent !important; padding: 12px !important; }
@@ -67,6 +81,42 @@ page-updateprofile {
 
   .btn-container { text-align: center; }
 
+  // ── Footer ──
+  ion-footer {
+    background: #0f172a;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 10px;
+
+    // glass-btn is designed for sticky-in-content use;
+    // inside ion-footer override its sticky/padding so it sits flush
+    app-glass-button {
+      flex: 1;
+      .glass-btn-wrap {
+        position: static !important;
+        padding: 0 !important;
+      }
+    }
+  }
+
+  .ghost-btn {
+    flex: 1;
+    height: 48px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    background: transparent;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    cursor: pointer;
+    &:active { transform: scale(0.98); }
+  }
+
   // ── Light Theme ──
   &.light-theme {
     .scroll-content { background-color: #f8fafc !important; }
@@ -83,5 +133,8 @@ page-updateprofile {
     }
 
     .text { color: #0f172a !important; }
+
+    ion-footer { background: #f8fafc; }
+    .ghost-btn { color: #475569; border-color: #cbd5e1; }
   }
 }

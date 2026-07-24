@@ -8,6 +8,18 @@ page-editfamily {
     padding: 0 !important;
     background-color: #0f172a !important;
     background-image: none !important;
+    padding-bottom: 80px !important;
+  }
+
+  ion-content .scroll-content {
+    padding-bottom: 80px !important;
+  }
+
+  .android-sdk35 &,
+  &.android-sdk35 {
+    ion-content .scroll-content {
+      padding-bottom: calc(80px + env(safe-area-inset-bottom, 32px)) !important;
+    }
   }
 
   .con { background: transparent !important; }
@@ -36,6 +48,40 @@ page-editfamily {
   .text { color: #f1f5f9 !important; }
   .lab { font-size: 11px !important; }
   .btn-container { text-align: center; }
+
+  // ── Footer ──
+  ion-footer {
+    background: #0f172a;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    gap: 10px;
+
+    app-glass-button {
+      flex: 1;
+      .glass-btn-wrap {
+        position: static !important;
+        padding: 0 !important;
+      }
+    }
+  }
+
+  .ghost-btn {
+    flex: 1;
+    height: 48px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 15px;
+    background: transparent;
+    color: #cbd5e1;
+    border: 1px solid #334155;
+    cursor: pointer;
+    &:active { transform: scale(0.98); }
+  }
 
   // Toggle items (non-.items ion-items)
   ion-item:not(.items) {
@@ -105,5 +151,8 @@ page-editfamily {
     .text { color: #0f172a !important; }
     .toggle_para { color: #1e293b !important; }
     .toggle { background-color: #ebf7fc; }
+
+    ion-footer { background: #f8fafc; }
+    .ghost-btn { color: #475569; border-color: #cbd5e1; }
   }
 }

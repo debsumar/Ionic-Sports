@@ -652,6 +652,7 @@ holidaycamp-page {
 
   .scrollable-content-area {
     padding: 8px;
+    padding-bottom: calc(80px + env(safe-area-inset-bottom, 32px));
   }
 
   .session-container {
@@ -835,3 +836,8 @@ holidaycamp-page {
     }
   }
 }
+
+  // Push FAB above Android gesture nav bar / iOS home indicator
+  ion-fab.safe-fab {
+    bottom: calc(16px + env(safe-area-inset-bottom, 32px)) !important;
+  }

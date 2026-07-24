@@ -1,0 +1,158 @@
+@import '../../../theme/android-sdk35-fixes.scss';
+
+page-createvideomenu {
+  @include android-sdk35-fixes;
+
+  // ── Dark theme defaults ──────────────────────────────────────────
+  .scroll-content {
+    padding: 12px !important;
+    background: #0f172a !important;
+    background-image: none !important;
+  }
+
+  ion-content {
+    --background: #0f172a !important;
+  }
+
+  app-form-field,
+  app-select-field {
+    display: block;
+    margin-bottom: 12px;
+  }
+
+  ion-item {
+    --background: #1e293b;
+    background: #1e293b !important;
+    border-radius: 10px;
+    color: #f1f5f9;
+
+    ion-label {
+      color: #cbd5e1 !important;
+    }
+
+    .text-input,
+    .text-input-md,
+    ion-input input,
+    ion-textarea textarea {
+      color: #f1f5f9 !important;
+    }
+
+    ::placeholder {
+      color: #94a3b8 !important;
+    }
+  }
+
+  .act {
+    margin-top: 15px !important;
+  }
+
+  .description-area {
+    white-space: pre-wrap;
+  }
+
+  .help_btn {
+    padding: 0px !important;
+    font-size: 24px !important;
+    margin: 0px !important;
+    height: 42px !important;
+    width: 42px;
+  }
+
+  // ── Toggle row ───────────────────────────────────────────────────
+  .toggle_row {
+    margin: 4px 4px 12px 4px;
+    padding: 4px 8px;
+    background: #1e293b;
+    border-radius: 10px;
+
+    .flex_col {
+      font-size: 16px;
+    }
+
+    .custom_toggle_para {
+      color: #f1f5f9;
+      margin: 0;
+    }
+
+    ion-col {
+      margin: auto !important;
+    }
+  }
+
+  // ── Footer ───────────────────────────────────────────────────────
+  ion-footer {
+    background: #0f172a;
+  }
+
+  .footer-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 12px;
+  }
+
+  .ghost-btn {
+    flex: 1;
+    background: transparent;
+    color: #2b92bb;
+    border: 1px solid #2b92bb;
+    border-radius: 10px;
+    height: 44px;
+    font-size: 15px;
+  }
+
+  app-glass-button {
+    flex: 1;
+  }
+
+  // ── Light theme overrides ────────────────────────────────────────
+  &.light-theme {
+    .scroll-content {
+      background: #f8fafc !important;
+    }
+
+    ion-content {
+      --background: #f8fafc !important;
+    }
+
+    ion-item {
+      --background: #ffffff;
+      background: #ffffff !important;
+      color: #1e293b;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+      ion-label {
+        color: #475569 !important;
+      }
+
+      .text-input,
+      .text-input-md,
+      ion-input input,
+      ion-textarea textarea {
+        color: #1e293b !important;
+      }
+
+      ::placeholder {
+        color: #94a3b8 !important;
+      }
+    }
+
+    .toggle_row {
+      background: #ffffff;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+
+      .custom_toggle_para {
+        color: #1e293b;
+      }
+    }
+
+    ion-footer {
+      background: #f8fafc;
+    }
+
+    .ghost-btn {
+      color: #2b92bb;
+      border-color: #2b92bb;
+    }
+  }
+}

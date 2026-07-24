@@ -82,12 +82,12 @@ export class Type2notification {
             parentclub_id: this.sharedservice.getPostgreParentClubId() || '',
             club_id: '',
             activity_id: '',
-            member_id: '',
+            member_id: this.sharedservice.getLoggedInUserId() || '',
             action_type: 1,
             device_type: this.sharedservice.getPlatform() === 'android' ? 1 : 2,
             app_type: AppType.ADMIN_NEW,
-            device_id: 'string',
-            updated_by: '',
+            device_id: this.sharedservice.getDeviceId() || 'web',
+            updated_by: this.sharedservice.getLoggedInUserId() || '',
             user_id: this.sharedservice.getLoggedInUserId() || ''
         };
         if (cursor) payload.cursor = cursor;
@@ -140,7 +140,7 @@ export class Type2notification {
             action_type: 0,
             device_type: this.sharedservice.getPlatform() === 'android' ? 1 : 2,
             app_type: AppType.ADMIN_NEW,
-            device_id: 'string',
+            device_id: this.sharedservice.getDeviceId() || 'web',
             updated_by: '',
             notification_id: item.id
         };

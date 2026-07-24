@@ -1,0 +1,46 @@
+<!--
+  Generated template for the AddMorePhotos page.
+
+  See http://ionicframework.com/docs/components/#navigation for more info on
+  Ionic pages and navigation.
+-->
+<ion-header no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <ion-navbar>
+    <ion-title class="icontitle"> Add More Photos </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <div class="upload-card" (click)="SelectProfImg()">
+    <div class="upload-label">Upload Photo</div>
+    <div class="upload-preview">
+      <img *ngIf="TitleUrl && format.ImageURL==''" [src]="TitleUrl" class="coach-img">
+      <img *ngIf="!TitleUrl && format.ImageURL!=''" [src]="format.ImageURL" class="coach-img">
+      <div *ngIf="!TitleUrl && format.ImageURL==''" class="upload-placeholder">
+        <ion-icon name="camera"></ion-icon>
+        <span>Tap to add a photo</span>
+      </div>
+    </div>
+  </div>
+
+  <app-form-field>
+    <ion-item>
+      <ion-label stacked>Image Caption</ion-label>
+      <ion-textarea type="text" rows="1" [(ngModel)]="format.ImageCaption"></ion-textarea>
+    </ion-item>
+  </app-form-field>
+
+  <app-form-field>
+    <ion-item>
+      <ion-label stacked>Description</ion-label>
+      <ion-textarea class="description-area" type="text" rows="10" placeholder="Description" [(ngModel)]="format.ImageDescription"></ion-textarea>
+    </ion-item>
+  </app-form-field>
+</ion-content>
+
+<ion-footer [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+  <div class="footer-actions">
+    <button class="ghost-btn" (click)="cancel()">Cancel</button>
+    <app-glass-button label="Save" (btnClick)="savePic()"></app-glass-button>
+  </div>
+</ion-footer>

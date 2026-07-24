@@ -108,6 +108,7 @@ export class Type2HolidayCamp {
   }
 
   ionViewWillEnter() {
+    this.loggedin_type = this.sharedservice.getLoggedInType();
     this.commonService.category.pipe(first()).subscribe((data) => {
       if (data == "update_camps_list") {
         this.loggedin_type = this.sharedservice.getLoggedInType();

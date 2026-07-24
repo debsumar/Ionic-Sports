@@ -327,7 +327,7 @@ export class Dashboard {
               Family: true,
             };
           }
-          if (data.length > 0 && data[0].DashboardView.FacilityBookings && data[0].DashboardView.FacilityBookings!= 0) {
+          if (data.length > 0 && data[0].DashboardView != undefined && data[0].DashboardView.FacilityBookings && data[0].DashboardView.FacilityBookings!= 0) {
             this.type = data[0].DashboardView.FacilityBookings;
             this.getactivebookingDetails();
           }
@@ -373,7 +373,6 @@ export class Dashboard {
     }
     
     // Load all other storage data in parallel
-    if (!this.hasLoaded) {
     Promise.all([
       //this.storage.get("postgre_parentclub"),
       this.storage.get("sessionDetails"),
@@ -385,10 +384,11 @@ export class Dashboard {
       this.storage.get("activeBookingsCount"),
       this.storage.get("eventDetails"),
       this.storage.get("loggedin_user"),
-      this.storage.get("dashboardTheme")
+      this.storage.get("dashboardTheme"),
+      this.storage.get("camp_enroldets")
     ])
     .then(([sessionDetails, sessionEnrolDets, sclSessionEnrolDets, 
-           monthlySessionEnrolDets, memberDetails, coachDetails, activeBookings, eventDetails, loggedinuser, isDarkTheme]) => {
+           monthlySessionEnrolDets, memberDetails, coachDetails, activeBookings, eventDetails, loggedinuser, isDarkTheme, campEnrolDets]) => {
       
       if(loggedinuser){
         const loggedin_user_info = JSON.parse(loggedinuser);
@@ -436,6 +436,11 @@ export class Dashboard {
         this.EventObj = eventDetails;
       }
       
+      // Handle camp enrollment details
+      if (campEnrolDets != null) {
+        this.campEnrolDetails = campEnrolDets;
+      }
+      
       // Handle theme preference
       if (isDarkTheme !== null) {
         this.isDarkTheme = isDarkTheme;
@@ -449,7 +454,6 @@ export class Dashboard {
     .catch(error => {
       console.error("Error loading dashboard cached data:", error);
     });
-    }
   }
 
   ionViewWillLeave() {

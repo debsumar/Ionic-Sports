@@ -56,6 +56,15 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
       color: #4a5c72 !important;
     }
 
+    /* Select (ion-select inside form-field) */
+    .form-field .item-ios ion-select,
+    .form-field .item-md ion-select {
+      color: #f1f5f9 !important;
+      max-width: 60% !important;
+    }
+    .form-field .select-text { color: #f1f5f9 !important; }
+    .form-field .select-icon { color: #94a3b8 !important; }
+
     /* Light variant */
     .form-field.light .item-ios,
     .form-field.light .item-md {
@@ -69,6 +78,10 @@ import { Component, Input, ViewEncapsulation } from '@angular/core';
     .form-field.light .text-input::placeholder { color: #94a3b8 !important; }
     .form-field.light textarea { color: #0f172a !important; }
     .form-field.light textarea::placeholder { color: #94a3b8 !important; }
+    .form-field.light .item-ios ion-select,
+    .form-field.light .item-md ion-select { color: #0f172a !important; }
+    .form-field.light .select-text { color: #0f172a !important; }
+    .form-field.light .select-icon { color: #475569 !important; }
   `]
 })
 export class FormFieldComponent {
