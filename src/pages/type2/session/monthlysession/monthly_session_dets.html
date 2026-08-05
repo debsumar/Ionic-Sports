@@ -122,16 +122,14 @@
             </ion-card>
         </div>
     </div>
-
-    <button ion-fab mini (tap)="alertConfirmation()" class="trash_icon" *ngIf="monthly_ses_dets.can_delete">
-        <ion-icon name="trash"></ion-icon>
-    </button> 
     
     </div>
 
 </ion-content>
 
-
+<button ion-fab mini (tap)="alertConfirmation()" class="trash_icon" *ngIf="monthly_ses_dets.can_delete">
+        <ion-icon name="trash"></ion-icon>
+</button> 
 
 
 <ion-fab mini right bottom #fab>

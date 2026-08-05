@@ -221,7 +221,7 @@
             </ion-col>
         </ion-row>
     </ion-item>
-    
+
     <ion-item class="border-btm-style">
         <ion-label fixed>{{LangObj.grp_session_noof_weeks}}</ion-label>
         <ion-input type="number" [(ngModel)]="sessionDetails.NoOfWeeks" (ionChange)="inputChanged()"
@@ -229,7 +229,7 @@
     </ion-item>
 
 
-    <!-- 
+    <!--
     <ion-item>
         <ion-label>{{LangObj.grp_session_paymentype}}</ion-label>
         <ion-select [(ngModel)]="sessionDetails.PaymentOption" (ionChange)="paymentOptionChanged()">
@@ -394,7 +394,7 @@
                 <!-- <ion-col col-1>
                             <button style="padding:0px;width:100%" ion-button clear (tap)="clearCache()">
                                 <ion-icon name=""></ion-icon>
-                            </button> 
+                            </button>
                         </ion-col> -->
             </ion-row>
         </ion-item>
@@ -463,9 +463,9 @@
 
 </ion-content>
 
-<page-paymentgatewaysetup *ngIf="sessionDetails.PaymentOption==100 && isTermsEmpty"
+<!--<page-paymentgatewaysetup *ngIf="sessionDetails.PaymentOption==100 && isTermsEmpty"
     InstructTxt="Please add  term for the venue" (skip)="skip()" (navigate)="GotoPaymentSetup()">
-</page-paymentgatewaysetup>
+</page-paymentgatewaysetup>-->
 <ion-fab right bottom *ngIf="sessionDetails.PaymentOption==100 && isTermsEmpty">
     <button ion-fab mini style="background-color:#2b92bb !important; color: white !important" (tap)="GotoPaymentSetup()"
         style="background-color:#2b92bb !important; color: white !important">
