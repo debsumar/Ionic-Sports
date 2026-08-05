@@ -830,24 +830,24 @@ export class CommonService {
     });
   }
 
-  sendPush(obj): Observable<any> {
-    return this.httpService.post(
-      `https://activitypro-nest-261607.appspot.com/pushnotification/publish`,
-      obj
-    );
-  }
-  sendBulkPush(reqObj): Observable<any> {
-    return this.httpService.post(
-      `https://activitypro-nest-261607.appspot.com​/pushnotification/publishbulkpush`,
-      reqObj
-    );
-  }
-  registerToken(requestingObj): Observable<any> {
-    return this.httpService.post(
-      `https://activitypro-nest-261607.appspot.com​/superadmin/device`,
-      requestingObj
-    );
-  }
+  // sendPush(obj): Observable<any> {
+  //   return this.httpService.post(
+  //     `https://activitypro-nest-261607.appspot.com/pushnotification/publish`,
+  //     obj
+  //   );
+  // }
+  // sendBulkPush(reqObj): Observable<any> {
+  //   return this.httpService.post(
+  //     `https://activitypro-nest-261607.appspot.com​/pushnotification/publishbulkpush`,
+  //     reqObj
+  //   );
+  // }
+  // registerToken(requestingObj): Observable<any> {
+  //   return this.httpService.post(
+  //     `https://activitypro-nest-261607.appspot.com​/superadmin/device`,
+  //     requestingObj
+  //   );
+  // }
   DeviceInput = {
     Device_id: "",
     Player_id: "",

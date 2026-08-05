@@ -77,6 +77,40 @@
             </ion-row>
         </ion-card-content>
     </ion-card>
+    <ion-card class="cardpending" (click)="gotoWeeklyPayment()">
+        <ion-card-content>
+            <ion-row>
+                <ion-col col-3 class="marginauto" text-center>
+                    <ion-icon name="repeat" class="header_icon"></ion-icon>
+                </ion-col>
+                <ion-col col-8 class="marginauto">
+                    <p style="font-size: 20px;
+                    font-weight: 400;">Weekly Session</p>
+                    <p class="venueList">Checkout Weekly Sessions Payment Report</p>
+                </ion-col>
+                <ion-col col-1 class="marginauto">
+                    <ion-icon class="forward_icon" name="ios-arrow-forward"></ion-icon>
+                </ion-col>
+            </ion-row>
+        </ion-card-content>
+    </ion-card>
+    <ion-card class="cardpending" (click)="gotoEventPayment()">
+        <ion-card-content>
+            <ion-row>
+                <ion-col col-3 class="marginauto" text-center>
+                    <ion-icon name="calendar" class="header_icon"></ion-icon>
+                </ion-col>
+                <ion-col col-8 class="marginauto">
+                    <p style="font-size: 20px;
+                    font-weight: 400;">Event</p>
+                    <p class="venueList">Checkout Event Payment Report</p>
+                </ion-col>
+                <ion-col col-1 class="marginauto">
+                    <ion-icon class="forward_icon" name="ios-arrow-forward"></ion-icon>
+                </ion-col>
+            </ion-row>
+        </ion-card-content>
+    </ion-card>
     <ion-card class="cardpending" (click)="goToSchoolsessionPaymentDetails()">
         <ion-card-content>
             <ion-row>

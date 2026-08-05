@@ -38,7 +38,7 @@
                 </ion-col>
             </ion-row>
         </div>
-        
+
         <div class="compact-filter-card" *ngIf="loggedin_type == 4">
             <ion-select class="compact-select" [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()" placeholder="Club">
                 <ion-option *ngFor="let club of clubs" [value]="club.FirebaseId">{{club.ClubName}}</ion-option>
@@ -57,7 +57,7 @@
             </button>
           </div>
         </div>
-        
+
         <!-- Pending Payments Button -->
         <div class="pending-payments-container" *ngIf="this.switchfilterpage == 1">
           <button ion-button clear class="pending-payments-btn" (click)="this.navCtrl.push('PendingTermSessionsPage')">
@@ -301,7 +301,7 @@
     </div>
     </div>
 
-   
+
 </ion-content>
 
 
@@ -358,5 +358,5 @@
 </ion-footer>
 
 
-<!-- <page-paymentgatewaysetup *ngIf="this.isShowPaymentModal" InstructTxt="Please connect to payment gateway for sessions"
-    (skip)="skip()" (navigate)="GotoPaymentSetup()"></page-paymentgatewaysetup> -->
+<!--<page-paymentgatewaysetup *ngIf="this.isShowPaymentModal" InstructTxt="Please connect to payment gateway for sessions"
+    (skip)="skip()" (navigate)="GotoPaymentSetup()"></page-paymentgatewaysetup>-->

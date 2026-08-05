@@ -1,0 +1,153 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-bookinghistory {
+    @include android-sdk35-fixes;
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        padding: 0 !important;
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+    }
+
+    .bh-wrap { padding: 10px 10px 20px; }
+
+    .member-name {
+        color: #f1f5f9;
+        margin: 6px 4px 10px;
+        font-size: 18px;
+        font-weight: 600;
+    }
+
+    // ===== Summary row =====
+    .due-row {
+        width: 100%;
+        margin: 0 auto 12px;
+        border-radius: 12px;
+        padding: 14px 0;
+        background: #1e293b;
+        border: 1px solid #334155;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+
+        ion-col { text-align: -webkit-center; }
+        .paid-col { border-right: 0.5px solid #334155; }
+        p { margin: 0; }
+
+        .font-25 { font-size: 22px; color: #f1f5f9; }
+        .font-17 { font-size: 14px; color: #94a3b8; }
+        .due-amount { color: #f87171; }
+    }
+
+    // ===== Filter button =====
+    .filter-wrap {
+        display: flex;
+        justify-content: flex-end;
+        margin: 4px 2px 10px;
+    }
+    .select-filter {
+        transition: all 0.3s ease;
+        background-color: transparent;
+        color: #35adff;
+        border: 1px solid #35adff;
+        border-radius: 10px;
+
+        &.active {
+            background-color: #f53d3d !important;
+            color: #ffffff !important;
+            border-color: #f53d3d !important;
+            box-shadow: 0 0 10px rgba(245, 61, 61, 0.3);
+        }
+    }
+
+    // ===== Booking cards =====
+    .bh-card {
+        display: block;
+        margin: 8px 0;
+
+        ion-card-content { padding: 8px 12px; }
+
+        .session-col { padding: 0 !important; }
+        .amount-col { text-align: right; padding: 0 !important; }
+
+        .row-line { margin: 0; line-height: 1.35; }
+
+        .name {
+            color: #f1f5f9;
+            font-size: 16px;
+        }
+        .session_name {
+            color: #cbd5e1;
+            font-size: 14px;
+            font-style: italic;
+        }
+        .coach-name {
+            font-weight: 400;
+            color: #94a3b8;
+            font-size: 13px;
+        }
+        .amount-paid { color: #34d399 !important; font-size: 15px; }
+        .amount-due { color: #f87171 !important; font-size: 15px; }
+        .amount-discount { color: #94a3b8; font-size: 14px; }
+        .txn-date { color: #94a3b8; font-size: 12px; }
+    }
+
+    .elipsesdot {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        width: 95%;
+        display: block;
+        overflow: hidden;
+    }
+    .para_overflow {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .member-name { color: rgba(0, 0, 0, 0.85); }
+
+        .due-row {
+            background: #ffffff;
+            border-color: #e2e8f0;
+            box-shadow: 0px 2px 8px -1px #b4b3b7;
+
+            .paid-col { border-right: 0.5px solid #bdbdbd; }
+            .font-25 { color: rgba(0, 0, 0, 0.65); }
+            .font-17 { color: rgba(0, 0, 0, 0.85); }
+            .due-amount { color: #d32f2f; }
+        }
+
+        .select-filter {
+            color: #488aff;
+            border-color: #488aff;
+        }
+
+        .bh-card {
+            .name { color: #000000e3; }
+            .session_name { color: #000009c7; }
+            .coach-name { color: #5d5d60; }
+            .amount-paid { color: #008000 !important; }
+            .amount-due { color: #ff0000 !important; }
+            .amount-discount { color: #5d5d60; }
+            .txn-date { color: #6f6f72; }
+        }
+    }
+}

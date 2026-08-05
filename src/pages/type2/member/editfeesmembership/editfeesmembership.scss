@@ -1,0 +1,49 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-editfeesmembership {
+  @include android-sdk35-fixes;
+
+  .scroll-content { padding: 0 !important; background: #0f172a !important; }
+  ion-content { background: #0f172a !important; }
+
+  ion-navbar {
+    background: #0f172a !important;
+    .toolbar-background { background: #0f172a !important; }
+    .toolbar-title { color: #f1f5f9 !important; }
+    .bar-button, .back-button-icon, ion-icon { color: #f1f5f9 !important; }
+  }
+
+  .page-pad { padding: 12px 12px 16px; }
+
+  app-list-card { display: block; margin-bottom: 10px; }
+  .fee-row {
+    display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 14px;
+  }
+  .fee-label { font-size: 14px; font-weight: 500; color: #e2e8f0; }
+  .fee-value { font-size: 15px; font-weight: 700; color: #64b8e8; }
+
+  .summary-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 6px; margin: 4px 0;
+    border-top: 1px dashed rgba(71, 85, 105, 0.6);
+    .s-label { font-size: 14px; font-weight: 600; color: #cbd5e1; }
+    .s-value { font-size: 15px; font-weight: 700; color: #f1f5f9; }
+    &.total .s-value { color: #10b981; font-size: 17px; }
+  }
+
+  ion-footer { background: #0f172a; }
+
+  &.light-theme {
+    .scroll-content { background: #f8fafc !important; }
+    ion-content { background: #f8fafc !important; }
+    ion-navbar { background: #f8fafc !important;
+      .toolbar-background { background: #f8fafc !important; }
+      .toolbar-title { color: #1e293b !important; }
+      .bar-button, .back-button-icon, ion-icon { color: #1e293b !important; }
+    }
+    .fee-label { color: #334155; }
+    .summary-row .s-label { color: #475569; }
+    .summary-row .s-value { color: #1e293b; }
+    ion-footer { background: #f8fafc; }
+  }
+}

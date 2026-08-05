@@ -140,8 +140,7 @@
 
   <!-- Player Action Bottom Sheet -->
   <app-bottom-sheet [(visible)]="showPlayerSheet"
-    [title]="selectedPlayer?.user?.FirstName + ' ' + selectedPlayer?.user?.LastName"
-    [bottomOffset]="20">
+    [title]="selectedPlayer?.user?.FirstName + ' ' + selectedPlayer?.user?.LastName" [bottomOffset]="20">
     <div class="sheet-item" (click)="onPlayerAction('payment')">
       <ion-icon name="card" class="sheet-item-icon"></ion-icon>
       <div class="sheet-item-info"><span class="sheet-item-name">Update Payment</span></div>

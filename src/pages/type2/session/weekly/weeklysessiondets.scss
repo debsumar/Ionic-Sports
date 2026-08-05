@@ -56,7 +56,6 @@ page-weeklysessiondets {
             margin: 8px 12px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
             transition: all 0.3s ease;
-            min-height: 80px;
 
             &:active {
                 transform: translateY(1px);
@@ -65,7 +64,7 @@ page-weeklysessiondets {
 
             ion-card-content {
                 color: #f8fafc;
-                padding: 12px 16px;
+                padding: 6px 10px;
             }
 
             p {
@@ -73,7 +72,7 @@ page-weeklysessiondets {
                 font-weight: 600;
                 font-size: 15px;
                 line-height: 1.3;
-                margin: 2px 0;
+                margin: 0;
             }
 
             .moneypaid {
@@ -82,6 +81,7 @@ page-weeklysessiondets {
                 font-size: 15px;
                 text-align: right;
                 margin: 0;
+                line-height: 1.2;
             }
 
             .pending {
@@ -90,7 +90,7 @@ page-weeklysessiondets {
                 font-size: 14px;
                 text-align: right;
                 margin: 0;
-                line-height: 1.9;
+                line-height: 1.2;
             }
 
             .pendingVerification {
@@ -99,22 +99,28 @@ page-weeklysessiondets {
                 font-size: 12px;
                 text-align: right;
                 margin: 0;
+                line-height: 1.2;
             }
 
             .transactiondate {
                 font-size: 11px;
                 font-weight: 400;
                 text-align: right;
-                margin: 1px 0;
+                margin: 0;
                 line-height: 1.2;
             }
 
             .paidBlock {
+                padding: 0 !important;
                 display: flex;
                 flex-direction: column;
                 align-items: flex-end;
                 justify-content: center;
-                min-height: 50px;
+                height: 100%;
+                min-width: 0;
+
+                > div { width: 100%; }
+                p { margin: 0 !important; }
             }
         }
 
@@ -263,7 +269,6 @@ page-weeklysessiondets {
         font-size: 15px;
         text-align: right;
         color: #ef4444;
-        font-style: italic;
     }
     .arrow {
         transform: translate(0%, 80%);

@@ -1,0 +1,112 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-cancelmembership {
+    @include android-sdk35-fixes;
+    background: #0f172a !important;
+
+    // ── Light Theme ──────────────────────────────────────
+    &.light-theme {
+        background: #f8fafc !important;
+
+        .scroll-content {
+            background: #f8fafc !important;
+        }
+
+        .modern-navbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            .navbar-title { color: #1e293b !important; }
+        }
+
+        .page-content {
+            background: #f8fafc !important;
+        }
+
+        .cancel-input-section {
+            background: #ffffff !important;
+            border: 1px solid #e2e8f0 !important;
+        }
+
+        .cancel-input {
+            border-color: #e2e8f0 !important;
+            color: #1e293b !important;
+            background: #f8fafc !important;
+        }
+
+        .action-footer {
+            background: #f8fafc !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
+
+        .back-btn {
+            color: #64748b !important;
+            background: #e2e8f0 !important;
+        }
+    }
+
+    // ── Dark Theme (default) ──────────────────────────────
+    .scroll-content {
+        background: #0f172a !important;
+        padding: 6px !important;
+    }
+
+    .modern-navbar {
+        background: #1e293b !important;
+        border-bottom: 1px solid #334155 !important;
+
+        .navbar-title {
+            color: #f1f5f9 !important;
+            font-weight: 600 !important;
+            font-size: 18px !important;
+        }
+    }
+
+    .page-content {
+        background: #0f172a;
+        padding: 8px;
+        padding-bottom: 120px;
+    }
+
+    .cancel-input-section {
+        background: #1e293b;
+        border: 1px solid #334155;
+        border-radius: 12px;
+        padding: 16px;
+        margin: 12px 0;
+    }
+
+    .input-wrapper {
+        margin-top: 8px;
+    }
+
+    .cancel-input {
+        border: 1px solid #334155 !important;
+        border-radius: 8px !important;
+        padding: 8px 12px !important;
+        color: #f1f5f9 !important;
+        background: #0f172a !important;
+        font-size: 16px;
+        width: 100%;
+    }
+
+    .action-footer {
+        background: #1e293b !important;
+        border-top: 1px solid #334155 !important;
+        padding: 8px;
+    }
+
+    .back-btn-wrapper {
+        padding: 4px 16px 8px;
+    }
+
+    .back-btn {
+        color: #94a3b8 !important;
+        background: rgba(148, 163, 184, 0.1) !important;
+        border: 1px solid #334155 !important;
+        border-radius: 8px;
+    }
+
+    // Preserve legacy
+    .expires { color: #94a3b8; margin: 0 5px; }
+    .btngrid { padding: 8px; }
+}

@@ -573,14 +573,14 @@ presentActionSheet(session_member:TermSessionMembers,ev:any) {
                     this.unEnrolAlertConfirmation(session_member);
                 }
             },
-            {
-                text: 'Close',
-                icon: this.platform.is('ios') ? "" : 'close',
-                role: 'cancel',
-                handler: () => {
+            // {
+            //     text: 'Close',
+            //     icon: this.platform.is('ios') ? "" : 'close',
+            //     role: 'cancel',
+            //     handler: () => {
 
-                }
-            }                                        
+            //     }
+            // }                                        
         )    
         
         const actionSheet = this.actionSheetCtrl.create(alert_options);

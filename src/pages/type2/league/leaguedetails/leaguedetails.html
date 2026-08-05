@@ -38,6 +38,13 @@
           >
             <ion-icon name="mail"></ion-icon>
           </button>
+          <button
+            *ngIf="individualLeague?.league_type_text !== 'Team'"
+            class="action-btn"
+            (click)="gotoNotificationPage()"
+          >
+            <ion-icon name="notifications"></ion-icon>
+          </button>
         </div>
       </app-detail-header>
 

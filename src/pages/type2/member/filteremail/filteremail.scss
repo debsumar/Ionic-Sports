@@ -1,0 +1,117 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-filteremail {
+  @include android-sdk35-fixes;
+
+  // ── Base (Dark Theme) ──
+  .scroll-content {
+    padding: 0 !important;
+    background-color: #0f172a !important;
+    background-image: none !important;
+  }
+
+  // Filter row
+  .filter_row {
+    border-bottom: 1px solid #334155 !important;
+    padding: 4px 8px;
+
+    ion-col { background-color: #0f172a !important; }
+
+    ion-item {
+      background: #1e293b !important;
+      border-radius: 8px !important;
+      padding-left: 8px !important;
+      border: 1px solid #334155 !important;
+
+      .item-inner { border: none !important; padding-right: 8px !important; }
+    }
+
+    ion-select {
+      max-width: 100% !important;
+      width: 100% !important;
+      padding: 10px 0 !important;
+    }
+
+    .select-text { color: #f1f5f9 !important; }
+    .select-icon {
+      min-width: 20px !important;
+      min-height: 20px !important;
+      margin-left: 4px !important;
+    }
+  }
+
+  // Form fields
+  ion-item {
+    background-color: #1e293b !important;
+    border: none !important;
+    border-bottom: 1px solid #334155 !important;
+
+    .item-inner { border-bottom: none !important; }
+
+    ion-label {
+      color: #94a3b8 !important;
+      font-weight: 700 !important;
+      font-size: 11px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.6px !important;
+      padding: 12px 8px !important;
+      margin: 0 !important;
+    }
+
+    ion-input, ion-textarea {
+      color: #f1f5f9 !important;
+      font-size: 15px !important;
+      font-weight: 500 !important;
+    }
+
+    .text-input {
+      color: #f1f5f9 !important;
+      font-size: 15px !important;
+    }
+  }
+
+  // Textarea message
+  ion-textarea {
+    .text-input::placeholder { color: #64748b !important; }
+  }
+
+  // Send button
+  ion-grid {
+    padding: 12px !important;
+
+    button[ion-button] {
+      background: linear-gradient(135deg, rgba(43,146,187,0.85), rgba(53,173,255,0.75)) !important;
+      color: white !important;
+      border-radius: 8px !important;
+      font-weight: 700 !important;
+      font-size: 14px !important;
+      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+      box-shadow: 0 4px 20px rgba(43, 146, 187, 0.25) !important;
+    }
+  }
+
+  ion-col { background-color: transparent !important; }
+
+  // ── Light Theme ──
+  &.light-theme {
+    .scroll-content { background-color: #f8fafc !important; }
+
+    .filter_row {
+      border-bottom-color: #e2e8f0 !important;
+      ion-col { background-color: #f8fafc !important; }
+      ion-item { background: #ffffff !important; border-color: #e2e8f0 !important; }
+      .select-text { color: #0f172a !important; }
+    }
+
+    ion-item {
+      background-color: #ffffff !important;
+      border-bottom-color: #e2e8f0 !important;
+
+      ion-label { color: #64748b !important; }
+      ion-input, ion-textarea { color: #0f172a !important; }
+      .text-input { color: #0f172a !important; }
+    }
+
+    ion-textarea .text-input::placeholder { color: #94a3b8 !important; }
+  }
+}

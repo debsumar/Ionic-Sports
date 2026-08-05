@@ -31,3 +31,32 @@ npm-debug.log*
 /www
 /.kiro
 .github/chatmodes/4.1-Beast.chatmode.md
+
+# ---------------------------------------------------------------------------
+# Secrets / credentials — NEVER commit these.
+# Real values stay local only. Copy from the *.example.ts templates and fill in.
+# ---------------------------------------------------------------------------
+
+# Firebase / Google service config
+google-services.json
+GoogleService-Info.plist
+
+# Environment configs (contain API keys, admin keys, prod endpoints)
+/src/environments/environment.ts
+/src/environments/environment.prod.ts
+!/src/environments/*.example.ts
+
+# Cordova signing / build credentials
+build.json
+*.keystore
+*.jks
+*.p12
+*.p8
+*.mobileprovision
+
+# Generic secret files
+.env
+.env.*
+*.pem
+serviceAccount*.json
+credentials*.json

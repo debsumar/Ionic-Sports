@@ -1,0 +1,123 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-showmembership {
+  @include android-sdk35-fixes;
+
+  .scroll-content { padding: 0 !important; background: #0f172a !important; }
+  ion-content { background: #0f172a !important; }
+
+  ion-navbar {
+    background: #0f172a !important;
+    .toolbar-background { background: #0f172a !important; }
+    .toolbar-title { color: #f1f5f9 !important; }
+    .bar-button, ion-icon { color: #f1f5f9 !important; }
+  }
+
+  .page-layout { display: flex; flex-direction: column; height: 100%; }
+  .page-fixed-header { flex-shrink: 0; background: #0f172a; z-index: 10; padding: 0 8px; }
+  .page-scroll-area { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 0 8px 24px; }
+
+  // Active memberships horizontal scroller
+  .active-scroller {
+    display: flex; gap: 12px; overflow-x: auto; -webkit-overflow-scrolling: touch;
+    padding: 4px 2px 12px; scroll-snap-type: x mandatory;
+    &::-webkit-scrollbar { display: none; }
+  }
+  .active-card { flex: 0 0 82%; max-width: 82%; scroll-snap-align: start; }
+
+  .m-card { padding: 14px; }
+  .m-card-top { display: flex; align-items: center; gap: 10px; }
+  .m-icon {
+    flex-shrink: 0; width: 34px; height: 34px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(245,158,11,0.26), rgba(245,158,11,0.1));
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    ion-icon { font-size: 18px; color: #f59e0b; }
+    &.paid {
+      background: linear-gradient(135deg, rgba(16,185,129,0.26), rgba(16,185,129,0.1));
+      border-color: rgba(16, 185, 129, 0.4);
+      ion-icon { color: #10b981; }
+    }
+  }
+  .m-name {
+    flex: 1; min-width: 0; margin: 0; font-size: 15px; font-weight: 700; color: #5ea68d;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .m-count {
+    flex-shrink: 0; min-width: 26px; height: 26px; padding: 0 7px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 13px; color: #fff; font-size: 12px; font-weight: 700;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  }
+  .m-type { margin: 10px 0 0; font-size: 13px; color: #64b8e8; app-status-badge { margin-left: 4px; } }
+  .m-dates {
+    display: flex; flex-direction: column; gap: 4px; margin-top: 10px;
+    padding-top: 10px; border-top: 1px solid rgba(71, 85, 105, 0.25);
+    span { font-size: 12px; color: #94a3b8; ion-icon { font-size: 13px; vertical-align: middle; color: #64748b; margin-right: 3px; } }
+  }
+
+  // Available memberships
+  app-list-card { display: block; margin-bottom: 10px; }
+  .rec-card {
+    display: flex; align-items: center; gap: 12px; padding: 13px 14px;
+    background: linear-gradient(145deg, rgba(43, 146, 187, 0.22) 0%, rgba(53, 173, 255, 0.08) 45%, transparent 80%);
+  }
+  .rec-icon {
+    flex-shrink: 0; width: 40px; height: 40px; border-radius: 11px;
+    display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(135deg, rgba(43,146,187,0.3), rgba(53,173,255,0.12));
+    border: 1px solid rgba(43, 146, 187, 0.4);
+    ion-icon { font-size: 20px; color: #64b8e8; }
+  }
+  .rec-info { flex: 1; min-width: 0; }
+  .rec-name {
+    margin: 0; font-size: 15px; font-weight: 700; color: #5ea68d;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .rec-tier {
+    margin: 3px 0 0; font-size: 12px; color: #cab389;
+    ion-icon { font-size: 12px; vertical-align: middle; margin-right: 2px; }
+  }
+  .rec-price {
+    margin: 4px 0 0; font-size: 13px; color: #92a7b5;
+    span { margin-right: 10px; }
+    b { color: #10b981; font-weight: 700; }
+  }
+  .rec-loc {
+    margin: 4px 0 0; font-size: 12px; color: #94a3b8;
+    ion-icon { font-size: 13px; color: #2b92bb; vertical-align: middle; margin-right: 3px; }
+  }
+  .rec-arrow {
+    flex-shrink: 0; width: 30px; height: 30px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(43, 146, 187, 0.16); border: 1px solid rgba(43, 146, 187, 0.3);
+    ion-icon { font-size: 16px; color: #2b92bb; }
+  }
+
+  // Light theme
+  &.light-theme {
+    .scroll-content { background: #f8fafc !important; }
+    ion-content { background: #f8fafc !important; }
+    ion-navbar {
+      background: #f8fafc !important;
+      .toolbar-background { background: #f8fafc !important; }
+      .toolbar-title { color: #1e293b !important; }
+      .bar-button, ion-icon { color: #1e293b !important; }
+    }
+    .page-fixed-header { background: #f8fafc; }
+    .m-dates { border-top-color: #e2e8f0; span { color: #64748b; ion-icon { color: #94a3b8; } } }
+    .rec-card { background: linear-gradient(145deg, rgba(43, 146, 187, 0.16) 0%, rgba(53, 173, 255, 0.06) 45%, transparent 80%); }
+    .rec-icon { background: linear-gradient(135deg, rgba(43,146,187,0.18), rgba(53,173,255,0.08)); }
+    .rec-price { color: #475569; }
+    .rec-loc { color: #64748b; }
+  }
+
+  @media (max-width: 359px) {
+    .active-card { flex-basis: 88%; max-width: 88%; }
+    .m-name, .rec-name { font-size: 14px; }
+  }
+  @media (min-width: 768px) {
+    .active-card { flex-basis: 46%; max-width: 46%; }
+    .page-scroll-area { padding: 0 16px 24px; }
+  }
+}

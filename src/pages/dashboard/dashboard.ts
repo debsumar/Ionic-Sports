@@ -33,7 +33,13 @@ import { AppType } from "../../shared/constants/module.constants";
 export class Dashboard {
   @ViewChild(FeatureAnnouncementModalComponent)
   featureAnnouncementModal: FeatureAnnouncementModalComponent;
-  footermenu: Array<any> = [];
+  footermenu: Array<any> = [
+    { DisplayName: "Home", Icon: "home", Component: "Dashboard" },
+    { DisplayName: "Groups", Icon: "people", Component: "Type2ManageSession" },
+    { DisplayName: "Camps", Icon: "tennisball", Component: "Type2HolidayCamp" },
+    { DisplayName: "Members", Icon: "contacts", Component: "Type2Member" },
+    { DisplayName: "Menu", Icon: "ios-more", Component: "MenupagePage" },
+  ];
   Tempfootermenu: Array<any> = [
     { DisplayName: "Home", Icon: "home", Component: "Dashboard" },
     { DisplayName: "Groups", Icon: "people", Component: "Type2ManageSession" },
@@ -126,6 +132,9 @@ export class Dashboard {
   getactivebookinInfo: any;
   bookingInfo = { totalbook: 0, todaycount: 0, slotListing: [] };
   showPendingPayments: boolean = true; // this is used when coach logged in aginst that coach check can he able to see payment card in dashboard
+  private readonly CACHE_REFRESH_MINUTES = 30;
+  private parentClubSub: any;
+  private hasLoaded: boolean = false;
   nesturl: any;
   constructor(
     public events: Events,
@@ -181,33 +190,19 @@ export class Dashboard {
       
       // Handle first login actions
       if (loginWhen === "first" && this.userData) {
-        this.getMemberDetails();
-        //this.getPostgreParentclub();
+        // getMemberDetails() is called inside getPostgreParentclub() after the
+        // postgres ID is set — calling it here would fire before the ID is ready
+        // and produce user/usercount/undefined
         this.storage.set("LoginWhen", "notFirst");
       }
       
       // Handle refresh timing
       if (lastRefresh) {
-        const dt1 = new Date().getMinutes();
-        const dt2 = new Date(lastRefresh).getMinutes();
-        const diff = dt1 - dt2;
+        const diff = (new Date().getTime() - lastRefresh) / 1000 / 60;
         
-        if (diff >= 1 && this.userData) {
-          this.getSessionDetails();
-          this.getTermSessionEnrolDetails();
-          this.getMemberDetails();
-          //this.getPostgreParentclub();
-          this.getCoachDetails();
-          this.getEvents();
+        if (diff >= this.CACHE_REFRESH_MINUTES && this.userData) {
+          this.getPostgreParentclub();
         }
-      } else if (this.userData) {
-        // If no last refresh time, fetch data anyway
-        this.getSessionDetails();
-        this.getTermSessionEnrolDetails();
-        this.getMemberDetails();
-        //this.getPostgreParentclub();
-        this.getCoachDetails();
-        this.getEvents();
       }
     })
     .catch(error => {
@@ -246,24 +241,19 @@ export class Dashboard {
 
 
   //getting the apikeys which needs for different module api's
-  async authenticate(){
-    this.fb.loginToFirebaseAuth().then(async(val)=>{
-      if(!this.sharedService.getApiKey("group-session")){
-        setTimeout(async()=>{
-          const access_id = await (await this.fb.getCurrentUser()).getIdToken();
-          const authObj = {
-            IdToken:access_id,
-            AppType:1,
-            // ParentClubKey:"",
-            // ClubKey:"",
-            // MemberKey:"",
-            // ActionType:1,
-            // DeviceType:1
-          }
-          const authQuery = gql`
+  async authenticate() {
+    try {
+      await this.fb.loginToFirebaseAuth();
+      if (!this.sharedService.getApiKey('group-session')) {
+        const access_id = await (await this.fb.getCurrentUser()).getIdToken();
+        const authObj = {
+          IdToken: access_id,
+          AppType: 1,
+        };
+        const authQuery = gql`
           query authenticateUser($auth: AuthInput!) {
             authenticateUser(authCred: $auth) {
-              AuthObj{
+              AuthObj {
                 AuthKey
                 AuthValue
               }
@@ -273,34 +263,30 @@ export class Dashboard {
         this.apollo
           .query({
             query: authQuery,
-            fetchPolicy: "no-cache",
-            variables: { auth: authObj},
+            fetchPolicy: 'no-cache',
+            variables: { auth: authObj },
           })
           .subscribe(
             ({ data }) => {
-                if(data["authenticateUser"]["AuthObj"]){
-                  data["authenticateUser"]["AuthObj"].forEach((auth:any)=>{
-                    const module = auth.AuthKey.split("/");
-                    //console.log(module[module.length-1]);
-                    if(module[module.length-1] === "group-session")
-                      this.sharedService.setApikey("group-session",auth.AuthValue);
-                      else if(module[module.length-1] === "leauge-api-key")
-                      this.sharedService.setApikey("league",auth.AuthValue);
-                  })
-                  console.log(`%cgrp_session_auth:${this.sharedService.getApiKey("group-session")}`,'color:green;font-size:20px');
+              if (data['authenticateUser']['AuthObj']) {
+                data['authenticateUser']['AuthObj'].forEach((auth: any) => {
+                  const module = auth.AuthKey.split('/');
+                  if (module[module.length - 1] === 'group-session')
+                    this.sharedService.setApikey('group-session', auth.AuthValue);
+                  else if (module[module.length - 1] === 'leauge-api-key')
+                    this.sharedService.setApikey('league', auth.AuthValue);
+                });
+                console.log(`%cgrp_session_auth:${this.sharedService.getApiKey('group-session')}`, 'color:green;font-size:20px');
               }
             },
             (err) => {
-              //this.commonService.hideLoader();
-              console.log(`%cfirebase auth api err:${JSON.stringify(err)}`,'color:red;font-size:20px');
-              //this.commonService.toastMessage("Gallery fetch failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+              console.log(`%cfirebase auth api err:${JSON.stringify(err)}`, 'color:red;font-size:20px');
             }
-          );          
-        },1200)
+          );
       }
-    }).catch((err)=>{
-      console.log(`%cfirebase auth err:${JSON.stringify(err)}`,'color:red;font-size:20px');
-    })
+    } catch (err) {
+      console.log(`%cfirebase auth err:${JSON.stringify(err)}`, 'color:red;font-size:20px');
+    }
   }
 
   getLanguage() {
@@ -327,7 +313,7 @@ export class Dashboard {
 
   //to know the chat function is available for this parentclub
   getParentClubDetails() {
-    this.fb.getAllWithQuery(`ParentClub/Type2/`, {orderByKey: true,equalTo: this.userData.UserInfo[0].ParentClubKey}).subscribe((data) => {
+    this.parentClubSub = this.fb.getAllWithQuery(`ParentClub/Type2/`, {orderByKey: true,equalTo: this.userData.UserInfo[0].ParentClubKey}).subscribe((data) => {
       this.parentClubInfo = data[0];
           if (data.length > 0 && data[0].IsChatEnable != undefined) {
             this.isChatEnable = data[0].IsChatEnable == "true" || data[0].IsChatEnable ? true: false;}
@@ -361,6 +347,7 @@ export class Dashboard {
   user: any;
   ionViewWillEnter() {
     // Handle login and user data first (needs to be sequential due to await)
+    if (!this.hasLoaded) {
     this.storage.get("isLogin").then(async (isLoggedIn) => {
       if (isLoggedIn === true) {
         try {
@@ -381,9 +368,12 @@ export class Dashboard {
           console.error("Error processing user data:", err);
         }
       }
+      this.hasLoaded = true;
     });
+    }
     
     // Load all other storage data in parallel
+    if (!this.hasLoaded) {
     Promise.all([
       //this.storage.get("postgre_parentclub"),
       this.storage.get("sessionDetails"),
@@ -459,6 +449,15 @@ export class Dashboard {
     .catch(error => {
       console.error("Error loading dashboard cached data:", error);
     });
+    }
+  }
+
+  ionViewWillLeave() {
+    if (this.parentClubSub) {
+      this.parentClubSub.unsubscribe();
+    }
+    this.events.unsubscribe('theme:changed');
+    this.events.unsubscribe('league:refresh');
   }
 
   checkDashBoardEmpty() {
@@ -746,42 +745,36 @@ export class Dashboard {
   }
 
   getEvents() {
-    let reqObj = {
-      parentCLubKey: this.userData.UserInfo[0].ParentClubKey,
-      loggedInType: "admin",
-      loggedInKey: this.userData.UserInfo[0].Key,
-      filterType: "present",
+    const reqObj = {
+      parentclub_id:  this.sharedService.getPostgreParentClubId(),
+      club_id:        "",
+      activity_id:    "",
+      member_id:      this.sharedService.getLoggedInId(),
+      action_type:    1,
+      device_type:    this.sharedService.getPlatform() === 'android' ? 1 : 2,
+      app_type:       AppType.ADMIN_NEW,
+      device_id:      this.sharedService.getDeviceId(),
+      updated_by:     this.sharedService.getLoggedInId(),
+      start_date:     "",
+      end_date:       "",
     };
-    this.fb.$post(`${this.nodeUrl}/event/history`, reqObj).subscribe(
-      (data) => {
-        // console.log(`events:${data}`);
-
-        console.log(this.EventObj);
-        this.EventObj.TotalEvents = data.events.length;
-        this.EventObj.TicketsSold = data.bookings;
-        this.EventObj.TotRevenue = parseFloat(data.totalPaidAmount).toFixed(2);
-        this.storage.set("eventDetails", this.EventObj);
-        // this.storage.get("eventDetails").then((data) => {
-        //   if (data != null) {
-        //     this.storage.remove("eventDetails").then(() => {
-        //       this.EventObj.TotalEvents = data.events.length;
-        //       this.EventObj.TicketsSold = data.bookings;
-        //       this.EventObj.TotRevenue = data.totalPaidAmount;
-        //       this.storage.set('eventDetails', this.EventObj);
-        //     });
-        //   } else {
-        //     this.EventObj.TotalEvents = data.events.length;
-        //     this.EventObj.TicketsSold = data.bookings;
-        //     this.EventObj.TotRevenue = data.totalPaidAmount;
-        //     this.storage.set('eventDetails', this.EventObj);
-        //   }
-        // })
-      },
-      (err) => {
-        console.log("err", err);
-        //this.showToast("There is some problem,Please try again",2500);
-      }
-    );
+    this.httpService.post<GetEventPaymentHistoryResponse>(
+        API.GET_EVENT_PAYMENT_HISTORY,
+        reqObj,
+        undefined,
+        1
+      )
+      .subscribe(
+        (data) => {
+          this.EventObj.TotalEvents = data.total_events;
+          this.EventObj.TicketsSold = data.total_tickets_sold;
+          this.EventObj.TotRevenue = parseFloat(data.total_revenue).toFixed(2);
+          this.storage.set("eventDetails", this.EventObj);
+        },
+        (err) => {
+          console.log("err", err);
+        }
+      );
   }
 
   //Navigate to events
@@ -910,16 +903,17 @@ export class Dashboard {
   //   })
 
   // }
+  
   getMemberDetails() {
-    this.http
-      .get(
-        `${this.nestUrl}/user/usercount/${this.userData.UserInfo[0].ParentClubKey}`
+    this.httpService.get(
+        `${API.GET_USER_COUNT}/${this.sharedService.getPostgreParentClubId()}`
       )
       .subscribe((resp) => {
         this.memberDetails = resp["data"];
         this.storage.set("memberDetails", this.memberDetails);
       });
   }
+
 
 
   getCoachDetails() {
@@ -973,11 +967,13 @@ export class Dashboard {
           this.sharedService.setPostgreParentClubId(res.data["Id"]);
           this.storage.set("postgre_parentclub", res.data);
           this.checkFeatureAnnouncements(res.data["Id"]);
+          this.getMemberDetails();
           this.getSessionDetails();
           this.getTermSessionEnrolDetails();
           this.getSchoolSessionEnrolDets();
           this.getMonthlySessionEnrolDets();
           this.getCoachDetails();
+          this.getEvents();
         }
       },
       error: (err) => {
@@ -1136,6 +1132,12 @@ interface ISessionPendingPayments{
   TotalAmountDue:string;
   TotalCount:string;
   VenueDetails:[]
+}
+
+interface GetEventPaymentHistoryResponse {
+  total_events: number;
+  total_tickets_sold: number;
+  total_revenue: string;
 }
 
 interface IPendingSessionVenues{

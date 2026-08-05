@@ -142,8 +142,7 @@ menupage-page {
             
             .card-icon-wrapper {
                 background: rgba(255, 255, 255, 0.3) !important;
-                backdrop-filter: blur(10px);
-                box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15) !important;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
                 
                 .card-icon {
                     color: #ffffff !important;
@@ -251,7 +250,7 @@ menupage-page {
         background: linear-gradient(135deg, #93c5fd 0%, #60a5fa 100%);
         border-radius: 16px;
         border: none;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 4px 16px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         //transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         cursor: pointer;
         overflow: hidden;
@@ -380,9 +379,7 @@ menupage-page {
             align-items: center;
             justify-content: center;
             background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
-            //transition: transform 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
             position: absolute;
             top: 16px;
             left: 16px;
@@ -416,7 +413,6 @@ menupage-page {
                 font-size: 10px;
                 font-weight: 600;
                 z-index: 10;
-                animation: pulse 2s infinite;
             }
         }
         
@@ -593,9 +589,7 @@ menupage-page {
         position: fixed;
         bottom: 20px;
         right: 20px;
-        background: linear-gradient(270deg, #2b92bb, #1e7a9a, #2b92bb, #1e7a9a);
-        background-size: 400% 400%;
-        animation: gradientShift 3s ease infinite;
+        background: #2b92bb;
         color: #ffffff;
         border: none;
         border-radius: 30px;
@@ -615,22 +609,14 @@ menupage-page {
     }
 
     @keyframes gradientShift {
-        0% {
-            background-position: 0% 50%;
-        }
-        50% {
-            background-position: 100% 50%;
-        }
-        100% {
-            background-position: 0% 50%;
-        }
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     &.light-theme {
         .ask-me-button {
-            background: linear-gradient(270deg, #2b92bb, #1e7a9a, #2b92bb, #1e7a9a);
-            background-size: 400% 400%;
-            animation: gradientShift 3s ease infinite;
+            background: #2b92bb;
             box-shadow: 0 4px 16px rgba(43, 146, 187, 0.3);
         }
     }

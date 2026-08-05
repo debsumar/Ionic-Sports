@@ -107,6 +107,14 @@ export class InnerPaymentMenu {
     this.navCtrl.push("Apkidsubscriptions");
   }
 
+  gotoEventPayment(){
+    this.navCtrl.push('EventPaymentReport');
+  }
+
+  gotoWeeklyPayment(){
+    this.navCtrl.push('WeeklyPaymentReport');
+  }
+
   showAlert(text:string) {
     const alert = this.alertCtrl.create({
       title: text,

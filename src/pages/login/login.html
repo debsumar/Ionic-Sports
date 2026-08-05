@@ -10,7 +10,7 @@
                     <ion-icon name="mail" class="input-icon"></ion-icon>
                 </ion-col>
                 <ion-col col-11>
-                    <ion-input type="email" [(ngModel)]="user.emailID" placeholder="Email" name="admin_input"></ion-input>
+                    <ion-input type="text" inputmode="email" autocomplete="email" [(ngModel)]="user.emailID" placeholder="Email" name="admin_input"></ion-input>
                 </ion-col>
             </ion-row>
 
@@ -19,7 +19,7 @@
                     <ion-icon name="lock" class="input-icon"></ion-icon>
                 </ion-col>
                 <ion-col col-10>
-                    <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" placeholder="Password" name="admin_password"></ion-input>
+                    <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" placeholder="Password" name="admin_password" [clearOnEdit]="false"></ion-input>
                 </ion-col>
                 <ion-col col-1>
                     <ion-icon [name]="showPassword ? 'eye' : 'eye-off'" class="toggle-pw" (click)="showPassword = !showPassword"></ion-icon>

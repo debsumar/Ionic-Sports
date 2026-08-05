@@ -1,0 +1,68 @@
+<ion-header>
+  <ion-navbar class="modern-navbar">
+    <ion-title class="navbar-title">Membership</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div [ngStyle]="{'margin-top.px': platformType=='ios' ? 30 : 0}" class="page-content">
+
+    <!-- Detail Header: membership name + expiry + member -->
+    <app-detail-header
+      *ngIf="membership_user"
+      [title]="membership_user.membership_name"
+      subtitle="Membership"
+      [detailRows]="isRenewal && membership_user.PaymentOptions && membership_user.PaymentOptions.Monthly
+        ? [
+            {icon: 'calendar', text: 'Expires: ' + membership_user.formatted_exp_date},
+            {icon: 'person', text: membership_user.first_name + ' ' + membership_user.last_name},
+            {icon: 'cash', text: 'Price: ' + ((currencyDetails && currencyDetails.CurrencySymbol) ? currencyDetails.CurrencySymbol : '') + membership_user.PaymentOptions.Monthly.Price}
+          ]
+        : [
+            {icon: 'calendar', text: 'Expires: ' + membership_user.formatted_exp_date},
+            {icon: 'person', text: membership_user.first_name + ' ' + membership_user.last_name}
+          ]"
+      accentColor="#2b92bb">
+    </app-detail-header>
+
+    <!-- Monthly records -->
+    <app-section-header title="Payment Records" [count]="membershipMonths.length"></app-section-header>
+
+    <div class="record-list">
+      <app-list-card
+        *ngFor="let monthly of membershipMonths"
+        accentColor="#35adff">
+        <div class="record-row">
+          <p class="record-date">{{monthly.date}}</p>
+          <div class="record-amount-block">
+            <p class="record-amount" *ngIf="monthly.amount_paid !== undefined || monthly.amount_due !== undefined">
+              <span *ngIf="currencyDetails!=undefined">{{currencyDetails.CurrencySymbol}}</span>
+              <span>{{monthly.subscription_status == 1 ? monthly.amount_paid : monthly.amount_due}}</span>
+            </p>
+            <app-status-badge
+              *ngIf="monthly.subscription_status == 1 && monthly.pay_status == 1"
+              variant="success" label="Paid"></app-status-badge>
+            <app-status-badge
+              *ngIf="monthly.subscription_status == 0 && monthly.pay_status == 0"
+              variant="warning" label="Pending"></app-status-badge>
+          </div>
+        </div>
+      </app-list-card>
+    </div>
+
+    <!-- Empty state -->
+    <app-empty-state
+      *ngIf="!membershipMonths || membershipMonths.length == 0"
+      icon="calendar"
+      text="No payment records found">
+    </app-empty-state>
+
+  </div>
+</ion-content>
+
+<ion-footer class="action-footer" *ngIf="isRenewal">
+  <app-glass-button
+    label="Renew Membership"
+    (btnClick)="renewMembership()">
+  </app-glass-button>
+</ion-footer>

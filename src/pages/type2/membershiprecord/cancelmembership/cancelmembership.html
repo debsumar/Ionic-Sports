@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-navbar class="modern-navbar">
+    <ion-title class="navbar-title">Membership Cancellation</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div [ngStyle]="{'margin-top.px': platformType=='ios' ? 30 : 0}" class="page-content">
+
+    <!-- Detail Header: membership name + expiry -->
+    <app-detail-header
+      *ngIf="membership_info"
+      [title]="membership_info.membership_name"
+      subtitle="Cancellation"
+      [detailRows]="membership_info.last_payment_date
+        ? [{icon: 'calendar', text: 'Expires: ' + membership_info.expiry_date}, {icon: 'cash', text: 'Last paid: ' + membership_info.last_payment_date}]
+        : [{icon: 'calendar', text: 'Expires: ' + membership_info.expiry_date}]"
+      accentColor="#ef4444">
+    </app-detail-header>
+
+    <!-- Confirmation input -->
+    <div class="cancel-input-section">
+      <app-section-header title="Confirm Cancellation"></app-section-header>
+      <div class="input-wrapper">
+        <ion-input
+          type="text"
+          class="cancel-input"
+          placeholder="Type 'CANCEL' here..."
+          [(ngModel)]="cancelText">
+        </ion-input>
+      </div>
+    </div>
+
+  </div>
+</ion-content>
+
+<ion-footer class="action-footer">
+  <app-glass-button
+    label="Cancel Membership"
+    (btnClick)="cancel()">
+  </app-glass-button>
+  <div class="back-btn-wrapper">
+    <button ion-button block class="back-btn" (click)="navCtrl.pop()">Go Back</button>
+  </div>
+</ion-footer>

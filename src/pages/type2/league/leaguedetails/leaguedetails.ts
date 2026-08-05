@@ -24,7 +24,7 @@ import { HttpService } from "../../../../services/http.service";
 import { DatePipe } from "@angular/common";
 import { LeagueMatch } from "../models/location.model";
 import { API } from "../../../../shared/constants/api_constants";
-import { AppType } from "../../../../shared/constants/module.constants";
+import { AppType, ModuleTypes } from "../../../../shared/constants/module.constants";
 import { ParticipantModel } from "../../match/matchdetails/matchdetails";
 import { MatchType } from "../../../../shared/utility/enums";
 import { ThemeService } from "../../../../services/theme.service";
@@ -1153,11 +1153,37 @@ export class LeaguedetailsPage {
       const email_modal = {
         module_info: session,
         email_users: member_list,
-        type: 600
+        type: 600,
+        isLeagueTeams: true
       };
       this.navCtrl.push("MailToMemberByAdminPage", { email_modal });
     } else {
       this.commonService.toastMessage("No participant(s) found", 2500, ToastMessageType.Error);
+    }
+  }
+
+  gotoNotificationPage() {
+    if (this.partcipantData && this.partcipantData.length > 0) {
+      const user_ids = this.partcipantData.map(p =>
+        p.participant_details.is_child
+          ? (p.participant_details.parent_id || p.participant_details.user_id)
+          : p.participant_details.user_id
+      );
+      const user_names = this.partcipantData.map(p =>
+        p.participant_details.first_name + ' ' + p.participant_details.last_name
+      );
+      const pay_status = this.partcipantData.map(p => p.amount_pay_status);
+      this.navCtrl.push('NotificationsPage', {
+        users: user_ids,
+        user_names: user_names,
+        pay_status: pay_status,
+        type: ModuleTypes.LEAGUE,
+        heading: this.individualLeague ? this.individualLeague.league_name : '',
+        module_id: this.league_id,
+        page_id: 'LEAGUE_DETAILS'
+      });
+    } else {
+      this.commonService.toastMessage('No participant(s) found', 2500, ToastMessageType.Error);
     }
   }
 

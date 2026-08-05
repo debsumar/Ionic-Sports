@@ -1,0 +1,100 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Edit Membership</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-pad" *ngIf="memberShipData">
+    <!-- Summary hero -->
+    <app-list-card class="summary"
+      [accentColor]="memberShipData?.membership_package?.subscription_status === 1 ? '#10b981' : '#f59e0b'">
+      <div class="m-card">
+        <div class="info-top">
+          <div class="m-icon">
+            <ion-icon name="ribbon"></ion-icon>
+          </div>
+          <div class="m-head">
+            <p class="m-name">{{memberShipData?.membership_name}}</p>
+            <app-status-badge *ngIf="memberShipData?.membership_package?.subscription_status === 1" variant="success" label="Paid"></app-status-badge>
+            <app-status-badge *ngIf="memberShipData?.membership_package?.subscription_status === 0" variant="warning" label="Pending"></app-status-badge>
+          </div>
+        </div>
+
+        <div class="info-plan">
+          <span *ngIf="monthly">Monthly · <b>{{currencyDetails?.CurrencySymbol}}{{memberShipData.monthly_price | number:'1.2-2'}}</b></span>
+          <span *ngIf="yearly">Yearly · <b>{{currencyDetails?.CurrencySymbol}}{{memberShipData.yearly_price}}</b>
+            <span class="disc" *ngIf="memberShipData.yearly_discount_absolute != 0 || memberShipData.yearly_discount_percentage != 0">
+              (Disc
+              <span *ngIf="memberShipData.yearly_discount_absolute != 0">{{currencyDetails?.CurrencySymbol}}{{memberShipData.yearly_discount_absolute}}</span>
+              <span *ngIf="memberShipData.yearly_discount_absolute != 0 && memberShipData.yearly_discount_percentage != 0"> or </span>
+              <span *ngIf="memberShipData.yearly_discount_percentage != 0">{{memberShipData.yearly_discount_percentage}}%</span>)
+            </span>
+          </span>
+        </div>
+
+        <div class="info-dates">
+          <div class="date-pill">
+            <ion-icon name="calendar"></ion-icon>
+            <div class="date-text">
+              <span class="lbl">Started</span>
+              <span class="val">{{memberShipData?.membership_package.start_date}}</span>
+            </div>
+          </div>
+          <div class="date-pill">
+            <ion-icon name="time"></ion-icon>
+            <div class="date-text">
+              <span class="lbl">Expires</span>
+              <span class="val">{{memberShipData?.membership_package.membership_expiry_date}}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </app-list-card>
+
+    <!-- Members -->
+    <div class="members-header">
+      <app-section-header title="Select Members"></app-section-header>
+      <button class="delete-avatar"
+        *ngIf="familyMemberInfo.length > 0 && memberShipData?.membership_package?.subscription_status === 0"
+        (tap)="deleteMemberShipConfirm()">
+        <ion-icon name="trash"></ion-icon>
+      </button>
+    </div>
+    <div class="member-list" *ngIf="familyMemberInfo.length > 0">
+      <div class="member-item" *ngFor="let member of familyMemberInfo"
+        [class.selected]="member.IsSelect && !member.member_enrolled"
+        [class.enrolled]="member.member_enrolled"
+        (click)="!member.member_enrolled && toggleMember(member)">
+        <div class="avatar" [class.is-enrolled]="member.member_enrolled">
+          {{ (member.FirstName ? member.FirstName.charAt(0) : '') + (member.LastName ? member.LastName.charAt(0) : '') }}
+        </div>
+        <div class="member-info">
+          <span class="member-name">{{member.FirstName}} {{member.LastName}}</span>
+          <span class="member-tag" *ngIf="member.member_enrolled">Enrolled</span>
+        </div>
+        <ng-container *ngIf="!member.member_enrolled">
+          <div class="row-check" [class.checked]="member.IsSelect">
+            <ion-icon name="checkmark"></ion-icon>
+          </div>
+        </ng-container>
+        <ng-container *ngIf="member.member_enrolled">
+          <button ion-button clear class="unenrol-btn" (click)="$event.stopPropagation()" (tap)="unEnrolConfirmation(member.Id)">
+            <ion-icon name="trash"></ion-icon>
+          </button>
+        </ng-container>
+      </div>
+    </div>
+
+    <app-empty-state *ngIf="familyMemberInfo.length == 0" icon="people" text="No Member(s) Left" [danger]="true"></app-empty-state>
+  </div>
+</ion-content>
+
+<ion-footer no-border [class.light-theme]="!isDarkTheme">
+  <div class="action-bar">
+    <button class="secondary-btn" *ngIf="memberShipData?.membership_package?.subscription_status === 1"
+      (click)="cancelMemberShip()">Cancel Membership</button>
+    <app-glass-button label="Update Membership" [disabled]="all_family_enrolled"
+      (btnClick)="enrolIntoMembership()"></app-glass-button>
+  </div>
+</ion-footer>

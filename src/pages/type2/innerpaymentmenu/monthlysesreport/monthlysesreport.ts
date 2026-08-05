@@ -15,7 +15,7 @@ import { CommonService, ToastMessageType, ToastPlacement } from '../../../../ser
 import { API } from '../../../../shared/constants/api_constants';
 import { SharedServices } from '../../../services/sharedservice';
 import { AppType } from '../../../../shared/constants/module.constants';
-import { payment_email } from '../../payment/model/report.model';
+// payment_email type removed (was already unresolvable before folder move)
 import { ModuleTypeForEmail } from '../../mailtomemberbyadmin/mailtomemberbyadmin';
 @IonicPage()
 @Component({
@@ -411,7 +411,7 @@ export class MonthlySessionReport {
   gotoEmailPage() {
     try{
       //console.log(this.reportType)
-      const reportList:payment_email[] = [];
+      const reportList: any[] = [];
       if(this.reportType.toLowerCase() === "due" && this.dueMemberListtemp.length == 0){
         this.commonService.toastMessage("Due members emails are not available", 2500, ToastMessageType.Error)
         return false;

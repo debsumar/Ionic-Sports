@@ -16,6 +16,8 @@ export const API = {
     TERM_SESSION_PENDING_PAYMENTS: `session/getTermPendingPayments`,
     MONTHLY_SESSION_PAYMENT_REPORT: `paymentreport/monthlyses_paymentreport`,
     EVENT_PAYMENT_REPORT: `paymentreport/eventpaymentreport`,
+    WEEKLY_PAYMENT_LISTING: `paymentreport/weekly_listing`,
+    WEEKLY_ALL_PAYMENT_DETAILS: `paymentreport/allweeklyPayment_details`,
     SCHOOL_SESSION_PAYMENT_REPORT: `paymentreport/schoolSessionPaymentReport`,
     HOLIDAYCAMP_PAYMENT_LISTING: `paymentreport/holidaycampPayment_listing`,
     MEMBERSHIP_PAYMENT_LIST: `paymentreport/membership_payment_list`,
@@ -96,6 +98,7 @@ export const API = {
     UPDATE_EVENT_COUPON: `events/coupons/update_event_coupon`,
     REMOVE_COUPON: `events/coupons/delete_coupon`,
     EVENT_PRINT_REPORT: `events/bookings/printeventreport`,
+    GET_EVENT_PAYMENT_HISTORY: `events/payment/getEventPaymentHistory`,
     GET_LEAGUE_MATCHES: `league/getLeagueMatches`,
     UPDATE_LEAGUE_PAYMENT_ADMIN: `league/updateLeaguePaymentAdmin`,
     GET_ALL_LEAGUES: `league/get-all-leagues`,
@@ -242,6 +245,7 @@ export const API = {
     // ── Legacy nest URL endpoints (host: activitypro-nest-261607.appspot.com) ──
     // Pass type=2 to httpService when calling these so they hit the legacy
     // nest server rather than the new Applus API.
+    GET_ALL_COURTS_WITH_POSTGRE: "courtbooking/getAllCourtsWithPostgre",
     LEGACY_MEMBERSHIP_ASSIGN_MONTHLY: 'membership/assignmonthlymembership',
     LEGACY_MEMBERSHIP_RENEW_MONTHLY: 'membership/renewmonthlymembership',
     LEGACY_MEMBERSHIP_HISTORY_INFO: 'membership/membershiphistoryinfo',

@@ -1,0 +1,87 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-updateprofile {
+  @include android-sdk35-fixes;
+
+  // ── Base (Dark Theme) ──
+  .scroll-content {
+    padding: 0 !important;
+    background-color: #0f172a !important;
+    background-image: none !important;
+  }
+
+  .con { background: transparent !important; padding: 12px !important; }
+
+  .grid { padding: 0 !important; }
+
+  // ── Form Fields (creatematch style) ──
+  .items {
+    background-color: #1e293b !important;
+    border-radius: 12px !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    padding-left: 16px !important;
+    margin-bottom: 4px !important;
+
+    .item-inner {
+      border-bottom: none !important;
+      box-shadow: none !important;
+      padding-right: 16px;
+    }
+
+    ion-label {
+      color: #94a3b8 !important;
+      font-weight: 700 !important;
+      font-size: 11px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.6px !important;
+    }
+
+    ion-input, ion-select, ion-datetime, ion-textarea {
+      color: #f1f5f9 !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+    }
+
+    .text-input, .select-text, .datetime-text {
+      color: #f1f5f9 !important;
+      font-size: 15px !important;
+      font-weight: 600 !important;
+    }
+  }
+
+  .rows { margin-top: -4px; background: transparent !important; }
+  .text { color: #f1f5f9 !important; }
+  .lab { font-size: 11px !important; }
+
+  // Buttons
+  .timekare-primary-btn {
+    background: linear-gradient(135deg, rgba(43,146,187,0.85), rgba(53,173,255,0.75)) !important;
+    color: white !important;
+    border-radius: 8px !important;
+    font-weight: 700 !important;
+    font-size: 14px !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 4px 20px rgba(43, 146, 187, 0.25) !important;
+  }
+
+  .btn-container { text-align: center; }
+
+  // ── Light Theme ──
+  &.light-theme {
+    .scroll-content { background-color: #f8fafc !important; }
+
+    .items {
+      background-color: #ffffff !important;
+      border-color: #e2e8f0 !important;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
+
+      ion-label { color: #64748b !important; }
+
+      ion-input, ion-select, ion-datetime, ion-textarea { color: #0f172a !important; }
+      .text-input, .select-text, .datetime-text { color: #0f172a !important; }
+    }
+
+    .text { color: #0f172a !important; }
+  }
+}

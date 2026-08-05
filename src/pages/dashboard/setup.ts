@@ -109,11 +109,21 @@ export class Setup {
       this.showAlter()
       return false;
     }
-    // else if( obj.component == 'WalletPage'){
-    //   this.showAlter1(obj)
-     
-    // }
-    
+    else if (obj.MobComponent === 'LoyaltySetupPage') {
+      let alert = this.alertCtrl.create({
+        title: '🔄 Migration in Progress',
+        message: 'We\'re upgrading the Wallet module for a better experience. In the meantime, please use the <strong>Club Web Admin</strong> to manage wallet settings.',
+        buttons: [
+          {
+            text: 'Got it',
+            role: 'cancel'
+          }
+        ]
+      });
+      alert.present();
+      return false;
+    }
+
     else if(obj.MobComponent == 'MembershipPage'){
       this.commonService.updateCategory("update_membership_list");
     }

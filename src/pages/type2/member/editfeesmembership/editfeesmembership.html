@@ -1,0 +1,61 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Edit Fees</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-pad">
+    <!-- Membership amount -->
+    <app-list-card>
+      <div class="fee-row">
+        <span class="fee-label">{{memberShipType == 'Monthly' ? 'Monthly' : 'Yearly'}}</span>
+        <span class="fee-value">{{membership_amt_with_currency}}</span>
+      </div>
+    </app-list-card>
+
+    <!-- Admin fees (editable) -->
+    <app-form-field [isDark]="isDarkTheme" *ngIf="eachSetup != undefined">
+      <ion-item>
+        <ion-label>Admin Fees ({{currencyDetails?.CurrencySymbol}})</ion-label>
+        <ion-input type="number" placeholder="0" [min]="0"
+          (ionChange)="onAdminFeesChange($event)" [(ngModel)]="adminFees"></ion-input>
+      </ion-item>
+    </app-form-field>
+
+    <!-- Sub total -->
+    <div class="summary-row">
+      <span class="s-label">Sub Total</span>
+      <span class="s-value">{{currencyDetails?.CurrencySymbol}}{{subtotalAmount | number: '1.2-2'}}</span>
+    </div>
+
+    <!-- Applied discounts -->
+    <div *ngIf="bookingDetails && bookingDetails.booking_payment_summary && bookingDetails.booking_payment_summary.discounts.length > 0">
+      <app-list-card *ngFor="let discount of bookingDetails.booking_payment_summary.discounts">
+        <div class="fee-row">
+          <span class="fee-label">{{discount.discount_name}}</span>
+          <span class="fee-value">{{currencyDetails?.CurrencySymbol}}{{discount.discount_amount}}</span>
+        </div>
+      </app-list-card>
+    </div>
+
+    <!-- Custom discount (editable) -->
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-label>Enter Discount ({{currencyDetails?.CurrencySymbol}})</ion-label>
+        <ion-input type="number" id="text" placeholder="0" [min]="0"
+          [(ngModel)]="oneTimeDiscount" (ionChange)="onDiscountChange($event)"></ion-input>
+      </ion-item>
+    </app-form-field>
+
+    <!-- Total -->
+    <div class="summary-row total">
+      <span class="s-label">Total - First Payment</span>
+      <span class="s-value">{{currencyDetails?.CurrencySymbol}}{{totalAmount | number: '1.2-2'}}</span>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer no-border [class.light-theme]="!isDarkTheme">
+  <app-glass-button label="Update" (btnClick)="save()"></app-glass-button>
+</ion-footer>

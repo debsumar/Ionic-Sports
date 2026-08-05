@@ -1121,6 +1121,7 @@ export class MatchTeamDetailsPage {
         users: user_ids,
         user_names: user_names,
         pay_status: pay_status,
+        isLeagueTeams: true,
         isMatchTeam: true,
         type: ModuleTypes.Match,
         heading: `Match: ${this.match.MatchTitle}`,

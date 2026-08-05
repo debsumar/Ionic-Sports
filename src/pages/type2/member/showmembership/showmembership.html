@@ -1,0 +1,93 @@
+<ion-header>
+  <ion-navbar>
+    <button ion-button icon-only menuToggle (click)="goToDashboardMenuPage()">
+      <ion-icon name="apps"></ion-icon>
+    </button>
+    <ion-title>
+      Membership
+    </ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="page-layout">
+    <div class="page-fixed-header">
+
+      <!-- Active memberships -->
+      <div class="active-section" *ngIf="userMemberShip?.length > 0">
+        <app-section-header title="Active Memberships" [count]="userMemberShip?.length"></app-section-header>
+        <div class="active-scroller">
+          <app-list-card class="active-card"
+            *ngFor="let eachSetup of userMemberShip; let i = index"
+            [accentColor]="eachSetup.membership_package.subscription_status=='1' ? '#10b981' : '#f59e0b'"
+            (cardClick)="presentActionSheet(eachSetup)">
+            <div class="m-card">
+              <div class="m-card-top">
+                <div class="m-icon"
+                  [class.paid]="eachSetup.membership_package.subscription_status=='1'">
+                  <ion-icon name="ribbon"></ion-icon>
+                </div>
+                <p class="m-name">{{eachSetup.membership_name}}</p>
+                <span class="m-count"
+                  [style.background]="eachSetup.membership_package.subscription_status=='1' ? '#10b981' : '#5ea68d'">{{eachSetup.membership_package.enrolled_count}}</span>
+              </div>
+              <p class="m-type">
+                {{eachSetup.membership_packages[0].membership_type_text}} · {{eachSetup.amount_to_show}}
+                <app-status-badge *ngIf="eachSetup.membership_package.subscription_status=='1'" variant="success" label="Paid"></app-status-badge>
+                <app-status-badge *ngIf="eachSetup.membership_package.subscription_status=='0'" variant="warning" label="Pending"></app-status-badge>
+              </p>
+              <div class="m-dates">
+                <span><ion-icon name="calendar"></ion-icon> {{eachSetup.membership_package.start_date}}</span>
+                <span><ion-icon name="time"></ion-icon> {{eachSetup.membership_package.membership_expiry_date}}</span>
+              </div>
+            </div>
+          </app-list-card>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <app-search-bar placeholder="Search Membership"
+        [count]="parentClubMemberShip?.memberships?.length"
+        (search)="getFilterItems($event)">
+      </app-search-bar>
+
+      <app-section-header *ngIf="parentClubMemberShip?.memberships?.length > 0"
+        title="Please select a membership"></app-section-header>
+    </div>
+
+    <!-- Available memberships -->
+    <div class="page-scroll-area">
+      <ng-container *ngIf="parentClubMemberShip?.memberships?.length > 0">
+        <app-list-card *ngFor="let eachSetup of parentClubMemberShip.memberships; let i = index"
+          accentColor="#2b92bb"
+          (cardClick)="gotoassignfromrecommended(eachSetup)">
+          <div class="rec-card">
+            <div class="rec-icon">
+              <ion-icon name="card"></ion-icon>
+            </div>
+            <div class="rec-info">
+              <p class="rec-name">{{eachSetup.membership_name}}</p>
+              <p class="rec-tier" *ngIf="eachSetup.membership_tier?.name">
+                <ion-icon name="pricetag"></ion-icon> {{eachSetup.membership_tier.name}}
+              </p>
+              <p class="rec-price">
+                <span *ngIf="eachSetup.monthly">Monthly <b>{{eachSetup.monthly_price}}</b></span>
+                <span *ngIf="eachSetup.yearly">Yearly <b>{{eachSetup.yearly_price}}</b></span>
+              </p>
+              <p class="rec-loc">
+                <ion-icon name="pin"></ion-icon>
+                <span>{{eachSetup.club.ClubName}}</span>
+              </p>
+            </div>
+            <span class="rec-arrow">
+              <ion-icon name="arrow-forward"></ion-icon>
+            </span>
+          </div>
+        </app-list-card>
+      </ng-container>
+
+      <app-empty-state *ngIf="parentClubMemberShip?.memberships?.length == 0"
+        icon="card" text="No Membership Setup"></app-empty-state>
+    </div>
+  </div>
+</ion-content>

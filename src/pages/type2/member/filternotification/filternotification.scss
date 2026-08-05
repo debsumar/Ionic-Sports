@@ -1,0 +1,55 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-filternotification {
+  @include android-sdk35-fixes;
+
+  // ── Dark theme (default) ─────────────────────────────────────────
+  .scroll-content {
+    background: linear-gradient(135deg, #0f172a 0%, #1a2740 100%) !important;
+    padding: 0 !important;
+  }
+
+  ion-navbar .toolbar-background {
+    background: #2b92bb !important;
+  }
+
+  ion-navbar .toolbar-title,
+  ion-navbar .bar-button {
+    color: #ffffff !important;
+  }
+
+  .filter_row {
+    display: flex;
+    padding: 8px;
+    gap: 8px;
+    border-bottom: 1px solid rgba(43, 146, 187, 0.4);
+
+    ion-col {
+      padding: 0;
+    }
+  }
+
+  app-form-field {
+    display: block;
+    padding: 8px;
+  }
+
+  // ── Light theme override ─────────────────────────────────────────
+  &.light-theme {
+    .scroll-content {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
+    }
+
+    ion-navbar .toolbar-background {
+      background: #2b92bb !important;
+    }
+
+    .filter_row {
+      border-bottom: 1px solid rgba(43, 146, 187, 0.3);
+
+      ion-col {
+        background: transparent;
+      }
+    }
+  }
+}

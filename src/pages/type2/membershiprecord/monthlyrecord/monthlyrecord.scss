@@ -1,0 +1,100 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-monthlyrecord {
+    @include android-sdk35-fixes;
+    background: #0f172a !important;
+
+    // ── Light Theme ──────────────────────────────────────
+    &.light-theme {
+        background: #f8fafc !important;
+
+        .scroll-content {
+            background: #f8fafc !important;
+        }
+
+        .modern-navbar {
+            background: #ffffff !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            .navbar-title { color: #1e293b !important; }
+        }
+
+        .page-content {
+            background: #f8fafc !important;
+        }
+
+        .record-date { color: #1e293b !important; }
+        .record-amount { color: #1e293b !important; }
+
+        .action-footer {
+            background: #f8fafc !important;
+            border-top: 1px solid #e2e8f0 !important;
+        }
+    }
+
+    // ── Dark Theme (default) ──────────────────────────────
+    .scroll-content {
+        background: #0f172a !important;
+        padding: 6px !important;
+    }
+
+    .modern-navbar {
+        background: #1e293b !important;
+        border-bottom: 1px solid #334155 !important;
+
+        .navbar-title {
+            color: #f1f5f9 !important;
+            font-weight: 600 !important;
+            font-size: 18px !important;
+        }
+    }
+
+    .page-content {
+        background: #0f172a;
+        padding: 8px;
+        padding-bottom: 120px;
+    }
+
+    .record-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin: 4px 0;
+    }
+
+    .record-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 12px 14px;
+    }
+
+    .record-date {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 500;
+        color: #f1f5f9;
+    }
+
+    .record-amount-block {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    .record-amount {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #f1f5f9;
+    }
+
+    .action-footer {
+        background: #1e293b !important;
+        border-top: 1px solid #334155 !important;
+        padding: 4px;
+    }
+
+    // Preserve legacy
+    .btngrid { padding: 8px; }
+}

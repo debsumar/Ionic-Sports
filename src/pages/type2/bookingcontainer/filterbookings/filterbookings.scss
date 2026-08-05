@@ -335,11 +335,6 @@ page-filterbookings {
         text-decoration: none;
         cursor: pointer;
     }
-    ion-select {
-        display: -webkit-box;
-        max-width: 100%;
-        width: 100%;
-    }
     .venuedropdown{
         padding: 13px 8px 13px 0px;
     }
@@ -458,36 +453,6 @@ page-filterbookings {
         font-size: 17px;
     }
    
-    ion-select{
-        padding: 0px 0px 0px 0px !important;
-    }
-    .select-text{
-        padding-top: 10px !important;
-        color:#faae4e !important;
-    }
-    .select-icon {
-        position: relative !important;
-        width: 20px !important;
-        height: 20px !important;
-        background: #f0dcbc !important;
-        border-radius: 50% !important;
-        color: white !important;
-        left: 0px !important;
-        top: 6px;
-        .select-icon-inner{
-            left: 5px !important;
-            top: 46% !important;
-            margin-top: -2px !important;
-            position: absolute !important;
-            width: 0 !important;
-            height: 0 !important;
-            border-top: 5px solid !important;
-            border-right: 5px solid transparent !important;
-            border-left: 5px solid transparent !important;
-            color: white !important;
-            pointer-events: none !important;
-        }
-    }
     .border-left-style{
         height: 65px;
         position: absolute;
