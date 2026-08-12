@@ -175,6 +175,11 @@ export class FirebaseService {
     });
 }
 
+  /** Generates a new Firebase push key for `child` WITHOUT writing any data. */
+  public getNewKey(child: string): string {
+    return this.db.child(child).push().key;
+  }
+
   public saveReturningKey(child: string, data: any): Promise<any> {
     let dbRef = this.db.child(child);
     return dbRef.push(data).key;

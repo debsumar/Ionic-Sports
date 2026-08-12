@@ -155,7 +155,6 @@ export class MonthlySessionDetails {
             coach_names
             coach_image
             paybydate
-            can_enroll
             session_stats{
               capacity
               capacity_left

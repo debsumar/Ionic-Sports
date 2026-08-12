@@ -5,7 +5,6 @@ import { FirebaseService } from '../../../services/firebase.service';
 import gql from "graphql-tag";
 import { Storage } from '@ionic/storage';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../services/common.service';
-import * as $ from 'jquery';
 import { HttpClient } from '@angular/common/http';
 import { GraphqlService } from '../../../services/graphql.service';
 import { HolidayCamp } from './models/holiday_camp.model';

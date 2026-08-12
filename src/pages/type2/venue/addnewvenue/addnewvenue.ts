@@ -4,17 +4,22 @@ import { SharedServices } from '../../../services/sharedservice';
 import { FirebaseService } from '../../../../services/firebase.service';
 import { Storage } from '@ionic/storage';
 import {IonicPage } from 'ionic-angular';
-import { CommonService, ToastMessageType } from '../../../../services/common.service';
+import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { ThemeService } from '../../../../services/theme.service';
+import { HttpService } from '../../../../services/http.service';
+import { API } from '../../../../shared/constants/api_constants';
+import { AppType, DeviceType } from '../../../../shared/constants/module.constants';
 @IonicPage()
 @Component({
     selector: 'addnewvenue-page',
-    templateUrl: 'addnewvenue.html'
+    templateUrl: 'addnewvenue.html',
+    providers: [HttpService]
 })
 export class AddNewVenue {
     selectedVenue: any;
     VisibleatSignUpPage = 1;
     selectedParentClub: string;
+    postgre_parentclub_id: string = '';
     themeType: number;
     country=[]
     clubObj = {
@@ -38,38 +43,6 @@ export class AddNewVenue {
         PostCode: ''
     };
 
-    tempClubObj = {  //type2 club
-        City: "",
-        ClubAdminEmailID: "",
-        ClubAdminPassword: "",
-        ClubContactName: "",
-        ClubDescription: "",
-        Location:'',
-        Country:'',
-        CountryName:'',
-        ClubID: "",
-        ClubName: "",
-       
-        ClubShortName: "",
-        ContactPhone: "",
-        FirstLineAddress: "",
-        ParentClubID: "",
-        PostCode: "",
-        VisibleatSignUpPage : 1,
-        SecondLineAddress: "",
-        State: "",
-        WebsiteUrl:'',
-        Type: "",
-        OriginalClubKey: "",
-        IsActive: true,
-        IsEnable: true,
-        CreatedDate: 0,
-            CreatedBy: 'Parent Club',
-            ParentClubKey:"",
-            OriginalParentClubKey:""
-
-    };
-
     userObj = { EmailID: '', Name: '', Password: '', RoleType: '', Type: '', UserType: '' };
     userInfoObj = { ParentClubKey: '', ClubKey: '' };
     userInfoObj2 = {
@@ -88,9 +61,15 @@ export class AddNewVenue {
     isDarkTheme: boolean = true; // 🌗 Default dark theme
     
     constructor(public storage: Storage, public comonService: CommonService, public navParams: NavParams, public navCtrl: NavController, public sharedservice: SharedServices, public fb: FirebaseService, public popoverCtrl: PopoverController,
-      private renderer: Renderer2, private themeService: ThemeService, public events: Events) {
+      private renderer: Renderer2, private themeService: ThemeService, public events: Events, private httpService: HttpService) {
       
       this.themeType = sharedservice.getThemeType();
+      this.postgre_parentclub_id = this.sharedservice.getPostgreParentClubId() || '';
+      storage.get('postgre_parentclub').then((postgre_parentclub) => {
+        if (!this.postgre_parentclub_id && postgre_parentclub && postgre_parentclub.Id) {
+          this.postgre_parentclub_id = postgre_parentclub.Id;
+        }
+      });
       storage.get('userObj').then((val) => {
         val = JSON.parse(val);
         this.userType = val.UserType;
@@ -149,21 +128,58 @@ export class AddNewVenue {
     }
 
     save(){
-        if(this.validateClubInfoForReg()){
-            this.selectedParentClubKey = "-LpjWofUo9B3zwzF_iKb" 
-            this.clubObj.ClubAdminEmailID = this.clubObj.ClubName+"01@gmail.com"
-    
-            this.userObj.EmailID = this.clubObj.ClubAdminEmailID;
-            this.userObj.Name = this.clubObj.ClubName;
-            this.userObj.Password = 'tttttt';
-            this.userObj.RoleType = "3";
-            this.userObj.Type = 'Type1';
-            this.userObj.UserType = "1";
-    
-            this.clubKey = this.fb.saveReturningKey("/Club/Type1/" + this.selectedParentClubKey + "/", this.clubObj);
-            if (this.clubKey != undefined) {
+        if (!this.validateClubInfoForReg()) {
+            return;
+        }
+        if (!this.postgre_parentclub_id) {
+            this.comonService.toastMessage("Parent club details are unavailable", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+            return;
+        }
+
+        this.selectedParentClubKey = "-LpjWofUo9B3zwzF_iKb"
+        this.clubObj.ClubAdminEmailID = this.clubObj.ClubName+"01@gmail.com"
+
+        this.clubKey = this.fb.getNewKey("/Club/Type1/" + this.selectedParentClubKey + "/");
+        const type2ClubKey = this.fb.getNewKey("/Club/Type2/" + this.selectedParentClub + "/");
+        const payload = {
+            FirebaseId: type2ClubKey,
+            ParentClubID: this.postgre_parentclub_id,
+            ClubName: this.clubObj.ClubName ? String(this.clubObj.ClubName) : '',
+            ClubShortName: this.clubObj.ClubShortName ? String(this.clubObj.ClubShortName) : '',
+            ClubContactName: this.clubObj.ClubContactName ? String(this.clubObj.ClubContactName) : '',
+            City: this.clubObj.City ? String(this.clubObj.City) : '',
+            State: this.clubObj.State ? String(this.clubObj.State) : '',
+            CountryName: this.clubObj.CountryName ? String(this.clubObj.CountryName) : '',
+            PostCode: this.clubObj.PostCode ? String(this.clubObj.PostCode) : '',
+            FirstLineAddress: this.clubObj.FirstLineAddress || '',
+            SecondLineAddress: this.clubObj.SecondLineAddress || '',
+            ContactPhone: this.clubObj.ContactPhone ? String(this.clubObj.ContactPhone) : '',
+            ClubDescription: this.clubObj.ClubDescription || '',
+            MapUrl: this.clubObj.Location || '',
+            WebsiteUrl: this.clubObj.WebsiteUrl || '',
+            ClubAdminEmailID: this.clubObj.ClubAdminEmailID,
+            Country: this.clubObj.Country || '',
+            OriginalClubKey: this.clubKey,
+            device_type: this.sharedservice.getPlatform() === 'android' ? DeviceType.ANDROID : DeviceType.IOS,
+            app_type: AppType.ADMIN_NEW,
+            device_id: this.sharedservice.getDeviceId() || 'web',
+            updated_by: this.sharedservice.getLoggedInUserId() || 'admin',
+        };
+
+        this.comonService.showLoader();
+        this.httpService.post(API.CREATE_CLUB, payload, undefined, 1).subscribe(
+            () => {
+                this.comonService.hideLoader();
+                this.fb.update(this.clubKey, "/Club/Type1/" + this.selectedParentClubKey + "/", this.clubObj);
+
+                this.userObj.EmailID = this.clubObj.ClubAdminEmailID;
+                this.userObj.Name = this.clubObj.ClubName;
+                this.userObj.Password = 'tttttt';
+                this.userObj.RoleType = "3";
+                this.userObj.Type = 'Type1';
+                this.userObj.UserType = "1";
+
                 this.userresponseDetals = this.fb.saveReturningKey("/User", this.userObj);
-    
                 if (this.userresponseDetals != undefined) {
                     this.userInfoObj.ParentClubKey = this.selectedParentClubKey
                     this.userInfoObj.ClubKey = this.clubKey
@@ -172,64 +188,34 @@ export class AddNewVenue {
                         this.responseDetails = this.fb.update(this.clubKey, "/Club/Type1/" + this.selectedParentClubKey + "/", { UserKey: this.userresponseDetals });
                     }
                 }
-                
-                    this.tempClubObj.City = this.clubObj.City;
-                    this.tempClubObj.ClubAdminEmailID = this.clubObj.ClubAdminEmailID;
-                    this.tempClubObj.ClubAdminPassword = this.clubObj.ClubAdminPassword;
-                    this.tempClubObj.ClubContactName = this.clubObj.ClubContactName;
-                    this.tempClubObj.ClubDescription = this.clubObj.ClubDescription;
-                    this.tempClubObj.ClubID = this.clubObj.ClubID;
-                    this.tempClubObj.ClubName = this.clubObj.ClubName;
-                    this.tempClubObj.Location = this.clubObj.Location ? this.clubObj.Location : '',
-                    this.tempClubObj.Country = this.clubObj.Country ? this.clubObj.Country : '',
-                    this.tempClubObj.CountryName = this.clubObj.CountryName ? this.clubObj.CountryName : '',
-                    this.tempClubObj.ClubShortName = this.clubObj.ClubShortName;
-                    this.tempClubObj.ContactPhone = this.clubObj.ContactPhone;
-                    this.tempClubObj.WebsiteUrl = this.clubObj.WebsiteUrl ? this.clubObj.WebsiteUrl : '';
-                    this.tempClubObj.FirstLineAddress = this.clubObj.FirstLineAddress;
-                    this.tempClubObj.ParentClubID = this.clubObj.ParentClubID;
-                    this.tempClubObj.PostCode = this.clubObj.PostCode;
-                    this.tempClubObj.SecondLineAddress = this.clubObj.SecondLineAddress;
-                    this.tempClubObj.State = this.clubObj.State;
-                    this.tempClubObj.Type = "";
-                    this.tempClubObj.OriginalClubKey = this.clubKey;
-                    this.tempClubObj.IsActive = true;
-                    this.tempClubObj.IsEnable = true;
-                    this.tempClubObj.ParentClubKey = this.selectedParentClub;
-                    this.tempClubObj.OriginalParentClubKey = this.selectedParentClubKey; 
-                    this.tempClubObj.CreatedDate = new Date().getTime();
-                    if (this.userType == "2") {
-                        this.responseDetails = this.fb.saveReturningKey("/Club/Type2/" + this.selectedParentClub + "/", this.tempClubObj);
-                        if (this.responseDetails != undefined) {
-                            this.userObj.EmailID = this.tempClubObj.ClubAdminEmailID;
-                            this.userObj.Name = this.tempClubObj.ClubName;
-                            this.userObj.Password = this.tempClubObj.ClubAdminPassword;
-                            this.userObj.RoleType = "3";
-                            this.userObj.Type = "2";
-                            this.userObj.UserType = "2";
-          
-    
-    
-    
-    
-                            this.userresponseDetails = this.fb.saveReturningKey("/User/", this.userObj);
-                            if (this.userresponseDetails != undefined) {
-                                this.userInfoObj2.ParentClubKey = this.selectedParentClub;
-                                this.userInfoObj2.ClubKey = this.responseDetails;
-                                this.userInfoObj2.OriginalClubKey = this.clubKey;
-                                this.userInfoObj2.OriginalParentClubKey=this.selectedParentClubKey;
-    
-                                this.fb.saveReturningKey("/User/" + this.userresponseDetails + "/UserInfo/", this.userInfoObj);
-                               
-                            }
-                            this.responseDetails = this.fb.saveReturningKey("/Club/Type1/" + this.selectedParentClub +"/"+this.clubKey+ "/Type2Child", {ParentClubKey:this.selectedParentClub,Clubkey:this.responseDetails});
-                        }
+
+                if (this.userType == "2") {
+                    this.userObj.EmailID = this.clubObj.ClubAdminEmailID;
+                    this.userObj.Name = this.clubObj.ClubName;
+                    this.userObj.Password = this.clubObj.ClubAdminPassword;
+                    this.userObj.RoleType = "3";
+                    this.userObj.Type = "2";
+                    this.userObj.UserType = "2";
+
+                    this.userresponseDetails = this.fb.saveReturningKey("/User/", this.userObj);
+                    if (this.userresponseDetails != undefined) {
+                        this.userInfoObj2.ParentClubKey = this.selectedParentClub;
+                        this.userInfoObj2.ClubKey = type2ClubKey;
+                        this.userInfoObj2.OriginalClubKey = this.clubKey;
+                        this.userInfoObj2.OriginalParentClubKey=this.selectedParentClubKey;
+
+                        this.fb.saveReturningKey("/User/" + this.userresponseDetails + "/UserInfo/", this.userInfoObj);
                     }
+                    this.responseDetails = this.fb.saveReturningKey("/Club/Type1/" + this.selectedParentClub +"/"+this.clubKey+ "/Type2Child", {ParentClubKey:this.selectedParentClub,Clubkey:type2ClubKey});
+                }
                 this.showPopover();
                 this.navCtrl.pop().then(() => this.navCtrl.pop());
+            },
+            () => {
+                this.comonService.hideLoader();
+                this.comonService.toastMessage("Venue creation failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
             }
-        }
-
+        );
     }
 
     showPopover() {

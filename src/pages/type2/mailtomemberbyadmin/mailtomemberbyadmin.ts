@@ -185,7 +185,9 @@ export class MailToMemberByAdminPage {
         CCName: this.parentClubDetails.ParentClubName,
         CCEmail: this.parentClubDetails.ParentClubAdminEmailID,
         Subject: this.emailObj.Subject,
-        Message: this.emailObj.Message,
+        // Convert plain-text line breaks to <br> so the backend's HTML email template
+        // renders paragraph spacing correctly instead of collapsing all newlines into one block.
+        Message: this.emailObj.Message.replace(/\n/g, '<br>'),
       }
 
       emailFormembers.Members = members.map(({ selected, payStatus, ...rest }) => rest);

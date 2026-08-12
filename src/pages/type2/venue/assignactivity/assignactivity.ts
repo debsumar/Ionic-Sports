@@ -227,8 +227,9 @@ export class AssignActivityPage {
             this.activityName = act.ActivityName;
             this.fb.update(act.$key, "Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/", activityObj);
 
-            // Fetch categories from all other venues for this activity and deduplicate
-            await this.saveCategoriesFromAllVenues(act.$key);
+            // Save this activity's own categories/subcategories first (as-is, from `act`),
+            // then fill in any missing category/subcategory keys on other venues.
+            await this.saveCategoriesFromAllVenues(act);
 
             this.assignActivityInPostgre();
             this.Emailsetup(act.$key);
@@ -241,8 +242,21 @@ export class AssignActivityPage {
        }
    }
 
-   private async saveCategoriesFromAllVenues(activityKey: string): Promise<void> {
-       // Get all venues from API (source of truth) — same as categoryNsubcategory.ts
+   private async saveCategoriesFromAllVenues(act: any): Promise<void> {
+       const activityKey = act.$key;
+
+       // Step 1: Read the SELECTED activity's own categories/subcategories directly from `act`,
+       // as-is. `act` is left untouched — this is only read into a fresh map, never mutated.
+       const categoryMap: Map<string, any> = new Map();
+
+       if (act.ActivityCategory) {
+           const ownCategories = this.comonService.convertFbObjectToArray(act.ActivityCategory).filter(cat => cat.IsActive);
+           ownCategories.forEach(cat => {
+               if (cat && cat.Key) categoryMap.set(cat.Key, cat);
+           });
+       }
+
+       // Step 2: Get all venues from API (source of truth) — same as categoryNsubcategory.ts
        const body: GetParentClubVenuesRequestDto = {
            parentclub_id: this.postgre_parentclub_id,
            app_type: AppType.ADMIN_NEW,
@@ -254,9 +268,9 @@ export class AssignActivityPage {
        const res = await this.httpService.post(API.GET_PARENT_CLUB_VENUES, body, null, 1).pipe(take(1)).toPromise() as GetParentClubVenuesResponseDto;
        const otherVenues = res.data.filter((club: ClubVenueDto) => club.FirebaseId !== this.venueFirebaseKey);
 
-       // Dedup by Firebase Key — same key is shared across venues (see saveCategory in categoryNsubcategory.ts)
-       const categoryMap: Map<string, any> = new Map();
-
+       // Step 3: Only use other venues' categories to FILL GAPS in the selected venue's own set
+       // (i.e. only add a category/subcategory key if the selected venue doesn't already have it).
+       // Never let another venue's data override what the selected venue already has.
        for (const venue of otherVenues) {
            const venueActivities: any[] = await this.fb.getAll(
                "/Activity/" + this.selectedParentClub + "/" + venue.FirebaseId + "/"
@@ -271,9 +285,11 @@ export class AssignActivityPage {
                if (!cat || !cat.Key) continue;
 
                if (!categoryMap.has(cat.Key)) {
+                   // Selected venue is missing this category entirely — add it
                    categoryMap.set(cat.Key, cat);
                } else {
-                   // Same Firebase key — merge subcategories
+                   // Selected venue already has this category (same Firebase key) — only fill in
+                   // subcategory keys it doesn't already have; never overwrite existing subcategories.
                    const existing = categoryMap.get(cat.Key);
                    if (cat.ActivitySubCategory) {
                        const existingSubcats = this.comonService.convertFbObjectToArray(existing.ActivitySubCategory || {});
@@ -294,7 +310,8 @@ export class AssignActivityPage {
 
        if (categoryMap.size === 0) return;
 
-       const baseCatPath = "Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/" + activityKey + "/ActivityCategory/";
+       // Step 4: Write the resulting (own + gap-filled) category set back to the SELECTED venue.
+       const selectedBaseCatPath = "Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/" + activityKey + "/ActivityCategory/";
 
        for (const cat of Array.from(categoryMap.values())) {
            const catObj = {
@@ -304,7 +321,7 @@ export class AssignActivityPage {
                IsEnable: cat.IsEnable,
                IsExistActivitySubCategory: cat.IsExistActivitySubCategory || false
            };
-           this.fb.update(cat.Key, baseCatPath, catObj);
+           this.fb.update(cat.Key, selectedBaseCatPath, catObj);
 
            if (cat.IsExistActivitySubCategory && cat.ActivitySubCategory) {
                const subcats = this.comonService.convertFbObjectToArray(cat.ActivitySubCategory).filter(s => s.IsActive);
@@ -316,13 +333,82 @@ export class AssignActivityPage {
                        IsActive: subcat.IsActive,
                        IsEnable: subcat.IsEnable
                    };
-                   this.fb.update(subcat.Key, baseCatPath + cat.Key + "/ActivitySubCategory/", subcatObj);
+                   this.fb.update(subcat.Key, selectedBaseCatPath + cat.Key + "/ActivitySubCategory/", subcatObj);
                }
            }
        }
 
-       // Mark activity as having categories
+       // Mark the selected venue's activity as having categories
        this.fb.update(activityKey, "Activity/" + this.selectedParentClub + "/" + this.venueFirebaseKey + "/", { IsExistActivityCategory: true });
+
+       // Step 5: Now propagate to the OTHER venues — for each other venue that already has this
+       // activity, only ADD the category/subcategory keys it's missing. Never touch/overwrite
+       // categories or subcategories it already has.
+       for (const venue of otherVenues) {
+           const venueActivities: any[] = await this.fb.getAll(
+               "/Activity/" + this.selectedParentClub + "/" + venue.FirebaseId + "/"
+           ).pipe(take(1)).toPromise();
+
+           const matchedActivity = venueActivities.find(a => a.$key === activityKey);
+           if (!matchedActivity) continue; // venue doesn't have this activity at all — nothing to sync
+
+           const venueBaseCatPath = "Activity/" + this.selectedParentClub + "/" + venue.FirebaseId + "/" + activityKey + "/ActivityCategory/";
+           const existingVenueCategories = this.comonService.convertFbObjectToArray(matchedActivity.ActivityCategory || {});
+           const existingVenueCategoryKeys = new Set(existingVenueCategories.map(c => c.Key));
+
+           let addedAnyCategory = existingVenueCategoryKeys.size > 0;
+
+           for (const cat of Array.from(categoryMap.values())) {
+               const existingCatForVenue = existingVenueCategories.find(c => c.Key === cat.Key);
+
+               if (!existingCatForVenue) {
+                   // Venue is missing this category key entirely — add it
+                   const catObj = {
+                       ActivityCategoryCode: cat.ActivityCategoryCode,
+                       ActivityCategoryName: cat.ActivityCategoryName,
+                       IsActive: cat.IsActive,
+                       IsEnable: cat.IsEnable,
+                       IsExistActivitySubCategory: cat.IsExistActivitySubCategory || false
+                   };
+                   this.fb.update(cat.Key, venueBaseCatPath, catObj);
+                   addedAnyCategory = true;
+
+                   if (cat.IsExistActivitySubCategory && cat.ActivitySubCategory) {
+                       const subcats = this.comonService.convertFbObjectToArray(cat.ActivitySubCategory).filter(s => s.IsActive);
+                       for (const subcat of subcats) {
+                           if (!subcat || !subcat.Key) continue;
+                           const subcatObj = {
+                               ActivitySubCategoryCode: subcat.ActivitySubCategoryCode,
+                               ActivitySubCategoryName: subcat.ActivitySubCategoryName,
+                               IsActive: subcat.IsActive,
+                               IsEnable: subcat.IsEnable
+                           };
+                           this.fb.update(subcat.Key, venueBaseCatPath + cat.Key + "/ActivitySubCategory/", subcatObj);
+                       }
+                   }
+               } else if (cat.ActivitySubCategory) {
+                   // Venue already has this category key — only add subcategory keys it's missing.
+                   const existingSubcats = this.comonService.convertFbObjectToArray(existingCatForVenue.ActivitySubCategory || {});
+                   const existingSubcatKeys = new Set(existingSubcats.map(s => s.Key));
+                   const subcatsToFill = this.comonService.convertFbObjectToArray(cat.ActivitySubCategory)
+                       .filter(s => s.IsActive && s.Key && !existingSubcatKeys.has(s.Key));
+
+                   for (const subcat of subcatsToFill) {
+                       const subcatObj = {
+                           ActivitySubCategoryCode: subcat.ActivitySubCategoryCode,
+                           ActivitySubCategoryName: subcat.ActivitySubCategoryName,
+                           IsActive: subcat.IsActive,
+                           IsEnable: subcat.IsEnable
+                       };
+                       this.fb.update(subcat.Key, venueBaseCatPath + cat.Key + "/ActivitySubCategory/", subcatObj);
+                   }
+               }
+           }
+
+           if (addedAnyCategory) {
+               this.fb.update(activityKey, "Activity/" + this.selectedParentClub + "/" + venue.FirebaseId + "/", { IsExistActivityCategory: true });
+           }
+       }
    }
 
    Emailsetup(activityKey){
