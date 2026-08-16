@@ -20,6 +20,7 @@ export const API = {
     WEEKLY_ALL_PAYMENT_DETAILS: `paymentreport/allweeklyPayment_details`,
     SCHOOL_SESSION_PAYMENT_REPORT: `paymentreport/schoolSessionPaymentReport`,
     HOLIDAYCAMP_PAYMENT_LISTING: `paymentreport/holidaycampPayment_listing`,
+    HOLIDAYCAMP_PAYMENT_DETAILS: `paymentreport/holidaycampPayment_details`,
     MEMBERSHIP_PAYMENT_LIST: `paymentreport/membership_payment_list`,
     CLUB_ACTIVITIES: 'club_activity/get_club_activities',
     ASSIGN_CLUB_ACTIVITIES: 'club_activity/assign_club_activities',

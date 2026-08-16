@@ -1,0 +1,144 @@
+@import '../../../../../theme/android-sdk35-fixes.scss';
+
+page-holidaycampaymentsdetails {
+  @include android-sdk35-fixes;
+
+  background: #0f172a !important;
+
+  ion-content,
+  .content-md,
+  .content-ios {
+    background: #0f172a !important;
+  }
+
+  .scroll-content {
+    background-image: none !important;
+    background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+  }
+
+  .details-container {
+    padding: 12px 12px 72px;
+  }
+
+  .transaction-header {
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-left: 4px solid #2b92bb;
+    border-radius: 12px;
+    background: #1e293b;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.28);
+  }
+
+  .transaction-title {
+    color: #f1f5f9;
+    font-size: 17px;
+    font-weight: 700;
+    word-break: break-word;
+  }
+
+  .transaction-camps {
+    color: #94a3b8;
+    font-size: 13px;
+    font-style: italic;
+    margin-top: 4px;
+  }
+
+  .transaction-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 24px;
+    margin-top: 14px;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+      min-width: 100px;
+    }
+  }
+
+  .detail-label {
+    color: #64748b;
+    font-size: 11px;
+    text-transform: uppercase;
+  }
+
+  .detail-value {
+    color: #e2e8f0;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .session-list {
+    margin-top: 8px;
+  }
+
+  .session-card {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+  .session-content {
+    padding: 13px 14px;
+  }
+
+  .session-heading {
+    color: #f1f5f9;
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .session-name {
+    color: #94a3b8;
+    font-size: 13px;
+    margin-top: 3px;
+  }
+
+  .session-row,
+  .session-footer {
+    color: #94a3b8;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    font-size: 12px;
+    margin-top: 8px;
+  }
+
+  .session-footer {
+    align-items: center;
+    justify-content: space-between;
+    border-top: 1px solid rgba(148, 163, 184, 0.12);
+    padding-top: 9px;
+
+    strong { color: #38bdf8; }
+  }
+
+  &.light-theme {
+    background: #f8fafc !important;
+
+    ion-content,
+    .content-md,
+    .content-ios,
+    .scroll-content {
+      background-image: none !important;
+      background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+    }
+
+    .transaction-header {
+      background: white;
+      border-color: #e2e8f0;
+      box-shadow: 0 3px 10px rgba(15, 23, 42, 0.08);
+    }
+
+    .transaction-title,
+    .session-heading { color: #1e293b; }
+    .transaction-camps,
+    .session-name,
+    .session-row,
+    .session-footer { color: #64748b; }
+    .detail-label { color: #94a3b8; }
+    .detail-value { color: #334155; }
+    .session-footer strong { color: #2b92bb; }
+  }
+}

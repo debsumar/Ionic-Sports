@@ -1017,7 +1017,7 @@ export class Dashboard {
 
   getactivebookingDetails() {
     let date = moment().format("YYYY-MM-DD");
-    const url = `${API.COURT_BOOKING_SUMMARY_V2}/${this.userData.UserInfo[0].ParentClubKey}/${this.type}/${date}`;
+    const url = `${API.COURT_BOOKING_SUMMARY_V2}/${this.sharedService.getPostgreParentClubId()}/${this.type}/${date}`;
 
     this.httpService.get(url, null, null, 1)
       .subscribe({

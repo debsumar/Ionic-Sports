@@ -431,7 +431,7 @@ async getParentClubUsers(){
               CCName: this.parentClubDetails.ParentClubName,
               CCEmail: this.parentClubDetails.ParentClubAdminEmailID,
               Subject: this.emailObj.Subject,
-              Message: this.emailObj.Message,
+              Message: this.emailObj.Message.replace(/\n/g, '<br>'),
           }
 
           emailFormembers.Members = this.filteredMember;

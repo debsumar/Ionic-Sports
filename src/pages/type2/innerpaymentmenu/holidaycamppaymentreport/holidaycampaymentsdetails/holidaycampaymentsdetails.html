@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>Holiday Camp Payment</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="details-container">
+    <div class="transaction-header">
+      <div class="transaction-title">Transaction {{transactionId}}</div>
+      <div class="transaction-camps" *ngIf="campNames">{{campNames}}</div>
+      <div class="transaction-grid">
+        <div>
+          <span class="detail-label">Date</span>
+          <span class="detail-value">{{formatDate(transactionDate)}}</span>
+        </div>
+        <div>
+          <span class="detail-label">Total paid</span>
+          <span class="detail-value">{{amountPaid | number: '1.2-2'}}</span>
+        </div>
+        <div *ngIf="paidByText">
+          <span class="detail-label">Paid by</span>
+          <span class="detail-value">{{paidByText}}</span>
+        </div>
+      </div>
+    </div>
+
+    <app-section-header title="Sessions" [count]="rows.length"></app-section-header>
+
+    <div class="session-list">
+      <app-list-card
+        class="session-card"
+        accentColor="#2b92bb"
+        *ngFor="let row of rows">
+        <div class="session-content">
+          <div class="session-heading">{{row.camp_name}}</div>
+          <div class="session-name">{{row.session_name}}</div>
+          <div class="session-row">
+            <span>{{formatDate(row.session_date)}}</span>
+            <span *ngIf="row.start_time">{{row.start_time}}</span>
+            <span *ngIf="row.days">{{row.days}}</span>
+          </div>
+          <div class="session-row" *ngIf="row.coach_name">
+            <span>Coach: {{row.coach_name}}</span>
+          </div>
+          <div class="session-footer">
+            <span>{{row.member_name}}</span>
+            <strong>{{row.amount_paid | number: '1.2-2'}}</strong>
+          </div>
+        </div>
+      </app-list-card>
+    </div>
+
+    <app-empty-state
+      *ngIf="isLoaded && rows.length === 0"
+      icon="ios-card-outline"
+      text="No session details found">
+    </app-empty-state>
+  </div>
+</ion-content>
