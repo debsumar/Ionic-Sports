@@ -40,6 +40,12 @@
             <ion-input type="text" [(ngModel)]="selectedCampDetails.camp_name"></ion-input>
         </ion-item>
         <ion-item>
+            <ion-label>Status</ion-label>
+            <ion-select [(ngModel)]="selectedCampDetails.camp_status">
+                <ion-option *ngFor="let status of Status" [value]="status.StatusCode">{{status.StatusText}}</ion-option>
+            </ion-select>
+        </ion-item>
+        <ion-item>
             <ion-label>{{LangObj.createhldycamp_camp_venue}}</ion-label>
             <ion-select [(ngModel)]="selectedSchoolVenue" disabled="true">
                 <ion-option *ngFor="let venue of schoolVenues"

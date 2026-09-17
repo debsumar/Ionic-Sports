@@ -1,4 +1,5 @@
 import { SchoolDetails } from "../schoolsession.model";
+import { SchoolGroupStatus } from "../constants/school_group_status.constants";
 import * as moment from "moment";
 export interface IFirebaseSchoolSessionDTO{
     CreatedDate: any,
@@ -30,6 +31,7 @@ export interface IFirebaseSchoolSessionDTO{
     Days:string;
     Duration: string;
     GroupSize: string;
+    group_status?: number;
     Comments:string;
     SessionFee: string;
     BookingButtonText: 'Book Now',
@@ -79,6 +81,7 @@ export class SchoolSessionDTO{
     duration: string;
     days: string;
     group_size: number;
+    group_status: number;
     comments: string;
     term_key: string;
     is_exist_activity_category: boolean;
@@ -156,6 +159,7 @@ export class CreateSchoolSession{
         this.school_session.duration = school_session.Duration;
         this.school_session.days = school_session.Days;
         this.school_session.group_size = Number(school_session.GroupSize) || 20;
+        this.school_session.group_status = typeof school_session.group_status === "number" ? school_session.group_status : SchoolGroupStatus.PUBLIC;
         this.school_session.comments = school_session.Comments;
         this.school_session.term_key = "";
         this.school_session.term_name = "";

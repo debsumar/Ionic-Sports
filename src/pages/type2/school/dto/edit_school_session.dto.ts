@@ -12,7 +12,7 @@ export class EditSchoolSession extends UserDeviceMetadata{
   start_date: string;
   end_date: string;
   pay_by_date: string;
-  group_status: string;
+  group_status: number;
   start_time: string;
   duration: string;
   group_size: number;
@@ -49,7 +49,7 @@ export class EditSchoolSession extends UserDeviceMetadata{
         schoolSession.start_date = moment(school_session.start_date,"DD-MMM-YYYY").format("YYYY-MM-DD");
         schoolSession.end_date = moment(school_session.end_date,"DD-MMM-YYYY").format("YYYY-MM-DD");
         schoolSession.pay_by_date = school_session.pay_by_date;
-        schoolSession.group_status = school_session.group_status.toString();
+        schoolSession.group_status = Number(school_session.group_status);
         schoolSession.start_time = school_session.start_time;
         schoolSession.duration = school_session.duration;
         schoolSession.group_size = school_session.group_size;

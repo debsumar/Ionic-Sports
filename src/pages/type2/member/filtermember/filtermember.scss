@@ -14,64 +14,72 @@ page-filtermember {
   .toolbar-title { color: #ffffff; font-weight: 400; }
   .pop-over ion-icon { color: #ffffff; }
 
-  // Search row
-  .sub-container {
-    border-bottom: 1px solid #334155;
-    padding: 8px 12px;
-    margin-top: 0;
+  ion-content { margin-bottom: 56px !important; }
 
-    button {
-      width: 90%; height: 86%; margin-top: 4px;
-      background: #2b92bb; border-radius: 8px;
-      color: white; border: none;
-    }
-
-    ion-icon { font-size: 20px; }
-
-    .searchbar, .searchbar-input {
-      background: #1e293b !important;
-      color: #f1f5f9 !important;
-      border-radius: 8px !important;
-      box-shadow: none !important;
-    }
-
-    .searchbar-search-icon { display: none !important; }
-    .searchbar-clear-icon { margin: 0; box-shadow: none; }
+  .page-fixed-header {
+    position: sticky;
+    top: 0;
+    background: #0f172a;
+    z-index: 10;
   }
 
-  // Member list
-  ion-list {
-    background: transparent !important;
+  .page-list-area { padding: 0 8px 80px; }
 
-    ion-item {
-      background: #1e293b !important;
-      border-bottom: 1px solid #334155 !important;
-      padding-left: 12px !important;
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px 8px;
+  }
 
-      .item-inner { border-bottom: none !important; }
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
 
-      ion-label {
-        color: #f1f5f9 !important;
-        font-size: 14px !important;
-        font-weight: 600 !important;
-      }
-    }
+  app-list-card { display: block; margin-bottom: 6px; }
 
-    ion-icon { color: #64748b !important; }
+  .member-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .member-avatar {
+    width: 34px; height: 34px; border-radius: 8px; flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(43, 146, 187, 0.15); color: #3fbcd3;
+    font-size: 14px; font-weight: 700; text-transform: uppercase;
+  }
+
+  .member-info { flex: 1; min-width: 0; }
+
+  .member-name {
+    font-size: 14px; font-weight: 700; color: #f1f5f9; margin: 0;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .empty-state {
+    display: flex; flex-direction: column; align-items: center; padding: 40px 20px; gap: 8px;
+    .empty-icon { font-size: 40px; color: #334155; }
+    .empty-text { font-size: 14px; color: #64748b; margin: 0; }
   }
 
   ion-checkbox {
     --background: #334155; --background-checked: #2b92bb;
     --border-color: #475569; --border-color-checked: #2b92bb;
-    --checkmark-color: #fff;
+    --checkmark-color: #fff; flex-shrink: 0;
   }
 
   // Footer
   ion-footer {
-    button[ion-button] {
-      background: linear-gradient(135deg, rgba(43,146,187,0.85), rgba(53,173,255,0.75)) !important;
-      color: white !important; font-weight: 700 !important;
-      border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    background: #0f172a !important;
+    box-shadow: none !important; border: none !important;
+    &::before, &::after { display: none !important; }
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #0f172a !important; border: none !important;
     }
   }
 
@@ -79,17 +87,23 @@ page-filtermember {
   &.light-theme {
     .scroll-content { background-color: #f8fafc !important; }
 
-    .sub-container {
-      border-bottom-color: #e2e8f0;
-      .searchbar, .searchbar-input { background: #ffffff !important; color: #0f172a !important; box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important; }
-    }
+    .page-fixed-header { background: #f8fafc; }
 
-    ion-list ion-item {
-      background: #ffffff !important;
-      border-bottom-color: #e2e8f0 !important;
-      ion-label { color: #1e293b !important; }
-    }
+    .section-title { color: #1e293b; }
+
+    .member-name { color: #1e293b; }
 
     ion-checkbox { --background: #fff; --border-color: #d1d5db; }
+
+    .empty-state .empty-icon { color: #cbd5e1; }
+
+    ion-footer {
+      background: #f8fafc !important;
+      box-shadow: none !important; border: none !important;
+      &::before, &::after { display: none !important; }
+      .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+        background: #f8fafc !important; border: none !important;
+      }
+    }
   }
 }

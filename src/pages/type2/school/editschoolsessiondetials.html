@@ -41,7 +41,6 @@
         </ion-select>
     </ion-item>
 
-
     <ion-item>
         <ion-label>Venue</ion-label>
         <!--(ionChange)="onChangeOfClub()"-->
@@ -74,6 +73,13 @@
         <ion-label>Sub Category</ion-label>
         <ion-select [(ngModel)]="selectActivitySubCategory" disabled="true">
             <ion-option *ngFor="let acs of activitySubCategoryList" value={{acs.ActivitySubCategoryId}}>{{acs.ActivitySubCategoryName}}</ion-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item>
+        <ion-label>Status</ion-label>
+        <ion-select [(ngModel)]="edit_school_session.group_status">
+            <ion-option *ngFor="let status of Status" [value]="status.StatusCode">{{status.StatusText}}</ion-option>
         </ion-select>
     </ion-item>
     <div class="margin_top">

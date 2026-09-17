@@ -60,16 +60,13 @@
 
 
 
-<ion-content class="cards-bg social-cards">
-    <ion-item class="search_add">
-        <ion-searchbar [showCancelButton]="shouldShowCancel" (ionInput)="getFilterItems($event)" autocorrect="off" placeholder="Search by name"></ion-searchbar>
-    </ion-item>
-
-    <ion-list class="ion_list">
-        <ion-list-header class="session_header">
-            Member Lists
-        </ion-list-header>
-    </ion-list>
+<ion-content class="cards-bg social-cards" [ngClass]="isDarkTheme ? 'dark-theme' : 'light-theme'">
+    <div class="page-fixed-header">
+        <app-search-bar placeholder="Search by name" [count]="filteredMembers?.length" (search)="getFilterItems($event)"></app-search-bar>
+        <div class="section-header">
+            <span class="section-title">Member Lists</span>
+        </div>
+    </div>
 
 
     <!-- <ion-scroll scrollY="true" class="block_height1"> -->
@@ -80,12 +77,24 @@
             </ion-item>
         </ion-list> -->
 
-        <ion-list class="margin">
-            <ion-item *ngFor="let member of filteredMembers;let i = index">
-                <ion-label>{{member.FirstName}} {{member.LastName}} ({{this.commonService.calculateAgeFromDOB(member.DOB)}})</ion-label>
-                <ion-checkbox [(ngModel)]="member.isSelected" [disabled]="member.isAlreadExisted" (ionChange)="toggleMember(member,$event)"></ion-checkbox>
-            </ion-item>
-        </ion-list>
+        <div class="page-list-area">
+            <app-list-card *ngFor="let member of filteredMembers;let i = index"
+                [accentColor]="member.isAlreadExisted ? '#64748b' : (member.isSelected ? '#10b981' : '#2b92bb')">
+                <div class="member-row">
+                    <div class="member-avatar">{{member.FirstName?.charAt(0)}}</div>
+                    <div class="member-info">
+                        <p class="member-name">{{member.FirstName}} {{member.LastName}} ({{this.commonService.calculateAgeFromDOB(member.DOB)}})</p>
+                        <span class="member-tag existing" *ngIf="member.isAlreadExisted">Already Added</span>
+                    </div>
+                    <ion-checkbox [(ngModel)]="member.isSelected" [disabled]="member.isAlreadExisted" (ionChange)="toggleMember(member,$event)"></ion-checkbox>
+                </div>
+            </app-list-card>
+
+            <div class="empty-state" *ngIf="filteredMembers?.length === 0">
+                <ion-icon name="people" class="empty-icon"></ion-icon>
+                <p class="empty-text">No members found</p>
+            </div>
+        </div>
     <!-- </ion-scroll> -->
 
   
@@ -124,12 +133,9 @@
         <ion-infinite-scroll-content loadingSpinner="crescent" loadingText="Loading more data...">></ion-infinite-scroll-content>
     </ion-infinite-scroll>
 </ion-content>
-<ion-footer>
-    <ion-grid>
-        <ion-row>
-            <ion-col col-12>
-                <button ion-button block class="timekare-primary-btn" (click)="updateMemberList()" [disabled]="schoolSesEnrolDets.enrol_users.length == 0">Add Members ({{schoolSesEnrolDets.enrol_users.length}})</button>
-            </ion-col>
-        </ion-row>
-    </ion-grid>
+<ion-footer [ngClass]="isDarkTheme ? 'dark-theme' : 'light-theme'">
+    <app-glass-button [label]="'Add Members (' + schoolSesEnrolDets.enrol_users.length + ')'"
+        [disabled]="schoolSesEnrolDets.enrol_users.length == 0"
+        (btnClick)="updateMemberList()">
+    </app-glass-button>
 </ion-footer>

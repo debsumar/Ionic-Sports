@@ -39,7 +39,6 @@
         </ion-select>
     </ion-item>
 
-
     <ion-item>
         <ion-label>{{LangObj.create_sclssn_venue}}</ion-label>
         <ion-select [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()">
@@ -80,6 +79,13 @@
         <ion-select [(ngModel)]="selectActivitySubCategory" (ionChange)="onChangeActivitySubCategory()">
             <ion-option *ngFor="let acs of activitySubCategoryList" value={{acs.ActivitySubCategoryId}}>{{acs.ActivitySubCategoryName}}
             </ion-option>
+        </ion-select>
+    </ion-item>
+
+    <ion-item>
+        <ion-label>Status</ion-label>
+        <ion-select [(ngModel)]="schoolSession.group_status">
+            <ion-option *ngFor="let status of Status" [value]="status.StatusCode">{{status.StatusText}}</ion-option>
         </ion-select>
     </ion-item>
 

@@ -24,6 +24,7 @@ export class Type2AddMemberSchoolSession {
   private searchTerms = new Subject<string>();
   schoolSession: SchoolDetails;
   themeType: number;
+  isDarkTheme: boolean = true;
   loading: any;
   clubs = [];
   members:UsersModel[]=[];
@@ -105,6 +106,11 @@ export class Type2AddMemberSchoolSession {
     public sharedservice: SharedServices,
     public popoverCtrl: PopoverController) {
     this.themeType = this.sharedservice.getThemeType();
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      if (isDarkTheme !== null) {
+        this.isDarkTheme = isDarkTheme;
+      }
+    });
     this.schoolSession = <SchoolDetails>this.navParams.get('SchoolSession');
 
     //console.log("school session data is:", this.schoolSession);

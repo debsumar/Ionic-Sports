@@ -226,6 +226,7 @@ export class Type2CampDetails {
           holidaycamp_information
           show_additional_info
           camp_name
+          camp_status
           venue_name
           camp_type
           ClubKey

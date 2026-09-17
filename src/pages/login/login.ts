@@ -61,6 +61,10 @@ export class Login {
     this.navCtrl.push("ForgotPassword");
   }
 
+  goToRegisterClub() {
+    this.navCtrl.push('RegisterClub');
+  }
+
   validateUserInputForLogin(): boolean {
     if (this.user.emailID == "") {
       let message = "Please enter email id";

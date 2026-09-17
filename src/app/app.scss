@@ -131,45 +131,88 @@ ion-toast.error .toast-wrapper { border-left: 4px solid; }
 ion-toast.info .toast-wrapper { border-left: 4px solid; }
 
 // Light theme (default)
+// Solid opaque fallback first (for browsers/WebViews without backdrop-filter
+// support, e.g. older Android system WebView on minSdk 22 devices) — the
+// translucent/blurred look below only layers on top when supported. Without
+// this fallback, the wrapper background stays effectively transparent and
+// text renders over whatever is behind it (often plain white), making it
+// unreadable.
 ion-toast.toast-light .toast-wrapper {
-  background: rgba(255, 255, 255, 0.35) !important;
+  background: #ffffff !important;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  ion-toast.toast-light .toast-wrapper {
+    background: rgba(255, 255, 255, 0.9) !important;
+  }
+}
+ion-toast.toast-light .toast-wrapper {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   color: #1e293b !important;
   .toast-message { color: #1e293b !important; }
+  // The close button (ion-button clear) has no color of its own and falls
+  // back to the app's default light/white button color, which is invisible
+  // against this near-white translucent background.
+  .toast-button { color: #1e293b !important; }
 }
 ion-toast.toast-light.success .toast-wrapper {
-  color: #047857; border-left: 4px solid #10b981 !important;
+  color: #047857 !important; border-left: 4px solid #10b981 !important;
+  .toast-message { color: #047857 !important; }
+  .toast-button { color: #047857 !important; }
 }
 ion-toast.toast-light.error .toast-wrapper {
-  color: #b91c1c; border-left: 4px solid #ef4444 !important;
+  color: #b91c1c !important; border-left: 4px solid #ef4444 !important;
+  .toast-message { color: #b91c1c !important; }
+  .toast-button { color: #b91c1c !important; }
 }
 ion-toast.toast-light.info .toast-wrapper {
-  color: #92400e; border-left: 4px solid #f59e0b !important;
+  color: #92400e !important; border-left: 4px solid #f59e0b !important;
+  .toast-message { color: #92400e !important; }
+  .toast-button { color: #92400e !important; }
 }
 
 // Dark theme
+// Same opaque-fallback-first approach as the light theme above. Previously
+// this rule set no background at all on the base .toast-wrapper — only the
+// per-type variants below added a background, and only as an 8%-opacity
+// tint meant to sit on a blurred dark backdrop. Without backdrop-filter
+// support that tint is nearly invisible against a plain white page,
+// leaving the light-colored success/error/info text unreadable.
+ion-toast.toast-dark .toast-wrapper {
+  background: #1e293b !important;
+}
+@supports ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+  ion-toast.toast-dark .toast-wrapper {
+    background: rgba(30, 41, 59, 0.85) !important;
+  }
+}
 ion-toast.toast-dark .toast-wrapper {
   border: 1px solid rgba(255, 255, 255, 0.15) !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  color: #f1f5f9 !important;
+  .toast-message { color: #f1f5f9 !important; }
+  .toast-button { color: #f1f5f9 !important; }
 }
 ion-toast.toast-dark.success .toast-wrapper {
-  background: rgba(16, 185, 129, 0.08) !important;
-  color: #34d399;
+  color: #34d399 !important;
   border-color: rgba(16, 185, 129, 0.15);
   border-left: 4px solid #10b981 !important;
+  .toast-message { color: #34d399 !important; }
+  .toast-button { color: #34d399 !important; }
 }
 ion-toast.toast-dark.error .toast-wrapper {
-  background: rgba(239, 68, 68, 0.08) !important;
-  color: #f87171;
+  color: #f87171 !important;
   border-color: rgba(239, 68, 68, 0.15);
   border-left: 4px solid #ef4444 !important;
+  .toast-message { color: #f87171 !important; }
+  .toast-button { color: #f87171 !important; }
 }
 ion-toast.toast-dark.info .toast-wrapper {
-  background: rgba(245, 158, 11, 0.08) !important;
-  color: #fbbf24;
+  color: #fbbf24 !important;
   border-color: rgba(245, 158, 11, 0.15);
   border-left: 4px solid #f59e0b !important;
+  .toast-message { color: #fbbf24 !important; }
+  .toast-button { color: #fbbf24 !important; }
 }
 //.alert-button
  .alert-wrapper .alert-button-group .HideButton{
@@ -212,6 +255,42 @@ ion-toast.toast-dark.info .toast-wrapper {
 
 .action-sheets-basic-page .border_bottom{  // this is for event details action sheet
     border-bottom: 0.5px solid rgba(128, 128, 128, 0.55);
+}
+
+// Dark-themed action sheet for RegisterClub's "Choose club logo" prompt —
+// ActionSheetController mounts its overlay at the app root, outside the
+// page's own component tree, so page-scoped SCSS (page-registerclub { ... })
+// cannot reach it; this must be declared globally and scoped via cssClass.
+.registerclub-action-sheet {
+    .action-sheet-title {
+        color: #f1f5f9 !important;
+    }
+
+    .action-sheet-group {
+        background: #1e293b !important;
+    }
+
+    .action-sheet-button {
+        background: #1e293b !important;
+        color: #f1f5f9 !important;
+
+        .action-sheet-icon {
+            color: #94a3b8 !important;
+        }
+    }
+
+    .action-sheet-cancel {
+        background: #0f172a !important;
+        color: #5ec8ee !important;
+
+        .action-sheet-icon {
+            color: #5ec8ee !important;
+        }
+    }
+
+    .action-sheet-group:not(.action-sheet-group-cancel) .action-sheet-button:not(:last-child) {
+        border-bottom: 1px solid #334155 !important;
+    }
 }
  
 //this is for showing modal pages in full screen when device like tab or pad
@@ -505,6 +584,42 @@ ion-content {
   gap: 14px;
 }
 
+// Cross-fading football/basketball/trophy sequence — a lightweight,
+// offline-safe stand-in for an animated multi-sport icon (no network GIF).
+.loader-activity-icon {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+
+.loader-activity-icon .sport-icon {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  line-height: 44px;
+  text-align: center;
+  font-size: 34px;
+  color: #2b92bb;
+  opacity: 0;
+  transform: scale(0.6) rotate(-15deg);
+  animation: loaderSportCycle 2.4s ease-in-out infinite both;
+}
+
+.loader-activity-icon .sport-icon-1 { animation-delay: 0s; }
+.loader-activity-icon .sport-icon-2 { animation-delay: 0.8s; }
+.loader-activity-icon .sport-icon-3 { animation-delay: 1.6s; }
+
+@keyframes loaderSportCycle {
+  0%   { opacity: 0; transform: scale(0.6) rotate(-15deg); }
+  8%   { opacity: 1; transform: scale(1) rotate(0deg); }
+  25%  { opacity: 1; transform: scale(1) rotate(0deg); }
+  33%  { opacity: 0; transform: scale(0.6) rotate(15deg); }
+  100% { opacity: 0; }
+}
+
 .loader-dots {
   display: flex;
   gap: 10px;
@@ -595,7 +710,12 @@ body.sheet-open .glass-fab {
   .item { color: #f1f5f9 !important; background: transparent !important; }
   .item-radio-checked { color: #3fbcd3 !important; }
   .radio-icon { border-color: #3fbcd3 !important; }
-  .radio-inner { background: #3fbcd3 !important; }
+  // Material-mode radio renders a solid filled dot when checked, so a
+  // background fill is correct here — but iOS mode's checked indicator is a
+  // thin bordered L-shape (border-bottom + border-right, rotated 45deg) that
+  // must stay unfilled, or the rotated bounding box paints as a solid
+  // diamond instead of a checkmark outline. Scope the fill to md only.
+  .radio-md.radio-checked .radio-inner { background: #3fbcd3 !important; }
   ion-label { color: #f1f5f9 !important; }
   .list-md, .list-ios { background: transparent !important; }
 }
@@ -606,7 +726,7 @@ body.sheet-open .glass-fab {
   .item { color: #1e293b !important; }
   .item-radio-checked { color: #2b92bb !important; }
   .radio-icon { border-color: #2b92bb !important; }
-  .radio-inner { background: #2b92bb !important; }
+  .radio-md.radio-checked .radio-inner { background: #2b92bb !important; }
   ion-label { color: #1e293b !important; }
 }
 
@@ -622,9 +742,15 @@ body.sheet-open .glass-fab {
   .alert-radio-group { background: transparent !important; }
   .alert-radio-label { color: #f1f5f9 !important; }
   [aria-checked="true"] .alert-radio-label { color: #3fbcd3 !important; }
-  .alert-radio-inner { border-color: #3fbcd3 !important; background: #3fbcd3 !important; }
   .alert-radio-icon { border-color: #475569 !important; }
   [aria-checked="true"] .alert-radio-icon { border-color: #3fbcd3 !important; }
+  // Material-mode radio renders a solid filled dot when checked (background
+  // fill is correct there); iOS mode's checked indicator is a thin bordered
+  // L-shape (border-bottom + border-right, rotated 45deg) that must stay
+  // unfilled, or the rotated bounding box paints as a solid diamond instead
+  // of a checkmark outline. Scope the fill to md only, leave iOS border-only.
+  &.alert-md .alert-radio-inner { border-color: #3fbcd3 !important; background: #3fbcd3 !important; }
+  &.alert-ios .alert-radio-inner { border-color: #3fbcd3 !important; }
   .alert-button { color: #3fbcd3 !important; }
   .alert-button-group { border-top: 1px solid #334155 !important; }
 }
@@ -638,9 +764,10 @@ body.light-theme .select-alert {
   .alert-title { color: #1e293b !important; }
   .alert-radio-label { color: #1e293b !important; }
   [aria-checked="true"] .alert-radio-label { color: #2b92bb !important; }
-  .alert-radio-inner { border-color: #2b92bb !important; background: #2b92bb !important; }
   .alert-radio-icon { border-color: #d1d5db !important; }
   [aria-checked="true"] .alert-radio-icon { border-color: #2b92bb !important; }
+  &.alert-md .alert-radio-inner { border-color: #2b92bb !important; background: #2b92bb !important; }
+  &.alert-ios .alert-radio-inner { border-color: #2b92bb !important; }
   .alert-button { color: #2b92bb !important; }
   .alert-button-group { border-top: 1px solid #e2e8f0 !important; }
 }

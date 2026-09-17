@@ -40,6 +40,7 @@ export class VenueUser {
   is_coach: boolean;
   handicap: number;
   is_gold_member: boolean;
+  promo_email_allowed: boolean;
   allow_court_booking: boolean;
   membership_Id: string;
   vehicleRegNo1: string;

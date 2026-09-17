@@ -296,6 +296,7 @@ export class Type2HolidayCamp {
           bookingCount
           id
           camp_name
+          camp_status
           camp_type
           duration_per_day
           session_count

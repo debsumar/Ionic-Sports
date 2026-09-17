@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { IonicPageModule } from 'ionic-angular';
 import { FiltermemberPage } from './filtermember';
+import { SharedComponentsModule } from '../../../../shared/components/shared-components.module';
 
 @NgModule({
   declarations: [
@@ -8,6 +9,7 @@ import { FiltermemberPage } from './filtermember';
   ],
   imports: [
     IonicPageModule.forChild(FiltermemberPage),
+    SharedComponentsModule,
   ],
 })
 export class FiltermemberPageModule {}

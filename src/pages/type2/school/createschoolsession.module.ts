@@ -8,7 +8,7 @@ import { SharedmoduleModule } from '../../../pages/sharedmodule/sharedmodule.mod
   ],
   imports: [
     IonicPageModule.forChild(Type2CreateSchoolSession),
-    SharedmoduleModule
+    SharedmoduleModule,
   ],
   exports: [
     Type2CreateSchoolSession

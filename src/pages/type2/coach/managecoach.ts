@@ -12,6 +12,9 @@ import gql from 'graphql-tag';
 import { first } from "rxjs/operators";
 import { GraphqlService } from '../../../services/graphql.service';
 import { ThemeService } from '../../../services/theme.service';
+import { HttpService } from '../../../services/http.service';
+import { API } from '../../../shared/constants/api_constants';
+import { AppType, DeviceType } from '../../../shared/constants/module.constants';
 
 @IonicPage()
 @Component({
@@ -76,6 +79,7 @@ export class Type2ManageCoach {
           public fb: FirebaseService, 
           public popoverCtrl: PopoverController,
           private graphqlService: GraphqlService,
+          private httpService: HttpService,
           private storage: Storage,
           public events: Events,
           private renderer: Renderer2,
@@ -583,33 +587,17 @@ updateImgaePostgres(id, url) {
 
 
   private async getCoachSessions(coachId: string, type: 'term' | 'monthly'): Promise<ICoachSessions[]> {
-    const query = type === 'term' ? 
-      gql`query getCoachSessionSummary($coachSummaryInput: SessionSummaryInput!) {
-          getCoachSessionSummary(coachSessionSummaryInput: $coachSummaryInput){
-            first_name
-            last_name
-            total_hours
-            sessions
-          }
-        }` :
-      gql`query getMontlyCoachSessionSummary($coachSummaryInput: MonthlySessionSummaryInput!) {
-          getMontlyCoachSessionSummary(coachSessionSummaryInput: $coachSummaryInput){
-            id
-            first_name
-            last_name
-            total_hours
-            sessions
-          }
-        }`;
-    
-    const coachSummaryInput = type === 'term' ? 
-      { parentclub_id: this.parentClubKey, coach_id: coachId, date: new Date() } :
-      { ParentClubKey: this.parentClubKey, Date: new Date(), coach_id: coachId };
-    
-    return this.graphqlService.query(query, {
-      coachSummaryInput
-    }, type === 'term' ? 0:1).toPromise().then(result => 
-      result.data[type === 'term' ? 'getCoachSessionSummary' : 'getMontlyCoachSessionSummary']
+    const apiMethod = type === 'term' ? API.COACH_SESSION_SUMMARY : API.MONTHLY_COACH_SESSION_SUMMARY;
+    const payload = {
+      parentclub_key: this.parentClubKey,
+      coach_id: coachId,
+      date: new Date().toISOString(),
+      device_type: this.sharedservice.getPlatform() === 'android' ? DeviceType.ANDROID : DeviceType.IOS,
+      app_type: AppType.ADMIN_NEW,
+    };
+
+    return this.httpService.post(apiMethod, payload).toPromise().then((result: any) =>
+      (result && result.data) ? result.data : []
     );
   }
 

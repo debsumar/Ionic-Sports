@@ -146,6 +146,7 @@ export class MemberprofilePage implements OnInit {
           is_coach
           handicap
           is_gold_member
+          promo_email_allowed
           allow_court_booking
           membership_Id
           vehicleRegNo1
@@ -652,6 +653,33 @@ export class MemberprofilePage implements OnInit {
           text: "Yes",
           handler: () => {
             this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),is_gold_member:this.memberInfo.is_gold_member})
+          },
+        },
+      ],
+    });
+    confirm.present();
+  }
+
+  savePromoEmailStatus() {
+    this.showAlertForPromoEmail(
+      "Are you sure you want to change the promotional emails setting for this member"
+    );
+  }
+  showAlertForPromoEmail(msg) {
+    const confirm = this.alertCtrl.create({
+      title: "Promotional Emails",
+      message: msg + "?",
+      buttons: [
+        {
+          text: "No",
+          handler: () => {
+            this.memberInfo.promo_email_allowed = !this.memberInfo.promo_email_allowed;
+          },
+        },
+        {
+          text: "Yes",
+          handler: () => {
+            this.updateUserProfileExtraInfo({id:this.navParams.get("member_id"),promo_email_allowed:this.memberInfo.promo_email_allowed})
           },
         },
       ],

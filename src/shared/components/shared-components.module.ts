@@ -23,6 +23,7 @@ import { SectionHeaderComponent } from "./section-header/section-header.componen
 import { StatusBadgeComponent } from "./status-badge/status-badge.component";
 import { EmptyStateComponent } from "./empty-state/empty-state.component";
 import { SelectFieldComponent } from "./select-field/select-field.component";
+import { DropdownFieldComponent } from "./dropdown-field/dropdown-field.component";
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { SelectFieldComponent } from "./select-field/select-field.component";
     StatusBadgeComponent,
     EmptyStateComponent,
     SelectFieldComponent,
+    DropdownFieldComponent,
   ],
   imports: [CommonModule, FormsModule, IonicModule],
   exports: [
@@ -67,6 +69,7 @@ import { SelectFieldComponent } from "./select-field/select-field.component";
     StatusBadgeComponent,
     EmptyStateComponent,
     SelectFieldComponent,
+    DropdownFieldComponent,
   ],
 })
 export class SharedComponentsModule {}

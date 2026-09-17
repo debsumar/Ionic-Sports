@@ -36,6 +36,7 @@ export class HolidayCamp {
     camp_name: string
     age_group: string
     camp_type: number
+    camp_status?: number
     ClubKey: string
     club_id: string
     ClubName: string

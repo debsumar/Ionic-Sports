@@ -1,42 +1,43 @@
 <ion-content class="login-content">
-    <!-- Background image -->
-    <img src="assets/images/bgi.jpeg" class="bg-img">
+    <div class="login-wrapper">
+        <div class="overlay"></div>
 
-    <!-- Form overlay -->
-    <div class="form-section">
-        <ion-grid class="login-form">
-            <ion-row class="input-row">
-                <ion-col col-1>
-                    <ion-icon name="mail" class="input-icon"></ion-icon>
-                </ion-col>
-                <ion-col col-11>
-                    <ion-input type="text" inputmode="email" autocomplete="email" [(ngModel)]="user.emailID" placeholder="Email" name="admin_input"></ion-input>
-                </ion-col>
-            </ion-row>
+        <div class="form-card">
+            <div class="logo-row">
+                <img src="assets/images/logo.svg" class="brand-logo" alt="ActivityPro" />
+                <span class="brand-name">ActivityPro</span>
+            </div>
 
-            <ion-row class="input-row">
-                <ion-col col-1>
-                    <ion-icon name="lock" class="input-icon"></ion-icon>
-                </ion-col>
-                <ion-col col-10>
-                    <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" placeholder="Password" name="admin_password" [clearOnEdit]="false"></ion-input>
-                </ion-col>
-                <ion-col col-1>
-                    <ion-icon [name]="showPassword ? 'eye' : 'eye-off'" class="toggle-pw" (click)="showPassword = !showPassword"></ion-icon>
-                </ion-col>
-            </ion-row>
+            <h1 class="login-title">Welcome back</h1>
+            <p class="login-subtitle">Log in to manage your club</p>
 
-            <ion-row>
-                <ion-col text-right style="padding: 0;">
-                    <span (click)="goToForgotPassword()" class="forgot-link">Forgot Password?</span>
-                </ion-col>
-            </ion-row>
+            <div class="login-form">
+                <div class="input-row">
+                    <ion-label class="field-label">Email</ion-label>
+                    <div class="input-wrap">
+                        <ion-input type="text" inputmode="email" autocomplete="email" [(ngModel)]="user.emailID" placeholder="you@example.com" name="admin_input"></ion-input>
+                        <ion-icon name="mail" class="input-icon"></ion-icon>
+                    </div>
+                </div>
 
-            <ion-row>
-                <ion-col col-12>
-                    <button ion-button block class="login-btn" (click)="login()">Login</button>
-                </ion-col>
-            </ion-row>
-        </ion-grid>
+                <div class="input-row">
+                    <ion-label class="field-label">Password</ion-label>
+                    <div class="input-wrap">
+                        <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" placeholder="••••••••" name="admin_password"></ion-input>
+                        <ion-icon [name]="showPassword ? 'eye' : 'eye-off'" class="input-icon toggle-pw" (click)="showPassword = !showPassword"></ion-icon>
+                    </div>
+                </div>
+
+                <div class="options-row">
+                    <span (click)="goToForgotPassword()" class="forgot-link">Forgot password?</span>
+                </div>
+
+                <button ion-button block class="login-btn" (click)="login()">Log in</button>
+
+                <div class="register-row">
+                    <span>Don't have an account? </span>&nbsp;<span class="register-link" (click)="goToRegisterClub()">Register your Club here</span>
+                </div>
+            </div>
+        </div>
     </div>
 </ion-content>

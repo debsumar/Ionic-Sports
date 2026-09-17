@@ -40,6 +40,13 @@ export enum NoticationModuleTypes {
 }
 
 
+export enum ActionType {
+  CREATE = 1,
+  UPDATE = 2,
+  DELETE = 3,
+  READ = 4,
+}
+
 export enum AppType {
   ADMIN = 0,
   ADMIN_NEW = 10,

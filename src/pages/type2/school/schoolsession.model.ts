@@ -20,6 +20,7 @@ export interface SchoolSessions {
     activity_category_name: string
     activity_subcategory_name: string
     coach_names: string;
+    group_status?: number;
     ActivityDetails: IActivityDetails;
     ClubDetails: {
         Id: string

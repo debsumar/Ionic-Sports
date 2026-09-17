@@ -19,6 +19,7 @@ import gql from "graphql-tag";
 import { GraphqlService } from "../../../services/graphql.service";
 import { Activity, ActivityCoach, ActivityInfoInput, ClubActivityInput, IClubDetails, SchoolDto } from "../../../shared/model/club.model";
 import { HolidayCamp } from "./models/holiday_camp.model";
+
 //import { CurrencyPipe } from "@angular/common";
 @IonicPage()
 @Component({
@@ -33,6 +34,10 @@ export class Type2CreateHolidayCamp {
 
   //Varriables
   themeType: any;
+  Status: Array<any> = [
+    { StatusCode: CampStatus.PUBLIC, StatusText: "Public" },
+    { StatusCode: CampStatus.PRIVATE, StatusText: "Hide" }
+  ];
   parentClubKey: string = "";
 
   holidayCampResponse: HolidayCamp;
@@ -71,6 +76,7 @@ export class Type2CreateHolidayCamp {
       AgeGroup: '',
       CampName: '',
       CampType: 502, //Single day || Half day || multiple day codes
+      camp_status: CampStatus.PUBLIC,
       ClubKey: '',
       ClubName: '',
       // CoachKey: '',
@@ -1655,10 +1661,16 @@ export class Type2CreateHolidayCamp {
 
   }
 
-
-  showToast(message) {
-    this.commonService.toastMessage(message, 2500, ToastMessageType.Info, ToastPlacement.Bottom)
+  showToast(message:string){
+    this.commonService.toastMessage(message, 2500, ToastMessageType.Info, ToastPlacement.Bottom);
   }
 
 
+
+}
+
+
+export enum CampStatus {
+  PRIVATE = 0,
+  PUBLIC = 1
 }

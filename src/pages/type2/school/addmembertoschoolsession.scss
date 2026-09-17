@@ -5,43 +5,242 @@ addmembertoschoolsession-page {
     .social-cards ion-col {
         padding: 0;
     }
-    .btn-clr {
-        color: $dashoboard-icon-color;
+    ion-content {
+        &.dark-theme {
+            .scroll-content {
+                background: #0f172a !important;
+                background-image: none !important;
+            }
+
+            ion-item,
+            ion-list-header {
+                background: #1e293b !important;
+                color: #e2e8f0 !important;
+            }
+
+            .card-md p,
+            .p_selected ion-card-content {
+                color: #e2e8f0 !important;
+            }
+
+            .cross {
+                background-color: #1e293b;
+            }
+
+            .page-fixed-header {
+                background: #0f172a;
+            }
+
+            .section-title,
+            .member-name {
+                color: #f1f5f9;
+            }
+
+            ion-checkbox {
+                --background: #334155;
+                --background-checked: #2b92bb;
+                --border-color: #475569;
+                --border-color-checked: #2b92bb;
+                --checkmark-color: #fff;
+            }
+
+            .empty-state .empty-icon {
+                color: #334155;
+            }
+        }
+
+        &.light-theme {
+            .scroll-content {
+                background: #f8fafc !important;
+                background-image: none !important;
+            }
+
+            ion-item,
+            ion-list-header {
+                background: #ffffff !important;
+                color: #1f2937 !important;
+            }
+
+            .card-md p,
+            .p_selected ion-card-content {
+                color: #1f2937 !important;
+            }
+
+            .cross {
+                background-color: #ffffff;
+            }
+
+            .page-fixed-header {
+                background: #f8fafc;
+            }
+
+            .section-title,
+            .member-name {
+                color: #1e293b;
+            }
+
+            ion-checkbox {
+                --background: #fff;
+                --background-checked: #2b92bb;
+                --border-color: #d1d5db;
+                --border-color-checked: #2b92bb;
+                --checkmark-color: #fff;
+            }
+
+            .empty-state .empty-icon {
+                color: #cbd5e1;
+            }
+        }
+
+        .page-fixed-header {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .page-list-area {
+            padding: 0 8px 80px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 16px 8px;
+        }
+
+        .section-title {
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        app-list-card {
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .member-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 14px;
+            background: transparent;
+        }
+
+        .member-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(43, 146, 187, 0.15);
+            color: #3fbcd3;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .member-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .member-name {
+            font-size: 14px;
+            font-weight: 700;
+            margin: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .member-tag {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 20px;
+            margin-top: 2px;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+
+            &.existing {
+                background: rgba(100, 116, 139, 0.2);
+                color: #64748b;
+            }
+        }
+
+        ion-checkbox {
+            flex-shrink: 0;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+            gap: 8px;
+
+            .empty-icon {
+                font-size: 40px;
+            }
+
+            .empty-text {
+                font-size: 14px;
+                color: #64748b;
+                margin: 0;
+            }
+        }
     }
-    .scroll-content {
-        background-image: none !important;
+
+    ion-footer {
+        &.dark-theme {
+            background: #0f172a !important;
+            box-shadow: none !important;
+            border: none !important;
+
+            &::before,
+            &::after {
+                display: none !important;
+            }
+
+            .toolbar,
+            .toolbar-background,
+            .toolbar-background-md,
+            .toolbar-background-ios {
+                background: #0f172a !important;
+                border: none !important;
+            }
+        }
+
+        &.light-theme {
+            background: #f8fafc !important;
+            box-shadow: none !important;
+            border: none !important;
+
+            &::before,
+            &::after {
+                display: none !important;
+            }
+
+            .toolbar,
+            .toolbar-background,
+            .toolbar-background-md,
+            .toolbar-background-ios {
+                background: #f8fafc !important;
+                border: none !important;
+            }
+        }
     }
     .align {
         margin-top: 5px;
         margin-left: 9px;
         margin-right: 9px;
     }
-    ion-item h2 {
-        // color: $dashoboard-icon-color !important;
-    }
-    .cross {
-        background-color: white;
-    }
-    .search_add {
-        background-color: transparent;
-        padding-left: 6px;
-    }
     .right {
         float: right;
-    }
-    .search_add {
-        .item-inner {
-            border-bottom: 0px !important;
-            ion-icon {
-                margin-top: 18px;
-            }
-            div {
-                ion-label {
-                    //margin-top: 0px;
-                    margin-bottom: 0px;
-                }
-            }
-        }
     }
     .session_header,
     ion-list {
@@ -65,20 +264,14 @@ addmembertoschoolsession-page {
         font-size: 1.3rem;
         font-weight: normal;
         line-height: 1.4;
-        color: #222;
     }
     .ion_list1 {
         margin-top: 10px;
     }
     .p_selected {
         ion-card-content {
-            //  border-bottom: 1px solid rgb(209, 209, 213);
-            //      padding: 5px 0px 5px 13px;
-            //     color: black;
-            //     font-size: 17px;
             border-bottom: 1px solid #d1d1d5;
             padding: 5px 0px 5px 13px;
-            color: rgba(0, 0, 0, 0.89);
             font-size: 17px;
         }
     }

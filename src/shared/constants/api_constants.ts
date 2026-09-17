@@ -6,7 +6,14 @@ export const API = {
     GET_PARENTCLUB_USER_MENUS: `parentclubuser/user_menus`,
     GET_ALL_PARENTCLUBS_LIST:`parentclub/get_all_parentclubs`,
     CHECK_PARENTCLUB_EMAIL_EXISTANCE: `parentclubuser/validate_email`,
+
+    // ─── Onboarding / Register Club ───
+    GET_ACTIVITIES: 'activity/get_activities',
+    CHECK_EMAIL_UNIQUE: 'parentclub/check-email-unique',
+    CREATE_PARENT_CLUB: 'parentclub/create_parentclub',
+
     CAMP_SESSION_CAPACITY_UPDATE: `holidaycamp/updateSessionCapcity`,
+    GET_HOLIDAYCAMP_DETAILS: 'holidaycamp/details',
     CHECK_STRIPE_AVAILABILITY: `payment/stripe_availability`,
     GET_PARENTCLUB_STRIPES: `payment/paerntclub_stripe_accounts`,
     UPDATE_STRIPE_STATUS: `payment/update_stripe_account`,
@@ -14,6 +21,8 @@ export const API = {
     USER_EXTRA_PROPS_UPDATE: `user/updatextraprops`,
     USER_UPDATE: `user`,
     TERM_SESSION_PENDING_PAYMENTS: `session/getTermPendingPayments`,
+    COACH_SESSION_SUMMARY: `session/coach-summary`,
+    MONTHLY_COACH_SESSION_SUMMARY: `monthly_session/coach-summary`,
     MONTHLY_SESSION_PAYMENT_REPORT: `paymentreport/monthlyses_paymentreport`,
     EVENT_PAYMENT_REPORT: `paymentreport/eventpaymentreport`,
     WEEKLY_PAYMENT_LISTING: `paymentreport/weekly_listing`,

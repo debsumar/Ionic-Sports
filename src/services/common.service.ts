@@ -571,11 +571,34 @@ export class CommonService {
     toast.present();
   }
 
+  // showLoader(loadertext?: string) {
+  //   const isLight = document.body.classList.contains('light-theme');
+  //   this.loader = this.loadingCtrl.create({
+  //     spinner: 'hide',
+  //     content: '<div class="custom-loader"><div class="loader-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>' + (loadertext ? '<p class="loader-text">' + loadertext + '</p>' : '') + '</div>',
+  //     cssClass: isLight ? 'light-loader' : 'dark-loader'
+  //   });
+  //   this.loader.present();
+  // }
+
   showLoader(loadertext?: string) {
     const isLight = document.body.classList.contains('light-theme');
+    // NOTE: LoadingController's `content` string is rendered via a raw
+    // [innerHTML] binding (see ionic-angular/components/loading), which is
+    // never processed by Angular's compiler/directive-matcher — <ion-icon>
+    // is an Angular Directive, not a plain custom element, so its glyph is
+    // only ever applied when Angular actually instantiates the directive.
+    // A bare <ion-icon> tag injected via innerHTML never gets upgraded and
+    // renders nothing. Ionicons also ships plain CSS font-icon classes
+    // (e.g. "ion ion-md-football") that work with zero Angular processing —
+    // use those instead for anything injected as raw HTML strings.
     this.loader = this.loadingCtrl.create({
       spinner: 'hide',
-      content: '<div class="custom-loader"><div class="loader-dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>' + (loadertext ? '<p class="loader-text">' + loadertext + '</p>' : '') + '</div>',
+      content: '<div class="custom-loader"><div class="loader-activity-icon">'
+        + '<i class="ion sport-icon sport-icon-1 ion-md-football"></i>'
+        + '<i class="ion sport-icon sport-icon-2 ion-md-basketball"></i>'
+        + '<i class="ion sport-icon sport-icon-3 ion-md-trophy"></i>'
+        + '</div>' + (loadertext ? '<p class="loader-text">' + loadertext + '</p>' : '') + '</div>',
       cssClass: isLight ? 'light-loader' : 'dark-loader'
     });
     this.loader.present();

@@ -17,6 +17,10 @@ import { Activity, ActivityCoach, ActivityInfoInput, ClubActivityInput, IClubDet
 import { EditHolidayCampDetails, UpadteHolidayCampDTO, UpdateHolidayCampDTO } from "./models/update_camp_dto";
 import moment from "moment";
 import { HolidayCamp } from "./models/holiday_camp.model";
+import { CampStatus } from "./constants/camp_status.constants";
+import { HttpService } from "../../../services/http.service";
+import { API } from "../../../shared/constants/api_constants";
+import { AppType, DeviceType } from "../../../shared/constants/module.constants";
 
 
 @IonicPage()
@@ -61,6 +65,10 @@ export class Type2EditHolidayCamp {
 
   //Varriables
   themeType: any;
+  Status: Array<any> = [
+    { StatusCode: CampStatus.PUBLIC, StatusText: "Public" },
+    { StatusCode: CampStatus.PRIVATE, StatusText: "Hide" }
+  ];
   parentClubKey: string = "";
 
   Currency: any;//added by vinod
@@ -187,10 +195,15 @@ export class Type2EditHolidayCamp {
   coachs = [];
   selectedCoach: any;
   types = [];
-  constructor(public graphqlService: GraphqlService, private navParams: NavParams, private selector: WheelSelector, public events: Events, public comonService: CommonService, public loadingCtrl: LoadingController, public alertCtrl: AlertController, private toastCtrl: ToastController, public navCtrl: NavController, private storage: Storage, public fb: FirebaseService, public sharedservice: SharedServices, public popoverCtrl: PopoverController) {
+  constructor(public graphqlService: GraphqlService, private navParams: NavParams, private selector: WheelSelector, public events: Events, public comonService: CommonService, public loadingCtrl: LoadingController, public alertCtrl: AlertController, private toastCtrl: ToastController, public navCtrl: NavController, private storage: Storage, public fb: FirebaseService, public sharedservice: SharedServices, public popoverCtrl: PopoverController, private httpService: HttpService) {
     this.themeType = sharedservice.getThemeType();
     this.userData = sharedservice.getUserData();
     this.selectedCampDetails = navParams.get('holidayCampDetails');
+    const campStatus = Number(this.selectedCampDetails.camp_status);
+    if (campStatus === CampStatus.PUBLIC || campStatus === CampStatus.PRIVATE) {
+        this.selectedCampDetails.camp_status = campStatus;
+        return;
+    }
     this.selectedCampDetails.start_date = moment(this.selectedCampDetails.start_date, 'DD-MMM-YYYY').format('YYYY-MM-DD');
     this.selectedCampDetails.end_date = moment(this.selectedCampDetails.end_date, 'DD-MMM-YYYY').format('YYYY-MM-DD');
     this.selectedCampDetails.pay_by_date = moment(this.selectedCampDetails.pay_by_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -222,9 +235,33 @@ export class Type2EditHolidayCamp {
 
   ionViewDidLoad() {
     this.getLanguage();
+    //this.loadCampStatus();
     this.events.subscribe('language', (res) => {
       this.getLanguage();
     });
+  }
+
+  loadCampStatus() {
+    const detailsInput = {
+      HolidayCampId: this.selectedCampDetails.id,
+      AppType: AppType.ADMIN,
+      DeviceType: this.sharedservice.getPlatform() === "android" ? DeviceType.ANDROID : DeviceType.IOS,
+      FetchActiveSession: false
+    };
+
+    this.httpService.post<HolidayCamp>(API.GET_HOLIDAYCAMP_DETAILS, detailsInput).subscribe(
+      (campDetails) => {
+        const campStatus = Number(campDetails.camp_status);
+        if (campStatus === CampStatus.PUBLIC || campStatus === CampStatus.PRIVATE) {
+          this.selectedCampDetails.camp_status = campStatus;
+          return;
+        }
+        this.comonService.toastMessage("Unable to load the current camp status", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
+      },
+      () => {
+        this.comonService.toastMessage("Unable to load the current camp status", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
+      }
+    );
   }
 
   getLanguage() {
@@ -763,6 +800,10 @@ export class Type2EditHolidayCamp {
     hour = calculatedHour < 10 ? "0" + calculatedHour : calculatedHour.toString();
 
     return hour + ":" + minute;
+  }
+
+  showToast(message:string){
+    this.comonService.toastMessage(message, 2500, ToastMessageType.Info, ToastPlacement.Bottom);
   }
 
 

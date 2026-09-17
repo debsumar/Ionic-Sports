@@ -1,0 +1,329 @@
+<ion-header>
+  <ion-navbar hideBackButton>
+    <ion-title>Register your club</ion-title>
+    <ion-buttons start>
+      <button ion-button icon-only (click)="goBack()"><ion-icon name="arrow-back"></ion-icon></button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content>
+  <div class="stepper" *ngIf="step < 5">
+    <div class="stepper-track">
+      <ng-container *ngFor="let item of [1, 2, 3, 4]; let last = last">
+        <div class="stepper-dot" [class.done]="step > item" [class.active]="step === item">
+          <ion-icon name="checkmark" *ngIf="step > item"></ion-icon>
+          <span *ngIf="step <= item">{{item}}</span>
+        </div>
+        <div class="stepper-line" *ngIf="!last" [class.done]="step > item"></div>
+      </ng-container>
+    </div>
+    <p class="stepper-label">Step {{step}} of 4</p>
+  </div>
+  <ion-list>
+    <section *ngIf="step === 1">
+      <ion-list-header>Club administrator</ion-list-header>
+
+      <div [class.field-error]="isInvalid('clubName')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Club name</ion-label>
+            <ion-input [(ngModel)]="accountInformation.adminInformation.clubName" placeholder="Your club name"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepOneSubmitted && isInvalid('clubName')">
+          <ion-label color="danger">Club name is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('primaryActivity')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Primary activity</ion-label>
+            <ion-select [(ngModel)]="accountInformation.adminInformation.primaryActivity" (ionChange)="onActivityChange()" placeholder="Select activity">
+              <ion-option *ngFor="let activity of activities" [value]="activity.ActivityCode">{{activity.ActivityName}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepOneSubmitted && isInvalid('primaryActivity')">
+          <ion-label color="danger">Select a primary activity.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('contactPersonName')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Contact person</ion-label>
+            <ion-input [(ngModel)]="accountInformation.adminInformation.contactPersonName" placeholder="Full name"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepOneSubmitted && isInvalid('contactPersonName')">
+          <ion-label color="danger">Contact person is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('phoneNumber')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Phone number</ion-label>
+            <ion-input type="tel" [(ngModel)]="accountInformation.adminInformation.phoneNumber" (paste)="onPhonePaste($event)" placeholder="+447700900000"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepOneSubmitted && isInvalid('phoneNumber')">
+          <ion-label color="danger">Enter 7–15 digits, optionally starting with +.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('adminEmail')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Admin email</ion-label>
+            <ion-input type="email" [(ngModel)]="accountInformation.adminInformation.email" placeholder="admin@example.com"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepOneSubmitted && isInvalid('adminEmail')">
+          <ion-label color="danger">Enter a valid email address.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('adminPassword')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Password</ion-label>
+            <ion-input type="password" [(ngModel)]="accountInformation.adminInformation.password" placeholder="Minimum 6 characters"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepOneSubmitted && isInvalid('adminPassword')">
+          <ion-label color="danger">Password must contain at least 6 characters.</ion-label>
+        </ion-item>
+      </div>
+    </section>
+
+    <section *ngIf="step === 2">
+      <ion-list-header>Address and branding</ion-list-header>
+
+      <div [class.field-error]="isInvalid('country')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Country</ion-label>
+            <ion-select [(ngModel)]="accountInformation.clubInformation.clubAddress.country" (ionChange)="onCountryChange()">
+              <ion-option *ngFor="let country of countries" [value]="country.code">{{country.label}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepTwoSubmitted && isInvalid('country')">
+          <ion-label color="danger">Country is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('address')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Address line 1</ion-label>
+            <ion-input [(ngModel)]="accountInformation.clubInformation.clubAddress.address"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepTwoSubmitted && isInvalid('address')">
+          <ion-label color="danger">Address is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <app-form-field>
+        <ion-item>
+          <ion-label>Address line 2 (optional)</ion-label>
+          <ion-input [(ngModel)]="accountInformation.clubInformation.clubAddress.address2"></ion-input>
+        </ion-item>
+      </app-form-field>
+
+      <app-form-field>
+        <ion-item>
+          <ion-label>City (optional)</ion-label>
+          <ion-input [(ngModel)]="accountInformation.clubInformation.clubAddress.city"></ion-input>
+        </ion-item>
+      </app-form-field>
+
+      <div [class.field-error]="isInvalid('state')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>State / County</ion-label>
+            <ion-input [(ngModel)]="accountInformation.clubInformation.clubAddress.state"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepTwoSubmitted && isInvalid('state')">
+          <ion-label color="danger">State or county is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('postCode')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Postcode</ion-label>
+            <ion-input [(ngModel)]="accountInformation.clubInformation.clubAddress.postCode"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepTwoSubmitted && isInvalid('postCode')">
+          <ion-label color="danger">Postcode is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('clubTnC')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Terms &amp; Conditions URL</ion-label>
+            <ion-input type="url" [(ngModel)]="accountInformation.clubInformation.clubTnC" placeholder="https://example.com/terms"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepTwoSubmitted && isInvalid('clubTnC')">
+          <ion-label color="danger">Enter a valid http(s) URL.</ion-label>
+        </ion-item>
+      </div>
+
+      <ion-list-header>Club logo</ion-list-header>
+      <ion-item class="logo-row">
+        <ion-thumbnail item-start *ngIf="accountInformation.croppedImage">
+          <img [src]="accountInformation.croppedImage" alt="Club logo preview">
+        </ion-thumbnail>
+        <ion-icon name="image" item-start *ngIf="!accountInformation.croppedImage"></ion-icon>
+        <ion-label>{{uploadingLogo ? 'Uploading…' : (accountInformation.appIconUrl ? 'Uploaded' : 'Camera or gallery')}}</ion-label>
+      </ion-item>
+      <ion-item class="logo-actions">
+        <button ion-button clear item-start (click)="selectLogo()" [disabled]="uploadingLogo">{{accountInformation.croppedImage ? 'Replace' : 'Add logo'}}</button>
+        <button ion-button clear color="danger" item-end *ngIf="accountInformation.croppedImage" (click)="removeLogo()" [disabled]="uploadingLogo">Remove</button>
+      </ion-item>
+    </section>
+
+    <section *ngIf="step === 3">
+      <ion-list-header>Lead coach</ion-list-header>
+
+      <div [class.field-error]="isInvalid('coachFirstName')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>First name</ion-label>
+            <ion-input [(ngModel)]="accountInformation.clubInformation.coachDetails.firstName"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepThreeSubmitted && isInvalid('coachFirstName')">
+          <ion-label color="danger">First name is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('coachLastName')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Last name</ion-label>
+            <ion-input [(ngModel)]="accountInformation.clubInformation.coachDetails.lastName"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepThreeSubmitted && isInvalid('coachLastName')">
+          <ion-label color="danger">Last name is required.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('coachEmail')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Coach email</ion-label>
+            <ion-input type="email" [(ngModel)]="accountInformation.clubInformation.coachDetails.email"></ion-input>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepThreeSubmitted && isInvalid('coachEmail')">
+          <ion-label color="danger">Enter a valid email different from the admin email.</ion-label>
+        </ion-item>
+      </div>
+
+      <div [class.field-error]="isInvalid('coachGender')">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Gender</ion-label>
+            <ion-select [(ngModel)]="accountInformation.clubInformation.coachDetails.gender" placeholder="Select gender">
+              <ion-option *ngFor="let gender of genders" [value]="gender">{{gender}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-form-field>
+        <ion-item *ngIf="stepThreeSubmitted && isInvalid('coachGender')">
+          <ion-label color="danger">Select a gender.</ion-label>
+        </ion-item>
+      </div>
+    </section>
+
+    <section *ngIf="step === 4">
+      <ion-item *ngIf="accountInformation.croppedImage">
+        <ion-thumbnail item-start>
+          <img [src]="accountInformation.croppedImage" alt="Club logo">
+        </ion-thumbnail>
+        <ion-label>Club logo</ion-label>
+      </ion-item>
+
+      <ion-list class="review-list">
+        <ion-list-header>Club and administrator</ion-list-header>
+        <ion-item><ion-label>Club</ion-label><ion-note item-end>{{accountInformation.adminInformation.clubName}}</ion-note></ion-item>
+        <ion-item><ion-label>Activity</ion-label><ion-note item-end>{{accountInformation.adminInformation.primaryActivityName}}</ion-note></ion-item>
+        <ion-item><ion-label>Contact</ion-label><ion-note item-end>{{accountInformation.adminInformation.contactPersonName}}</ion-note></ion-item>
+        <ion-item><ion-label>Phone</ion-label><ion-note item-end>{{accountInformation.adminInformation.phoneNumber}}</ion-note></ion-item>
+        <ion-item><ion-label>Admin email</ion-label><ion-note item-end>{{accountInformation.adminInformation.email}}</ion-note></ion-item>
+      </ion-list>
+
+      <ion-list class="review-list">
+        <ion-list-header>Club address</ion-list-header>
+        <ion-item><ion-label>Address</ion-label><ion-note item-end>{{accountInformation.clubInformation.clubAddress.address}}</ion-note></ion-item>
+        <ion-item *ngIf="accountInformation.clubInformation.clubAddress.address2"><ion-label>Address line 2</ion-label><ion-note item-end>{{accountInformation.clubInformation.clubAddress.address2}}</ion-note></ion-item>
+        <ion-item *ngIf="accountInformation.clubInformation.clubAddress.city"><ion-label>City</ion-label><ion-note item-end>{{accountInformation.clubInformation.clubAddress.city}}</ion-note></ion-item>
+        <ion-item><ion-label>State / County</ion-label><ion-note item-end>{{accountInformation.clubInformation.clubAddress.state}}</ion-note></ion-item>
+        <ion-item><ion-label>Postcode</ion-label><ion-note item-end>{{accountInformation.clubInformation.clubAddress.postCode}}</ion-note></ion-item>
+        <ion-item><ion-label>Country</ion-label><ion-note item-end>{{accountInformation.clubInformation.clubAddress.countryName}}</ion-note></ion-item>
+        <ion-item><ion-label>Terms URL</ion-label><ion-note item-end>{{accountInformation.clubInformation.clubTnC}}</ion-note></ion-item>
+      </ion-list>
+
+      <ion-list class="review-list">
+        <ion-list-header>Lead coach</ion-list-header>
+        <ion-item><ion-label>Name</ion-label><ion-note item-end>{{accountInformation.clubInformation.coachDetails.firstName}} {{accountInformation.clubInformation.coachDetails.lastName}}</ion-note></ion-item>
+        <ion-item><ion-label>Email</ion-label><ion-note item-end>{{accountInformation.clubInformation.coachDetails.email}}</ion-note></ion-item>
+        <ion-item><ion-label>Gender</ion-label><ion-note item-end>{{accountInformation.clubInformation.coachDetails.gender}}</ion-note></ion-item>
+      </ion-list>
+
+      <ion-item class="terms-row">
+        <app-checkbox item-start [(checked)]="accountInformation.clubInformation.termsAccepted" color="#2b92bb"></app-checkbox>
+        <ion-label>I accept the club Terms and Conditions.</ion-label>
+      </ion-item>
+    </section>
+
+    <section *ngIf="step === 5">
+      <app-empty-state icon="checkmark-circle" text="Your Club App is ready"></app-empty-state>
+      <p>Welcome to ActivityPro, {{accountInformation.adminInformation.clubName}}.</p>
+      <ion-list>
+        <ion-item><ion-label>Admin email</ion-label><ion-note item-end>{{accountInformation.adminInformation.email}}</ion-note></ion-item>
+        <ion-item><ion-label>Coach email</ion-label><ion-note item-end>{{accountInformation.clubInformation.coachDetails.email}}</ion-note></ion-item>
+      </ion-list>
+    </section>
+  </ion-list>
+</ion-content>
+
+<ion-footer no-border class="action-footer">
+  <ng-container *ngIf="step === 1">
+    <div class="footer-row">
+      <div class="back-btn-wrapper"><button ion-button block class="back-btn" (click)="goBack()">Cancel</button></div>
+      <app-glass-button label="Next" (btnClick)="nextFromAdmin()"></app-glass-button>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="step === 2">
+    <div class="footer-row">
+      <div class="back-btn-wrapper"><button ion-button block class="back-btn" (click)="goBack()">Back</button></div>
+      <app-glass-button label="Next" [disabled]="uploadingLogo" (btnClick)="nextFromClubDetails()"></app-glass-button>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="step === 3">
+    <div class="footer-row">
+      <div class="back-btn-wrapper"><button ion-button block class="back-btn" (click)="goBack()">Back</button></div>
+      <app-glass-button label="Review details" (btnClick)="nextFromCoachDetails()"></app-glass-button>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="step === 4">
+    <div class="footer-row">
+      <div class="back-btn-wrapper"><button ion-button block class="back-btn" (click)="goBack()">Back</button></div>
+      <app-glass-button label="Create club" [disabled]="submitting" (btnClick)="submitRegistration()"></app-glass-button>
+    </div>
+  </ng-container>
+  <ng-container *ngIf="step === 5">
+    <app-glass-button label="Back to Login" (btnClick)="goToLogin()"></app-glass-button>
+  </ng-container>
+</ion-footer>

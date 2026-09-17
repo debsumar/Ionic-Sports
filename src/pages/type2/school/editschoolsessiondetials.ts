@@ -12,6 +12,7 @@ import { GraphqlService } from '../../../services/graphql.service';
 import gql from 'graphql-tag';
 import { Activity, ActivityCategory, ActivityCoach, ActivityInfoInput, ActivitySubCategory, ClubActivityInput, IClubDetails } from '../../../shared/model/club.model';
 import { FinancialYearTerms } from '../../../shared/model/financial_terms.model';
+import { SchoolGroupStatus } from './constants/school_group_status.constants';
 
 @IonicPage()
 @Component({
@@ -23,6 +24,10 @@ export class Type2EditSchoolSessionDetails {
 
     parentClubKey: any;
     themeType: number;
+    Status: Array<any> = [
+        { StatusCode: SchoolGroupStatus.PUBLIC, StatusText: "Public" },
+        { StatusCode: SchoolGroupStatus.PRIVATE, StatusText: "Hide" }
+    ];
     selectedSchool: string = "";
     school_session:SchoolDetails;
     clubs:IClubDetails[] = [];
@@ -80,7 +85,7 @@ export class Type2EditSchoolSessionDetails {
         start_date: '',
         end_date: '',
         pay_by_date: '',
-        group_status: '1',
+        group_status: SchoolGroupStatus.PUBLIC,
         start_time: '',
         duration: '60',
         group_size: 20,

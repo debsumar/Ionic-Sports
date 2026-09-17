@@ -14,6 +14,7 @@ import { GraphqlService } from '../../../services/graphql.service';
 import gql from 'graphql-tag';
 import { Activity, ActivityCategory, ActivityCoach, ActivityInfoInput, ActivitySubCategory, ClubActivityInput, IClubDetails } from '../../../shared/model/club.model';
 import { FinancialYearTerms } from '../../../shared/model/financial_terms.model';
+import { SchoolGroupStatus } from './constants/school_group_status.constants';
 @IonicPage()
 @Component({
     selector: 'createschoolsession-page',
@@ -26,6 +27,10 @@ export class Type2CreateSchoolSession {
     isTermsEmpty: boolean = false;
     parentClubKey: any;
     themeType: number;
+    Status: Array<any> = [
+        { StatusCode: SchoolGroupStatus.PUBLIC, StatusText: "Public" },
+        { StatusCode: SchoolGroupStatus.PRIVATE, StatusText: "Hide" }
+    ];
     schools: SchoolVenue[] = []
     selectedSchool: string = "";
     clubs:IClubDetails[] = [];
@@ -96,6 +101,7 @@ export class Type2CreateSchoolSession {
         Days: '',
         Duration: '60',
         GroupSize: '20',
+        group_status: SchoolGroupStatus.PUBLIC,
         Comments: '',
         SessionFee: '7.00',
         BookingButtonText: 'Book Now',

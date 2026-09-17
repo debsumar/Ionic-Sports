@@ -1,0 +1,353 @@
+@import '../../theme/android-sdk35-fixes.scss';
+
+page-registerclub {
+  @include android-sdk35-fixes;
+
+  // ── Header back button — force left placement defensively; the
+  // navbar back-button slot order is normally guaranteed by Ionic's
+  // own ng-content projection, but pin it explicitly in case a global
+  // toolbar override elsewhere in the app reorders bar-buttons slots. ──
+  ion-navbar {
+    ion-buttons[start] {
+      order: -1;
+      margin-right: auto;
+    }
+
+    .toolbar-content {
+      order: 0;
+    }
+  }
+
+  // ── Page background ──
+  .scroll-content {
+    background-color: #0f172a !important;
+    padding: 0 !important;
+  }
+
+  ion-content {
+    margin-bottom: 56px !important;
+  }
+
+  ion-list {
+    margin: 12px !important;
+    background: transparent !important;
+  }
+
+  .item,
+  .item-inner,
+  .item-block {
+    background-color: transparent !important;
+    border: none !important;
+  }
+
+  // ── Step progress (numbered stepper) ──
+  .stepper {
+    padding: 16px 16px 8px;
+  }
+
+  .stepper-track {
+    display: flex;
+    align-items: center;
+  }
+
+  .stepper-dot {
+    flex: 0 0 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #1e293b;
+    border: 2px solid #334155;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 700;
+    transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+
+    ion-icon {
+      font-size: 15px;
+      color: #ffffff;
+    }
+
+    &.active {
+      background: #2b92bb;
+      border-color: #2b92bb;
+      color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(43, 146, 187, 0.2);
+    }
+
+    &.done {
+      background: #2b92bb;
+      border-color: #2b92bb;
+    }
+  }
+
+  .stepper-line {
+    flex: 1;
+    height: 2px;
+    background: #334155;
+    margin: 0 4px;
+
+    &.done {
+      background: #2b92bb;
+    }
+  }
+
+  .stepper-label {
+    margin: 10px 0 0;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  ion-list > p,
+  section > p {
+    margin: 0 12px 8px;
+    color: #94a3b8;
+    font-size: 14px;
+    font-weight: 500;
+    text-align: center;
+  }
+
+  // ── Section headers ──
+  ion-list-header {
+    color: #64748b !important;
+    font-weight: 700 !important;
+    font-size: 12px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.6px !important;
+    padding: 8px 4px !important;
+    background: transparent !important;
+  }
+
+  // ── Card-style form rows (matches createleague) ──
+  ion-item {
+    background-color: #1e293b !important;
+    border-radius: 12px !important;
+    margin-bottom: 12px !important;
+    border: 1px solid #334155 !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3) !important;
+    padding-left: 16px;
+    align-items: center;
+
+    .item-inner {
+      border-bottom: none !important;
+      padding-right: 16px;
+      box-shadow: none !important;
+      padding-top: 6px;
+      padding-bottom: 6px;
+    }
+
+    ion-label {
+      color: #94a3b8 !important;
+      font-weight: 700 !important;
+      font-size: 11px !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.6px !important;
+      white-space: normal !important;
+      overflow: visible !important;
+      margin: 0 12px 0 0 !important;
+      line-height: 1 !important;
+      align-self: center;
+    }
+
+    ion-input,
+    ion-select,
+    ion-datetime {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      color: #ffffff !important;
+      text-align: right !important;
+    }
+
+    .text-input,
+    .select-text,
+    .datetime-text {
+      font-size: 16px !important;
+      font-weight: 600 !important;
+      color: #ffffff !important;
+      text-align: right !important;
+    }
+
+    .text-input::placeholder {
+      color: #64748b !important;
+      font-weight: 400 !important;
+      text-align: right !important;
+    }
+  }
+
+  // Error rows sit directly under the field they belong to — flatten their
+  // own card chrome so they read as inline feedback, not another field.
+  // Structure is always: <div class="field-error"><app-form-field>...
+  // </app-form-field><ion-item *ngIf="...">...</ion-item></div> — the
+  // error <ion-item> is therefore always the sibling immediately after
+  // the closing </app-form-field>, so target it structurally.
+  .field-error > app-form-field + ion-item {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: -6px 0 10px !important;
+    padding-left: 4px !important;
+    min-height: 0 !important;
+
+    .item-inner { padding: 0 !important; }
+  }
+
+  ion-label[color="danger"] {
+    color: #fca5a5 !important;
+    font-size: 11px !important;
+    font-weight: 500 !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    white-space: normal !important;
+  }
+
+  // ── Logo panel & review rows (info-only, not editable) ──
+  ion-thumbnail {
+    width: 48px;
+    height: 48px;
+    border-radius: 10px;
+  }
+
+  .logo-row ion-icon[name="image"] {
+    font-size: 30px;
+    color: #64748b;
+    margin-right: 4px;
+  }
+
+  .logo-row ion-label {
+    color: #f1f5f9 !important;
+    font-weight: 600 !important;
+    font-size: 14px !important;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+  }
+
+  .logo-actions button[ion-button][clear] {
+    font-weight: 700 !important;
+    color: #5ec8ee !important;
+    padding-left: 0;
+  }
+
+  .logo-actions button[ion-button][clear][color="danger"] {
+    color: #fca5a5 !important;
+  }
+
+  ion-note {
+    color: #f1f5f9 !important;
+    font-size: 14px !important;
+    font-weight: 500 !important;
+    max-width: 60%;
+    text-align: right;
+    white-space: normal !important;
+  }
+
+  // ── Review screen (step 4) — grouped card, not individually-boxed rows ──
+  .review-list {
+    background: #1e293b !important;
+    border: 1px solid #334155 !important;
+    border-radius: 12px !important;
+    margin: 0 12px 16px !important;
+    overflow: hidden;
+
+    ion-list-header {
+      padding: 10px 14px 6px !important;
+      margin: 0 !important;
+    }
+
+    ion-item {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0 !important;
+      box-shadow: none !important;
+      margin: 0 !important;
+      border-bottom: 1px solid #263242 !important;
+
+      &:last-child { border-bottom: none !important; }
+
+      ion-label {
+        text-transform: none !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        color: #94a3b8 !important;
+      }
+    }
+  }
+
+  .terms-row {
+    align-items: flex-start !important;
+    margin: 4px 12px 16px !important;
+
+    ion-label {
+      text-transform: none !important;
+      font-size: 13px !important;
+      font-weight: 500 !important;
+      color: #cbd5e1 !important;
+      white-space: normal !important;
+    }
+  }
+
+  // ── Terms checkbox row ──
+  app-checkbox {
+    margin-right: 10px;
+  }
+
+  // ── Footer (matches cancelmembership's proven glass-button + back-btn layout) ──
+  ion-footer.action-footer {
+    background: #0f172a !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-top: 1px solid #334155 !important;
+    padding: 8px;
+
+    &::before,
+    &::after {
+      display: none !important;
+    }
+
+    .toolbar,
+    .toolbar-background,
+    .toolbar-background-md,
+    .toolbar-background-ios {
+      background: #0f172a !important;
+      border: none !important;
+    }
+  }
+
+  .footer-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+
+    app-glass-button {
+      display: block;
+      flex: 1;
+      min-width: 0;
+
+      .glass-btn-wrap { padding: 12px 0; }
+    }
+
+    .back-btn-wrapper {
+      flex: 0 0 96px;
+      padding: 12px 0;
+    }
+
+    .back-btn {
+      height: 100%;
+      margin: 0;
+    }
+  }
+
+  .back-btn-wrapper {
+    padding: 4px 16px 8px;
+  }
+
+  .back-btn {
+    color: #94a3b8 !important;
+    background: rgba(148, 163, 184, 0.1) !important;
+    border: 1px solid #334155 !important;
+    border-radius: 8px;
+    font-weight: 600 !important;
+  }
+}

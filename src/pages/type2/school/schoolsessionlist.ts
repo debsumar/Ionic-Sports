@@ -366,6 +366,7 @@ export class Type2SchoolSessionList {
                   activity_subcategory_name
                   coach_names
                   enrolled_count
+                  group_status
                   ClubDetails{
                     Id
                     FirebaseId

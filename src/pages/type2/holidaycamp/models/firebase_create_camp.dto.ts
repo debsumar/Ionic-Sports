@@ -3,6 +3,7 @@ export interface IFirebaseCreateCamp{
       AgeGroup: string,
       CampName: string,
       CampType: number, //Single day || Half day || multiple day codes
+      camp_status?: number,
       ClubKey: string,
       ClubName: string,
       // CoachKey: string,

@@ -1,8 +1,6 @@
 import { FirebaseService } from '../../services/firebase.service';
 import { Component } from '@angular/core';
-
 import { NavController,IonicPage } from 'ionic-angular';
-
 import { SharedServices } from '../services/sharedservice';
 import { ToastController } from 'ionic-angular';
 import * as $ from 'jquery';

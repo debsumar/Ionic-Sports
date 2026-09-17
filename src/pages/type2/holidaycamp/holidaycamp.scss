@@ -766,6 +766,22 @@ holidaycamp-page {
     }
   }
 
+  .session-badge {
+    flex-shrink: 0;
+
+    .badge-text {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+
+      &.private {
+        background: #ef4444;
+        color: #ffffff;
+      }
+    }
+  }
+
   .session-details {
     .detail-row {
       display: flex;
