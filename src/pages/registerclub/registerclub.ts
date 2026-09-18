@@ -318,7 +318,15 @@ export class RegisterClub {
   captureLogo(sourceType: PictureSourceType) {
     const options: CameraOptions = {
       quality: 70,
-      allowEdit: true,
+      // Native crop (allowEdit: true) relies on Android's generic
+      // ACTION_CROP intent, which many gallery/photo-picker apps either
+      // don't support or return a content URI the crop activity can't
+      // read. That's why picking from "Gallery" shows a crop screen that
+      // then fails, while apps like Google Photos skip crop entirely (no
+      // matching activity) and the upload succeeds. Disabling allowEdit
+      // avoids the unreliable native crop step for both camera and
+      // gallery; targetWidth/targetHeight below still resize the image.
+      allowEdit: false,
       targetWidth: 512,
       targetHeight: 512,
       destinationType: this.camera.DestinationType.DATA_URL,

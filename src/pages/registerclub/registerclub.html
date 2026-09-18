@@ -116,7 +116,7 @@
         </ion-item>
       </div>
 
-      <div [class.field-error]="isInvalid('address')">
+      <div [class.field-error]="isInvalid('address')" class="stacked-field">
         <app-form-field>
           <ion-item>
             <ion-label>Address line 1</ion-label>
@@ -128,12 +128,14 @@
         </ion-item>
       </div>
 
-      <app-form-field>
-        <ion-item>
-          <ion-label>Address line 2 (optional)</ion-label>
-          <ion-input [(ngModel)]="accountInformation.clubInformation.clubAddress.address2"></ion-input>
-        </ion-item>
-      </app-form-field>
+      <div class="stacked-field">
+        <app-form-field>
+          <ion-item>
+            <ion-label>Address line 2 (optional)</ion-label>
+            <ion-input [(ngModel)]="accountInformation.clubInformation.clubAddress.address2"></ion-input>
+          </ion-item>
+        </app-form-field>
+      </div>
 
       <app-form-field>
         <ion-item>
@@ -166,7 +168,7 @@
         </ion-item>
       </div>
 
-      <div [class.field-error]="isInvalid('clubTnC')">
+      <div [class.field-error]="isInvalid('clubTnC')" class="stacked-field">
         <app-form-field>
           <ion-item>
             <ion-label>Terms &amp; Conditions URL</ion-label>

@@ -177,7 +177,92 @@ page-registerclub {
     }
   }
 
-  // Error rows sit directly under the field they belong to — flatten their
+  // ── Stacked fields — label above input, full-width value.
+  // Used for fields whose value is often too long for the default
+  // inline (label-left, value-right) row: Address line 1/2 and the
+  // Terms & Conditions URL. Only text inputs are stacked; every select
+  // (Primary activity, Country, Gender) uses the inline row.
+  //
+  // Ionic 3's ion-item is a flex row by default (.item-block { display:
+  // flex; flex-direction: row }), and .item-inner / .input-wrapper both
+  // use `flex-direction: inherit`. align-items only changes cross-axis
+  // (vertical) alignment — it does NOT stack label above input. The
+  // actual fix is flipping the item's flex-direction to column, which
+  // cascades down via `inherit` and puts ion-label (first child) above
+  // the input-wrapper (second child) in the DOM's natural order. ──
+  .stacked-field ion-item {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    padding-left: 16px;
+
+    .item-inner {
+      width: 100%;
+      padding-right: 16px !important;
+    }
+
+    ion-label {
+      width: 100% !important;
+      max-width: 100% !important;
+      flex: 0 0 auto !important;
+      margin: 0 0 6px !important;
+      white-space: normal !important;
+    }
+
+    .input-wrapper {
+      width: 100%;
+    }
+
+    ion-input {
+      text-align: left !important;
+      width: 100% !important;
+      max-width: 100% !important;
+    }
+
+    // Ionic's md theme insets the value away from the row's left edge:
+    // `.text-input-md` carries an 8px margin-start (with a matching
+    // width: calc(100% - 16px)). In a stacked row that pushes the value
+    // right of the label sitting directly above it — zero it and reclaim
+    // the width so value and label share the same left edge.
+    .text-input {
+      text-align: left !important;
+      white-space: normal !important;
+      padding-left: 0 !important;
+      margin-left: 0 !important;
+      margin-right: 0 !important;
+      width: 100% !important;
+    }
+
+    .text-input::placeholder {
+      text-align: left !important;
+    }
+  }
+
+  // ── Selects (inline rows: label left, value + caret right) ──
+  //
+  // Ionic gives `.select-icon` a fixed 19px height, so `align-items: stretch`
+  // (the flex default on ion-select) resolves to flex-start and parks the
+  // caret at the top of the select box instead of centring it on the row.
+  // Centre the select's own children, then centre the caret glyph inside its
+  // box: Ionic positions `.select-icon-inner` absolutely from top: 50% with a
+  // hard-coded `margin-top: -3px`, which only lines up at its default row
+  // height — a transform holds at any height.
+  ion-select {
+    align-items: center !important;
+  }
+
+  ion-select .select-icon {
+    align-self: center;
+  }
+
+  ion-select .select-icon .select-icon-inner {
+    top: 50% !important;
+    margin-top: 0 !important;
+    transform: translateY(-50%);
+  }
+
+  // ── Error rows sit directly under the field they belong to — flatten their
   // own card chrome so they read as inline feedback, not another field.
   // Structure is always: <div class="field-error"><app-form-field>...
   // </app-form-field><ion-item *ngIf="...">...</ion-item></div> — the
