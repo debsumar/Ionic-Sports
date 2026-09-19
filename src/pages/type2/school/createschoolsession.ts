@@ -14,7 +14,8 @@ import { GraphqlService } from '../../../services/graphql.service';
 import gql from 'graphql-tag';
 import { Activity, ActivityCategory, ActivityCoach, ActivityInfoInput, ActivitySubCategory, ClubActivityInput, IClubDetails } from '../../../shared/model/club.model';
 import { FinancialYearTerms } from '../../../shared/model/financial_terms.model';
-import { SchoolGroupStatus } from './constants/school_group_status.constants';
+import { Subscription } from 'rxjs';
+import { ThemeService } from '../../../services/theme.service';
 @IonicPage()
 @Component({
     selector: 'createschoolsession-page',
@@ -24,6 +25,8 @@ import { SchoolGroupStatus } from './constants/school_group_status.constants';
 
 export class Type2CreateSchoolSession {
     LangObj: any = {};//by vinod
+    isDarkTheme: boolean = true;
+    private themeSubscription: Subscription;
     isTermsEmpty: boolean = false;
     parentClubKey: any;
     themeType: number;
@@ -98,10 +101,10 @@ export class Type2CreateSchoolSession {
         Activity: {},
         CoachName: '',
         CoachKey: '',
+        group_status: SchoolGroupStatus.PUBLIC,
         Days: '',
         Duration: '60',
         GroupSize: '20',
-        group_status: SchoolGroupStatus.PUBLIC,
         Comments: '',
         SessionFee: '7.00',
         BookingButtonText: 'Book Now',
@@ -136,7 +139,8 @@ export class Type2CreateSchoolSession {
           private graphqlService: GraphqlService,
           public popoverCtrl: PopoverController, 
           private commonService: CommonService,
-          private langService: LanguageService) {
+          private langService: LanguageService,
+          private themeService: ThemeService) {
         let temp = "";
         for (let i = 1; i < 60; i++) {
             if (i % 5 == 0) {
@@ -167,6 +171,27 @@ export class Type2CreateSchoolSession {
         this.events.subscribe('language', (res) => {
             this.getLanguage();
         });
+    }
+
+    ionViewWillEnter() {
+        this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+            this.isDarkTheme = isDark;
+            this.applyTheme();
+        });
+    }
+
+    ionViewWillLeave() {
+        if (this.themeSubscription) {
+            this.themeSubscription.unsubscribe();
+        }
+    }
+
+    applyTheme() {
+        const el = document.querySelector('createschoolsession-page');
+        if (el) {
+            el.classList.remove('dark-theme', 'light-theme');
+            el.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+        }
     }
 
     getLanguage() {
@@ -1268,4 +1293,9 @@ export class Type2CreateSchoolSession {
 
 
 
+}
+
+export enum SchoolGroupStatus {
+  PRIVATE = 0,
+  PUBLIC = 1
 }

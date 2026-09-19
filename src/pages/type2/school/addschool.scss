@@ -2,57 +2,83 @@
 
 addschool-page {
     @include android-sdk35-fixes;
-.padding-left-item{
-        padding:0px;
-    }
-    .scroll-content{
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
         background-image: none !important;
-        background-color: #f4efef !important;
-        padding: 6px !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+        padding: 8px 8px 16px !important;
     }
-    .schoolcard{
-        box-shadow: 1px 1px 9px #ada8a1;
+
+    ion-list { background: transparent !important; }
+
+    .padding-left-item { padding: 0px; }
+
+    .schoolcard {
+        background: #1e293b;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
         border-bottom: 1px solid orange;
+
+        ion-item { background: #1e293b; color: rgba(255, 255, 255, 0.85); }
+        ion-label { color: rgba(255, 255, 255, 0.85); }
+        p { color: rgba(255, 255, 255, 0.65); }
     }
-    .sub-container {
-        button {
-            width: 90%;
-            height: 86%;
-            margin-top: 4px;
-            background: linear-gradient(to right, #f3c686, rgba(250, 169, 40, 0.8274509803921568));
-            border-radius: 5px;
-            color: white;
-            box-shadow: 2px 3px 5px -1px rgb(156, 156, 155)
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+
+        .cancel-btn {
+            display: block;
+            width: calc(100% - 24px);
+            margin: 12px 12px 0;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
         }
-    
-        .searchbar {
-            border: none !important;
-            background: #ffffff !important;
-            border-radius: 5px !important;
-            height: 86% !important;
-            margin-top: 4px !important;
-            padding: 2px 0px
-        }
-    
-        .searchbar-input {
-            padding-left: 15px !important;
-            box-shadow: 2px 3px 5px -1px rgb(156, 156, 155)
-    
-        }
-    
-        .searchbar-search-icon {
-            display: none !important;
-        }
-    
-        ion-icon {
-            font-size: 20px;
-        }
-    
-        .searchbar-clear-icon {
-            margin: 0;
-            box-shadow:none
+
+        &.light-theme {
+            background: #f8fafc;
+            .cancel-btn { border-color: #e2e8f0; color: #64748b; }
         }
     }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .schoolcard {
+            background: white;
+            box-shadow: 1px 1px 9px #ada8a1;
+
+            ion-item { background: white; color: #222; }
+            ion-label { color: #222; }
+            p { color: #666; }
+        }
+
+        ion-footer { background: #f8fafc; }
+        ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+    }
+
+    // ===== Page-specific custom styles =====
     .select-icon {
         position: relative !important;
         width: 25px !important;
@@ -60,22 +86,20 @@ addschool-page {
         background: #faae4e !important;
         border-radius: 50% !important;
         color: white !important;
-       // left: 3px !important;
     }
-    
+
     .select-text {
         padding-top: 2px !important;
         color: #faae4e !important;
-       // text-align: right;
         padding-right: 5px;
     }
-    
+
     .select-icon .select-icon-inner {
         left: 7px !important;
         top: 49%;
         color: white !important;
     }
-    
+
     .search_add {
         background-color: transparent;
         padding-left: 6px;

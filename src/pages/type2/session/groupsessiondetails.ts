@@ -572,7 +572,7 @@ presentActionSheet(session_member:TermSessionMembers,ev:any) {
                 handler: () => {
                     this.unEnrolAlertConfirmation(session_member);
                 }
-            },
+            }
             // {
             //     text: 'Close',
             //     icon: this.platform.is('ios') ? "" : 'close',

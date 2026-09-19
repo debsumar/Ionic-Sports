@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import * as moment from 'moment'
 import * as $ from "jquery";
@@ -11,6 +11,7 @@ import { HttpService } from '../../../../../../services/http.service';
 import { API } from '../../../../../../shared/constants/api_constants';
 import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../../../shared/dtos/club.dto';
 import { AppType } from '../../../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../../../services/theme.service';
 
 
 
@@ -56,18 +57,56 @@ export class BulkSlotCancellation {
   userkey: any;
   cancelReason = "";
   type: any;
+  isDarkTheme: boolean = true;
   
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController, public storage: Storage,
     public fb: FirebaseService, public commonService: CommonService,
-    public alertCtrl: AlertController, public loadingCtrl: LoadingController, public sharedService: SharedServices, public http: HttpClient, private httpService: HttpService) {
+    public alertCtrl: AlertController, public loadingCtrl: LoadingController, public sharedService: SharedServices, public http: HttpClient, private httpService: HttpService,
+    public events: Events, private themeService: ThemeService) {
     //this.sharedService.get
   
 
   }
 
 
+  ngOnInit() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme(true);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const el = document.querySelector("page-bulkslotcancellation");
+    if (el) {
+      isDark ? el.classList.remove("light-theme") : el.classList.add("light-theme");
+    }
+  }
+
+
   ionViewWillEnter() {
+    this.loadTheme();
     this.storage.get('userObj').then((val) => {
       val = JSON.parse(val);
       this.userkey = val.$key

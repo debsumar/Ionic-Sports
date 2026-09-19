@@ -50,7 +50,6 @@
                 <ion-option *ngFor="let camp of campList" value={{camp.Key}}>{{camp.Value}}</ion-option>
             </ion-select>
         </ion-item>
-
         <ion-item>
             <ion-label>{{LangObj.createhldycamp_camp_venue}}</ion-label>
             <ion-select [(ngModel)]="selectedSchoolVenue" (ionChange)="onChangeOfSchoolVenue()">

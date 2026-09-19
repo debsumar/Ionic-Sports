@@ -10,6 +10,8 @@ import gql from 'graphql-tag';
 import * as moment from 'moment';
 import { AttendanceDatesInfo, SessionAttendanceDates } from '../../../../shared/model/attendance.model';
 import { first } from "rxjs/operators";
+import { ThemeService } from '../../../../services/theme.service';
+import { Subscription } from 'rxjs';
 /**
  * Generated class for the SchoolesessiondetailsforattendancePage page.
  *
@@ -27,6 +29,8 @@ import { first } from "rxjs/operators";
 })
 export class SchooSesAttendanceDaysPage {
   sessionInfo:SchoolDetails;
+  isDarkTheme: boolean = true;
+  private themeSubscription: Subscription;
   //days:Array<Day> = [];
   LangObj: any = {};//by vinod
   attendance_info:SessionAttendanceDates = {
@@ -43,7 +47,8 @@ export class SchooSesAttendanceDaysPage {
      public storage: Storage,
      public commonService:CommonService,
      private sharedservice: SharedServices, 
-     private graphqlService: GraphqlService
+     private graphqlService: GraphqlService,
+     private themeService: ThemeService
     ) {
 
     // console.log('ionViewDidLoad SchoolesessiondetailsforattendancePage');
@@ -58,10 +63,28 @@ export class SchooSesAttendanceDaysPage {
   }
 
   ionViewWillEnter(){
+    this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
     this.action_type = 1;
     this.getLanguage();
     this.sessionInfo = <SchoolDetails>this.navParams.get('session_info');
     this.getAttendanceDates();
+  }
+
+  ionViewWillLeave() {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+  }
+
+  applyTheme() {
+    const pageElement = document.querySelector('page-school_ses_attendance_days');
+    if (pageElement) {
+      pageElement.classList.remove('dark-theme', 'light-theme');
+      pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
   }
 
   ionViewDidLoad() {

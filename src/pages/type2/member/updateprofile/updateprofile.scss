@@ -8,19 +8,19 @@ page-updateprofile {
     padding: 0 !important;
     background-color: #0f172a !important;
     background-image: none !important;
-    padding-bottom: 80px !important;
+    padding-bottom: 120px !important;
   }
 
   // Extra specificity to beat android-sdk35-fixes mixin override
   ion-content .scroll-content {
-    padding-bottom: 80px !important;
+    padding-bottom: 120px !important;
   }
 
   // On SDK35 devices the mixin sets padding-bottom via env() — override it here
   .android-sdk35 &,
   &.android-sdk35 {
     ion-content .scroll-content {
-      padding-bottom: calc(80px + env(safe-area-inset-bottom, 32px)) !important;
+      padding-bottom: calc(120px + env(safe-area-inset-bottom, 32px)) !important;
     }
   }
 

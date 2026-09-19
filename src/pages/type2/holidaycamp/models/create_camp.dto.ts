@@ -1,5 +1,4 @@
 import { convertToMinutes } from "../functions/holidaycamp_utility";
-import { CampStatus } from "../constants/camp_status.constants";
 import { IFirebaseCreateCamp, ICampSessionConfig } from "./firebase_create_camp.dto";
 
 export class camp_id_fields {
@@ -16,7 +15,6 @@ export class HolidayCampDTO {
     camp_firebase_fields: camp_id_fields;
     holidaycamp_name: string;
     camp_type: string;
-    camp_status: number;
     venue_address: string;
     venue_name: string;
     venue_post_code: string;
@@ -117,7 +115,6 @@ export class CreateHolidayCampDTO {
         this.holidaycamp_details.camp_postgre_fields.club_id = "";
         this.holidaycamp_details.holidaycamp_name = holidaycamp.CampName;
         this.holidaycamp_details.camp_type = holidaycamp.CampType.toString();
-        this.holidaycamp_details.camp_status = typeof holidaycamp.camp_status === "number" ? holidaycamp.camp_status : CampStatus.PUBLIC;
         this.holidaycamp_details.venue_address = holidaycamp.VenueAddress;
         this.holidaycamp_details.venue_name = holidaycamp.VenueName;
         this.holidaycamp_details.venue_post_code = holidaycamp.VenuePostCode;

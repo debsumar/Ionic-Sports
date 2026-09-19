@@ -12,7 +12,8 @@ import { GraphqlService } from '../../../services/graphql.service';
 import gql from 'graphql-tag';
 import { Activity, ActivityCategory, ActivityCoach, ActivityInfoInput, ActivitySubCategory, ClubActivityInput, IClubDetails } from '../../../shared/model/club.model';
 import { FinancialYearTerms } from '../../../shared/model/financial_terms.model';
-import { SchoolGroupStatus } from './constants/school_group_status.constants';
+import { ThemeService } from '../../../services/theme.service';
+import { Subscription } from 'rxjs';
 
 @IonicPage()
 @Component({
@@ -28,6 +29,8 @@ export class Type2EditSchoolSessionDetails {
         { StatusCode: SchoolGroupStatus.PUBLIC, StatusText: "Public" },
         { StatusCode: SchoolGroupStatus.PRIVATE, StatusText: "Hide" }
     ];
+    isDarkTheme: boolean = true;
+    private themeSubscription: Subscription;
     selectedSchool: string = "";
     school_session:SchoolDetails;
     clubs:IClubDetails[] = [];
@@ -150,6 +153,7 @@ export class Type2EditSchoolSessionDetails {
          private storage: Storage,
          private sharedservice: SharedServices, 
          private graphqlService: GraphqlService,
+         private themeService: ThemeService,
         ) {
         this.edit_school_session = EditSchoolSession.getSchoolSessionForEdit(<SchoolDetails>this.navParams.get("SchoolSession"));
         this.school_session = <SchoolDetails>this.navParams.get("SchoolSession");
@@ -231,6 +235,27 @@ export class Type2EditSchoolSessionDetails {
         popover.present({
             ev: myEvent
         });
+    }
+
+    ionViewWillEnter() {
+        this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+            this.isDarkTheme = isDark;
+            this.applyTheme();
+        });
+    }
+
+    ionViewWillLeave() {
+        if (this.themeSubscription) {
+            this.themeSubscription.unsubscribe();
+        }
+    }
+
+    applyTheme() {
+        const el = document.querySelector('editschoolsessiondetials-page');
+        if (el) {
+            el.classList.remove('dark-theme', 'light-theme');
+            el.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+        }
     }
 
     goToDashboardMenuPage() {
@@ -758,4 +783,10 @@ export class Type2EditSchoolSessionDetails {
 
 
 
+}
+
+
+export enum SchoolGroupStatus {
+  PRIVATE = 0,
+  PUBLIC = 1
 }

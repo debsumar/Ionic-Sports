@@ -19,7 +19,7 @@
                 </ion-select>
             </ion-item>
             <ion-item class="filter-item">
-                <ion-select [selectOptions]="{title:'Select Activity',mode:'ios'}" [(ngModel)]="selectedActivity" interface="action-sheet">
+                <ion-select [selectOptions]="{title:'Select Activity',mode:'ios'}" [(ngModel)]="selectedActivity" >
                     <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}} (ionSelect)="onActivityChange($event)">{{Activity.ActivityName}}</ion-option>
                 </ion-select>
             </ion-item>
@@ -27,7 +27,7 @@
         <div class="filter-row">
             <ion-item class="filter-item full">
                 <ion-label>Select Courts</ion-label>
-                <ion-select [selectOptions]="{title:'Select Court',mode:'ios'}" [(ngModel)]="selectedCourt" interface="action-sheet">
+                <ion-select [selectOptions]="{title:'Select Court',mode:'ios'}" [(ngModel)]="selectedCourt" >
                     <ion-option *ngFor="let court of courts" value={{court.$key}} (ionSelect)="onCourtChange($event)">{{court.CourtName}}</ion-option>
                 </ion-select>
             </ion-item>

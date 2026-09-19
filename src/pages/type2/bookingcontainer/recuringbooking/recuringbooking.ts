@@ -259,14 +259,14 @@ export class RecuringbookingPage {
             console.log(info);
             this.showConfirm(info);
           }
-        },
-        {
-          text: 'Close',
-          role: 'cancel',
-          handler: () => {
-            console.log('Close clicked');
-          }
         }
+        // {
+        //   text: 'Close',
+        //   role: 'cancel',
+        //   handler: () => {
+        //     console.log('Close clicked');
+        //   }
+        // }
       ]
     });
  

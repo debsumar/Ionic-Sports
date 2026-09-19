@@ -3,70 +3,91 @@
 page-schoolmembersheet {
     @include android-sdk35-fixes;
 
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
 
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
 
     .scroll-content {
         background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
     }
-    .btn_container {
-        text-align: center;
-    }
-    .footer {
-        border-top: 1px solid rgb(245, 238, 238);
-    }
-    .lab {
-        font-size: 16px;
-    }
-    .col {
-        margin-top: -10px;
-        background-image: none !important;
-    }
+
+    .btn_container { text-align: center; }
+    .lab { font-size: 16px; color: #f1f5f9; }
     .lab2 {
         margin-top: -2px !important;
         transform: translate(0%, 25%) !important;
     }
-    .btn {
-        width: 140px;
-        margin-left: 18px;
-        margin-top: 15px;
-    }
-    .chk2 {
-        margin-top: 28px !important;
-    }
-    .items2 {
-        margin-left: -18px !important;
-    }
+
+    // ---- Top header block ----
     .topblock {
-        background: #1b2c3b;
+        background: #1e293b;
         padding: 10px 10px 10px 12px;
     }
     .paragraph_color {
-        color: white;
+        color: #f1f5f9;
         font-size: 17px;
-        //line-height: 8px;
     }
-    .venuename {
-        font-size: 23px;
-    }
+    .venuename { font-size: 23px; }
     .custom_icon {
-        color: white;
+        color: #f1f5f9;
         float: RIGHT;
         margin-top: -57px;
         font-size: 30px;
-    
     }
-    .textbox_item {
-        background-color: #1b2d3b;
-        padding-left: 0px;
-        div {
-            border-bottom: 1px solid #ffffff;
+
+    // ---- Filter checkbox rows ----
+    .rows { align-items: center; }
+    .items {
+        background: transparent !important;
+        --background: transparent !important;
+    }
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+
+        .cancel-btn {
+            display: block;
+            width: calc(100% - 24px);
+            margin: 12px 12px 0;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        &.light-theme {
+            background: #f8fafc;
+            .cancel-btn { border-color: #e2e8f0; color: #64748b; }
         }
     }
-    .inputtext {
-        color: #fff !important;
-    }
-    .customlabel {
-        color: #87f4ef !important;
-        margin-top: 0px;
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .lab { color: #1e293b; }
+
+        .topblock { background: #114a70; }
+        .paragraph_color { color: #ffffff; }
+        .custom_icon { color: #ffffff; }
+
+        ion-footer { background: #f8fafc; }
+        ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }
     }
 }

@@ -3,6 +3,37 @@
 weeklypaymentreport-page {
   @include android-sdk35-fixes;
 
+  ion-segment {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    margin: 8px auto;
+    padding: 4px;
+    display: flex;
+    width: calc(100% - 16px);
+
+    &.segment-md .segment-button,
+    &.segment-ios .segment-button {
+      color: rgba(255, 255, 255, 0.8) !important;
+      background: transparent !important;
+      border: 0 !important;
+      border-radius: 6px !important;
+      font-size: 14px;
+      font-weight: 600;
+      min-height: 32px;
+      line-height: 32px;
+      text-transform: capitalize;
+      margin: 0 2px;
+      flex: 1 1 50%;
+      max-width: 50%;
+    }
+
+    &.segment-md .segment-button.segment-activated,
+    &.segment-ios .segment-button.segment-activated {
+      color: white !important;
+      background: #ffa500 !important;
+    }
+  }
+
   ion-toolbar {
     --background: #2b92bb;
   }
@@ -263,6 +294,7 @@ weeklypaymentreport-page {
       }
 
       .pay-amount--paid { color: #38bdf8 !important; }
+      .pay-amount--due { color: #f87171 !important; }
 
       .pay-mode {
         font-size: 10px !important;
@@ -326,6 +358,7 @@ weeklypaymentreport-page {
       .pay-time, .pay-venue { color: #94a3b8 !important; }
       .pay-date { color: #64748b !important; }
       .pay-amount--paid { color: #2b92bb !important; }
+      .pay-amount--due { color: #dc2626 !important; }
       .pay-mode {
         color: #2b92bb !important;
         background: rgba(43, 146, 187, 0.1) !important;

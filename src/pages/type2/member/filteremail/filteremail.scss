@@ -50,6 +50,13 @@ page-filteremail {
       padding: 10px 0 !important;
     }
 
+    .select-field {
+      .item-ios ion-select,
+      .item-md ion-select { margin-left: 0 !important; text-align: left !important; }
+      .select-text,
+      .select-placeholder { text-align: left !important; }
+    }
+
     .select-icon {
       min-width: 20px !important;
       min-height: 20px !important;

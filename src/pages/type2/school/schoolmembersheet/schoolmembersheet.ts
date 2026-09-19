@@ -6,6 +6,10 @@ import * as $ from 'jquery';
 import { SharedServices } from '../../../services/sharedservice';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
+import { HttpService } from '../../../../services/http.service';
+import { API } from '../../../../shared/constants/api_constants';
+import { ThemeService } from '../../../../services/theme.service';
+import { Subscription } from 'rxjs';
 /**
  * Generated class for the SchoolmembersheetPage page.
  *
@@ -17,9 +21,12 @@ import { Storage } from '@ionic/storage';
 @Component({
   selector: 'page-schoolmembersheet',
   templateUrl: 'schoolmembersheet.html',
+  providers: [HttpService]
 })
 export class SchoolmembersheetPage {
   nestUrl = "";
+  isDarkTheme: boolean = true;
+  private themeSubscription: Subscription;
   selectOBj: SelectedItems;
   sessionInfo: any = "";
   actionSheet: any = {
@@ -53,7 +60,7 @@ export class SchoolmembersheetPage {
   memberDetailsArr: Array<any> = new Array();
   clubInfo: any = "";
   userObj:any = "";
-  constructor(public altctrl: AlertController, public toastCtrl: ToastController, public sharedservice: SharedServices, public fb: FirebaseService, public navCtrl: NavController, public navParams: NavParams, public storage:Storage, public commonService: CommonService) {
+  constructor(public altctrl: AlertController, public toastCtrl: ToastController, public sharedservice: SharedServices, public fb: FirebaseService, public navCtrl: NavController, public navParams: NavParams, public storage:Storage, public commonService: CommonService, private httpService: HttpService, private themeService: ThemeService) {
     this.nestUrl = this.sharedservice.getnestURL();
     this.checkedFilterBoxes.add('FirstName');
     this.checkedFilterBoxes.add('LastName');
@@ -116,6 +123,27 @@ export class SchoolmembersheetPage {
 
   ionViewDidLoad() {
     
+  }
+
+  ionViewWillEnter() {
+    this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
+  }
+
+  ionViewWillLeave() {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+  }
+
+  applyTheme() {
+    const pageElement = document.querySelector('page-schoolmembersheet');
+    if (pageElement) {
+      pageElement.classList.remove('dark-theme', 'light-theme');
+      pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
   }
   showHide() {
     this.blockShowToggle = !this.blockShowToggle;
@@ -256,20 +284,10 @@ export class SchoolmembersheetPage {
       this.selectOBj.msgBody = `<p> Hello ${this.selectOBj.parentClubName},</p><p style="margin:1px">Please find below the link for the report.</p><p>Note: The link will be disabled after 3 days. </p>`;
       this.selectOBj.attachmentName = `School Session@${this.selectOBj.parentClubName + new Date().getTime()}`;
       //console.log(holidayCampReportObject);
-      let url = this.sharedservice.getEmailUrl();
-      //let http://localhost:32683/
-      // url = "http://localhost:32683/";
-      //https://activitypro-nest-261607.appspot.com/session/printreport
-      $.ajax({
-        url: `${this.nestUrl}/session/printreport`,
-        data: this.selectOBj,
-        type: "POST",
-        success: function (response) {
-          res(response);
-        }, error: function (error, xhr) {
-          rej(error);
-        }
-      });
+      this.httpService.post(API.SESSION_PRINT_REPORT, this.selectOBj, null, 2).subscribe(
+        (response) => res(response),
+        (error) => rej(error)
+      );
     })
 
   }

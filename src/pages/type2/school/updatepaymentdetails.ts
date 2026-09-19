@@ -12,6 +12,8 @@ import { SessionPaymentUpdateInput } from './dto/school_ses_payment.dto';
 import { GraphqlService } from '../../../services/graphql.service';
 import gql from 'graphql-tag';
 import * as moment from 'moment';
+import { ThemeService } from '../../../services/theme.service';
+import { Subscription } from 'rxjs';
 @IonicPage()
 @Component({
   selector: 'updatepaymentdetails-page',
@@ -22,6 +24,8 @@ import * as moment from 'moment';
 export class UpdatePaymentDetails {
   parentClubKey: any;
   themeType: number;
+  isDarkTheme: boolean = true;
+  private themeSubscription: Subscription;
   selectedMemberDetails: ISession_MemberEnrols;
   selectedSessionDetails: SchoolDetails;
 
@@ -73,7 +77,8 @@ export class UpdatePaymentDetails {
      public sharedservice: SharedServices, 
      public popoverCtrl: PopoverController,
      private commonService:CommonService,
-     private graphqlService: GraphqlService) {
+     private graphqlService: GraphqlService,
+     private themeService: ThemeService) {
     this.themeType = sharedservice.getThemeType();
     this.selectedMemberDetails = <ISession_MemberEnrols>navParams.get('SelectedMember');
     this.selectedSessionDetails = <SchoolDetails>navParams.get('SessionDetails');
@@ -246,8 +251,26 @@ export class UpdatePaymentDetails {
     });
   }
 
+  ionViewWillEnter() {
+    this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
+  }
 
-  
+  ionViewWillLeave() {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+  }
+
+  applyTheme() {
+    const el = document.querySelector('updatepaymentdetails-page');
+    if (el) {
+      el.classList.remove('dark-theme', 'light-theme');
+      el.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
+  }
 
   goToDashboardMenuPage() {
     this.navCtrl.setRoot("Dashboard");

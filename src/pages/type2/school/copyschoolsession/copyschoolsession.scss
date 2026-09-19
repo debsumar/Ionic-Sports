@@ -3,50 +3,65 @@
 page-copyschoolsession {
     @include android-sdk35-fixes;
 
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
 
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
 
     .scroll-content {
-        margin-top: 56px;
-        padding: 6px !important;
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+        padding: 8px 8px 16px !important;
     }
+
+    ion-list {
+        background: transparent !important;
+        margin: 0;
+    }
+
+    // ===== Page-specific custom widgets =====
     .margin_top {
         margin-top: 10px;
     }
     .padding_class {
         padding-top: 20px;
-        //font-size: 15px;
     }
+
+    .card {
+        margin: 6px 0px 6px 0px;
+        width: 100%;
+        background: #1e293b;
+        color: #f1f5f9;
+    }
+    .card_header {
+        padding: 3px 0px 5px 5px;
+        color: #f1f5f9;
+    }
+    ion-card-content {
+        padding: 0px !important;
+    }
+
     .days {
         ion-col {
             text-align: center;
             p {
-                border: 1px solid #76747d;
+                border: 1px solid #334155;
+                color: #94a3b8;
             }
         }
     }
     .text_white {
         color: white;
     }
-    .card_header {
-        padding: 3px 0px 5px 5px;
-    }
     .rounded {
-        // width: 35px;
-        // height: 38px;
-        // border-radius: 19px;
-        // padding-top: 8px;
         width: 33px;
         height: 33px;
         border-radius: 19px;
         padding-top: 6px;
     }
-    .card {
-        margin: 6px 0px 6px 0px;
-        width: 100%
-    }
-    ion-card-content {
-        padding: 0px !important;
-    }
+
     .left_margin {
         padding-left: 5px;
         ion-checkbox {
@@ -55,5 +70,55 @@ page-copyschoolsession {
         ion-label {
             white-space: pre-wrap !important;
         }
+    }
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+
+        .cancel-btn {
+            display: block;
+            width: calc(100% - 24px);
+            margin: 12px 12px 0;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        &.light-theme {
+            background: #f8fafc;
+            .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+        }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .card {
+            background: #ffffff;
+            color: #1e293b;
+        }
+        .card_header { color: #1e293b; }
+
+        .days ion-col p {
+            border-color: #e2e8f0;
+            color: #64748b;
+        }
+
+        ion-footer { background: #f8fafc; }
+        ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }
     }
 }

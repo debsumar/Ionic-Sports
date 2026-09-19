@@ -43,7 +43,7 @@ export class MyApp {
     private oneSignal: OneSignal,
     private device: Device, // public cache: CacheService
   ) {
-    let isProduction = true;
+    let isProduction = false;
     let emailUrl = "";
     let nodeURL = "";
     let SuperAdminKey = "";

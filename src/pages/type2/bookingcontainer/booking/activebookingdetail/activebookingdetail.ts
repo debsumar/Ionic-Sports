@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController } from 'ionic-angular';
+import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import * as moment from 'moment'
 import { HttpClient } from '@angular/common/http';
@@ -9,6 +9,7 @@ import { CommonService, ToastPlacement, ToastMessageType } from '../../../../../
 import { CallNumber } from '@ionic-native/call-number';
 import { HttpService } from '../../../../../services/http.service';
 import { API } from '../../../../../shared/constants/api_constants';
+import { ThemeService } from '../../../../../services/theme.service';
 
 
 /**
@@ -25,7 +26,6 @@ import { API } from '../../../../../shared/constants/api_constants';
 })
 export class ActiveBookingDetail {
   ParentClubKey: any;
- 
   ClubKey: any;
   courtInfoObj: any;
   selectedCourt: any;
@@ -40,12 +40,14 @@ export class ActiveBookingDetail {
   userkey: any;
   
   cancelby: any;
+  isDarkTheme: boolean = true;
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController, public storage: Storage,
     public fb: FirebaseService, public commonService: CommonService,
     public alertCtrl: AlertController, public loadingCtrl: LoadingController,
     public callNumber: CallNumber, public sharedService: SharedServices, 
-    public http: HttpClient, private httpService: HttpService) {
+    public http: HttpClient, private httpService: HttpService,
+    public events: Events, private themeService: ThemeService) {
     //this.sharedService.get
     
     this.ParentClubKey  = this.navParams.get('ParentClubKey'),
@@ -79,6 +81,44 @@ export class ActiveBookingDetail {
 
   cancelBooking(){
 
+  }
+
+  ngOnInit() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe(isDark => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+    this.events.subscribe('theme:changed', (isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    });
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
+  }
+
+  private loadTheme(): void {
+    this.storage.get('dashboardTheme').then((isDarkTheme) => {
+      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      this.isDarkTheme = isDark;
+      this.applyTheme(isDark);
+    }).catch(() => {
+      this.isDarkTheme = true;
+      this.applyTheme(true);
+    });
+  }
+
+  private applyTheme(isDark: boolean): void {
+    const el = document.querySelector("page-activebookingdetail");
+    if (el) {
+      isDark ? el.classList.remove("light-theme") : el.classList.add("light-theme");
+    }
   }
 
   calculateDuration(){

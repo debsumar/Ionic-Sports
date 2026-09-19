@@ -17,11 +17,9 @@ import { Activity, ActivityCoach, ActivityInfoInput, ClubActivityInput, IClubDet
 import { EditHolidayCampDetails, UpadteHolidayCampDTO, UpdateHolidayCampDTO } from "./models/update_camp_dto";
 import moment from "moment";
 import { HolidayCamp } from "./models/holiday_camp.model";
-import { CampStatus } from "./constants/camp_status.constants";
 import { HttpService } from "../../../services/http.service";
 import { API } from "../../../shared/constants/api_constants";
 import { AppType, DeviceType } from "../../../shared/constants/module.constants";
-
 
 @IonicPage()
 @Component({
@@ -195,15 +193,19 @@ export class Type2EditHolidayCamp {
   coachs = [];
   selectedCoach: any;
   types = [];
-  constructor(public graphqlService: GraphqlService, private navParams: NavParams, private selector: WheelSelector, public events: Events, public comonService: CommonService, public loadingCtrl: LoadingController, public alertCtrl: AlertController, private toastCtrl: ToastController, public navCtrl: NavController, private storage: Storage, public fb: FirebaseService, public sharedservice: SharedServices, public popoverCtrl: PopoverController, private httpService: HttpService) {
+  constructor(public graphqlService: GraphqlService, private navParams: NavParams, private selector: WheelSelector, 
+    public events: Events, public comonService: CommonService, public loadingCtrl: LoadingController, 
+    public alertCtrl: AlertController, private toastCtrl: ToastController, public navCtrl: NavController, 
+    private storage: Storage, public fb: FirebaseService, public sharedservice: SharedServices,
+     public popoverCtrl: PopoverController,private httpService: HttpService) {
     this.themeType = sharedservice.getThemeType();
     this.userData = sharedservice.getUserData();
     this.selectedCampDetails = navParams.get('holidayCampDetails');
-    const campStatus = Number(this.selectedCampDetails.camp_status);
-    if (campStatus === CampStatus.PUBLIC || campStatus === CampStatus.PRIVATE) {
-        this.selectedCampDetails.camp_status = campStatus;
-        return;
-    }
+    // const campStatus = Number(this.selectedCampDetails.camp_status);
+    // if (campStatus === CampStatus.PUBLIC || campStatus === CampStatus.PRIVATE) {
+    //     this.selectedCampDetails.camp_status = campStatus;
+    //     return;
+    // }
     this.selectedCampDetails.start_date = moment(this.selectedCampDetails.start_date, 'DD-MMM-YYYY').format('YYYY-MM-DD');
     this.selectedCampDetails.end_date = moment(this.selectedCampDetails.end_date, 'DD-MMM-YYYY').format('YYYY-MM-DD');
     this.selectedCampDetails.pay_by_date = moment(this.selectedCampDetails.pay_by_date, 'YYYY-MM-DD').format('YYYY-MM-DD');
@@ -235,7 +237,7 @@ export class Type2EditHolidayCamp {
 
   ionViewDidLoad() {
     this.getLanguage();
-    //this.loadCampStatus();
+    this.loadCampStatus();
     this.events.subscribe('language', (res) => {
       this.getLanguage();
     });
@@ -807,4 +809,9 @@ export class Type2EditHolidayCamp {
   }
 
 
+}
+
+export enum CampStatus {
+  PRIVATE = 0,
+  PUBLIC = 1
 }

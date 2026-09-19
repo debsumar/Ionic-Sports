@@ -26,13 +26,16 @@
   </div>
 
   <div class="page-list-area">
-    <app-list-card *ngFor="let member of members; let i = index">
+    <app-list-card *ngFor="let member of members"
+      [showCheckbox]="true"
+      [checked]="member.isSelected"
+      (checkedChange)="toggleMember(member, $event)"
+      (cardClick)="toggleMember(member)">
       <div class="member-row">
         <div class="member-avatar">{{member.FirstName?.charAt(0)}}</div>
         <div class="member-info">
           <p class="member-name">{{member.FirstName}} {{member.LastName}} ({{(this.commonService.getAge(member.DOB))}})</p>
         </div>
-        <ion-checkbox (ionChange)="selecteMembers(i,$event)"></ion-checkbox>
       </div>
     </app-list-card>
 

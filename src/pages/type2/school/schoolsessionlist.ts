@@ -16,6 +16,7 @@ import gql from 'graphql-tag';
 import { GraphqlService } from '../../../services/graphql.service';
 import { setDay } from '../../../shared/utility/utility';
 import { ThemeService } from '../../../services/theme.service';
+import { Subscription } from 'rxjs';
 @IonicPage()
 @Component({
     selector: 'schoolsessionlist-page',
@@ -61,6 +62,7 @@ export class Type2SchoolSessionList {
     loggedin_type:number = 2;
     can_coach_see_revenue:boolean = true;
     isDarkTheme: boolean = true;
+    private themeSubscription: Subscription;
     constructor(public events: Events,
         public toastCtrl:ToastController,
         private graphqlService: GraphqlService,
@@ -80,6 +82,10 @@ export class Type2SchoolSessionList {
 
     
     ionViewWillEnter(){
+        this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+            this.isDarkTheme = isDark;
+            this.applyTheme();
+        });
         this.commonService.category.pipe(first()).subscribe((data) => {
             this.loggedin_type = this.sharedservice.getLoggedInType();
             if (data == "update_scl_session_list") {
@@ -105,6 +111,7 @@ export class Type2SchoolSessionList {
         this.myIndex = -1;
         //this.getSchoolSessionlist();
     }
+
     ionViewDidLoad() {
         this.getLanguage();
         this.events.subscribe('language', (res) => {
@@ -878,6 +885,9 @@ export class Type2SchoolSessionList {
     ionViewWillLeave(){
         this.events.unsubscribe("theme:changed");
         this.commonService.updateCategory("");
+        if (this.themeSubscription) {
+            this.themeSubscription.unsubscribe();
+        }
     }
 
      

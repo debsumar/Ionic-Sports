@@ -13,7 +13,7 @@
 </ion-header>
 
 
-<ion-content>
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
   <div class="container">
 
 
@@ -24,10 +24,12 @@
               <span>- Member Sheet </span>
           </p>
           <ion-icon class="custom_icon" name="ios-create-outline" (click)="showHide()"></ion-icon>
-          <ion-item class="textbox_item" *ngIf="blockShowToggle">
-              <ion-label floating class="customlabel">Subject</ion-label>
-              <ion-input type="text" class="inputtext" [(ngModel)]="membersheetSubject"></ion-input>
-          </ion-item>
+          <app-form-field [isDark]="isDarkTheme" *ngIf="blockShowToggle">
+              <ion-item>
+                  <ion-label stacked>Subject</ion-label>
+                  <ion-input type="text" [(ngModel)]="membersheetSubject"></ion-input>
+              </ion-item>
+          </app-form-field>
 
       </div>
 
@@ -117,23 +119,11 @@
           </ion-row>
 
 
-         
-
-          <ion-grid>
-              <ion-row>
-                  <ion-col col-6>
-                      <button ion-button block style="background-color:#2b92bb !important; color: white !important" (click)="cancel()">Cancel</button>
-                  </ion-col>
-                  <ion-col col-6>
-                      <button ion-button block class="timekare-primary-btn" (click)="proceed()">Print</button>
-                  </ion-col>
-
-              </ion-row>
-          </ion-grid>
-
-         
-
-
       </ion-grid>
   </div>
 </ion-content>
+
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <button class="cancel-btn" (click)="cancel()">Cancel</button>
+    <app-glass-button label="Print" (btnClick)="proceed()"></app-glass-button>
+</ion-footer>

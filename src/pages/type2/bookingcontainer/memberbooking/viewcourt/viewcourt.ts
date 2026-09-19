@@ -7,7 +7,6 @@ import { CommonService,ToastPlacement, ToastMessageType } from '../../../../../s
 import { FirebaseService } from '../../../../../services/firebase.service';
 import { ViewChild } from '@angular/core';
 import { Content } from 'ionic-angular';
-import { RequestOptions } from '@angular/http';
 import { HttpClient } from '@angular/common/http';
 import { SharedServices } from '../../../../services/sharedservice';
 import * as $ from 'jquery';
@@ -15,6 +14,7 @@ import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesRespons
 import { AppType } from '../../../../../shared/constants/module.constants';
 import { API } from '../../../../../shared/constants/api_constants';
 import { HttpService } from '../../../../../services/http.service';
+import { ThemeService } from '../../../../../services/theme.service';
 /**
  * Generated class for the ViewcourtPage page.
  *
@@ -29,6 +29,7 @@ import { HttpService } from '../../../../../services/http.service';
 })
 export class ViewcourtPage {
   @ViewChild(Content) content: Content;
+  isDarkTheme: boolean = true;
   emil = "";
   NoSlotsAvailable = "No Slots Available"
   memberName = "";
@@ -114,7 +115,7 @@ export class ViewcourtPage {
     public navParams: NavParams,public fb: FirebaseService,
     public storage: Storage, public commonService: CommonService,
     public http: HttpClient,public loadingCtrl: LoadingController,
-    private httpService: HttpService) {
+    private httpService: HttpService, private themeService: ThemeService) {
    
    this.recurringSubjectArray.forEach((element:String)=>{
      this.recurringSubjectSet.add(element);
@@ -154,6 +155,23 @@ export class ViewcourtPage {
   });
   }
      
+  ionViewWillEnter() {
+    this.loadTheme();
+  }
+
+  loadTheme() {
+    this.isDarkTheme = this.themeService.getCurrentTheme();
+    this.applyTheme();
+  }
+
+  applyTheme() {
+    const pageElement = document.querySelector('page-viewcourt');
+    if (pageElement) {
+      pageElement.classList.remove('dark-theme', 'light-theme');
+      pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
+  }
+
   ionViewDidEnter(){
     this.loading = this.loadingCtrl.create({
       content: 'Please wait...'

@@ -11,6 +11,8 @@ import { SchoolDetails } from '../schoolsession.model';
 import { AttendanceUpdate, SchoolSessionAttendees, SchoolUpdateAttendanceInput } from '../dto/school_ses_attendance.dto';
 import * as moment from 'moment';
 import { AppType } from '../../../../shared/constants/module.constants';
+import { ThemeService } from '../../../../services/theme.service';
+import { Subscription } from 'rxjs';
 /**
  * Generated class for the SchoolattendencePage page.
  *
@@ -26,6 +28,8 @@ import { AppType } from '../../../../shared/constants/module.constants';
 })
 export class SchoolattendencePage {
   dateInfo:any = {};
+  isDarkTheme: boolean = true;
+  private themeSubscription: Subscription;
   sessionInfo:SchoolDetails;
   themeType: number;
     sessionDetails: any;
@@ -80,7 +84,8 @@ export class SchoolattendencePage {
       private sharedservice:SharedServices,
       public commonService:CommonService,
       public fb:FirebaseService,
-      private graphqlService: GraphqlService
+      private graphqlService: GraphqlService,
+      private themeService: ThemeService
     ) {
     console.log('ionViewDidLoad SchoolattendencePage');
 
@@ -108,6 +113,27 @@ export class SchoolattendencePage {
 
   ionViewDidLoad() {
     
+  }
+
+  ionViewWillEnter() {
+    this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
+  }
+
+  ionViewWillLeave() {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+  }
+
+  applyTheme() {
+    const pageElement = document.querySelector('page-schoolattendence');
+    if (pageElement) {
+      pageElement.classList.remove('dark-theme', 'light-theme');
+      pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
   }
 
   ///getAge

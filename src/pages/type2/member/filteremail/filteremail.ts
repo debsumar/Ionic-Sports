@@ -1,12 +1,11 @@
-import { Component, Input } from '@angular/core';
-import { LoadingController, AlertController, ModalController, ToastController, NavController, Events } from 'ionic-angular';
+import { Component } from '@angular/core';
+import { LoadingController, AlertController, ModalController, NavController, Events } from 'ionic-angular';
 import { PopoverController } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import { IonicPage } from 'ionic-angular';
 import { SharedServices } from '../../../services/sharedservice';
 import { FirebaseService } from '../../../../services/firebase.service';
 import { CommonService,ToastPlacement, ToastMessageType } from '../../../../services/common.service';
-import { ThemeService } from '../../../../services/theme.service';
 import gql from 'graphql-tag';
 import { UsersModel } from '../../../../shared/model/users_list.model';
 import { GraphqlService } from '../../../../services/graphql.service';
@@ -94,7 +93,6 @@ export class Filteremail {
     public popoverCtrl: PopoverController,
     private graphqlService:GraphqlService,
     private httpService: HttpService,
-    private themeService: ThemeService,
     public events: Events) {
       this.themeType = sharedservice.getThemeType();
       this.loadTheme();
@@ -292,9 +290,9 @@ async getParentClubUsers(){
             this.numberOfPeopleToSend = this.filteredMember.length;
             break;
         case 2:
-          this.numberOfPeopleToSend = this.memberList.length;
+          this.numberOfPeopleToSend = 0;
           this.gotoFilterMemberModal();
-          break;
+          return;
     }
     //this.commonService.hideLoader();
     
@@ -302,13 +300,17 @@ async getParentClubUsers(){
 }
 
   gotoFilterMemberModal() {
-    let memberModal = this.modalCtrl.create("FiltermemberPage",{memberList:this.memberList});
-    memberModal.onDidDismiss(async (data) => {
+    let memberModal = this.modalCtrl.create("FiltermemberPage", { memberList: this.memberList }, {
+      cssClass: 'filtermember-modal'
+    });
+    memberModal.onDidDismiss((data) => {
         console.log(data);
-        this.numberOfPeopleToSend = data.selectedMembers.length;
-        if(data.selectedMembers.length > 0){
+        this.filteredMember = [];
+        const selected = (data && data.selectedMembers) ? data.selectedMembers : [];
+        this.numberOfPeopleToSend = selected.length;
+        if(selected.length > 0){
             this.commonService.showLoader("Please wait");
-            for(let member of data.selectedMembers){
+            for(let member of selected){
                 this.filteredMember.push({
                     //$key:member.FirebaseKey, MemberEmail: member.EmailID, MemberName: member.FirstName + " " + member.LastName 
                     IsChild:member.IsChild ? true:false,
@@ -323,7 +325,7 @@ async getParentClubUsers(){
         
         console.log(this.filteredMember);
     });
-    memberModal.present();
+    setTimeout(() => memberModal.present(), 300);
   }
   
   

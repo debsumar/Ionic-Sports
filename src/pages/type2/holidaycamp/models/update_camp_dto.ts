@@ -58,7 +58,6 @@ export class EditHolidayCampDetails {
     authorize_child_to_move_back_home: boolean
     show_additional_info: boolean
     camp_status?: number
-
 }
 
 export class EditSessionConfigDetails {
@@ -126,9 +125,6 @@ export class UpadteHolidayCampDTO {
         //authorize_child_to_move_back_home = edit_Holidaycamp.;
         edit_Holidaycamp.is_agree_terms_conditions = false;// as of now no interface
         edit_Holidaycamp.show_additional_info = campDet.show_additional_info;// as of now no interface
-        if (typeof campDet.camp_status === "number") {
-            edit_Holidaycamp.camp_status = campDet.camp_status;
-        }
 
         return edit_Holidaycamp;
     }

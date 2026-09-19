@@ -1,11 +1,9 @@
-import { Component, Input } from '@angular/core';
-import { LoadingController, AlertController, ModalController, ToastController, NavController, Events } from 'ionic-angular';
-import { PopoverController } from 'ionic-angular';
+import { Component } from '@angular/core';
+import { AlertController, ModalController, NavController, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 // import { Dashboard } from './../../dashboard/dashboard';
 import { IonicPage } from 'ionic-angular';
 import { SharedServices } from '../../../services/sharedservice';
-import { FirebaseService } from '../../../../services/firebase.service';
 import { CommonService, ToastPlacement, ToastMessageType } from '../../../../services/common.service';
 import gql from "graphql-tag";
 import { GraphqlService } from '../../../../services/graphql.service';
@@ -39,25 +37,10 @@ export class Filternotification {
     club_id:"",
     member_type:1
   }
-  themeType: number;
-  isAndroid: boolean = false;
-  parentClubKey: any;
   clubs: ClubVenueDto[] = [];
   selectedClub: any;
   memberList:UsersModel[] = [];
-  notificationObj = { CreatedTime: "", Message: '', SendTo: '', SendBy: '', ComposeOn: '', Purpose: '', sendByRole: "", Status: "Unread", SessionName: '' };
-  notificationObjForSesion = { CreatedTime: "", Message: '', SendTo: '', SendBy: '', ComposeOn: '', Purpose: '', sendByRole: "", Status: "Unread", SessionName: '' };
-  emailObj = { Message: "", Subject: "" };
-  isEmail = true;
-  
-  currentSessionMembers = [];
   numberOfPeopleToSend = 0;
-  recentNotificationList = [];
-  blockIndex = -1;
-  notification = [];
-  currentLastIndex = 30;
-  notificationCountDevider = 0;
-  notificationCountreminder = 0;
   notification_input = {
     parentClubId:"" ,
     userIds: [],
@@ -66,30 +49,33 @@ export class Filternotification {
     moduleId: ModuleTypes.MEMBER
   }
 
-  copiedText: any = "";
   isDarkTheme: boolean = true;
   constructor(public commonService: CommonService,
      public modalCtrl: ModalController, 
       public alertCtrl: AlertController, 
       private graphqlService: GraphqlService, 
-      public fb: FirebaseService, private storage: Storage,
-      public navCtrl: NavController, public sharedservice: SharedServices, 
-      public popoverCtrl: PopoverController,
+      private storage: Storage,
+      public navCtrl: NavController, public sharedservice: SharedServices,
       private httpService: HttpService,
       public events: Events) {
 
-    this.themeType = sharedservice.getThemeType();
-    this.parentClubKey = this.sharedservice.getParentclubKey();
     this.notification_input.parentClubId = this.sharedservice.getPostgreParentClubId();
     this.notification_input.heading = "Hey user!"
     this.venus_user_input.parentclub_id = this.sharedservice.getPostgreParentClubId();
     this.getClubList();
     this.selectedEmailCategory = 0;
-    this.loadTheme();
   }
 
   ionViewDidLoad() {
     console.log('ionViewDidLoad FilternotificationPage');
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+  }
+
+  ionViewWillLeave() {
+    this.events.unsubscribe('theme:changed');
   }
 
   getClubList() {
@@ -156,8 +142,9 @@ export class Filternotification {
 
   
 
-  onChangeOfClub(club) {
+  onChangeOfClub() {
     this.numberOfPeopleToSend = 0;
+    this.notification_input.userIds = [];
     this.venus_user_input.club_id = this.selectedClub;
     this.getMemberList();
   }
@@ -210,6 +197,7 @@ export class Filternotification {
 
   onChangeEmailFilter() {
     this.filteredMember = [];
+    this.notification_input.userIds = [];
     const members_map = new Map();
     switch (Number(this.selectedEmailCategory)) {
       case 0:
@@ -240,19 +228,24 @@ export class Filternotification {
   }
 
   gotoFilterMemberModal() {
-    let filterDataObj = {};
-    // filterDataObj["parentClubKey"] = this.parentClubKey;
-    // filterDataObj["selectedClub"] = this.selectedClub;
     this.notification_input.userIds = [];
-    let memberModal = this.modalCtrl.create("FiltermemberPage", { memberList: this.memberList});
+    let memberModal = this.modalCtrl.create("FiltermemberPage", {
+      parentclub_id: this.venus_user_input.parentclub_id,
+      club_id: this.venus_user_input.club_id,
+      member_type: this.venus_user_input.member_type,
+      memberList: this.memberList
+    }, {
+      cssClass: 'filtermember-modal'
+    });
     memberModal.onDidDismiss(data => {
       console.log(data);
+      const selected = (data && data.selectedMembers) ? data.selectedMembers : [];
       this.filteredMember = [];
-      this.filteredMember = data.selectedMembers;
+      this.filteredMember = selected;
      
-      if(data.selectedMembers.length > 0){
+      if(selected.length > 0){
         const members_map = new Map();
-        data.selectedMembers.forEach((member)=>{
+        selected.forEach((member)=>{
           const user_id = member.IsChild ? member.ParentKey:member.Id;
           if(!members_map.has(user_id)){
             members_map.set(user_id,member);
@@ -263,17 +256,12 @@ export class Filternotification {
         members_map.clear();
       }
     });
-    memberModal.present();
+    setTimeout(() => memberModal.present(), 300);
   }
 
   
 
-  focusOutMessage() {
-    this.emailObj.Subject = this.notificationObj.Message.split(/\s+/).slice(0, 4).join(" ");
-  }
 
-
-  
   sendNotification() {
     if (this.notification_input.message == "") {
       let message = "Please enter notification message";
@@ -329,12 +317,15 @@ export class Filternotification {
       page_id:"MEMBERLIST_NOTIFY"
     };
 
+    this.commonService.showLoader('Sending notification...');
     this.httpService.post(API.SEND_PUSH_NOTIFICATION, body, null, 1).subscribe({
       next: (res: any) => {
+        this.commonService.hideLoader();
         this.commonService.toastMessage("Notification sent successfully.", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
         this.navCtrl.pop();
       },
       error: (err) => {
+        this.commonService.hideLoader();
         console.error('Error sending notification:', err);
         this.commonService.toastMessage("Notification sent failed", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
       }
@@ -343,19 +334,19 @@ export class Filternotification {
 
   loadTheme() {
     this.storage.get('dashboardTheme').then((isDarkTheme) => {
-      this.isDarkTheme = isDarkTheme !== null ? isDarkTheme : true;
-      this.applyTheme();
-    }).catch(() => { this.isDarkTheme = true; this.applyTheme(); });
+      const isDark = isDarkTheme !== null ? isDarkTheme : true;
+      this.applyTheme(isDark);
+    }).catch(() => { this.applyTheme(true); });
     this.events.subscribe('theme:changed', (isDark) => {
-      this.isDarkTheme = isDark;
-      this.applyTheme();
+      this.applyTheme(isDark);
     });
   }
 
-  applyTheme() {
+  applyTheme(isDark: boolean) {
+    this.isDarkTheme = isDark;
     const el = document.querySelector('page-filternotification');
     if (el) {
-      if (this.isDarkTheme) { el.classList.remove('light-theme'); }
+      if (isDark) { el.classList.remove('light-theme'); }
       else { el.classList.add('light-theme'); }
     }
   }

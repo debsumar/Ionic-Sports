@@ -34,26 +34,22 @@
     </ion-navbar>
 
 </ion-header>
-<ion-content class="cards-bg social-cards" padding [ngClass]="isDarkTheme ? 'dark-theme' : 'light-theme'">
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
     <!-- Sticky Header Container -->
     <div class="sticky-header-container">
         <!-- Full Width School Dropdown -->
-        <ion-item class="venue-dropdown">
-            <ion-label>School</ion-label>
-            <ion-select [(ngModel)]="selectedSchool" (ionChange)="onChangeOfSchool()" class="full-width-select">
-                <ion-option value='all'>{{LangObj.scl_ssn_all}}</ion-option>
-                <ion-option *ngFor="let school of schools" value={{school.id}}>{{school.school_name}}</ion-option>
-            </ion-select>
-        </ion-item>
+        <app-select-field [isDark]="isDarkTheme">
+            <ion-item class="venue-dropdown">
+                <ion-label>School</ion-label>
+                <ion-select [(ngModel)]="selectedSchool" (ionChange)="onChangeOfSchool()" class="full-width-select">
+                    <ion-option value='all'>{{LangObj.scl_ssn_all}}</ion-option>
+                    <ion-option *ngFor="let school of schools" value={{school.id}}>{{school.school_name}}</ion-option>
+                </ion-select>
+            </ion-item>
+        </app-select-field>
         
         <!-- Compact Search -->
-        <div class="compact-search-card themed-card">
-            <div class="search-content">
-                <ion-searchbar class="sleek-searchbar themed-searchbar" placeholder="Search sessions of {{session_count}}" 
-                    [(ngModel)]="searchInput" (ionInput)="getFilterItems($event)" autocorrect="off" 
-                    showCancelButton="never"></ion-searchbar>
-            </div>
-        </div>
+        <app-search-bar placeholder="Search sessions of {{session_count}}" (search)="getFilterItems($event)"></app-search-bar>
     </div>
 
     <!-- Scrollable Content Area -->

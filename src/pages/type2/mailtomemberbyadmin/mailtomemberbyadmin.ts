@@ -159,7 +159,7 @@ export class MailToMemberByAdminPage {
         this.commonService.toastMessage("Parent club admin email is required", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         return;
       }
-      if (!this.emailObj.Subject.trim() || this.emailObj.Subject === "") {
+      if (!this.emailObj.Subject || !this.emailObj.Subject.trim() || this.emailObj.Subject === "") {
         this.commonService.toastMessage("Email subject is required", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
         return;
       }
@@ -185,13 +185,17 @@ export class MailToMemberByAdminPage {
         CCName: this.parentClubDetails.ParentClubName,
         CCEmail: this.parentClubDetails.ParentClubAdminEmailID,
         Subject: this.emailObj.Subject,
+        //Message: this.emailObj.Message,
         // Convert plain-text line breaks to <br> so the backend's HTML email template
         // renders paragraph spacing correctly instead of collapsing all newlines into one block.
         Message: this.emailObj.Message.replace(/\n/g, '<br>'),
       }
 
+      //emailFormembers.Members = members;
+
       emailFormembers.Members = members.map(({ selected, payStatus, ...rest }) => rest);
       this.commonService.showLoader("Sending email...");
+
       const email_mutation = gql`
       mutation sendNotificationEmail($emailInput: EmailNotification!) {
         sendNotificationEmail(emailInput: $emailInput)

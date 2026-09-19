@@ -520,7 +520,7 @@ export class EachSessionDetailsPage {
      notifyGroupUsers(){
         if (this.memberEnrolDetails.length > 0) {
             const member_ids = this.memberEnrolDetails.map(enrol_member => enrol_member.member.IsChild ? enrol_member.member.ParentId:enrol_member.member.Id);
-            this.navCtrl.push("Type2NotificationSession",{
+            this.navCtrl.push("NotificationsPage",{
                 users:member_ids,
                 type:ModuleTypes.SCHOOLSESSION,
                 heading:`Enrolement:${this.schoolDetails.school_session_name}`

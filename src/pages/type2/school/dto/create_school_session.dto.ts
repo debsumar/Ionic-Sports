@@ -1,5 +1,4 @@
 import { SchoolDetails } from "../schoolsession.model";
-import { SchoolGroupStatus } from "../constants/school_group_status.constants";
 import * as moment from "moment";
 export interface IFirebaseSchoolSessionDTO{
     CreatedDate: any,
@@ -31,9 +30,9 @@ export interface IFirebaseSchoolSessionDTO{
     Days:string;
     Duration: string;
     GroupSize: string;
-    group_status?: number;
     Comments:string;
     SessionFee: string;
+    group_status?: number;
     BookingButtonText: 'Book Now',
     ReserveButtonText: 'Add to Waiting List',
     AutoEnrolment: boolean;//true
@@ -259,3 +258,8 @@ export class CopySchoolSession{
 }
 
 
+
+export enum SchoolGroupStatus {
+  PRIVATE = 0,
+  PUBLIC = 1
+}

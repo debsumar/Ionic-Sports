@@ -2,7 +2,7 @@
     <ion-navbar>
         <ion-title>Notification</ion-title>
         <ion-buttons end>
-            <button ion-button icon-only (click)="sendEmail()">
+            <button ion-button icon-only (click)="sendNotification()">
                 <ion-icon name="ios-send-outline" class="ico"></ion-icon>
             </button>
         </ion-buttons>
@@ -13,7 +13,8 @@
       <ion-col col-7>
           <app-select-field [isDark]="isDarkTheme">
               <ion-item>
-                  <ion-select [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub(club)">
+                  <ion-label stacked>Club</ion-label>
+                  <ion-select [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()">
                       <ion-option *ngFor="let club of clubs" [value]="club.Id">{{club.ClubName}}</ion-option>
                   </ion-select>
               </ion-item>
@@ -22,6 +23,7 @@
       <ion-col col-5>
           <app-select-field [isDark]="isDarkTheme">
               <ion-item>
+                  <ion-label stacked>Category</ion-label>
                   <ion-select [(ngModel)]="selectedEmailCategory" (ionChange)="onChangeEmailFilter()">
                       <ion-option *ngFor="let type of EmailFilterCategory" [value]="type.CategoryVal">
                           {{type.CategoryText}}</ion-option>
@@ -33,7 +35,7 @@
 
   <app-form-field [isDark]="isDarkTheme">
       <ion-item>
-          <ion-textarea rows="10" [(ngModel)]="notification_input.message" (focusout)="focusOutMessage()"
+          <ion-textarea rows="10" [(ngModel)]="notification_input.message"
               placeholder="Type a message here..."></ion-textarea>
       </ion-item>
   </app-form-field>

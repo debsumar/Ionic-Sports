@@ -10,6 +10,8 @@ import { CopySchoolSession,SchoolSessionDTO } from '../dto/create_school_session
 import { SchoolDetails, SchoolVenue } from '../schoolsession.model';
 import { Activity, ActivityCategory, ActivityCoach, ActivityInfoInput, ActivitySubCategory, ClubActivityInput, IClubDetails } from '../../../../shared/model/club.model';
 import { FinancialYearTerms } from '../../../../shared/model/financial_terms.model';
+import { ThemeService } from '../../../../services/theme.service';
+import { Subscription } from 'rxjs';
 /**
  * Generated class for the CopyschoolsessionPage page.
  *
@@ -26,6 +28,8 @@ import { FinancialYearTerms } from '../../../../shared/model/financial_terms.mod
 export class CopyschoolsessionPage {
   parentClubKey: any;
     themeType: number;
+    isDarkTheme: boolean = true;
+    private themeSubscription: Subscription;
     schools = [];
     selectedSchool: string = "";
     clubs:IClubDetails[] = [];
@@ -122,7 +126,8 @@ export class CopyschoolsessionPage {
         public navCtrl: NavController,
         public sharedservice: SharedServices,
         private graphqlService: GraphqlService, 
-        public popoverCtrl: PopoverController) {
+        public popoverCtrl: PopoverController,
+        private themeService: ThemeService) {
         
       this.preSessionInfo = <SchoolDetails>this.navParams.get('SchoolSession'); 
       this.school_session = CopySchoolSession.getSchoolSessionForCopy(this.navParams.get("SchoolSession"));
@@ -223,6 +228,27 @@ export class CopyschoolsessionPage {
 
     goToDashboardMenuPage() {
         this.navCtrl.setRoot("Dashboard");
+    }
+
+    ionViewWillEnter() {
+        this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+            this.isDarkTheme = isDark;
+            this.applyTheme();
+        });
+    }
+
+    ionViewWillLeave() {
+        if (this.themeSubscription) {
+            this.themeSubscription.unsubscribe();
+        }
+    }
+
+    applyTheme() {
+        const pageElement = document.querySelector('page-copyschoolsession');
+        if (pageElement) {
+            pageElement.classList.remove('dark-theme', 'light-theme');
+            pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+        }
     }
 
     //

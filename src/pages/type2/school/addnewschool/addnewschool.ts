@@ -11,6 +11,8 @@ import gql from "graphql-tag";
 import {IonicPage } from 'ionic-angular';
 import { ICreateSchoolDto } from '../dto/school.dto';
 import { GraphqlService } from '../../../../services/graphql.service';
+import { ThemeService } from '../../../../services/theme.service';
+import { Subscription } from 'rxjs';
 @IonicPage()
 @Component({
   selector: 'addnewschool-page',
@@ -20,6 +22,8 @@ import { GraphqlService } from '../../../../services/graphql.service';
 
 export class AddnewSchool {
   themeType: number;
+  isDarkTheme: boolean = true;
+  private themeSubscription: Subscription;
   parentClubKey: string;
   schools: any;
   clubs: any;
@@ -53,7 +57,7 @@ export class AddnewSchool {
     private commonService: CommonService,
     private graphqlService: GraphqlService,
     public navCtrl: NavController, public sharedservice: SharedServices,
-     public fb: FirebaseService, public popoverCtrl: PopoverController) {
+     public fb: FirebaseService, public popoverCtrl: PopoverController, private themeService: ThemeService) {
       this.platform = this.sharedservice.getPlatform();
     this.themeType = sharedservice.getThemeType();
     storage.get('userObj').then((val) => {
@@ -130,6 +134,27 @@ export class AddnewSchool {
 
   cancelSchoolSetup(){
     this.schoolSetupObj = { SchoolName: "", SchoolEmailID: "",SchoolAddress: "",SchoolContactNumber: "",IsActive:false,IsEnable:false,FirstLineAddress:'',SecondLineAddress:'',PostCode:'',City:'' };
+  }
+
+  ionViewWillEnter() {
+    this.themeSubscription = this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
+    });
+  }
+
+  ionViewWillLeave() {
+    if (this.themeSubscription) {
+      this.themeSubscription.unsubscribe();
+    }
+  }
+
+  applyTheme() {
+    const pageElement = document.querySelector('addnewschool-page');
+    if (pageElement) {
+      pageElement.classList.remove('dark-theme', 'light-theme');
+      pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
   }
 
   ionViewDidLoad() {

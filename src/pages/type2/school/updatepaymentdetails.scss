@@ -2,67 +2,96 @@
 
 updatepaymentdetails-page {
     @include android-sdk35-fixes;
-    // .margin_top{
-    //     margin-top: 10px;
-    // }
-    // .padding_class{
-    //     padding-top: 20px;
-    //     //font-size: 15px;
-    // }
-    // .days{
-    //     ion-col{
-    //         text-align: center;
-    //         p{
-    //             border: 1px solid #76747d;;
-    //         }
-    //     }
-    // }
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
     .scroll-content {
-        padding: 16px 9px !important;
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+        padding: 8px 8px 16px !important;
     }
+
+    ion-list {
+        background: transparent !important;
+        margin: 0;
+    }
+
     .due {
-        color: red;
+        color: #f87171;
     }
     .paid {
-        color: green;
+        color: #4ade80;
     }
-    // .text_white{
-    //     color:white;
-    // }
-    // .card_header{
-    //     padding: 3px 0px 5px 19px;
-    // }
-    // .rounded{
-    //     width: 38px;
-    //     height: 38px;
-    //     border-radius: 19px;
-    //     padding-top: 8px;
-    // }
+
+    // ===== Info card (custom widget) =====
     .card {
         margin: 6px 0px 6px 0px;
         width: 100%;
+        background: #1e293b;
         border-bottom: 1.7px solid #FF9800;
         .mem_name{
             font-size: 20px !important;
-            color: rgba(0,0,0,0.85) !important;
+            color: rgba(255,255,255,0.9) !important;
         }
         .ses_name{
             font-size: 18px !important;
-            color: rgba(0,0,0,0.65) !important;
+            color: rgba(255,255,255,0.7) !important;
         }
         .paymentmode{
             font-weight: bold;
         }
     }
-    .item-input .label-md {
-        color:#222 !important;
+
+    // ===== Footer =====
+    ion-footer {
+        background: #0f172a;
+
+        .cancel-btn {
+            display: block;
+            width: calc(100% - 24px);
+            margin: 12px 12px 0;
+            height: 44px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+            background: transparent;
+            color: #94a3b8;
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        &.light-theme {
+            background: #f8fafc;
+            .cancel-btn { border-color: #e2e8f0; color: #64748b; }
+        }
     }
-    .item-select .label-md {
-        color:#222 !important;
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .due { color: red; }
+        .paid { color: green; }
+
+        .card {
+            background: #ffffff;
+            .mem_name { color: rgba(0,0,0,0.85) !important; }
+            .ses_name { color: rgba(0,0,0,0.65) !important; }
+        }
+
+        ion-footer { background: #f8fafc; }
+        ion-footer .cancel-btn { border-color: #e2e8f0; color: #64748b; }
     }
-    
-    // ion-card-content{
-    //     padding:0px !important;
-    // }
-    
 }

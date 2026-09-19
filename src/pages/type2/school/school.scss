@@ -2,27 +2,91 @@
 
 school-page {
     @include android-sdk35-fixes;
-    // .social-cards ion-col {
-    //     padding: 0;
-    //  }
-    //  .btn-clr{
-    //      color: $dashoboard-icon-color;
-    //  }
-     ion-card{
-        margin:0px !important;
-        width:100% !important;
-        -webkit-box-shadow: none !important;
-        box-shadow: none !important;
-        border-bottom: 1px solid #f6ae4d !important; .nonlocationcard  {
-          padding: 14px 0;
-      }
+
+    // ===== Dark theme (default) =====
+    background: #0f172a !important;
+
+    ion-content,
+    .content-md,
+    .content-ios { background: #0f172a !important; }
+
+    .scroll-content {
+        background-image: none !important;
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+        background-size: 100% 100%;
     }
-    ion-card-content{
+
+    ion-list { background: transparent !important; }
+
+    ion-item {
+        background: #1e293b;
+        color: rgba(255, 255, 255, 0.85);
+
+        &.item-md,
+        &.item-ios { background: #1e293b !important; }
+    }
+    .card-h2-style { color: rgba(255, 255, 255, 0.85); }
+    p { color: rgba(255, 255, 255, 0.65); }
+    ion-card {
+        background: #1e293b;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+
+        &.card-md,
+        &.card-ios { background: #1e293b !important; }
+    }
+
+    // ===== Light theme overrides =====
+    &.light-theme {
+        background: #f8fafc !important;
+
+        ion-content,
+        .content-md,
+        .content-ios { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        ion-item {
+            background: white;
+            color: #222;
+
+            &.item-md,
+            &.item-ios { background: white !important; }
+        }
+        .card-h2-style { color: #222; }
+        p { color: #666; }
+        ion-card {
+            background: white;
+            box-shadow: 1px 1px 9px #ada8a1;
+
+            &.card-md,
+            &.card-ios { background: white !important; }
+        }
+        .card-md p {
+            margin: 0 0 0px;
+            font-size: 1.3rem;
+            font-weight: normal;
+            line-height: 1.4;
+            color: #222;
+        }
+    }
+
+    // ===== Page-specific custom styles =====
+    ion-card {
+        margin: 0px !important;
+        width: 100% !important;
+        border-bottom: 1px solid #f6ae4d !important;
+        .nonlocationcard { padding: 14px 0; }
+    }
+    ion-card-content {
         margin-top: 0px !important;
         padding: 0px !important;
     }
     .fabTop {
         margin-bottom: 3px;
+        background-color: #2b92bb !important;
+        color: #ffffff !important;
     }
     .fabEmailText {
         margin-left: -172px;
@@ -35,7 +99,6 @@ school-page {
         margin-right: 36px;
         -webkit-box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
         box-shadow: 0 4px 6px 0 rgba(0, 0, 0, 0.14), 0 4px 5px rgba(0, 0, 0, 0.1);
-        /* margin-bottom: 2px; */
         -webkit-transform: translate(0px, -20px);
         transform: translate(0px, -4px);
     }
@@ -49,71 +112,27 @@ school-page {
         border-radius: 3px;
         margin-right: 36px;
     }
-     .cross {
-         background-color: white;
-     }
-     .search_add{
-         background-color: transparent;
-         padding-left: 6px;
-     }
-     .right{
-         float: right;
-     }
-     ion-item{
-        border-bottom: 0.55px solid #FF9800 !important;
-     }
-     .search_add{
-         .item-inner{
-             border-bottom: 0px !important;
-            
-             ion-icon{
-                 margin-top: 18px;
-             }
-             div{
-                 ion-label{
-                     //margin-top: 0px;
-                     margin-bottom: 0px;
-                 }
-             }
-         }
-
-     }
-     .block_height {
-        height: 77%;
+    .cross { background-color: white; }
+    .search_add {
+        background-color: transparent;
+        padding-left: 6px;
     }
-    .card-md p {
-        margin: 0 0 0px;
-        font-size: 1.3rem;
-        font-weight: normal;
-        line-height: 1.4;
-        color: #222;
-    }
-    .ion-item-lable{
-        div{
-            ion-icon{
-                margin:0px 0px 9px 0px !important;
-            }
-            div{
-                ion-label{
-                    margin: 0px 0px 0px 0px;
-                }
-            }
+    .right { float: right; }
+    ion-item { border-bottom: 0.55px solid #FF9800 !important; }
+    .search_add {
+        .item-inner {
+            border-bottom: 0px !important;
+            ion-icon { margin-top: 18px; }
+            div { div { ion-label { margin-bottom: 0px; } } }
         }
     }
-    .slider_list_margin{
-            margin: 10px 0 8px 0;
-    }
-    .scroll-content{
-        background-image: none !important;
-        background-color: #f4efef !important;
-        //top:60px !important;
-        background-size: 100% 100%;
-        .slider_list_margin{
-                //  padding: 0px 14px;
+    .block_height { height: 77%; }
+    .ion-item-lable {
+        div {
+            ion-icon { margin: 0px 0px 9px 0px !important; }
+            div { div { ion-label { margin: 0px 0px 0px 0px; } } }
         }
     }
-    .nonmemcard {
-        padding: 14px 0;
-    }
-
+    .slider_list_margin { margin: 10px 0 8px 0; }
+    .nonmemcard { padding: 14px 0; }
 }

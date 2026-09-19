@@ -1,0 +1,340 @@
+@import '../../../../theme/android-sdk35-fixes.scss';
+
+page-membershipreport {
+  @include android-sdk35-fixes;
+
+  ion-toolbar {
+    --background: #2b92bb;
+    
+    ion-segment {
+      background: rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      margin: 8px auto;
+      padding: 4px;
+      display: flex;
+      width: calc(100% - 16px);
+      
+      ion-segment-button {
+        --color: rgba(255, 255, 255, 0.8);
+        --color-checked: #fff;
+        --background: transparent;
+        --background-checked: #ffa500;
+        --border-radius: 6px;
+        font-size: 14px;
+        font-weight: 600;
+        min-height: 32px;
+        text-transform: capitalize;
+        margin: 0 2px;
+        flex: 1 1 50%;
+        max-width: 50%;
+      }
+    }
+  }
+
+  .month-toolbar {
+    --background: #2b92bb;
+    --min-height: 70px;
+    
+    &[hidden] {
+      display: none;
+      height: 0;
+      min-height: 0;
+    }
+  }
+
+  .month-slider {
+    padding: 8px 0;
+    
+    ion-slides {
+      height: 60px;
+    }
+    
+    .month-item {
+      padding: 8px 12px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      text-align: center;
+      min-width: 48px;
+      
+      .month-text {
+        font-size: 12px;
+        font-weight: 600;
+        color: #fff;
+        margin: 0 0 3px 0;
+      }
+      
+      .year-text {
+        font-size: 10px;
+        color: rgba(255, 255, 255, 0.9);
+        margin: 0;
+      }
+    }
+    
+    .active .month-item {
+      background: #ffa500;
+    }
+  }
+
+  ion-header.no-month-toolbar ~ ion-content {
+    .scroll-content,
+    .fixed-content {
+      margin-top: 90px !important;
+    }
+    
+    .sticky-wrapper {
+      padding-top: 48px;
+    }
+  }
+
+  ion-content {
+    .scroll-content {
+      overflow: hidden;
+      background: #0f172a !important;
+      background-image: none !important;
+    }
+  }
+
+  .sticky-wrapper {
+    position: sticky;
+    top: 0;
+    background: #0f172a;
+    z-index: 10;
+    padding: 8px 8px 0 8px;
+  }
+
+  .scrollable-wrapper {
+    overflow-y: auto;
+    height: calc(100vh - 172px);
+    padding: 0 8px 80px 8px;
+  }
+
+  ion-header.no-month-toolbar ~ ion-content .scrollable-wrapper {
+    height: calc(100vh - 90px);
+  }
+
+  .date-range-section {
+    margin-bottom: 8px;
+    background: #0f172a;
+    
+    .date-item {
+      border: 1px solid #334155;
+      border-radius: 8px;
+      margin: 0 4px;
+      background: #1e293b !important;
+      color: #f1f5f9 !important;
+
+      ion-label { color: #94a3b8 !important; }
+      ion-datetime { color: #f1f5f9 !important; }
+    }
+    
+    .custom-go-btn {
+      background: #2b92bb;
+      color: white;
+      border-radius: 8px;
+      height: 48px;
+      width: 100%;
+      font-size: 14px;
+    }
+  }
+
+  .filter-section {
+    margin-bottom: 8px;
+    background: #0f172a;
+    
+    .filter-row {
+      display: flex;
+      gap: 10px;
+      position: relative;
+      align-items: center;
+      
+      .filter-content {
+        flex: 1;
+        
+        ion-select {
+          border: 1px solid #334155;
+          border-radius: 8px;
+          width: 100%;
+          max-width: 100%;
+          background: #1e293b !important;
+          color: #f1f5f9 !important;
+
+          .select-text { color: #f1f5f9 !important; }
+        }
+      }
+    }
+  }
+
+  .summary-section {
+    margin-bottom: 8px;
+    background: #0f172a;
+    
+    ion-row {
+      display: flex;
+      align-items: stretch;
+    }
+    
+    ion-col {
+      display: flex;
+      padding: 0 4px;
+    }
+    
+    .summary-card {
+      background: linear-gradient(135deg, #2b92bb, #1e7a9a);
+      border-radius: 10px;
+      padding: 18px;
+      text-align: center;
+      color: white;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      
+      .amount, .count {
+        font-size: 22px;
+        font-weight: 700;
+        margin-bottom: 4px;
+      }
+      
+      .label {
+        font-size: 12px;
+        opacity: 0.9;
+      }
+    }
+  }
+
+  .payment-list {
+    padding-bottom: 240px;
+  }
+
+  .payment-card {
+    background: #1e293b;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    border-left: 3px solid #2b92bb;
+    
+    .pay-card-row {
+      padding: 12px !important;
+      display: flex !important;
+      align-items: center !important;
+      min-height: 70px !important;
+      gap: 8px !important;
+    }
+    
+    .pay-left {
+      flex: 1 1 0% !important;
+      min-width: 0 !important;
+
+      .pay-name {
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        color: #f1f5f9 !important;
+        margin-bottom: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .pay-session {
+        font-size: 13px !important;
+        color: #94a3b8 !important;
+        font-style: italic !important;
+        margin-bottom: 2px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      
+      .pay-time {
+        font-size: 11px !important;
+        color: #64748b !important;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+    
+    .pay-right {
+      flex: 0 0 auto !important;
+      min-width: 80px !important;
+      text-align: right !important;
+      margin-left: auto !important;
+
+      .pay-date {
+        font-size: 12px !important;
+        color: #94a3b8 !important;
+        margin-bottom: 4px;
+      }
+      
+      .pay-amount {
+        font-size: 15px !important;
+        font-weight: 600 !important;
+        margin-bottom: 2px;
+        word-wrap: break-word;
+      }
+
+      .pay-amount--paid { color: #38bdf8 !important; }
+      .pay-amount--due { color: #f87171 !important; }
+    }
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 0 20px;
+    margin-top: 0;
+    
+    .empty-icon {
+      width: 80px;
+      height: 80px;
+      opacity: 0.6;
+      margin-bottom: 16px;
+    }
+    
+    p {
+      color: #94a3b8;
+      font-size: 16px;
+    }
+  }
+
+  .fab-btn {
+    background: #2b92bb;
+    
+    ion-icon {
+      color: white;
+    }
+  }
+
+  // ── Light Theme ──
+  &.light-theme {
+    ion-content, .scroll-content {
+      background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+      background-image: none !important;
+    }
+
+    .sticky-wrapper, .date-range-section, .filter-section, .summary-section {
+      background: #f8fafc !important;
+    }
+
+    .date-range-section .date-item {
+      border-color: #e2e8f0 !important;
+      background: white !important;
+      ion-label { color: #64748b !important; }
+      ion-datetime { color: #1e293b !important; }
+    }
+    .filter-section .filter-content ion-select { border-color: #e2e8f0 !important; background: white !important; color: #1e293b !important; .select-text { color: #1e293b !important; } }
+
+    .payment-card {
+      background: white !important;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+
+      .pay-name { color: #1e293b !important; }
+      .pay-session { color: #64748b !important; }
+      .pay-time { color: #94a3b8 !important; }
+      .pay-date { color: #64748b !important; }
+      .pay-amount--paid { color: #2b92bb !important; }
+      .pay-amount--due { color: #dc2626 !important; }
+    }
+
+    .empty-state p { color: #64748b !important; }
+  }
+}

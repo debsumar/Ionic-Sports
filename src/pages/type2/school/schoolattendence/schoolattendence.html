@@ -10,7 +10,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content class="cards-bg social-cards">
+<ion-content [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
     <ion-card class="card_list hadder-card" *ngIf="sessionInfo">
         <ion-card-content style="padding:0px !important">
             <p class="dotted1" style="">{{sessionInfo.days}}</p>
@@ -77,29 +77,22 @@
     <!-- <ion-fab bottom right class="edit" (click)="editMode()" *ngIf="attendance_status==1">
       <button ion-fab ><ion-icon name="md-create" ></ion-icon></button>
     </ion-fab> -->
+
+    <app-select-field [isDark]="isDarkTheme" *ngIf="attendance_status==2 || action_type == 2">
+        <ion-item>
+            <ion-label>Cancel</ion-label>
+            <ion-select [(ngModel)]="cancelReason" disabled="{{attendance_status == 2}}">
+                <ion-option value="">Reason</ion-option>
+                <ion-option value="Rainy Day">Rainy Day</ion-option>
+                <ion-option value="Snow in the Court">Snow in the Court</ion-option>
+                <ion-option value="Half Term">Half Term</ion-option>
+                <ion-option value="Slippery Court"> Slippery Court</ion-option>
+                <ion-option value="Others">Others</ion-option>
+            </ion-select>
+        </ion-item>
+    </app-select-field>
 </ion-content>
-<ion-footer>
-    <ion-row *ngIf="attendance_status==2 || action_type == 2">
-        <ion-col col-8>
-            <ion-item class="border">
-                <ion-label>Cancel</ion-label>
-                <ion-select [(ngModel)]="cancelReason" disabled="{{attendance_status == 2}}">
-                    <ion-option value="">Reason</ion-option>
-                    <ion-option value="Rainy Day">Rainy Day</ion-option>
-                    <ion-option value="Snow in the Court">Snow in the Court</ion-option>
-                    <ion-option value="Half Term">Half Term</ion-option>
-                    <ion-option value="Slippery Court"> Slippery Court</ion-option>
-                    <ion-option value="Others">Others</ion-option>
-                </ion-select>
-            </ion-item>
-        </ion-col>
-        <ion-col col-4>
-            <button ion-button block [disabled]="attendance_status == 2" class="timekare-primary-btn" (click)="saveAttendanceDetails()">Save</button>
-        </ion-col>
-    </ion-row>
-    <ion-row *ngIf="attendance_status!=2 && action_type!=2">
-        <ion-col col-12>
-            <button ion-button block class="timekare-primary-btn" (click)="saveAttendanceDetails()">Update Attendance</button>
-        </ion-col>
-    </ion-row>
+<ion-footer no-border [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
+    <app-glass-button *ngIf="attendance_status==2 || action_type == 2" label="Save" [disabled]="attendance_status == 2" (btnClick)="saveAttendanceDetails()"></app-glass-button>
+    <app-glass-button *ngIf="attendance_status!=2 && action_type!=2" label="Update Attendance" (btnClick)="saveAttendanceDetails()"></app-glass-button>
 </ion-footer>

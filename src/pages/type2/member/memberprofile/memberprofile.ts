@@ -1,17 +1,15 @@
 import { Component, OnInit } from "@angular/core";
-import { IonicPage,NavController,NavParams,AlertController,ToastController, Toast,} from "ionic-angular";
+import { IonicPage,NavController,NavParams,AlertController,ToastController,} from "ionic-angular";
 import { Storage } from "@ionic/storage";
 import { Events } from "ionic-angular";
 import { CommonService,ToastMessageType,ToastPlacement,} from "../../../../services/common.service";
 import { CallNumber } from "../../../../../node_modules/@ionic-native/call-number";
 import { FirebaseService } from "../../../../services/firebase.service";
-import * as moment from "moment";
 import gql from 'graphql-tag';
 import { SharedServices } from "../../../services/sharedservice";
 import { FamilyMember, FamilyMemberInput, VenueUser } from "../model/member";
 import { HttpService } from "../../../../services/http.service";
 import { GraphqlService } from "../../../../services/graphql.service";
-import { ThemeService } from "../../../../services/theme.service";
 import { API } from "../../../../shared/constants/api_constants";
 import { first } from "rxjs/operators";
 import { ModuleTypes } from "../../../../shared/constants/module.constants";
@@ -77,8 +75,7 @@ export class MemberprofilePage implements OnInit {
     public navCtrl: NavController,
     public navParams: NavParams,
     private graphqlService:GraphqlService,
-    private httpService:HttpService,
-    private themeService: ThemeService
+    private httpService:HttpService
   ) {
     this.loadTheme();
   }
@@ -146,6 +143,7 @@ export class MemberprofilePage implements OnInit {
           is_coach
           handicap
           is_gold_member
+          promo_email_allowed
           promo_email_allowed
           allow_court_booking
           membership_Id
@@ -491,13 +489,33 @@ export class MemberprofilePage implements OnInit {
     // this.navCtrl.push("Type2NotificationToIndividualMember", {
     //   MemberDetails: this.memberInfo,
     // });
-    
-    this.navCtrl.push("Type2NotificationSession",{
-      users:[this.memberInfo.Id],
+
+    // Guard before pushing, the same way groupsessiondetails.notifyGroupUsers()
+    // checks session_members.length first. memberInfo is populated
+    // asynchronously by the getUserDetsForAdmin query, so if it has not
+    // resolved (or came back without an Id) the recipient array collapses to
+    // [] inside NotificationsPage, which then opens showing "0 recipients"
+    // and the send fails server-side — indistinguishable from a dead button.
+    const recipient_id = this.memberInfo && this.memberInfo.Id ? this.memberInfo.Id : "";
+    if (!recipient_id) {
+      this.commonService.toastMessage("Member details are still loading, please try again", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+      return;
+    }
+
+    const member_name = `${this.memberInfo.parent_firstname || ""} ${this.memberInfo.parent_lastname || ""}`.trim();
+
+    this.navCtrl.push("NotificationsPage",{
+      users:[recipient_id],
+      user_names:[member_name],
       type:ModuleTypes.MEMBER,
-      heading:`Hey:${this.memberInfo.parent_firstname} ${this.memberInfo.parent_lastname}`,
+      heading:`Hey:${member_name}`,
+      module_id:recipient_id,
       page_id:"MEMBER_PROFILE_NOTIFY"
-    });           
+    }).catch((err) => {
+      // A rejected push is silent in Ionic 3 — surface it instead.
+      console.error("Failed to open NotificationsPage from member profile", err);
+      this.commonService.toastMessage("Unable to open the notification screen", 2500, ToastMessageType.Error, ToastPlacement.Bottom);
+    });
   }
 
   //sending email
@@ -659,6 +677,8 @@ export class MemberprofilePage implements OnInit {
     });
     confirm.present();
   }
+
+  
 
   savePromoEmailStatus() {
     this.showAlertForPromoEmail(

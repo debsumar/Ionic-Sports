@@ -1665,8 +1665,6 @@ export class Type2CreateHolidayCamp {
     this.commonService.toastMessage(message, 2500, ToastMessageType.Info, ToastPlacement.Bottom);
   }
 
-
-
 }
 
 

@@ -10,7 +10,7 @@
   </ion-navbar>
 </ion-header>
 
-<ion-content class="padding_content">
+<ion-content class="padding_content" [class.dark-theme]="isDarkTheme" [class.light-theme]="!isDarkTheme">
   <!-- <ion-card class="card_list hadder-card" *ngIf="sessionInfo">
       <ion-card-content style="padding:0px !important">
           <ion-col col-12 style="text-align:center;color:white">
