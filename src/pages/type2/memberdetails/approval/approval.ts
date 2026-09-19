@@ -6,7 +6,6 @@ import { Storage } from "@ionic/storage";
 import { AlertController } from 'ionic-angular/components/alert/alert-controller';
 import gql from 'graphql-tag';
 import { UserLevelHistoryForApprovalModel } from '../../levels/models/levels.model';
-import { UsersModel } from '../../tournament/addmembertournament/addmembertournament';
 import { ToastController } from 'ionic-angular/components/toast/toast-controller';
 import { GraphqlService } from '../../../../services/graphql.service';
 
