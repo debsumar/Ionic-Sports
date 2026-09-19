@@ -397,7 +397,7 @@ export class RegisterClub {
         this.uploadingLogo = false;
         this.commonService.hideLoader();
         this.accountInformation.appIconUrl = this.sharedservice.getCloudfrontURL()
-          + '/parentclub_logo/' + fileName;
+          + '/parent_club_logo/' + fileName;
         this.commonService.toastMessage('Image uploaded successfully', 2500, ToastMessageType.Success);
       },
       (error) => {
