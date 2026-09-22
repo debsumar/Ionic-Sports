@@ -89,7 +89,8 @@
       </ion-item>
     </app-form-field>
 
-    <app-form-field [isDark]="isDarkTheme" *ngIf="!isTeamType">
+    <!-- <app-form-field [isDark]="isDarkTheme" *ngIf="!isTeamType"> -->
+    <app-form-field [isDark]="isDarkTheme">
       <ion-item>
         <ion-label>Category</ion-label>
         <ion-select [(ngModel)]="leagueCreationInput.league.league_category">

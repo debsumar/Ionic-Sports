@@ -2,15 +2,16 @@ import { Component } from '@angular/core';
 import { IonicPage, LoadingController, NavController, NavParams, AlertController, ActionSheetController, Events } from 'ionic-angular';
 import { Storage } from '@ionic/storage';
 import * as moment from 'moment'
-import * as $ from "jquery";
 import { HttpClient } from '@angular/common/http';
 import { SharedServices } from '../../../../../services/sharedservice';
 import { FirebaseService } from '../../../../../../services/firebase.service';
 import { CommonService, ToastPlacement, ToastMessageType } from '../../../../../../services/common.service';
 import { HttpService } from '../../../../../../services/http.service';
 import { API } from '../../../../../../shared/constants/api_constants';
-import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../../../shared/dtos/club.dto';
-import { AppType } from '../../../../../../shared/constants/module.constants';
+import { ClubVenueDto, CourtDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../../../shared/dtos/club.dto';
+import { AppType, DeviceType } from '../../../../../../shared/constants/module.constants';
+import { CommonRestApiDto } from '../../../../../../shared/model/common.model';
+import { ClubActivity } from '../../../../../../shared/model/activity.model';
 import { ThemeService } from '../../../../../../services/theme.service';
 
 
@@ -58,6 +59,12 @@ export class BulkSlotCancellation {
   cancelReason = "";
   type: any;
   isDarkTheme: boolean = true;
+  // Club key the current ActivityList was fetched for - guards against the duplicate
+  // ionChange that a programmatic selectedClubKey write triggers.
+  private activityFetchClubKey: string = null;
+  // Last club/activity/court combination slots were fetched for - dedupes the explicit
+  // fetch against the court select's (ionChange).
+  private lastSlotFetchKey: string = null;
   
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController, public storage: Storage,
@@ -129,6 +136,9 @@ export class BulkSlotCancellation {
   }
 
   getClubDetails() {
+    // Allow one activity/slot fetch per page entry even if the club is unchanged.
+    this.activityFetchClubKey = null;
+    this.lastSlotFetchKey = null;
     // this.fb.getAllWithQuery("/Club/Type2/" + this.selectedParentClubKey, { orderByChild: "IsEnable", equalTo: true }).subscribe((data) => {
     //   this.clubs = data;
     //   if (data.length != 0) {
@@ -158,35 +168,113 @@ export class BulkSlotCancellation {
     });
   }
   getAllActivity() {
-    this.fb.getAll("/Activity/" + this.selectedParentClubKey + "/" + this.selectedClubKey + "/").subscribe((data) => {
-      this.ActivityList = [];
-      this.selectedActivity = "";
-      if (data.length > 0) {
-        this.ActivityList = data;
-        this.selectedActivity = this.ActivityList[0].$key;
+    // ion-select re-emits (ionChange) when selectedClubKey is written programmatically
+    // in getClubDetails() - Ionic 3 BaseInput.writeValue() fires _fireIonChange() on every
+    // write after the first, which would call this endpoint twice per page entry.
+    if (this.activityFetchClubKey === this.selectedClubKey) {
+      return;
+    }
+    this.activityFetchClubKey = this.selectedClubKey;
+
+    // The club select binds the Firebase club id, but club_activity/get_club_activities is
+    // keyed on postgres ids - bridge the two via the clubs list (ClubVenueDto has both).
+    const selectedClub = this.clubs.find((club: ClubVenueDto) => club.FirebaseId === this.selectedClubKey);
+    const body: CommonRestApiDto & { updated_by: string } = {
+      parentclubId: this.sharedService.getPostgreParentClubId(),
+      clubId: selectedClub ? selectedClub.Id : '',
+      activityId: '',
+      memberId: this.sharedService.getLoggedInUserId(),
+      action_type: 0,
+      device_type: this.sharedService.getPlatform() == 'android' ? DeviceType.ANDROID : DeviceType.IOS,
+      app_type: AppType.ADMIN_NEW,
+      device_id: this.sharedService.getDeviceId() || '',
+      updated_by: this.sharedService.getLoggedInUserId()
+    };
+
+    this.httpService.post(API.CLUB_ACTIVITIES, body).subscribe({
+      next: (res: any) => {
+        this.ActivityList = [];
+        this.selectedActivity = "";
+        const clubActivities: ClubActivity[] = (res && res.data && res.data.club_activities) ? res.data.club_activities : [];
+        // Drop the placeholder rows this endpoint returns (activity_key "undefined", null
+        // activity/name) - courts are keyed on activity_key, so a row without one is unusable.
+        this.ActivityList = clubActivities
+          .filter((activity) => activity && activity.activity_key && activity.activity_key !== 'undefined'
+            && (activity.alias_name || activity.activity_name))
+          // Keep $key / ActivityName so the template and court lookup stay unchanged.
+          .map((activity) => ({
+            ...activity,
+            $key: activity.activity_key,
+            ActivityName: activity.alias_name || activity.activity_name
+          }));
+        if (this.ActivityList.length > 0) {
+          this.selectedActivity = this.ActivityList[0].$key;
+        }
+        this.getAllCourts();
+      },
+      error: () => {
+        this.ActivityList = [];
+        this.selectedActivity = "";
       }
-      this.getAllCourts();
-    }, (err) => {
-      
     });
   }
   getAllCourts() {
-    this.fb.getAllWithQuery("Court/" + this.selectedParentClubKey + "/" + this.selectedClubKey + "/" + this.selectedActivity, { orderByChild: 'IsActive', equalTo: true }).subscribe((data) => {
-      this.courts = [];
-      if (data.length > 0) {
-        this.courts = data 
-        this.selectedCourt = this.courts[0].$key
-        //this.callbothfunction()
+    this.courts = [];
+    // Default to the "All" option rather than the first court. The booking
+    // APIs already map 'all' -> 'nil', and resetting here also clears a stale
+    // court key when the activity changes (that key belongs to the old activity).
+    this.selectedCourt = 'all';
+    if (!this.selectedActivity) {
+      return;
+    }
+    // courtbooking/getAllCourts is keyed on Firebase ids, which is what all three
+    // of these already hold.
+    const params = {
+      activity: this.selectedActivity,
+      clubKey: this.selectedClubKey,
+      parentClubKey: this.selectedParentClubKey
+    };
+    this.httpService.get(API.GET_ALL_COURTS, params, null, 1).subscribe({
+      next: (res: any) => {
+        const allCourts: CourtDto[] = (res && res.data) ? res.data : [];
+        this.courts = allCourts
+          // Preserves the IsActive filter the previous Firebase query applied.
+          .filter((court) => court && court.IsActive && court.firebasekey)
+          // Keep $key so the template and the booking API URLs stay unchanged.
+          .map((court) => ({ ...court, $key: court.firebasekey }));
+        // Load the slots for the new court list. Previously this happened only as a
+        // side effect of selectedCourt changing to courts[0].$key and re-emitting
+        // (ionChange); with 'all' as the default that write is a no-op, so the fetch
+        // has to be explicit. callbothfunction() dedupes against the ionChange path.
+        this.callbothfunction();
+      },
+      error: () => {
+        this.courts = [];
       }
-    }, (err) => {
-
     });
   }
   getTime(date) {
     return moment(date, 'DD MM YYYY').format('D-MMM');
   }
 
+  /**
+   * On this bulk-cancellation screen the card is the row's primary tap target, so
+   * tapping it toggles selection instead of navigating. Navigating away would discard
+   * the user's in-progress selection. The sibling app-checkbox re-renders because its
+   * `checked` input is bound to the same property.
+   */
+  toggleSlotSelection(slot) {
+    slot.IsSelect = !slot.IsSelect;
+  }
+
   async callbothfunction(){
+    // Slots are loaded from two places: the court select's (ionChange) and the explicit
+    // call at the end of getAllCourts(). Dedupe so the same selection is not fetched twice.
+    const fetchKey = `${this.selectedClubKey}-${this.selectedActivity}-${this.selectedCourt}-${this.type}`;
+    if (this.lastSlotFetchKey === fetchKey) {
+      return;
+    }
+    this.lastSlotFetchKey = fetchKey;
     this.getActiveBookings()
   }
 
@@ -223,17 +311,6 @@ export class BulkSlotCancellation {
       this.slots = [];
     }
   }
-
-  openSearch(){
-    let searchrow = document.getElementById('row');
-    if(searchrow.style.display == "none"){
-        $("#row").css("display", "block");
-        document.getElementById('fab').classList.add('searchbtn')
-    }else{
-        $("#row").css("display", "none");
-        document.getElementById('fab').classList.remove('searchbtn')
-    }
-}
 
   getFilterItems(ev: any) {
 

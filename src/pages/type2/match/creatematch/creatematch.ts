@@ -28,6 +28,7 @@ import { LeagueVenueType, MatchType } from "../../../../shared/utility/enums";
 import { CatandType } from "../../league/models/location.model";
 import { TeamsForParentClubModel } from "../../league/models/team.model";
 import { MatchDuration } from "../../../../shared/model/match.model";
+import { minutesOfDay, normalizeTimeOfDay } from "../../../../shared/utility/utility";
 /**
  * Generated class for the CreatematchPage page.
  *
@@ -84,6 +85,7 @@ export class CreatematchPage {
     MatchCreator: 2,
     MatchStartDate: null,
     MatchEndDate: null,
+    early_arrival_time: '',
     MatchVisibility: 0,
     MatchStatus: 0,
     MatchDetails: "",
@@ -463,6 +465,13 @@ export class CreatematchPage {
       return false;
     }
 
+    const early = minutesOfDay(this.createMatchInput.early_arrival_time);
+    const startMins = minutesOfDay(this.startTime);
+    if (early !== null && startMins !== null && early >= startMins) {
+      this.commonService.toastMessage("Early arrival time must be before the start time", 2500, ToastMessageType.Error);
+      return false;
+    }
+
     return true;
   }
 
@@ -517,6 +526,7 @@ export class CreatematchPage {
           MatchCreator: this.createMatchInput.MatchCreator,
           MatchStartDate: this.createMatchInput.MatchStartDate,
           MatchEndDate: this.createMatchInput.MatchEndDate,
+          early_arrival_time: normalizeTimeOfDay(this.createMatchInput.early_arrival_time),
           MatchVisibility: this.createMatchInput.MatchVisibility,
           Hosts: [this.createMatchInput.Hosts],
           MatchStatus: this.createMatchInput.MatchStatus,
@@ -595,6 +605,7 @@ export class CreateMatchInput {
   MatchCreator: number;
   MatchStartDate: any;
   MatchEndDate: any;
+  early_arrival_time: string;
   MatchVisibility: number;
   MatchStatus: number;
   MatchDetails: string;

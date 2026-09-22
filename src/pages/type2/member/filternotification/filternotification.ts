@@ -229,10 +229,9 @@ export class Filternotification {
 
   gotoFilterMemberModal() {
     this.notification_input.userIds = [];
+    // Pass only the already-loaded member list (same as filteremail) so the modal
+    // renders the full list instead of re-fetching a paginated page of 18 users.
     let memberModal = this.modalCtrl.create("FiltermemberPage", {
-      parentclub_id: this.venus_user_input.parentclub_id,
-      club_id: this.venus_user_input.club_id,
-      member_type: this.venus_user_input.member_type,
       memberList: this.memberList
     }, {
       cssClass: 'filtermember-modal'

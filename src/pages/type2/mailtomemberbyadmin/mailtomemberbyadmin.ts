@@ -4,10 +4,11 @@ import { Component, ViewChild, Renderer2 } from '@angular/core';
 import { ViewController, Platform, NavParams } from 'ionic-angular';
 import { FirebaseService } from '../../../services/firebase.service';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../services/common.service';
-import gql from 'graphql-tag';
 import { ParentClub } from '../../../shared/model/club.model';
-import { GraphqlService } from '../../../services/graphql.service';
 import { ThemeService } from '../../../services/theme.service';
+import { NotificationEmailService } from '../../../services/notificationemail.service';
+import { NoticationModuleTypes } from '../../../shared/constants/module.constants';
+import { SharedServices } from '../../services/sharedservice';
 
 @IonicPage()
 @Component({
@@ -47,7 +48,8 @@ export class MailToMemberByAdminPage {
     public platform: Platform,
     private params: NavParams,
     public viewCtrl: ViewController,
-    private graphqlService: GraphqlService,
+    private sharedservice: SharedServices,
+    private notificationEmailService: NotificationEmailService,
     private themeService: ThemeService,
     private renderer: Renderer2,
     public events: Events
@@ -149,6 +151,28 @@ export class MailToMemberByAdminPage {
     })
   }
 
+  private getNotificationModule(): string {
+    switch (this.module_obj.type) {
+      case ModuleTypeForEmail.TERMSESSION:
+        return String(NoticationModuleTypes.TERMSESSION);
+      case ModuleTypeForEmail.MONTHLYSESSION:
+        return String(NoticationModuleTypes.MONTHLYSESSION);
+      case ModuleTypeForEmail.WEEKLYSESSION:
+        return String(NoticationModuleTypes.WEEKLYSESSION);
+      case ModuleTypeForEmail.SCHOOLSESSION:
+        return String(NoticationModuleTypes.SCHOOLSESSION);
+      case ModuleTypeForEmail.MEMBER:
+        return String(NoticationModuleTypes.INDIVIDUALMEMBER);
+      case ModuleTypeForEmail.HOLIDAYCAMP:
+        return String(NoticationModuleTypes.HOLIDAYCAMP);
+      case ModuleTypeForEmail.LEAGUE:
+      case ModuleTypeForEmail.LEAGUE_TEAM:
+        return String(NoticationModuleTypes.LEAGUE);
+      default:
+        return undefined;
+    }
+  }
+
   sendEmails() {
     try {
       if (!this.parentClubDetails.ParentClubName || this.parentClubDetails.ParentClubName === "") {
@@ -175,34 +199,19 @@ export class MailToMemberByAdminPage {
         return;
       }
 
-      const emailFormembers = {
-        Members: [],
-        ImagePath: this.parentClubDetails.ParentClubAppIconURL,
-        FromEmail: "activitypro17@gmail.com",
-        FromName: this.parentClubDetails.ParentClubName,
-        ToEmail: this.parentClubDetails.ParentClubAdminEmailID,
-        ToName: this.parentClubDetails.ParentClubName,
-        CCName: this.parentClubDetails.ParentClubName,
-        CCEmail: this.parentClubDetails.ParentClubAdminEmailID,
-        Subject: this.emailObj.Subject,
-        //Message: this.emailObj.Message,
-        // Convert plain-text line breaks to <br> so the backend's HTML email template
-        // renders paragraph spacing correctly instead of collapsing all newlines into one block.
-        Message: this.emailObj.Message.replace(/\n/g, '<br>'),
-      }
-
-      //emailFormembers.Members = members;
-
-      emailFormembers.Members = members.map(({ selected, payStatus, ...rest }) => rest);
       this.commonService.showLoader("Sending email...");
-
-      const email_mutation = gql`
-      mutation sendNotificationEmail($emailInput: EmailNotification!) {
-        sendNotificationEmail(emailInput: $emailInput)
-      }`
-
-      const email_variable = { emailInput: emailFormembers };
-      this.graphqlService.mutate(email_mutation, email_variable, 0).subscribe((response) => {
+      this.notificationEmailService.sendNotificationEmail({
+        members: members.map(({ selected, payStatus, ...rest }) => rest),
+        parentClubIconUrl: this.parentClubDetails.ParentClubAppIconURL,
+        fromEmail: "activitypro17@gmail.com",
+        parentClubName: this.parentClubDetails.ParentClubName,
+        parentClubAdminEmail: this.parentClubDetails.ParentClubAdminEmailID,
+        subject: this.emailObj.Subject,
+        message: this.emailObj.Message,
+        module: this.getNotificationModule(),
+        purpose: 'AdminModuleEmail-' + this.module_obj.type,
+        clubId: this.module_obj.module_info && this.module_obj.module_info.module_booking_club_id,
+      }).subscribe((response) => {
         this.commonService.hideLoader();
         this.commonService.toastMessage("Mail sent successfully", 2500, ToastMessageType.Success, ToastPlacement.Bottom);
         this.emailObj.Message = "Dear All,\n\n\n\nSincerely Yours,\n" + this.parentClubDetails.ParentClubName + "\n" + this.parentClubDetails.ParentClubAdminEmailID;

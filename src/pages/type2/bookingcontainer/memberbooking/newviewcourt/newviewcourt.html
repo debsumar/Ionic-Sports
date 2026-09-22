@@ -16,7 +16,7 @@
   </ion-item> -->
   <ion-row *ngIf="clubs.length > 1 || ActivityList.length > 1" class="venuerow">
     <ion-col  *ngIf="clubs.length > 1" col-1 text-center>
-      <img src="assets/imgs/location.png">
+      <img class="theme-icon" src="assets/imgs/location.png">
     </ion-col>
     <ion-col  *ngIf="clubs.length > 1" col-5 text-left>
       <ion-select [(ngModel)]="selectedClubKey" (ionChange)="changeClub()">
@@ -24,7 +24,7 @@
       </ion-select>
     </ion-col>
     <ion-col *ngIf="ActivityList.length > 1" col-1 text-center>
-      <img src="assets/imgs/activity.png">
+      <img class="pale-icon" src="assets/imgs/activity.png">
     </ion-col>
     <ion-col col-5 *ngIf="ActivityList.length > 1" text-left>
       <ion-select [(ngModel)]="selectedActivity" (ionChange)="changeActivity()">

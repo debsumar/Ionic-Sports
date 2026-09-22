@@ -15,113 +15,85 @@
 
 <ion-content [ngClass]="{'light-theme': !isDarkTheme}">
 
-  <div class="header-container">
-      <ion-row style="margin-top: -13px;" class="rows-allign">
+  <div class="page-layout">
 
-          <ion-col col-7>
-              <ion-item style="background-color: #efefefd9;" class="headitem">
-                  <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
-                      <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
-                  </ion-select>
-              </ion-item>
-          </ion-col>
-          <ion-col col-5>
-              <ion-item style="background-color: #efefefd9;" class="headitem">
-                  <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourts()">
-                      <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}}>
-                          {{Activity.ActivityName}}</ion-option>
-                  </ion-select>
-              </ion-item>
-          </ion-col>
-      </ion-row>
-      <ion-row class="rows-allign">
-          <ion-col col-12 class="border-bottom-default-color">    
-              <ion-item style="background-color: #efefefd9;" class="headitem">
-                  <ion-select [(ngModel)]="selectedCourt" (ionChange)="callbothfunction()">
-                      <ion-option *ngFor="let court of courts" value={{court.$key}}>{{court.CourtName}}</ion-option>
-                      <ion-option value="all">All</ion-option>
-                  </ion-select>
-              </ion-item>
-          </ion-col>
-      </ion-row>
-  </div>
+    <div class="page-fixed-header">
+      <div class="header-container">
+        <app-select-field [isDark]="isDarkTheme">
+          <ion-item>
+            <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
+              <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
+            </ion-select>
+          </ion-item>
+        </app-select-field>
 
-  <ion-row *ngIf="slotListing.length == 0">
-      <ion-card
-          style=" margin:30px 0px 0px 0px !important; width:100% !important; -webkit-box-shadow: none !important; box-shadow: none !important; border-bottom: 1px solid #f6ae4d !important;">
-          <ion-card-content style="text-align: center; ">
-              <p class="danger_color2  padding: 0; ">{{NoActiveBooking}}</p>
-          </ion-card-content>
-      </ion-card>
-  </ion-row>
-  <!-- <page-commentforemptiness *ngIf="upCommingSlots.length == 0" [customTitle]="NoActiveBooking"></page-commentforemptiness> -->
+        <div class="filter-row">
+          <app-select-field [isDark]="isDarkTheme">
+            <ion-item>
+              <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourts()">
+                <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}}>
+                  {{Activity.ActivityName}}</ion-option>
+              </ion-select>
+            </ion-item>
+          </app-select-field>
 
-  <ion-row *ngFor="let slot of slotListing;let i = index" style="margin-top: 10px !important;" class="rows-allign slot-row">
-      <ion-col col-1>
-          <ion-checkbox [(ngModel)]="slot.IsSelect"></ion-checkbox>
-      </ion-col>
+          <app-select-field [isDark]="isDarkTheme">
+            <ion-item>
+              <ion-select [(ngModel)]="selectedCourt" (ionChange)="callbothfunction()">
+                <ion-option *ngFor="let court of courts" value={{court.$key}}>{{court.CourtName}}</ion-option>
+                <ion-option value="all">All</ion-option>
+              </ion-select>
+            </ion-item>
+          </app-select-field>
+        </div>
 
-      <ion-col col-11 class="allignment-col">
-          <primary-card accentColor="#35adff" (cardClick)="gotoDetails(slot)">
-              <div class="slot-card-body">
-                  <ion-row class="slot-head">
-                      <ion-col col-10 class="align-text-left">
-                          <span class="name">{{slot.name}}</span>
-                      </ion-col>
-                      <ion-col col-2 style="text-align: right">
-                          <span class="family">{{slot.slot_start_time}}</span>
-                      </ion-col>
-                  </ion-row>
-                  <ion-row>
-                      <ion-col col-7 class="align-text-left">
-                          {{slot.slot_start_time}} - {{slot.slot_end_time}}
-                      </ion-col>
-                      <ion-col col-5 style="text-align: right">
-                          {{getTime(slot.booking_date)}}
-                      </ion-col>
-                  </ion-row>
-                  <ion-row>
-                      <ion-col col-6 class="align-text-left">
-                          {{slot.courtname}}
-                      </ion-col>
-                      <ion-col *ngIf="currencyDetails!=undefined" col-6 text-right>
-                          {{currencyDetails.CurrencySymbol}}{{slot.price}}
-                      </ion-col>
-                  </ion-row>
-                  <ion-row class="partner-row" *ngIf="slot.partnerAddedText">
-                      <ion-col col-12 class="align-text-left">
-                          <span>{{slot.partnerAddedText}}</span>
-                      </ion-col>
-                  </ion-row>
+        <app-search-bar placeholder="Search bookings" [count]="slotListing.length"
+          (search)="getFilterItems($event)">
+        </app-search-bar>
+      </div>
+    </div>
+
+    <div class="page-scroll-area">
+      <app-empty-state *ngIf="slotListing.length == 0" icon="calendar" [text]="NoActiveBooking">
+      </app-empty-state>
+
+      <div class="slot-list">
+        <div class="slot-item" *ngFor="let slot of slotListing;let i = index">
+          <app-checkbox [(checked)]="slot.IsSelect" color="#35adff"></app-checkbox>
+          <primary-card accentColor="#35adff" (cardClick)="toggleSlotSelection(slot)">
+            <div class="slot-card-content">
+              <div class="slot-row">
+                <span class="slot-name">{{slot.name}}</span>
+                <span class="slot-time-badge">{{slot.slot_start_time}}</span>
               </div>
+              <div class="slot-row">
+                <span class="slot-detail">{{slot.slot_start_time}} - {{slot.slot_end_time}}</span>
+                <span class="slot-detail">{{getTime(slot.booking_date)}}</span>
+              </div>
+              <div class="slot-row">
+                <span class="slot-detail">{{slot.courtname}}</span>
+                <span class="slot-price" *ngIf="currencyDetails!=undefined">
+                  {{currencyDetails.CurrencySymbol}}{{slot.price}}</span>
+              </div>
+              <div class="slot-partner" *ngIf="slot.partnerAddedText">
+                <span>{{slot.partnerAddedText}}</span>
+              </div>
+            </div>
           </primary-card>
-      </ion-col>
-  </ion-row>
- 
-  <ion-fab mini right bottom #fab>
-  
-      <button ion-fab mini
-          style='background-color: rgba(246, 174, 77, 0.65);float: right;margin: 3px 0px 0px 0px !important;' id="fab"
-          (click)="openSearch()">
-          <ion-icon ios="ios-search" md="md-search"></ion-icon>
-      </button>
-      <ion-row id="row" class="searchrow" style="display: none;">
-          <ion-col col-10>
-              <ion-searchbar placeholder="Search bookings" id="customsearchbar"
-                  (ionInput)="getFilterItems($event)" autocorrect="off"></ion-searchbar>
-          </ion-col>
-      </ion-row>
-  </ion-fab>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </ion-content>
 <ion-footer>
-  <ion-row style=" margin-top: 10px;">
-    <ion-col col-12>
-      <ion-input type="text" class="ion_input" placeholder="Type 'DELETE' here..." [(ngModel)]="deleteText"></ion-input>
-    </ion-col>
-</ion-row>
-  <ion-row>
-    <ion-col col-12 style="text-align: end;">
-      <button ion-button (click)="showConfirm()" [disabled]="deleteText == '' ? true : false">Cancel Booking</button>
-    </ion-col> 
-  </ion-row>  
+  <div class="footer-actions">
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
+        <ion-input type="text" placeholder="Type 'DELETE' here..." [(ngModel)]="deleteText"></ion-input>
+      </ion-item>
+    </app-form-field>
+    <app-glass-button label="Cancel Booking" [disabled]="deleteText == '' ? true : false" (btnClick)="showConfirm()">
+    </app-glass-button>
+  </div>
 </ion-footer>

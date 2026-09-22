@@ -42,7 +42,7 @@ export class EachSessionDetailsPage {
     enrolledMemberInsession: any[];
     userData: SharedServices;
     currencyDetails: any;
-    isShowDelete = true;
+    isShowDelete = false;
     MemberListsForDeviceToken = [];
     clubs: any[];
     selectedClub: any;
@@ -243,6 +243,12 @@ export class EachSessionDetailsPage {
                //   this.commonService.hideLoader();
                   this.schoolDetails = res.data.getSchoolSession as SchoolDetails;
                   this.memberEnrolDetails = res.data.getSchoolSession.session_member;
+                  // Hide the delete fab as soon as any enrolled member has paid,
+                  // so a session with payments against it can't be removed.
+                  const has_paid_member = (this.memberEnrolDetails || []).filter(
+                      session_user => session_user.amount_pay_status && Number(session_user.amount_pay_status) > 0
+                  ).length > 0;
+                  this.isShowDelete = !has_paid_member;
                   //console.log("School Details Data Is:", JSON.stringify(this.schoolDetails));
                   //console.log("Member Data  Is:", JSON.stringify(this.memberEnrolDetails));
               },

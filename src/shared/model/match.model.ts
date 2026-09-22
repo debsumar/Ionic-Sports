@@ -313,6 +313,7 @@ export interface AllMatchData {
     MatchDuration: number | null; // ⏳ Match duration (can be null)
     MatchEndDate: string; // 📅 Match end date string
     MatchStartDate: string; // 📅 Match start date and time string (YYYY-MM-DD HH:mm)
+    early_arrival_time?: string;
     Date: string; // 📅 Formatted date string
     Time: string; // ⏰ Formatted time string
     MatchStatus: number; // 🚦 Current status of the match

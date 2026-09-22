@@ -30,6 +30,14 @@
 
     <app-form-field [isDark]="isDarkTheme">
       <ion-item>
+        <ion-label>Early Arrival <span class="optional-tag">(Optional)</span></ion-label>
+        <ion-datetime displayFormat="hh mm A" pickerFormat="hh mm A" minuteValues="0,10,20,30,40,50,60"
+          [(ngModel)]="early_arrival_time"></ion-datetime>
+      </ion-item>
+    </app-form-field>
+
+    <app-form-field [isDark]="isDarkTheme">
+      <ion-item>
         <ion-label>Duration <span class="optional-tag">(Optional)</span></ion-label>
         <ion-select [(ngModel)]="selectedDuration" placeholder="Select duration">
           <ion-option *ngFor="let d of durations" [value]="d.id">{{d.duration}} mins</ion-option>

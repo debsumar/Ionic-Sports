@@ -42,3 +42,39 @@ export interface ClubVenueDto {
   shop_pickup_location: number;
   visible_at_signup: number;
 }
+
+/** A court as returned by courtbooking/getAllCourts ("All Courts in a venue"). */
+export interface CourtDto {
+  firebasekey: string;
+  CourtName: string;
+  CourtType: string;
+  ActivityKey: string;
+  ActivityName: string;
+  ClubKey: string;
+  ClubName: string;
+  ParentClubkey: string;
+  Comments: string;
+  Days: string;
+  StartTime: string;
+  EndTime: string;
+  Surface: string;
+  SurfaceCode: number;
+  Shared: string;
+  FloodLight: string;
+  FloodLightCostForMember: string;
+  FloodLightCostForNonMember: string;
+  BookedTime: string;
+  BookingInFo: string;
+  IsActive: boolean;
+  IsEnable: boolean;
+  Status: boolean;
+  CreatedDate: string;
+  UpdatedDate: string;
+}
+
+export interface GetAllCourtsResponseDto {
+  status: number;
+  message: string;
+  data: CourtDto[];
+  type: string;
+}

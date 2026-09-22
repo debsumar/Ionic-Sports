@@ -30,6 +30,7 @@ import { CommonService } from "../services/common.service";
 import { CommonLeagueService } from "../pages/type2/league/commonleague.service";
 import { ThemeService } from "../services/theme.service";
 import { HttpService } from "../services/http.service";
+import { NotificationEmailService } from "../services/notificationemail.service";
 import { ParentClubService } from "../services/parentclub.service";
 import { FeatureAnnouncementService } from "../services/feature-announcement.service";
   
@@ -80,6 +81,7 @@ import { MapPickerModalComponent } from '../shared/components/map-picker/map-pic
     CommonLeagueService,
     ThemeService,
     HttpService,
+    NotificationEmailService,
     ParentClubService,
     FeatureAnnouncementService,
     {

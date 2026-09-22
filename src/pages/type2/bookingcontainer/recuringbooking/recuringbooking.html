@@ -14,21 +14,21 @@
         <!-- 🎛️ Club / Activity filters -->
         <div class="filter-row">
             <ion-item class="filter-item">
-                <ion-select [selectOptions]="{title:'Select Club',mode:'ios'}" [(ngModel)]="selectedClubKey" interface="action-sheet">
-                    <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}} (ionSelect)="onClubChange($event)">{{club.ClubName}}</ion-option>
+                <ion-select [selectOptions]="{title:'Select Club',mode:'ios'}" [(ngModel)]="selectedClubKey" interface="action-sheet" (ionChange)="onClubChange()">
+                    <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
                 </ion-select>
             </ion-item>
             <ion-item class="filter-item">
-                <ion-select [selectOptions]="{title:'Select Activity',mode:'ios'}" [(ngModel)]="selectedActivity" >
-                    <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}} (ionSelect)="onActivityChange($event)">{{Activity.ActivityName}}</ion-option>
+                <ion-select [selectOptions]="{title:'Select Activity',mode:'ios'}" [(ngModel)]="selectedActivity" (ionChange)="onActivityChange()">
+                    <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}}>{{Activity.ActivityName}}</ion-option>
                 </ion-select>
             </ion-item>
         </div>
         <div class="filter-row">
             <ion-item class="filter-item full">
                 <ion-label>Select Courts</ion-label>
-                <ion-select [selectOptions]="{title:'Select Court',mode:'ios'}" [(ngModel)]="selectedCourt" >
-                    <ion-option *ngFor="let court of courts" value={{court.$key}} (ionSelect)="onCourtChange($event)">{{court.CourtName}}</ion-option>
+                <ion-select [selectOptions]="{title:'Select Court',mode:'ios'}" [(ngModel)]="selectedCourt" (ionChange)="onCourtChange()">
+                    <ion-option *ngFor="let court of courts" value={{court.$key}}>{{court.CourtName}}</ion-option>
                 </ion-select>
             </ion-item>
         </div>

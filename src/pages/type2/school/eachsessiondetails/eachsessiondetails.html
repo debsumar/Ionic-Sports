@@ -154,12 +154,12 @@
 </ion-content>
 
 
-   <ion-fab left bottom>
+   <ion-fab left bottom class="session-fab" *ngIf="isShowDelete">
         <button ion-fab mini class="trash-fab" (click)="removeConfirmation()">
             <ion-icon name="trash"></ion-icon>
         </button>
     </ion-fab>
-    <ion-fab mini right bottom #fab>
+    <ion-fab right bottom class="session-fab" #fab>
 
         <button class="primary-fab" ion-fab mini
              id="fav-ico">

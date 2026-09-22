@@ -10,72 +10,80 @@
 
 
 <ion-content>
-    <ion-refresher slot="fixed" pullFactor="0.5" (ionRefresh)="doRefresh($event)">
-        <ion-refresher-content></ion-refresher-content>
-    </ion-refresher>
+    <div class="page-layout">
 
-    <div class="booking-header">
-        <!-- 🔀 Today / All days tab toggle -->
-        <app-pill-tabs leftLabel="Today" rightLabel="All days"
-            [(activeIndex)]="selectedTabInd" (activeIndexChange)="changeTab($event)">
-        </app-pill-tabs>
+        <div class="page-fixed-header">
+            <div class="booking-header">
+                <!-- 🔀 Today / All days tab toggle -->
+                <app-pill-tabs leftLabel="Today" rightLabel="All days"
+                    [(activeIndex)]="selectedTabInd" (activeIndexChange)="changeTab($event)">
+                </app-pill-tabs>
 
-        <!-- 🎛️ Club / Activity / Court filters -->
-        <div class="filter-row">
-            <ion-item class="filter-item">
-                <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
-                    <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
-                </ion-select>
-            </ion-item>
-            <ion-item class="filter-item">
-                <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourts()">
-                    <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}}>
-                        {{Activity.ActivityName}}</ion-option>
-                </ion-select>
-            </ion-item>
-            <ion-item class="filter-item">
-                <ion-select [(ngModel)]="selectedCourt" (ionChange)="callbothfunction()">
-                    <ion-option *ngFor="let court of courts" value={{court.$key}}>{{court.CourtName}}</ion-option>
-                    <ion-option value="all">All</ion-option>
-                </ion-select>
-            </ion-item>
+                <!-- 🎛️ Club filter -->
+                <div class="filter-row">
+                    <ion-item class="filter-item">
+                        <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
+                            <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
+                        </ion-select>
+                    </ion-item>
+                </div>
+
+                <!-- 🎛️ Activity / Court filters share one line -->
+                <div class="filter-row">
+                    <ion-item class="filter-item">
+                        <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourts()">
+                            <ion-option *ngFor="let Activity of ActivityList" value={{Activity.$key}}>
+                                {{Activity.ActivityName}}</ion-option>
+                        </ion-select>
+                    </ion-item>
+                    <ion-item class="filter-item">
+                        <ion-select [(ngModel)]="selectedCourt" (ionChange)="callbothfunction()">
+                            <ion-option *ngFor="let court of courts" value={{court.$key}}>{{court.CourtName}}</ion-option>
+                            <ion-option value="all">All</ion-option>
+                        </ion-select>
+                    </ion-item>
+                </div>
+
+                <!-- 🔎 Search -->
+                <app-search-bar placeholder="Search bookings" [count]="slotListing.length"
+                    (search)="getFilterItems($event)">
+                </app-search-bar>
+            </div>
         </div>
 
-        <!-- 🔎 Search -->
-        <app-search-bar placeholder="Search bookings" [count]="slotListing.length"
-            (search)="getFilterItems($event)">
-        </app-search-bar>
-    </div>
-
-    <!-- 🈳 Empty state -->
-    <div class="empty-state" *ngIf="slotListing.length == 0">
-        <ion-icon name="calendar" class="empty-icon"></ion-icon>
-        <p class="empty-title">{{NoActiveBooking}}</p>
-    </div>
-
-    <!-- 📋 Slot listing -->
-    <div class="slot-list">
-        <primary-card *ngFor="let slot of slotListing;let i = index" accentColor="#35adff"
-            (cardClick)="gotoDetails(slot)">
-            <div class="slot-card-content">
-                <div class="slot-row">
-                    <span class="slot-name">{{slot.name}}</span>
-                    <span class="slot-time-badge">{{slot.slot_start_time}}</span>
-                </div>
-                <div class="slot-row">
-                    <span class="slot-detail">{{slot.slot_start_time}} - {{slot.slot_end_time}}</span>
-                    <span class="slot-detail">{{getTime(slot.booking_date)}}</span>
-                </div>
-                <div class="slot-row">
-                    <span class="slot-detail">{{slot.courtname}}</span>
-                    <span class="slot-price" *ngIf="currencyDetails!=undefined">
-                        {{currencyDetails.CurrencySymbol}}{{slot.price}}</span>
-                </div>
-                <div class="slot-partner" *ngIf="slot.partnerAddedText">
-                    <span>{{slot.partnerAddedText}}</span>
-                </div>
+        <div class="page-scroll-area">
+            <!-- 🈳 Empty state -->
+            <div class="empty-state" *ngIf="slotListing.length == 0">
+                <ion-icon name="calendar" class="empty-icon"></ion-icon>
+                <p class="empty-title">{{NoActiveBooking}}</p>
             </div>
-        </primary-card>
+
+            <!-- 📋 Slot listing -->
+            <div class="slot-list">
+                <primary-card *ngFor="let slot of slotListing;let i = index" accentColor="#35adff"
+                    (cardClick)="gotoDetails(slot)">
+                    <div class="slot-card-content">
+                        <div class="slot-row">
+                            <span class="slot-name">{{slot.name}}</span>
+                            <span class="slot-time-badge">{{slot.slot_start_time}}</span>
+                        </div>
+                        <div class="slot-row">
+                            <span class="slot-detail">{{slot.slot_start_time}} - {{slot.slot_end_time}}</span>
+                            <span class="slot-detail">{{getTime(slot.booking_date)}}</span>
+                        </div>
+                        <div class="slot-row">
+                            <span class="slot-detail">{{slot.courtname}}</span>
+                            <span class="slot-price" *ngIf="currencyDetails!=undefined">
+                                {{currencyDetails.CurrencySymbol}}{{slot.price}}</span>
+                        </div>
+                        <div class="slot-partner" *ngIf="slot.partnerAddedText">
+                            <span>{{slot.partnerAddedText}}</span>
+                        </div>
+                    </div>
+                </primary-card>
+            </div>
+        </div>
+
     </div>
 </ion-content>
 

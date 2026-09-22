@@ -11,10 +11,34 @@ page-booking {
     .content-md,
     .content-ios { background: #0f172a !important; }
 
+    // The scroller moves from .scroll-content to .page-scroll-area so the tabs,
+    // filters and search bar stay pinned while only the slot list scrolls.
     .scroll-content {
-        padding: 12px 12px 90px !important;
+        padding: 0 !important;
+        overflow: hidden !important;
         background-image: none !important;
         background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
+    }
+
+    .page-layout {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    // Opaque so slot cards cannot show through as they scroll underneath.
+    .page-fixed-header {
+        flex-shrink: 0;
+        z-index: 10;
+        background: #0f172a;
+        padding: 12px 12px 0;
+    }
+
+    .page-scroll-area {
+        flex: 1;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 0 12px 90px;
     }
 
     .booking-header {
@@ -135,6 +159,10 @@ page-booking {
 
         .scroll-content {
             background: linear-gradient(165deg, #f8fafc 0%, #eef4fb 50%, #f8fafc 100%) !important;
+        }
+
+        .page-fixed-header {
+            background: #f8fafc;
         }
 
         .filter-item {

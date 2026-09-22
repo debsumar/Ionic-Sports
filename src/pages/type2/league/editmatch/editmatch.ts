@@ -11,6 +11,7 @@ import { AllMatchData, MatchDuration } from '../../../../shared/model/match.mode
 import { RoundTypeInput, RoundTypesModel } from '../../../../shared/model/league.model';
 import { CatandType } from '../models/location.model';
 import moment from 'moment';
+import { minutesOfDay, normalizeTimeOfDay } from '../../../../shared/utility/utility';
 
 @IonicPage()
 @Component({
@@ -23,6 +24,8 @@ export class EditmatchPage {
   data: AllMatchData;
   start_date: string;
   start_time: string;
+  early_arrival_time: string = '';
+  private originalEarlyArrival: string = '';
   min: string;
   max: string = '2049-12-31';
   publicType: boolean = true;
@@ -64,6 +67,8 @@ export class EditmatchPage {
     const parsed = moment(this.data.MatchStartDate, 'YYYY-MM-DD HH:mm');
     this.start_date = parsed.isValid() ? parsed.format('YYYY-MM-DD') : moment().format('YYYY-MM-DD');
     this.start_time = parsed.isValid() ? parsed.format('HH:mm') : '09:00';
+    this.early_arrival_time = normalizeTimeOfDay(this.data.early_arrival_time);
+    this.originalEarlyArrival = this.early_arrival_time;
 
     this.publicType = (this.data as any).MatchVisibility === 0;
     this.isChecked = parseFloat(this.data.MemberFees) > 0 || parseFloat(this.data.NonMemberFees) > 0;
@@ -165,6 +170,14 @@ export class EditmatchPage {
       this.commonService.toastMessage('Enter non-member fee', 2500, ToastMessageType.Error);
       return false;
     }
+
+    const early = minutesOfDay(this.early_arrival_time);
+    const startMins = minutesOfDay(this.start_time);
+    if (early !== null && startMins !== null && early >= startMins) {
+      this.commonService.toastMessage('Early arrival time must be before the start time', 2500, ToastMessageType.Error);
+      return false;
+    }
+
     return true;
   }
 
@@ -208,6 +221,11 @@ export class EditmatchPage {
       location_type: 0,
       Round: this.data.Round ? (this.roundTypes.find(r => r.name === this.data.Round) || {} as any).id || 0 : 0
     };
+
+    const earlyArrival = normalizeTimeOfDay(this.early_arrival_time);
+    if (earlyArrival || this.originalEarlyArrival) {
+      payload['early_arrival_time'] = earlyArrival;
+    }
 
     this.httpService.put(`${API.EDIT_MATCH}`, payload).subscribe({
       next: (res: any) => {

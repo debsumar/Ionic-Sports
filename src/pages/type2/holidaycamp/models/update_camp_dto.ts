@@ -125,6 +125,12 @@ export class UpadteHolidayCampDTO {
         //authorize_child_to_move_back_home = edit_Holidaycamp.;
         edit_Holidaycamp.is_agree_terms_conditions = false;// as of now no interface
         edit_Holidaycamp.show_additional_info = campDet.show_additional_info;// as of now no interface
+        // Carry the Public/Hide selection (CampStatus PRIVATE=0 / PUBLIC=1) through to the
+        // mutation. Coerced because ion-select can hand back the option value as a string.
+        // Left unset when the camp status was never loaded, so we don't send NaN.
+        if (campDet.camp_status !== undefined && campDet.camp_status !== null) {
+            edit_Holidaycamp.camp_status = Number(campDet.camp_status);
+        }
 
         return edit_Holidaycamp;
     }

@@ -179,6 +179,7 @@ export const API = {
     CANCEL_SLOT_WITH_ID: 'courtbooking/cancelslotwithid',
     ALL_BOOKING_BY_COURT: 'courtbooking/allbookingbycourt',
     CREATE_COURT: "courtbooking/createCourt",
+    GET_ALL_COURTS: "courtbooking/getAllCourts",
     UPDATE_COURT_V2: "courtbooking/updateCourtV2",
     LOYALTY_REWARD_POINTS: 'loyalty/rewardpoints',
     LOYALTY_REWARD_POINTS_V2: 'loyalty/rewardpoints_v2',
@@ -205,6 +206,8 @@ export const API = {
     SEND_PUSH_NOTIFICATION: 'notifications/send-push-notification',
     GET_NOTIFICATIONS: 'notifications/get-notifications',
     DELETE_NOTIFICATION: 'notifications/delete-notification',
+    // --- Messaging (ap_next_gen_backend) ---
+    SEND_NOTIFICATION_EMAIL: 'messaging/SendNotificationEmail',
     GET_SUPERADMIN_MEMBER_COUNT: 'superadmin/membercount',
     GET_APKIDS_LOGIN_STATUS: 'apkids/loginstatus',
     SUBADMIN_RESET_PASSWORD: 'parentclubuser/subadmin/resetpassword',

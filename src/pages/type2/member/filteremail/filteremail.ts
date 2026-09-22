@@ -11,9 +11,10 @@ import { UsersModel } from '../../../../shared/model/users_list.model';
 import { GraphqlService } from '../../../../services/graphql.service';
 import { UsersListInput } from '../model/member';
 import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../shared/dtos/club.dto';
-import { AppType } from '../../../../shared/constants/module.constants';
+import { AppType, NoticationModuleTypes } from '../../../../shared/constants/module.constants';
 import { API } from '../../../../shared/constants/api_constants';
 import { HttpService } from '../../../../services/http.service';
+import { NotificationEmailService } from '../../../../services/notificationemail.service';
 
 /**
  * Generated class for the FilteremailPage page.
@@ -93,6 +94,7 @@ export class Filteremail {
     public popoverCtrl: PopoverController,
     private graphqlService:GraphqlService,
     private httpService: HttpService,
+    private notificationEmailService: NotificationEmailService,
     public events: Events) {
       this.themeType = sharedservice.getThemeType();
       this.loadTheme();
@@ -381,98 +383,47 @@ async getParentClubUsers(){
   checkEmail() {
 
   }
-  email() {
-      try {
-          // let notificationDetailsObjForMember = {
-          //     ParentClubKey: this.parentClubKey,
-          //     ClubKey: this.selectedClub,
-          //     ClubName: this.clubName,
-          //     ClubShortName: this.clubShortName,
-          //     Message: this.emailObj.Message,
-          //     Subject: this.emailObj.Subject,
-          //     // SendTo: "",
-          //     SendBy: "ClubAdmin",
-          //     ComposeOn: new Date().getTime(),
-          //     Purpose: "Notification",
-          //     MemberKey: "",
-          //     MemberName: "",
-          //     MemberEmailId: "",
-          //     Status: "Unread",
-          //     Type: ""
-          // };
-          // let notificationDetailsObjForAdmin = {
-          //     ParentClubKey: this.parentClubKey,
-          //     ClubKey: this.selectedClub,
-          //     ClubName: this.clubName,
-          //     ClubShortName: this.clubShortName,
-          //     Message: this.emailObj.Message,
-          //     Subject: this.emailObj.Subject,
-          //     // SendTo: "",
-          //     SendBy: "ClubAdmin",
-          //     Type: "",
-          //     ComposeOn: new Date().getTime(),
-          //     Purpose: "Notification",
-          //     Member: []
-
-          // };
-          // let notificationDetailsObjForMemberInner = {
-          //     MemberKey: "",
-          //     MemberName: "",
-          //     MemberEmailId: "",
-          //     Status: "Unread"
-          // }
-          
-          let emailFormembers = {
-              Members: [],
-              ImagePath: this.parentClubDetails.ParentClubAppIconURL,
-              FromEmail: "info@activitypro.app",
-              //FromEmail:"beactive@activitypro.co.uk",
-              FromName: this.parentClubDetails.ParentClubName,
-              ToEmail: this.parentClubDetails.ParentClubAdminEmailID,
-              ToName: this.parentClubDetails.ParentClubName,
-              CCName: this.parentClubDetails.ParentClubName,
-              CCEmail: this.parentClubDetails.ParentClubAdminEmailID,
-              Subject: this.emailObj.Subject,
-              Message: this.emailObj.Message.replace(/\n/g, '<br>'),
-          }
-
-          emailFormembers.Members = this.filteredMember;
-          //return false;
-          try{
-            this.commonService.showLoader("Please wait");
-            
-            const email_mutation = gql`
-              mutation sendNotificationEmail($emailInput: EmailNotification!) {
-                sendNotificationEmail(emailInput: $emailInput)
-              }` 
-              
-              const email_variable = { emailInput: emailFormembers };
-              this.graphqlService.mutate(email_mutation, email_variable,0).subscribe((response)=>{
-                //let firebs = this.fb;
-                //let members = [];
-                //members = this.filteredMember; //this.memberList;
-                // let pc = this.parentClubKey;
-                // let url = this.sharedservice.getEmailUrl();
-                this.commonService.hideLoader();
-                this.commonService.toastMessage("Mail sent successfully",2500,ToastMessageType.Success, ToastPlacement.Bottom);
-                this.emailObj.Message = "Dear All,\n\n\n\nSincerely Yours,\n" + this.parentClubDetails.ParentClubName + "\n" + "Ph:" + this.parentClubDetails.ContactPhone + "\n" + this.parentClubDetails.ParentClubAdminEmailID;
-                this.emailObj.Subject = "";
-                //this.navCtrl.setRoot("Dashboard");
-                this.navCtrl.pop();
-              },(err)=>{
-                this.commonService.hideLoader();
-                this.commonService.toastMessage("Email sent failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
-              });   
-          }catch(err){
-            console.log(`${JSON.stringify(err)}`);
-            this.commonService.hideLoader();
-          }
-      } catch (ex) {
-        this.commonService.toastMessage("Email sent failed",2500,ToastMessageType.Error, ToastPlacement.Bottom);
-        this.commonService.hideLoader();
+  private getNotificationModule(): string {
+      switch (Number(this.selectedEmailCategory)) {
+          case 0:
+              return String(NoticationModuleTypes.MEMBER_EMAIL);
+          case 1:
+              return String(NoticationModuleTypes.NON_MEMBER_EMAIL);
+          case 2:
+              return String(NoticationModuleTypes.INDIVIDUALEMAIL);
       }
   }
 
+  email() {
+     try{
+            this.commonService.showLoader("Please wait");
+            this.notificationEmailService.sendNotificationEmail({
+              members: this.filteredMember,
+              parentClubIconUrl: this.parentClubDetails.ParentClubAppIconURL,
+              fromEmail: "info@activitypro.app",
+              parentClubName: this.parentClubDetails.ParentClubName,
+              parentClubAdminEmail: this.parentClubDetails.ParentClubAdminEmailID,
+              subject: this.emailObj.Subject,
+              message: this.emailObj.Message,
+              module: this.getNotificationModule(),
+              purpose: 'MemberFilterEmail',
+              clubId: this.selectedClub,
+            }).subscribe((response) => {
+              this.commonService.hideLoader();
+              this.commonService.toastMessage("Mail sent successfully",2500,ToastMessageType.Success, ToastPlacement.Bottom);
+              this.emailObj.Message = "Dear All,\n\n\n\nSincerely Yours,\n" + this.parentClubDetails.ParentClubName + "\n" + "Ph:" + this.parentClubDetails.ContactPhone + "\n" + this.parentClubDetails.ParentClubAdminEmailID;
+              this.emailObj.Subject = "";
+              this.navCtrl.pop();
+            },(err) => {
+              this.commonService.hideLoader();
+              this.commonService.toastMessage(err.error.message || "Failed to send email",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+            });
+          }catch(err){
+            console.log(`${JSON.stringify(err)}`);
+            this.commonService.hideLoader();
+            this.commonService.toastMessage(err.error.message || "Failed to send email",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+          }
+  }
 
 
 

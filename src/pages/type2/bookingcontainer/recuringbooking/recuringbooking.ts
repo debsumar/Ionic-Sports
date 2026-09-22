@@ -9,8 +9,10 @@ import { FirebaseService } from '../../../../services/firebase.service';
 import { HttpClient } from '@angular/common/http';
 import { HttpService } from '../../../../services/http.service';
 import { API } from '../../../../shared/constants/api_constants';
-import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../shared/dtos/club.dto';
-import { AppType } from '../../../../shared/constants/module.constants';
+import { ClubVenueDto, CourtDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../shared/dtos/club.dto';
+import { AppType, DeviceType } from '../../../../shared/constants/module.constants';
+import { CommonRestApiDto } from '../../../../shared/model/common.model';
+import { ClubActivity } from '../../../../shared/model/activity.model';
 import { ThemeService } from '../../../../services/theme.service';
 
 /**
@@ -47,6 +49,12 @@ export class RecuringbookingPage {
   recuringBookDetails:any = [];
   daysDetails = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
   isDarkTheme: boolean = true; // 🌗 Default dark theme
+  // Each fetch below writes its own select's ngModel, and Ionic 3's BaseInput re-emits
+  // (ionChange) on programmatic writes - which would re-trigger the next fetch on top of
+  // the explicit chained call. These remember the last inputs each fetch ran for.
+  private activityFetchClubKey: string = null;
+  private courtFetchActivityKey: string = null;
+  private recurringFetchCourtKey: string = null;
   constructor(public navCtrl: NavController,public http: HttpClient, 
     public navParams: NavParams,public storage: Storage,
     public fb: FirebaseService,public commonService: CommonService,
@@ -106,6 +114,10 @@ export class RecuringbookingPage {
   }
 
   getClubDetails() {
+          // Allow one fetch of each stage per page entry even if the selections are unchanged.
+          this.activityFetchClubKey = null;
+          this.courtFetchActivityKey = null;
+          this.recurringFetchCourtKey = null;
           const body: GetParentClubVenuesRequestDto = {
               parentclub_id: this.sharedService.getPostgreParentClubId(),
               app_type: AppType.ADMIN_NEW,
@@ -132,36 +144,101 @@ export class RecuringbookingPage {
   }
   
   getAllActivity() {
-    this.fb.getAll("/Activity/" + this.selectedParentClubKey + "/" + this.selectedClubKey + "/").subscribe((data) => {
-        // this.ActivityList = [];
-        // this.selectedActivity = "";
-        if (data.length > 0) {
-            this.ActivityList = data;
-            this.selectedActivity = this.ActivityList[0].$key;
-            //if(!this.is_initial) this.getAllCourts();
-            this.getAllCourts();
-        }else{
+    if (this.activityFetchClubKey === this.selectedClubKey) {
+      return;
+    }
+    this.activityFetchClubKey = this.selectedClubKey;
+
+    // The club select binds the Firebase club id, but club_activity/get_club_activities is
+    // keyed on postgres ids - bridge the two via the clubs list (ClubVenueDto has both).
+    const selectedClub = this.clubs.find((club: ClubVenueDto) => club.FirebaseId === this.selectedClubKey);
+    const body: CommonRestApiDto & { updated_by: string } = {
+      parentclubId: this.sharedService.getPostgreParentClubId(),
+      clubId: selectedClub ? selectedClub.Id : '',
+      activityId: '',
+      memberId: this.sharedService.getLoggedInUserId(),
+      action_type: 0,
+      device_type: this.sharedService.getPlatform() == 'android' ? DeviceType.ANDROID : DeviceType.IOS,
+      app_type: AppType.ADMIN_NEW,
+      device_id: this.sharedService.getDeviceId() || '',
+      updated_by: this.sharedService.getLoggedInUserId()
+    };
+
+    this.httpService.post(API.CLUB_ACTIVITIES, body).subscribe({
+      next: (res: any) => {
+        const clubActivities: ClubActivity[] = (res && res.data && res.data.club_activities) ? res.data.club_activities : [];
+        // Drop the placeholder rows this endpoint returns (activity_key "undefined", null
+        // activity/name) - courts are keyed on activity_key, so a row without one is unusable.
+        const activities = clubActivities
+          .filter((activity) => activity && activity.activity_key && activity.activity_key !== 'undefined'
+            && (activity.alias_name || activity.activity_name))
+          // Keep $key / ActivityName so the template and court lookup stay unchanged.
+          .map((activity) => ({
+            ...activity,
+            $key: activity.activity_key,
+            ActivityName: activity.alias_name || activity.activity_name
+          }));
+        if (activities.length > 0) {
+          this.ActivityList = activities;
+          this.selectedActivity = this.ActivityList[0].$key;
+          this.getAllCourts();
+        } else {
+          this.ActivityList = [];
+          this.selectedActivity = "";
           this.courts = [];
           this.selectedCourt = "";
+          this.recuringBookDetails = [];
         }
-        //this.getAllCourts();
+      },
+      error: () => {
+        this.ActivityList = [];
+        this.selectedActivity = "";
+      }
     });
   }
   getAllCourts(){
-    this.fb.getAllWithQuery("/Court/"+this.selectedParentClubKey+"/"+this.selectedClubKey+"/"+this.selectedActivity,{orderByChild:'IsActive',equalTo:true}).subscribe(async (data) =>{
-    //  this.courts = [];
-    //  this.selectedCourt = "";
-     if(data.length > 0){
-        this.courts = data;
-        this.selectedCourt = this.courts[0].$key;
-        this.recuringBookDetails = [];
-        //if(!this.is_initial) this.getrecuringBookDetails();
-        this.getrecuringBookDetails();
-      }else{
+    if (!this.selectedActivity) {
+      this.courts = [];
+      this.selectedCourt = "";
+      this.recuringBookDetails = [];
+      return;
+    }
+    if (this.courtFetchActivityKey === this.selectedActivity) {
+      return;
+    }
+    this.courtFetchActivityKey = this.selectedActivity;
+    // courtbooking/getAllCourts is keyed on Firebase ids, which is what all three
+    // of these already hold.
+    const params = {
+      activity: this.selectedActivity,
+      clubKey: this.selectedClubKey,
+      parentClubKey: this.selectedParentClubKey
+    };
+    this.httpService.get(API.GET_ALL_COURTS, params, null, 1).subscribe({
+      next: (res: any) => {
+        const allCourts: CourtDto[] = (res && res.data) ? res.data : [];
+        const courts = allCourts
+          // Preserves the IsActive filter the previous Firebase query applied.
+          .filter((court) => court && court.IsActive && court.firebasekey)
+          // Keep $key so the template and the recurring lookup stay unchanged.
+          .map((court) => ({ ...court, $key: court.firebasekey }));
+        if (courts.length > 0) {
+          this.courts = courts;
+          // Recurring bookings target one specific court (there is no "All" option on
+          // this page), so the first court stays the default.
+          this.selectedCourt = this.courts[0].$key;
+          this.recuringBookDetails = [];
+          this.getrecuringBookDetails();
+        } else {
+          this.courts = [];
+          this.selectedCourt = "";
+          this.recuringBookDetails = [];
+        }
+      },
+      error: () => {
         this.courts = [];
         this.recuringBookDetails = [];
       }
-      //await this.getrecuringBookDetails();
     });
   }
   // getrecuringBookDetrails(){
@@ -187,6 +264,14 @@ export class RecuringbookingPage {
   // }
 
   getrecuringBookDetails(){
+    if (!this.selectedCourt) {
+      this.recuringBookDetails = [];
+      return;
+    }
+    if (this.recurringFetchCourtKey === this.selectedCourt) {
+      return;
+    }
+    this.recurringFetchCourtKey = this.selectedCourt;
     this.commonService.showLoader('Please wait');
     const url = `${API.GET_RECURRING_LIST}/${this.selectedParentClubKey}/${this.selectedCourt}`;
     
@@ -223,21 +308,20 @@ export class RecuringbookingPage {
   }
 
 
-  //On Club selection change
-  onClubChange(val:any){
-    this.selectedClubKey = val;
+  // On Club selection change. Bound to the select's (ionChange) rather than each
+  // ion-option's (ionSelect), so the fetch happens when the value is committed (OK)
+  // instead of the moment a radio is tapped. ngModel has already written the value.
+  onClubChange(){
     this.getAllActivity();
   }
 
   //On Activity selection change
-  onActivityChange(val:any){
-    this.selectedActivity = val;
+  onActivityChange(){
     this.getAllCourts();
   }
 
   //On Court selection change
-  onCourtChange(val:any){
-    this.selectedCourt = val;
+  onCourtChange(){
     this.getrecuringBookDetails();
   }
 

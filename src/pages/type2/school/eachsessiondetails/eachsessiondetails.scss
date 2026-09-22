@@ -176,6 +176,17 @@ page-eachsessiondetails {
     .margin_auto { margin: auto; }
 
     // ---- Fabs ----
+    // The delete fab (left) and the actions fab (right) must sit on one baseline.
+    // Pin both containers to the same bottom offset and give the buttons inside
+    // identical metrics so the two can never drift apart.
+    ion-fab.session-fab {
+        bottom: 10px;
+        margin: 0;
+
+        > [ion-fab] {
+            margin: 8px;
+        }
+    }
     .primary-fab {
         background-color: #2b92bb !important;
         color: #ffffff !important;

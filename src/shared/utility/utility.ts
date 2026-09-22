@@ -18,6 +18,43 @@ export function convertMinutesToHoursAndMinutes(minutes: number): string {
     return `${hoursStr}:${minutesStr}`;
 }
 
+/**
+ * Normalizes a time-of-day value to a zero-padded 24-hour "HH:mm" string.
+ * Returns an empty string when the value is missing or invalid.
+ */
+export function normalizeTimeOfDay(value: string): string {
+    if (typeof value !== 'string') {
+        return '';
+    }
+
+    const match = /^(\d{1,2}):(\d{2})/.exec(value);
+    if (!match) {
+        return '';
+    }
+
+    const hours = Number(match[1]);
+    const minutes = Number(match[2]);
+    if (hours > 23 || minutes > 59) {
+        return '';
+    }
+
+    return `${padLeft(hours, 2)}:${padLeft(minutes, 2)}`;
+}
+
+/**
+ * Converts a valid time-of-day value to minutes elapsed since midnight.
+ * Returns null when the value is missing or invalid.
+ */
+export function minutesOfDay(value: string): number | null {
+    const normalized = normalizeTimeOfDay(value);
+    if (!normalized) {
+        return null;
+    }
+
+    const parts = normalized.split(':');
+    return Number(parts[0]) * 60 + Number(parts[1]);
+}
+
 export function setDay(shortDay):string {
     if (shortDay == "Mon") {
       return "Monday";
