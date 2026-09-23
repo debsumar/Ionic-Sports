@@ -20,7 +20,12 @@ import { Device } from "@ionic-native/device";
 
 @Component({
   templateUrl: "app.html",
-  providers: [SharedServices, FirebaseService, CommonService, LanguageService],
+  // NOTE: SharedServices must NOT be listed here. A component-level provider creates
+  // an instance scoped to this component's injector, so the setters below (presigned
+  // URL, cloudfront, node/graphql URLs, platform, ...) were writing to a second,
+  // orphaned instance while every page read the root one from app.module - leaving
+  // those values undefined app-wide. FirebaseService has no root provider, so it stays.
+  providers: [FirebaseService, CommonService, LanguageService],
 })
 export class MyApp {
   @ViewChild(Nav) nav: Nav;
@@ -43,12 +48,13 @@ export class MyApp {
     private oneSignal: OneSignal,
     private device: Device, // public cache: CacheService
   ) {
-    let isProduction = false;
+    let isProduction = true;
     let emailUrl = "";
     let nodeURL = "";
     let SuperAdminKey = "";
     let aws_cloudfrontURL = "";
     let aws_presignedUrl = "";
+    let onboardingUrl = "";
     let graphql_url = "";
     let group_sessionsUrl = "";
     let group_session_apikey = "";
@@ -65,6 +71,8 @@ export class MyApp {
       aws_cloudfrontURL = "https://d1ybtjfafmsyx2.cloudfront.net";
       aws_presignedUrl =
         "https://k26gihyg2c.execute-api.eu-west-2.amazonaws.com/prod/generatesignedurl";
+      onboardingUrl =
+        "https://edge.activitypro.app/auth/onboarding/create-account";
       SuperAdminKey = "-KxumnfpRwRV--yZ5PVu";
       graphql_url = "https://applus-api.activitypro.co.uk/graphql";
     } else {
@@ -77,6 +85,8 @@ export class MyApp {
       aws_cloudfrontURL = "https://d2ert9om2cv970.cloudfront.net";
       aws_presignedUrl =
         "https://i97kakk5tk.execute-api.eu-west-2.amazonaws.com/Dev/generatesignedurl";
+      onboardingUrl =
+        "https://dev-edge.activitypro.app/auth/onboarding/create-account";
       SuperAdminKey = "-KoGLONcroK1vB02b9Gg";
       graphql_url = "https://api-dev.activitypro.co.uk/graphql";
     }
@@ -89,6 +99,7 @@ export class MyApp {
     this.sharedservice.setSuperAdminKey(SuperAdminKey);
     this.sharedservice.setCloudfrontURL(aws_cloudfrontURL);
     this.sharedservice.setPresignedURL(aws_presignedUrl);
+    this.sharedservice.setOnboardingURL(onboardingUrl);
     this.sharedservice.setGroupSessionsURL(group_sessionsUrl);
     this.sharedservice.setGroupSessionAPiKey(group_session_apikey);
     this.sharedservice.setPlatform(platform.is("android") ? "android" : "ios");

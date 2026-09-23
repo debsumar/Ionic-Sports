@@ -1063,7 +1063,7 @@ export class Type2EditGroupSessionMonthly {
         },
         (err) => {
           this.commonService.toastMessage(
-            "Session updation failed",
+            err.error.message || "Failed to update session",
             2500,
             ToastMessageType.Error,
             ToastPlacement.Bottom,

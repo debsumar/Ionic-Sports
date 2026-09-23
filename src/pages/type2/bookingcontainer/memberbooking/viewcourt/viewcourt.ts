@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, ToastController, ActionSheetController, Alert, AlertController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, ActionSheetController, Alert, AlertController } from 'ionic-angular';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { TSMap } from 'typescript-map';
@@ -66,7 +66,6 @@ export class ViewcourtPage {
     MaxBookingForTotaldays:0,
     IsAllowNonMember:false
   }
-  loading:any = "";
   days:any = [];
   dates:any = [];
   fomatedDate:any = [];
@@ -114,7 +113,7 @@ export class ViewcourtPage {
     public toastCtrl:ToastController,public navCtrl: NavController, 
     public navParams: NavParams,public fb: FirebaseService,
     public storage: Storage, public commonService: CommonService,
-    public http: HttpClient,public loadingCtrl: LoadingController,
+    public http: HttpClient,
     private httpService: HttpService, private themeService: ThemeService) {
    
    this.recurringSubjectArray.forEach((element:String)=>{
@@ -173,16 +172,13 @@ export class ViewcourtPage {
   }
 
   ionViewDidEnter(){
-    this.loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    this.loading.present().then(() => {
+    this.commonService.showLoader('Please wait...').then(() => {
       this.freeImageURl = "https://firebasestorage.googleapis.com/v0/b/activityprouk-b5815/o/ActivityPro%2FBookingPhotos%2FCourt_Booking_Free_Slot.jpeg?alt=media&token=9cac1375-2177-41d7-8d51-26a67857f709";
       this.timeConstraint.clear();
       this.noOfSlootBook = 0;
       this.selectedCourt.clear();
       this.getBookingInf0();
-      this.loading.dismiss().catch(() => { });
+      this.commonService.hideLoader();
     });
   }
 
@@ -241,10 +237,7 @@ export class ViewcourtPage {
   }
 
   getLoadedwithRequireddata(){
-    this.loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    this.loading.present().then(() => {
+    this.commonService.showLoader('Please wait...').then(() => {
       this.todayDay = moment().format('ddd');
       this.tomorrowday = moment().add(1, 'days').format('ddd');
       this.dayAfterTomorrowday = moment().add(2, 'days').format('ddd');
@@ -302,7 +295,7 @@ export class ViewcourtPage {
          this.courtDetailsTemp.splice(this.indexOfSelectedCourt,1);
          this.getBookingInf0();
 
-      this.loading.dismiss().catch(() => { });
+      this.commonService.hideLoader();
     });
   
   }
@@ -330,17 +323,14 @@ export class ViewcourtPage {
   }
   //..........................After select a Court callad method........................
   select(courts){
-    this.loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    this.loading.present().then(() => {
+    this.commonService.showLoader('Please wait...').then(() => {
       this.selectedCourt.clear();
     this.todaysSlot = [];
     this.tommorowSlot = [];
     this.dayAfterTomorrowSlot = [];
     this.selectedCourts = courts;
     this.getrecuringBookDetrails();
-      this.loading.dismiss().catch(() => { });
+      this.commonService.hideLoader();
     });
    
   }

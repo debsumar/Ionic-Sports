@@ -1,5 +1,5 @@
 import { Component, NgZone, } from '@angular/core';
-import { IonicPage, NavController, NavParams, LoadingController, ToastController, Events, ActionSheetController, Alert, AlertController, FabContainer } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, Events, ActionSheetController, Alert, AlertController, FabContainer } from 'ionic-angular';
 import * as moment from 'moment';
 import { Storage } from '@ionic/storage';
 import { CommonService, ToastPlacement, ToastMessageType } from '../../../../../services/common.service';
@@ -37,7 +37,6 @@ export class NewViewcourtPage {
   selectedDate: string;
   showDate: string = '';
   freeImageURl: string;
-  loading: any;
   timeConstraint: any;
   allCourts: any = [];
   parentClubKey: any;
@@ -83,7 +82,7 @@ export class NewViewcourtPage {
   constructor(public sharedService: SharedServices, public events: Events, 
     public ngZone: NgZone, public alertCtrl: AlertController, public actionSheetCtrl: ActionSheetController,
      public toastCtrl: ToastController, public navCtrl: NavController, public navParams: NavParams, public fb: FirebaseService, 
-     public storage: Storage, public commonService: CommonService, public http: HttpClient, public loadingCtrl: LoadingController, private httpService: HttpService, private themeService: ThemeService) {
+     public storage: Storage, public commonService: CommonService, public http: HttpClient, private httpService: HttpService, private themeService: ThemeService) {
     //  this.events.subscribe('updateScreen', () => {
     //    this.ngZone.run(() => {
    
@@ -244,10 +243,7 @@ export class NewViewcourtPage {
     }
     
     this.isLoadingSlots = true;
-    this.loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    this.loading.present();
+    this.commonService.showLoader('Please wait...');
     const courtwiseSlots = await this.getSlotsbyAPi(date, courtKey);
     this.isLoadingSlots = false;
   }
@@ -274,9 +270,7 @@ export class NewViewcourtPage {
         
         this.httpService.get(API.GET_MULTI_COURT_SLOT, params, null, 1).subscribe({
           next: (response) => {
-            if (this.loading) {
-              this.loading.dismiss().catch(() => {});
-            }
+            this.commonService.hideLoader();
             if (response['data']['bookingDetails']) {
               this.bookingDetails = response['data']['bookingDetails']
             }
@@ -291,17 +285,13 @@ export class NewViewcourtPage {
             res('success')
           },
           error: (err) => {
-            if (this.loading) {
-              this.loading.dismiss().catch(() => {});
-            }
+            this.commonService.hideLoader();
             rej(err)
           }
         })
       } catch (err) {
         rej(err)
-        if (this.loading) {
-          this.loading.dismiss().catch(() => {});
-        }
+        this.commonService.hideLoader();
       }
     })
   }
@@ -385,10 +375,7 @@ export class NewViewcourtPage {
       this.calltobookinginfo(court, slideInfo)
     }
     else {
-      this.loading = this.loadingCtrl.create({
-        content: 'Please wait...'
-      });
-      this.loading.present().then(() => {
+      this.commonService.showLoader('Please wait...').then(() => {
         {
           let creatTime = new Date(`${this.dmmmyyyformatDtae} 12:00`).getTime()
           let isAllow = false;
@@ -472,7 +459,7 @@ export class NewViewcourtPage {
             this.commonService.toastMessage("Non members not allowed to book  ", 3000, ToastMessageType.Info, ToastPlacement.Bottom);
           }
         }
-        this.loading.dismiss().catch(() => { });
+        this.commonService.hideLoader();
       });
     }
   }
@@ -497,10 +484,7 @@ export class NewViewcourtPage {
   }
 
   bookslotforamin() {
-    this.loading = this.loadingCtrl.create({
-      content: 'Please wait...'
-    });
-    this.loading.present().then(() => {
+    this.commonService.showLoader('Please wait...').then(() => {
       try {
         const paymentDEtails = {
           parentClubKey: this.parentClubKey,
@@ -552,19 +536,19 @@ export class NewViewcourtPage {
         
         this.httpService.post(API.BOOK_FOR_ADMIN, paymentDEtails, null, 1).subscribe({
           next: (res) => {
-            this.loading.dismiss()
+            this.commonService.hideLoader();
             if (res['data']) {
               this.commonService.toastMessage(res['data'], 2500, ToastMessageType.Success)
               this.navCtrl.pop()
             }
           },
           error: (err) => {
-            this.loading.dismiss();
+            this.commonService.hideLoader();
             this.commonService.toastMessage(err['data'], 2500, ToastMessageType.Success)
           }
         })
       } catch (err) {
-        this.loading.dismiss();
+        this.commonService.hideLoader();
       }
     })
   }

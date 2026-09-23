@@ -601,12 +601,19 @@ export class CommonService {
         + '</div>' + (loadertext ? '<p class="loader-text">' + loadertext + '</p>' : '') + '</div>',
       cssClass: isLight ? 'light-loader' : 'dark-loader'
     });
-    this.loader.present();
+    // Returned so callers can defer work until the overlay is actually presented.
+    // Ionic 3's ViewController.dismiss() resolves false WITHOUT dismissing when the
+    // overlay's _nav is not set yet, so a hideLoader() issued before present()
+    // completes would leave the loader stuck on screen blocking the UI.
+    return this.loader.present();
   }
 
   hideLoader() {
     //call this fn to hide loader
-    this.loader.dismiss().catch((err) => {});
+    // Guarded: hideLoader() may be reached on an error path that never showed one.
+    if (this.loader) {
+      this.loader.dismiss().catch((err) => {});
+    }
   }
 
   getMemberSignedUpType(memberObj): number {

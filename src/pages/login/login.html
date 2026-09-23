@@ -23,8 +23,8 @@
                 <div class="input-row">
                     <ion-label class="field-label">Password</ion-label>
                     <div class="input-wrap">
-                        <ion-input [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" placeholder="••••••••" name="admin_password"></ion-input>
-                        <ion-icon [name]="showPassword ? 'eye' : 'eye-off'" class="input-icon toggle-pw" (click)="showPassword = !showPassword"></ion-icon>
+                        <ion-input #passwordInput [type]="showPassword ? 'text' : 'password'" [(ngModel)]="user.password" placeholder="••••••••" name="admin_password"></ion-input>
+                        <ion-icon [name]="showPassword ? 'eye' : 'eye-off'" class="input-icon toggle-pw" (mousedown)="$event.preventDefault()" (click)="togglePassword(passwordInput)"></ion-icon>
                     </div>
                 </div>
 

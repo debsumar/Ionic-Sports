@@ -6,7 +6,7 @@ import { NavController, Events, IonicPage } from 'ionic-angular';
 import { SharedServices } from '../services/sharedservice';
 // import { Dashboard } from '../dashboard/dashboard';
 import { FirebaseService } from '../../services/firebase.service';
-import { LoadingController, ToastController } from 'ionic-angular';
+import { ToastController } from 'ionic-angular';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../services/common.service';
 import { Platform } from 'ionic-angular';
 import { Subscription } from 'rxjs/Subscription';
@@ -32,6 +32,24 @@ export class Login {
   };
   showPassword: boolean = false;
 
+  /**
+   * Toggles password visibility without dismissing the soft keyboard.
+   *
+   * Tapping the eye icon moves focus off the input, and swapping the native
+   * input's `type` between 'password' and 'text' blurs it as well - either is
+   * enough for the WebView to hide the keyboard mid-edit. preventDefault() on
+   * mousedown stops the icon from taking focus, and setFocus() restores it on
+   * the next tick for the platforms that blur on the type change anyway.
+   */
+  togglePassword(passwordInput?: any) {
+    this.showPassword = !this.showPassword;
+    setTimeout(() => {
+      if (passwordInput && passwordInput.setFocus) {
+        passwordInput.setFocus();
+      }
+    }, 0);
+  }
+
 
   isExist: boolean = false;
   isExistEmailID: boolean = false;
@@ -47,12 +65,11 @@ export class Login {
   Apadmin$Obs:Subscription;
   constructor(public plt: Platform, 
     public commonService: CommonService,
-    public loadingCtrl: LoadingController,
      public menuCtrl: MenuController, 
      public toastCtrl: ToastController, 
      public events: Events, public navCtrl: NavController,
-      public fb: FirebaseService, 
-      private httpService: HttpService,
+     public fb: FirebaseService, 
+     private httpService: HttpService,
     public sharedservice: SharedServices, public storage: Storage) {
     this.menuCtrl.swipeEnable(false);
     this.themeType = sharedservice.getThemeType();
@@ -61,7 +78,22 @@ export class Login {
     this.navCtrl.push("ForgotPassword");
   }
 
+  /**
+   * Club registration is handled by the Edge web app, not in-app, so this opens
+   * the onboarding page in the device browser. The URL is environment-specific and
+   * comes from SharedServices (set in app.component from the same isProduction flag
+   * that selects every other environment URL).
+   *
+   * '_system' requires cordova-plugin-inappbrowser (installed) and hands the URL to
+   * the OS browser rather than loading it inside the app's WebView.
+   */
   goToRegisterClub() {
+    const onboardingUrl = this.sharedservice.getOnboardingURL();
+    if (onboardingUrl) {
+      window.open(onboardingUrl, '_system');
+      return;
+    }
+    // Fall back to the in-app page rather than leaving the link dead.
     this.navCtrl.push('RegisterClub');
   }
 
@@ -237,8 +269,9 @@ export class Login {
     /***-------------------  New code for login -----------------***/
     if (!this.validateUserInputForLogin()) return;
 
-    const loading = this.loadingCtrl.create({ content: 'Please wait...' });
-    loading.present();
+    // const loading = this.loadingCtrl.create({ content: 'Please wait...' });
+    // loading.present();
+    this.commonService.showLoader("Please wait...");
     
     this.user.emailID = this.user.emailID.trim().toLowerCase();
     
@@ -246,7 +279,7 @@ export class Login {
     this.sub = this.fb.getAllWithQuery("User/", { orderByChild: 'EmailID', equalTo: this.user.emailID })
       .subscribe(admin => {
         if (admin.length > 0 && this.user.password === admin[0].Password) {
-          loading.dismiss().catch(() => {});
+          this.commonService.hideLoader();
           this.handleLogin(admin[0], BookingMemberType.ADMIN, "admin",admin[0].$key);
           //this.getLoggedInUserInfo(admin[0].$key);
           return;
@@ -257,7 +290,7 @@ export class Login {
           .subscribe(coach => {
             if (coach.length > 0 && (coach[0].IsActive == undefined || coach[0].IsActive) && 
                 this.user.password === coach[0].Password) {
-              loading.dismiss().catch(() => {});
+              this.commonService.hideLoader();
               this.handleLogin(coach[0], BookingMemberType.COACH, "coach",coach[0].$key);
               //this.getLoggedInUserInfo();
               return;
@@ -268,7 +301,7 @@ export class Login {
               .subscribe(subAdmin => {
                 if (subAdmin.length > 0 && this.user.password === subAdmin[0].Password && 
                     (subAdmin[0].IsActive == undefined || subAdmin[0].IsActive)) {
-                  loading.dismiss().catch(() => {});
+                  this.commonService.hideLoader();
                   subAdmin[0]["SignedUpUnder"] = 6;
                   this.handleLogin(subAdmin[0], BookingMemberType.SUBADMIN, "subadmin",subAdmin[0].$key);
                   //this.getLoggedInUserInfo(subAdmin[0].$key);
@@ -278,7 +311,7 @@ export class Login {
                 // Check AppAdmin
                 this.Apadmin$Obs = this.fb.getAllWithQuery("User/APAdmin/", { orderByChild: 'EmailID', equalTo: this.user.emailID })
                   .subscribe(appAdmin => {
-                    loading.dismiss().catch(() => {});
+                    this.commonService.hideLoader();
                     if (appAdmin.length > 0 && this.user.password === appAdmin[0].Password) {
                       this.storage.set('isAppAdminLogin', true);
                       this.sharedservice.setAdminStatus(true);
@@ -289,19 +322,19 @@ export class Login {
                       this.commonService.toastMessage("Invalid User ID or Password", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
                     }
                   }, error => {
-                    loading.dismiss().catch(() => {});
+                    this.commonService.hideLoader();
                     this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
                   });
               }, error => {
-                loading.dismiss().catch(() => {});
+                this.commonService.hideLoader();
                 this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
               });
           }, error => {
-            loading.dismiss().catch(() => {});
+            this.commonService.hideLoader();
             this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
           });
       }, error => {
-        loading.dismiss().catch(() => {});
+        this.commonService.hideLoader();
         this.commonService.toastMessage("Login failed. Please try again.", 3000, ToastMessageType.Error, ToastPlacement.Bottom);
       });
 

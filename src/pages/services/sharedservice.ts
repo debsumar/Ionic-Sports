@@ -11,6 +11,7 @@ export class SharedServices {
     private static graphqlURL:string;
     private cloudFrontURL: string;
     private presignedURL:string;
+    private onboardingURL:string;
     private group_sessionsUrl:string;
     private group_session_apikey:string;
     private userData:any;
@@ -120,6 +121,13 @@ export class SharedServices {
     }
     getPresignedURL(){ 
         return this.presignedURL;
+    }
+
+    setOnboardingURL(url:string){
+        this.onboardingURL = url;
+    }
+    getOnboardingURL(){
+        return this.onboardingURL;
     }
 
     setSuperAdminKey(key: string){

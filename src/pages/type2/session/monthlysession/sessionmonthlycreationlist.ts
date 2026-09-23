@@ -439,11 +439,25 @@ export class SessionMonthlyCreationList {
           //this.reinitializeSession();
         },(err)=>{
           this.commonService.hideLoader();
-          this.commonService.toastMessage("Session creation failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+          if (err.error && err.error.message) {
+            this.commonService.toastMessage(
+              err.error.message,
+              2500,
+              ToastMessageType.Error,
+              ToastPlacement.Bottom,
+            );
+          } else {
+            this.commonService.toastMessage(
+              "Session creation failed",
+              2500,
+              ToastMessageType.Error,
+              ToastPlacement.Bottom,
+            );
+          }
         });
     }catch(err){
       this.commonService.hideLoader();
-      this.commonService.toastMessage("Session creation failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
+      this.commonService.toastMessage(err.message || "Session creation failed",2500,ToastMessageType.Error,ToastPlacement.Bottom);
     }
      
   }

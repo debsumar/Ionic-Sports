@@ -14,7 +14,7 @@
         <!-- 🎛️ Club / Activity filters -->
         <div class="filter-row">
             <ion-item class="filter-item">
-                <ion-select [selectOptions]="{title:'Select Club',mode:'ios'}" [(ngModel)]="selectedClubKey" interface="action-sheet" (ionChange)="onClubChange()">
+                <ion-select [selectOptions]="{title:'Select Club',mode:'ios'}" [(ngModel)]="selectedClubKey" (ionChange)="onClubChange()">
                     <ion-option *ngFor="let club of clubs" value={{club.FirebaseId}}>{{club.ClubName}}</ion-option>
                 </ion-select>
             </ion-item>
