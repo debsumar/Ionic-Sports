@@ -255,6 +255,41 @@ dashboard-page {
                 }
             }
         }
+
+        // Events Summary tiles were missed when .booking-card got its light variant.
+        // .modern-card turns white in light theme, but these nested tiles kept the dark
+        // #334155 background while .card-body forced their text to #1e293b - i.e. dark
+        // text on a dark tile.
+        .events-card {
+            .metrics-grid {
+                .metric-item {
+                    background: #f8fafc !important;
+                    border: 1px solid #e2e8f0 !important;
+
+                    .metric-value {
+                        color: #1e293b !important;
+                    }
+
+                    .metric-label {
+                        color: #64748b !important;
+                    }
+
+                    // The revenue tile keeps its gradient in both themes, so its text
+                    // must stay white - .card-body's light rule would otherwise force
+                    // it dark against the blue gradient.
+                    &.revenue-metric {
+                        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%) !important;
+                        border: none !important;
+
+                        .metric-value,
+                        .metric-label,
+                        .currency-small {
+                            color: #ffffff !important;
+                        }
+                    }
+                }
+            }
+        }
     }
     
     // Dark Theme Dashboard Styles

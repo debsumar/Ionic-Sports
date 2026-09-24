@@ -540,18 +540,23 @@ export class MemberprofilePage implements OnInit {
 
   //dialing phone number
   callToMember() {
-    if(this.memberInfo.phone_number !== undefined || this.memberInfo.phone_number!==""){
-      if (this.callNumber.isCallSupported()) {
-        this.callNumber
-          .callNumber(this.memberInfo.phone_number, true)
-          .then(() => console.log())
-          .catch(() => console.log());
-      } else {
-        this.commonService.toastMessage("Your device is not supporting to lunch call dialer.",2500,ToastMessageType.Info,ToastPlacement.Bottom);
-      }
-    }else{
+    const phoneNumber = this.memberInfo.phone_number;
+    // The old guard was `!== undefined || !== ""`, which is always true - a missing
+    // or empty number fell through to the dialler instead of this toast.
+    if (!phoneNumber || phoneNumber === 'n/a') {
       this.commonService.toastMessage("Invalid phone number.", 2500,ToastMessageType.Error,ToastPlacement.Bottom);
+      return;
     }
+    // isCallSupported() returns a Promise, so the previous `if (isCallSupported())`
+    // was a truthiness check on the Promise object, not on the boolean it resolves
+    // to - it never actually tested support. On iOS it evaluated falsy and the
+    // dialler was never launched, while Android happened to pass. Call directly and
+    // treat only a real rejection as "cannot dial", which behaves the same on both.
+    this.callNumber
+      .callNumber(phoneNumber, true)
+      .catch(() => {
+        this.commonService.toastMessage("Your device is not supporting to launch call dialer.",2500,ToastMessageType.Info,ToastPlacement.Bottom);
+      });
   }
   
   changeActiveState() {

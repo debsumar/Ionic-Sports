@@ -104,6 +104,17 @@ login-page {
     }
 
     .input-wrap {
+        // MUST stay position:relative. Ionic 3 renders a <div class="input-cover">
+        // inside every ion-input when scrollAssist is on (true on Android per
+        // platform-registry), and that cover is `position:absolute; width:100%;
+        // height:100%`. Without a positioned ancestor here it resolved against
+        // .form-card (position:relative) and blanketed the whole card, so every tap -
+        // including one placing the caret mid-password - landed on the cover and ran
+        // _pointerStart/_pointerEnd -> initFocus(), blurring and re-focusing the field.
+        // That toggled the keyboard and reset the caret to the end, which is why the
+        // password could only be cleared and retyped. Inputs inside an ion-item (e.g.
+        // registerclub) never had this because ion-item's wrapper is positioned.
+        position: relative;
         display: flex;
         align-items: center;
         background: rgba(255, 255, 255, 0.08);

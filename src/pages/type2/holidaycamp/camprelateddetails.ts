@@ -888,11 +888,16 @@ export class CampRelatedDetailsPage {
 
   sendNotification(enrols:CampUserEnrols){
     const member_ids = [enrols.user.Id];
-      this.navCtrl.push("Type2NotificationSession",{
+      this.navCtrl.push("NotificationsPage",{
           users:member_ids,
           type:ModuleTypes.HOLIDAYCAMP,
           heading:`Enrolment:${this.holidayCampDetails.camp_name}(${this.selectedSessionObj.session_name})`,
-          module_id:this.campDetails.id,
+          // Was this.campDetails.id, but campDetails' only assignment is commented out
+          // (line ~130), so it was always undefined and this threw
+          // "Cannot read property 'id' of undefined". holidayCampDetails is the field
+          // this page actually populates (navParams, line ~139) and is what the rest of
+          // the page already uses for the camp id.
+          module_id:this.holidayCampDetails.id,
           sub_module_id:this.selectedSessionObj.id,
           page_id:"HOLIDAYCAMP_INDIVIDUAL_DETS"
       }); 
@@ -901,7 +906,7 @@ export class CampRelatedDetailsPage {
   notifyToAllMembers() {
     if (this.enrolledMembers.length > 0) {
       const member_ids = this.enrolledMembers.map(enrol_member => enrol_member.user.IsChild ? enrol_member.user.ParentId:enrol_member.user.Id);
-      this.navCtrl.push("Type2NotificationSession",{
+      this.navCtrl.push("NotificationsPage",{
           users:member_ids,
           type:ModuleTypes.HOLIDAYCAMP,
           heading:`Enrolment:${this.holidayCampDetails.camp_name}(${this.selectedSessionObj.session_name})`

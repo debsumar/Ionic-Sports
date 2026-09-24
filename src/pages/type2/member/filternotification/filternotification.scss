@@ -1,75 +1,106 @@
 @import '../../../../theme/android-sdk35-fixes.scss';
 
+// Mirrors filteremail.scss so both compose screens share one look: flat background
+// (no gradient), sticky section header, and the same select sizing - the dropdown
+// height comes from `ion-select { padding: 10px 0 }` and the absence of a stacked
+// label, which is what made this page look taller/misaligned.
 page-filternotification {
   @include android-sdk35-fixes;
 
-  // ── Dark theme (default) ─────────────────────────────────────────
-  ion-content {
-    background: #0f172a !important;
-  }
-
+  // ── Base (Dark Theme) ──
   .scroll-content {
-    background: linear-gradient(135deg, #0f172a 0%, #1a2740 100%) !important;
-    background-image: linear-gradient(135deg, #0f172a 0%, #1a2740 100%) !important;
     padding: 0 !important;
+    background-color: #0f172a !important;
+    background-image: none !important;
   }
 
-  ion-navbar .toolbar-background {
-    background: #2b92bb !important;
-  }
+  ion-content { margin-bottom: 56px !important; }
 
+  ion-navbar .toolbar-background { background: #2b92bb !important; }
   ion-navbar .toolbar-title,
-  ion-navbar .bar-button {
-    color: #ffffff !important;
+  ion-navbar .bar-button { color: #ffffff !important; }
+
+  .page-fixed-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: #0f172a;
   }
 
-  .filter_row {
+  .page-list-area {
+    padding: 0 8px 80px;
+  }
+
+  .section-header {
     display: flex;
-    padding: 8px;
-    border-bottom: 1px solid rgba(43, 146, 187, 0.4);
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 16px 8px;
+  }
 
-    ion-col {
-      padding: 0 4px;
+  .section-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #f1f5f9;
+  }
+
+  // Filter row
+  .filter_row {
+    border-bottom: 1px solid #334155 !important;
+    padding: 4px 8px;
+
+    ion-col { background-color: #0f172a !important; }
+
+    ion-select {
+      max-width: 100% !important;
+      width: 100% !important;
+      padding: 10px 0 !important;
+    }
+
+    .select-field {
+      .item-ios ion-select,
+      .item-md ion-select { margin-left: 0 !important; text-align: left !important; }
+      .select-text,
+      .select-placeholder { text-align: left !important; }
+    }
+
+    .select-icon {
+      min-width: 20px !important;
+      min-height: 20px !important;
+      margin-left: 4px !important;
     }
   }
 
-  // Category/Club selected values read better left-aligned in these narrow columns
-  // (overrides the shared select-field component's default right-aligned value).
-  app-select-field .select-text,
-  app-select-field .select-placeholder {
-    text-align: left !important;
-  }
-  app-select-field .item-ios ion-select,
-  app-select-field .item-md ion-select {
-    margin-left: 0 !important;
-    margin-right: auto !important;
+  ion-col { background-color: transparent !important; }
+
+  ion-footer {
+    background: #0f172a !important;
+    box-shadow: none !important; border: none !important;
+    &::before, &::after { display: none !important; }
+    .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+      background: #0f172a !important; border: none !important;
+    }
   }
 
-  app-form-field {
-    display: block;
-    padding: 8px;
-  }
-
-  // ── Light theme override ─────────────────────────────────────────
+  // ── Light Theme ──
   &.light-theme {
-    ion-content {
-      background: #f8fafc !important;
-    }
+    .scroll-content { background-color: #f8fafc !important; }
 
-    .scroll-content {
-      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
-      background-image: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%) !important;
-    }
+    .page-fixed-header { background: #f8fafc; }
 
-    ion-navbar .toolbar-background {
-      background: #2b92bb !important;
-    }
+    .section-title { color: #1e293b; }
 
     .filter_row {
-      border-bottom: 1px solid rgba(43, 146, 187, 0.3);
+      border-bottom-color: #e2e8f0 !important;
+      ion-col { background-color: #f8fafc !important; }
+    }
 
-      ion-col {
-        background: transparent;
+    ion-footer {
+      background: #f8fafc !important;
+      box-shadow: none !important; border: none !important;
+      &::before, &::after { display: none !important; }
+      .toolbar, .toolbar-background, .toolbar-background-md, .toolbar-background-ios {
+        background: #f8fafc !important; border: none !important;
       }
     }
   }

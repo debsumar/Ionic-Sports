@@ -79,22 +79,76 @@ export class Login {
   }
 
   /**
-   * Club registration is handled by the Edge web app, not in-app, so this opens
-   * the onboarding page in the device browser. The URL is environment-specific and
-   * comes from SharedServices (set in app.component from the same isProduction flag
-   * that selects every other environment URL).
+   * Club registration is handled by the Edge web app, so this opens the onboarding
+   * page in an in-app browser rather than handing off to the device browser. The URL
+   * is environment-specific and comes from SharedServices (set in app.component from
+   * the same isProduction flag that selects every other environment URL).
    *
-   * '_system' requires cordova-plugin-inappbrowser (installed) and hands the URL to
-   * the OS browser rather than loading it inside the app's WebView.
+   * SFSafariViewController is preferred over cordova-plugin-inappbrowser because the
+   * latter has no safe-area handling on iOS and lays its toolbar out with raw
+   * arithmetic, so the Close button can be clipped and the content frame can extend
+   * past the visible area. Details on the fallback are documented below.
    */
   goToRegisterClub() {
     const onboardingUrl = this.sharedservice.getOnboardingURL();
-    if (onboardingUrl) {
-      window.open(onboardingUrl, '_system');
+    if (!onboardingUrl) {
+      // Fall back to the in-app page rather than leaving the link dead.
+      this.navCtrl.push('RegisterClub');
       return;
     }
-    // Fall back to the in-app page rather than leaving the link dead.
-    this.navCtrl.push('RegisterClub');
+
+    // Prefer SFSafariViewController (cordova-plugin-safariviewcontroller): Apple's
+    // own in-app browser, so safe areas, scrolling and the Done button are handled
+    // by the OS. cordova-plugin-inappbrowser has no safeAreaInsets handling in its
+    // iOS source and positions its toolbar with raw arithmetic, so the Close button
+    // can be clipped by the status bar or home indicator. Android falls back to
+    // Chrome Custom Tabs via the same plugin.
+    const safari = (<any>window).SafariViewController;
+    if (safari && safari.isAvailable) {
+      safari.isAvailable(
+        (available: boolean) => {
+          if (!available) {
+            this.openOnboardingInAppBrowser(onboardingUrl);
+            return;
+          }
+          safari.show(
+            {
+              url: onboardingUrl,
+              hidden: false,
+              animated: true,
+              enterReaderModeIfAvailable: false,
+              tintColor: '#2b92bb',
+            },
+            () => { /* opened / loaded / closed events - nothing to do */ },
+            () => this.openOnboardingInAppBrowser(onboardingUrl),
+          );
+        },
+        () => this.openOnboardingInAppBrowser(onboardingUrl),
+      );
+      return;
+    }
+
+    // Plugin not present in this build - keep the previous behaviour.
+    this.openOnboardingInAppBrowser(onboardingUrl);
+  }
+
+  /**
+   * InAppBrowser fallback for builds without cordova-plugin-safariviewcontroller.
+   *
+   * usewkwebview=yes matters in this project: it is on cordova-plugin-inappbrowser 3.x,
+   * whose iOS default is `self.usewkwebview = NO` (CDVInAppBrowserOptions.m:28) i.e. the
+   * long-deprecated UIWebView. It is safe to request because cordova-plugin-ionic-webview
+   * supplies CDVWKWebViewEngine.h, the header the plugin's __has_include check requires.
+   *
+   * toolbarposition is left at its default ('bottom'): neither position is safe-area
+   * aware, and the Close button was reported missing with 'top' in effect.
+   */
+  private openOnboardingInAppBrowser(url: string) {
+    window.open(
+      url,
+      '_blank',
+      'location=yes,toolbar=yes,closebuttoncaption=Close,disallowoverscroll=no,usewkwebview=yes,zoom=no,hardwareback=yes',
+    );
   }
 
   validateUserInputForLogin(): boolean {

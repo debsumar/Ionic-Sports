@@ -8,37 +8,46 @@
         </ion-buttons>
     </ion-navbar>
 </ion-header>
+
 <ion-content>
-  <ion-row class="filter_row">
-      <ion-col col-7>
-          <app-select-field [isDark]="isDarkTheme">
-              <ion-item>
-                  <ion-label stacked>Club</ion-label>
-                  <ion-select [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()">
-                      <ion-option *ngFor="let club of clubs" [value]="club.Id">{{club.ClubName}}</ion-option>
-                  </ion-select>
-              </ion-item>
-          </app-select-field>
-      </ion-col>
-      <ion-col col-5>
-          <app-select-field [isDark]="isDarkTheme">
-              <ion-item>
-                  <ion-label stacked>Category</ion-label>
-                  <ion-select [(ngModel)]="selectedEmailCategory" (ionChange)="onChangeEmailFilter()">
-                      <ion-option *ngFor="let type of EmailFilterCategory" [value]="type.CategoryVal">
-                          {{type.CategoryText}}</ion-option>
-                  </ion-select>
-              </ion-item>
-          </app-select-field>
-      </ion-col>
-  </ion-row>
+    <div class="page-fixed-header">
+        <div class="section-header">
+            <span class="section-title">Compose Notification</span>
+        </div>
+    </div>
 
-  <app-form-field [isDark]="isDarkTheme">
-      <ion-item>
-          <ion-textarea rows="10" [(ngModel)]="notification_input.message"
-              placeholder="Type a message here..."></ion-textarea>
-      </ion-item>
-  </app-form-field>
+    <div class="page-list-area">
+        <ion-row class="filter_row">
+            <ion-col col-7>
+                <app-select-field [isDark]="isDarkTheme">
+                    <ion-item>
+                        <ion-select [(ngModel)]="selectedClub" (ionChange)="onChangeOfClub()">
+                            <ion-option *ngFor="let club of clubs" [value]="club.Id">{{club.ClubName}}</ion-option>
+                        </ion-select>
+                    </ion-item>
+                </app-select-field>
+            </ion-col>
+            <ion-col col-5>
+                <app-select-field [isDark]="isDarkTheme">
+                    <ion-item>
+                        <ion-select [(ngModel)]="selectedEmailCategory" (ionChange)="onChangeEmailFilter()">
+                            <ion-option *ngFor="let type of EmailFilterCategory" [value]="type.CategoryVal">
+                                {{type.CategoryText}}</ion-option>
+                        </ion-select>
+                    </ion-item>
+                </app-select-field>
+            </ion-col>
+        </ion-row>
 
-  <app-glass-button [label]="'Notify (' + numberOfPeopleToSend + ')'" (btnClick)="sendNotification()"></app-glass-button>
+        <app-form-field [isDark]="isDarkTheme">
+            <ion-item>
+                <ion-textarea rows="10" [(ngModel)]="notification_input.message"
+                    placeholder="Type a message here..."></ion-textarea>
+            </ion-item>
+        </app-form-field>
+    </div>
 </ion-content>
+
+<ion-footer no-border>
+    <app-glass-button [label]="'Notify (' + numberOfPeopleToSend + ')'" (btnClick)="sendNotification()"></app-glass-button>
+</ion-footer>
