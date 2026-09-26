@@ -9,6 +9,11 @@ import { FirebaseService } from '../../../../services/firebase.service';
 import { CommonService, ToastMessageType, ToastPlacement } from '../../../../services/common.service';
 import { API } from '../../../../shared/constants/api_constants';
 import { HttpService } from '../../../../services/http.service';
+import { ThemeService } from '../../../../services/theme.service';
+import { ClubVenueDto, GetParentClubVenuesRequestDto, GetParentClubVenuesResponseDto } from '../../../../shared/dtos/club.dto';
+import { AppType, DeviceType } from '../../../../shared/constants/module.constants';
+import { CommonRestApiDto } from '../../../../shared/model/common.model';
+import { ClubActivity } from '../../../../shared/model/activity.model';
 /**
  * Generated class for the FilterbookingsPage page.
  *
@@ -37,6 +42,10 @@ export class FilterbookingsPage {
   allCourtSlots: any;
   courts: any[];
   slotListing = [];
+  isDarkTheme: boolean = true;
+  // Club the current ActivityList was fetched for - guards against the duplicate
+  // (ionChange) Ionic re-fires when selectedClubKey is written programmatically.
+  private activityFetchClubKey: string = null;
   Isgotosession: boolean = false;
   currencyDetails: any;
   constructor(public navCtrl: NavController, 
@@ -44,7 +53,7 @@ export class FilterbookingsPage {
      public http: HttpClient, 
     public fb: FirebaseService, public commonService: CommonService,  
     public loadingCtrl: LoadingController,  public navParams: NavParams,
-    private httpService: HttpService) {
+    private httpService: HttpService, private themeService: ThemeService) {
     
     this.storage.get('userObj').then((val) => {
       val = JSON.parse(val);
@@ -67,6 +76,14 @@ export class FilterbookingsPage {
     this.storage.get('Currency').then((val) => {
       this.currencyDetails = JSON.parse(val);
     }).catch(error => {
+    });
+  }
+
+  ionViewWillEnter() {
+    this.loadTheme();
+    this.themeService.isDarkTheme$.subscribe((isDark) => {
+      this.isDarkTheme = isDark;
+      this.applyTheme();
     });
   }
 
@@ -94,37 +111,94 @@ export class FilterbookingsPage {
     
 
   getClubDetails() {
+    // Allow one activity fetch per page entry even if the club is unchanged.
+    this.activityFetchClubKey = null;
+    const body: GetParentClubVenuesRequestDto = {
+      parentclub_id: this.sharedService.getPostgreParentClubId(),
+      app_type: AppType.ADMIN_NEW,
+      device_type: this.sharedService.getPlatform() == 'android' ? DeviceType.ANDROID : DeviceType.IOS,
+      device_id: this.sharedService.getDeviceId() || 'web',
+      updated_by: this.sharedService.getLoggedInUserId()
+    };
 
-    this.fb.getAllWithQuery("/Club/Type2/" + this.selectedParentClubKey, { orderByChild: "IsEnable", equalTo: true }).subscribe((data) => {
-      this.clubs = data;
-      if (data.length != 0) {
-        this.selectedClubKey = this.clubs[0].$key;
-        this.getAllActivity();
-        try {
-
-
-          // this.getClubMmebers(this.selectedClubKey);
+    this.httpService.post(API.GET_PARENT_CLUB_VENUES, body, null, 1).subscribe({
+      next: (res: GetParentClubVenuesResponseDto) => {
+        // Keep $key/ClubKey so the template and the Firebase court path stay unchanged.
+        this.clubs = res.data.map((club: ClubVenueDto) => ({ ...club, $key: club.FirebaseId, ClubKey: club.FirebaseId }));
+        if (this.clubs.length > 0) {
+          this.selectedClubKey = this.clubs[0].FirebaseId;
+          this.getAllActivity();
         }
-        catch (ex) {
-
-        } finally {
-          //this.loading.dismiss().catch(() => { });
-        }
+      },
+      error: () => {
+        this.clubs = [];
       }
     });
   }
   getAllActivity() {
-    this.fb.getAll("/Activity/" + this.selectedParentClubKey + "/" + this.selectedClubKey + "/").subscribe((data) => {
-      this.ActivityList = [];
-      this.selectedActivity = "";
-      if (data.length > 0) {
-        this.ActivityList = data;
-        this.selectedActivity = this.ActivityList[0].$key;
-        this. getAllCourts() 
+    // Ionic re-fires (ionChange) when selectedClubKey is written programmatically in
+    // getClubDetails(), which would call this endpoint twice per page entry.
+    if (this.activityFetchClubKey === this.selectedClubKey) {
+      return;
+    }
+    this.activityFetchClubKey = this.selectedClubKey;
+
+    // The club select binds the Firebase club id, but club_activity/get_club_activities
+    // is keyed on postgres ids - bridge the two via the clubs list (ClubVenueDto has both).
+    const selectedClub = this.clubs.find((club: ClubVenueDto) => club.FirebaseId === this.selectedClubKey);
+    const body: CommonRestApiDto & { updated_by: string } = {
+      parentclubId: this.sharedService.getPostgreParentClubId(),
+      clubId: selectedClub ? selectedClub.Id : '',
+      activityId: '',
+      memberId: this.sharedService.getLoggedInUserId(),
+      action_type: 0,
+      device_type: this.sharedService.getPlatform() == 'android' ? DeviceType.ANDROID : DeviceType.IOS,
+      app_type: AppType.ADMIN_NEW,
+      device_id: this.sharedService.getDeviceId() || '',
+      updated_by: this.sharedService.getLoggedInUserId()
+    };
+
+    this.httpService.post(API.CLUB_ACTIVITIES, body).subscribe({
+      next: (res: any) => {
+        this.ActivityList = [];
+        this.selectedActivity = "";
+        const clubActivities: ClubActivity[] = (res && res.data && res.data.club_activities) ? res.data.club_activities : [];
+        // Drop the placeholder rows this endpoint returns (activity_key "undefined", null
+        // activity/name) - courts are keyed on activity_key, so a row without one is unusable.
+        this.ActivityList = clubActivities
+          .filter((activity) => activity && activity.activity_key && activity.activity_key !== 'undefined'
+            && (activity.alias_name || activity.activity_name))
+          // Keep $key / ActivityName so the template and the court lookup stay unchanged.
+          .map((activity) => ({
+            ...activity,
+            $key: activity.activity_key,
+            ActivityName: activity.alias_name || activity.activity_name
+          }));
+        if (this.ActivityList.length > 0) {
+          this.selectedActivity = this.ActivityList[0].$key;
+          this.getAllCourts();
+        }
+      },
+      error: () => {
+        this.ActivityList = [];
+        this.selectedActivity = "";
       }
-     
     });
-  } 
+  }
+
+  loadTheme() {
+    this.isDarkTheme = this.themeService.getCurrentTheme();
+    this.applyTheme();
+  }
+
+  applyTheme() {
+    const pageElement = document.querySelector('page-filterbookings');
+    if (pageElement) {
+      pageElement.classList.remove('dark-theme', 'light-theme');
+      pageElement.classList.add(this.isDarkTheme ? 'dark-theme' : 'light-theme');
+    }
+  }
+
     calculateweek(firstdayofweek, date){
       this.showCalender = false   
       this.sevenDaysAvailability = [];

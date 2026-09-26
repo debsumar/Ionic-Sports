@@ -129,7 +129,9 @@ page-filterbookings {
         
         padding: 16px 9px !important;
         background-image: none !important;
-        background: linear-gradient(to bottom left, #f7f7f7, #f1f1f1, #efefef) !important;
+        // Dark is the default here to match the other booking screens; the original
+        // light gradient moved into the &.light-theme block at the bottom of this file.
+        background: linear-gradient(165deg, #0f172a 0%, #1a2744 50%, #0f172a 100%) !important;
     }
     .favs{
         background-color:#35adff;
@@ -390,8 +392,10 @@ page-filterbookings {
     box-shadow: -2px 4px 28px rgba(250, 170, 40, 0.45);
         }
     .searchbar{
+        // themed: white moved to &.light-theme (this one does render, unlike
+        // .cardStyle / .modal-content which are unused legacy selectors)
+        background: #1e293b !important;
         border: none !important;
-        background: #ffffff !important;
         border-radius: 5px !important;
         height: 86% !important;
         margin-top: 4px !important;
@@ -419,7 +423,7 @@ page-filterbookings {
         }
     }
     .headitem{
-        background: #ffffff !important;
+        background: #1e293b !important;
         .item-inner {
              border-bottom:none !important; 
         }
@@ -489,19 +493,103 @@ page-filterbookings {
     .align-text-left{
         text-align: left !important;
     }
+    // Was `background-color: white !important` cascading onto every ion-row/col/item
+    // inside - that is what kept showing a white block in dark theme. Now dark by
+    // default, with the white restored under &.light-theme below.
     .header-container{
-        background-color: white !important;
+        background-color: #1e293b !important;
         width: 105%;
         margin-left: -2% !important;
         margin-top: -4%;
         ion-row{
-            background-color: white ;
+            background-color: #1e293b !important;
             ion-col{
-                background-color: white ;
+                background-color: #1e293b !important;
                 ion-item{
-                    background-color: white ;
+                    background-color: #1e293b !important;
                 }
             }
         }
+    }
+
+    // ── Theming ──────────────────────────────────────────────────────────────
+    // This page was light-only. Dark is now the default (matching booking /
+    // bulkslotcancellation) with the original light palette restored under
+    // &.light-theme. Only the surfaces that actually render are covered here -
+    // the legacy selectors further up are untouched.
+    background: #0f172a;
+
+    ion-content { background: #0f172a !important; }
+
+    // Filter row that holds the venue + activity selects
+    .filter-head-row {
+        margin-top: -13px;
+        border-bottom: 1px solid #334155;
+    }
+
+    // Week strip
+    .forecast_container { background: #1e293b !important; }
+
+    // The month label carried its colour inline (rgba(0,0,0,.85)), so no stylesheet
+    // could theme it - it stayed near-black on the dark surface.
+    .current-month {
+        margin: 2px 8px;
+        font-size: 18px;
+        font-weight: 500;
+        color: #f1f5f9;
+    }
+    .colofweek {
+        .day { color: #94a3b8; }
+        .date { color: #f1f5f9; }
+    }
+
+    ion-card {
+        background: #1e293b !important;
+        ion-card-header, ion-card-content { background: #1e293b !important; color: #f1f5f9; }
+    }
+
+    p, span, .align-text-left { color: #f1f5f9; }
+
+    &.light-theme {
+        background: #f8fafc;
+
+        ion-content { background: #f8fafc !important; }
+
+        .scroll-content {
+            background: linear-gradient(to bottom left, #f7f7f7, #f1f1f1, #efefef) !important;
+        }
+
+        .filter-head-row { border-bottom: 1px solid #FBC27A; }
+
+        .header-container{
+            background-color: #ffffff !important;
+            ion-row{
+                background-color: #ffffff !important;
+                ion-col{
+                    background-color: #ffffff !important;
+                    ion-item{ background-color: #ffffff !important; }
+                }
+            }
+        }
+
+        .headitem { background: #ffffff !important; }
+
+        // matches the dark rule's nesting (.sub-container .searchbar)
+        .sub-container .searchbar { background: #ffffff !important; }
+
+        .forecast_container { background: #ffffff !important; }
+
+        .current-month { color: rgba(0, 0, 0, 0.85); }
+        .colofweek {
+            .day { color: #64748b; }
+            .date { color: #1e293b; }
+        }
+
+        ion-card {
+            background: #ffffff !important;
+            ion-card-header, ion-card-content { background: #ffffff !important; color: #1e293b; }
+        }
+
+        p, span, .align-text-left { color: #1e293b; }
     }
 }

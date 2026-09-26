@@ -33,6 +33,7 @@ import { HttpService } from "../services/http.service";
 import { NotificationEmailService } from "../services/notificationemail.service";
 import { ParentClubService } from "../services/parentclub.service";
 import { FeatureAnnouncementService } from "../services/feature-announcement.service";
+import { MapsLoaderService } from "../services/maps-loader.service";
   
        
 
@@ -84,6 +85,7 @@ import { MapPickerModalComponent } from '../shared/components/map-picker/map-pic
     NotificationEmailService,
     ParentClubService,
     FeatureAnnouncementService,
+    MapsLoaderService,
     {
       provide: APOLLO_OPTIONS,
       useFactory: createApollo,

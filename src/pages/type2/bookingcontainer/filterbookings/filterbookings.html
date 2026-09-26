@@ -11,14 +11,14 @@
 </ion-header>
 
 
-<ion-content padding>
+<ion-content padding [ngClass]="{'light-theme': !isDarkTheme}">
 
 
   <div class="header-container">
-    <ion-row style="margin-top: -13px;border-bottom: 1px solid #FBC27A;" class="rows-allign">
+    <ion-row class="rows-allign filter-head-row">
 
       <ion-col col-7>
-        <app-select-field [isDark]="false">
+        <app-select-field [isDark]="isDarkTheme">
           <ion-item class="headitem">
             <ion-select [(ngModel)]="selectedClubKey" (ionChange)="getAllActivity()">
               <ion-option *ngFor="let club of clubs" [value]="club.$key">{{club.ClubName}}</ion-option>
@@ -27,7 +27,7 @@
         </app-select-field>
       </ion-col>
       <ion-col col-5>
-        <app-select-field [isDark]="false">
+        <app-select-field [isDark]="isDarkTheme">
           <ion-item class="headitem">
             <ion-select [(ngModel)]="selectedActivity" (ionChange)="getAllCourts()">
               <ion-option *ngFor="let Activity of ActivityList" [value]="Activity.$key">{{Activity.ActivityName}}</ion-option>
@@ -41,9 +41,9 @@
 
   <div style="margin-left: -3% !important;margin-top:0 !important" class="header-container">
     <ion-calendar *ngIf="showCalender" #calendar (onDaySelect)="onDaySelect($event)"></ion-calendar>
-    <ion-row style="background: white;" (click)="showCalender = !showCalender" class="forecast_container">
+    <ion-row (click)="showCalender = !showCalender" class="forecast_container">
       <ion-col col-12>
-        <p style="margin: 2px 8px; font-size: 18px; font-weight: 500; color:rgba(0, 0, 0, 0.85)">{{currentmonth}}</p>
+        <p class="current-month">{{currentmonth}}</p>
       </ion-col>
       <!-- <ion-col col-2>
       <ion-icon name="md-arrow-dropdown"></ion-icon>

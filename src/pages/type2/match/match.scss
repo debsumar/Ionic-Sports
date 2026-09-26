@@ -37,6 +37,7 @@ page-match {
 
     .card-title { color: #1e293b !important; }
     .card-subtitle { color: #64748b !important; }
+    .card-early { color: #2b92bb !important; }
     .card-activity { color: #2b92bb !important; }
     .card-venue-footer { .mp-icon { color: #94a3b8; } .mp-text, .mp-text.mp-selected { color: #94a3b8 !important; } }
     .scoreboard { .sb-name { color: #1e293b; } .sb-vs { background: #cbd5e1; color: #1e293b; } .sb-score { color: #1e293b; } }
@@ -107,6 +108,14 @@ page-match {
     .card-subtitle {
       font-size: 11px; font-weight: 500; line-height: 1.2; letter-spacing: 0.1px;
       color: #94a3b8; margin: 0;
+    }
+    // early_arrival_time from match/FetchAllMatches - mirrors the web app's
+    // .comp-card-early chip. Hidden entirely when the API returns null.
+    .card-early {
+      display: inline-flex; align-items: center; gap: 3px;
+      font-size: 10px; font-weight: 600; line-height: 1.2;
+      color: #3fbcd3; margin: 1px 0 0;
+      ion-icon { font-size: 11px; }
     }
     .card-activity {
       display: flex; align-items: center; font-size: 10px; font-weight: 600; color: #3fbcd3; margin: 1px 0 0; letter-spacing: 0.2px;

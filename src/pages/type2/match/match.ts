@@ -19,6 +19,7 @@ import * as moment from "moment";
 import { first } from "rxjs/operators";
 import { GraphqlService } from "../../../services/graphql.service";
 import { MatchType } from "../../../shared/utility/enums";
+import { normalizeTimeOfDay } from '../../../shared/utility/utility';
 import { HttpService } from "../../../services/http.service";
 import { API } from "../../../shared/constants/api_constants";
 import { AllMatchData, MatchModelV3 } from "../../../shared/model/match.model";
@@ -268,6 +269,16 @@ export class MatchPage {
   }
 
   // 🔄 Method to get the string representation of MatchType from the enum
+  /**
+   * match/FetchAllMatches returns early_arrival_time as "HH:mm" / "HH:mm:ss" / null.
+   * Normalised to "HH:mm" via the shared helper, returning '' when absent so the
+   * template hides the chip. Mirrors getEarlyArrivalTime() in the web app's
+   * competitions-home component.
+   */
+  getEarlyArrivalTime(match: any): string {
+    return normalizeTimeOfDay(match && match.early_arrival_time);
+  }
+
   getMatchTypeName(type: number): string {
     switch (type) {
       case MatchType.SINGLES:

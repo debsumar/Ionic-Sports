@@ -6,11 +6,11 @@ import { MapPickerModalComponent } from './map-picker-modal.component';
   selector: 'app-map-picker',
   encapsulation: ViewEncapsulation.None,
   template: `
-    <div class="map-picker-field" (click)="openMap()">
+    <div class="map-picker-field" [class.mp-readonly]="readOnly" (click)="openMap()">
       <ion-icon name="pin" class="mp-icon"></ion-icon>
       <span class="mp-text" *ngIf="!selectedAddress">Pick location on map</span>
       <span class="mp-text mp-selected" *ngIf="selectedAddress">{{ selectedAddress }}</span>
-      <ion-icon name="arrow-forward" class="mp-chevron"></ion-icon>
+      <ion-icon name="arrow-forward" class="mp-chevron" *ngIf="!readOnly"></ion-icon>
     </div>
   `,
   styles: [`
@@ -24,6 +24,8 @@ import { MapPickerModalComponent } from './map-picker-modal.component';
       transition: border-color 0.2s;
     }
     .map-picker-field:active { transform: scale(0.98); }
+    .map-picker-field.mp-readonly { cursor: default; }
+    .map-picker-field.mp-readonly:active { transform: none; }
     .mp-icon { font-size: 18px; color: #3fbcd3; flex-shrink: 0; }
     .mp-text {
       flex: 1; font-size: 14px; font-weight: 500; color: #64748b;
@@ -43,18 +45,20 @@ export class MapPickerComponent implements OnChanges {
   @Input() address: string = '';
   @Input() lat: number = null;
   @Input() lng: number = null;
+  @Input() readOnly: boolean = false;
   @Output() locationSelected = new EventEmitter<any>();
   selectedAddress: string = '';
 
   constructor(private modalCtrl: ModalController) {}
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes.address && changes.address.currentValue) {
-      this.selectedAddress = changes.address.currentValue;
+    if (changes.address) {
+      this.selectedAddress = changes.address.currentValue || '';
     }
   }
 
   openMap() {
+    if (this.readOnly) { return; }
     const modal = this.modalCtrl.create(MapPickerModalComponent, {
       initialAddress: this.selectedAddress,
       initialLat: this.lat,

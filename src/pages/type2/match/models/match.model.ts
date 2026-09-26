@@ -20,6 +20,8 @@ export class MatchModel {
   MemberFees: number;
   NonMemberFees: number;
   MatchStartDate: any;
+  /** "HH:mm" or "HH:mm:ss" or null, as returned by match/FetchAllMatches. */
+  early_arrival_time?: string;
   Result: ResultModel;
   Capacity: number;
   MatchTitle: string;

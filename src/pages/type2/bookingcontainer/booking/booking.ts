@@ -59,6 +59,9 @@ export class BookingPage {
   // Last club/activity/court/tab combination slots were fetched for - dedupes the
   // explicit fetch against the court select's (ionChange).
   private lastSlotFetchKey: string = null;
+  // Last club+activity the court list was fetched for - drops the duplicate
+  // getAllCourts() caused by the programmatic selectedActivity write.
+  private courtFetchKey: string = null;
 
   constructor(public navCtrl: NavController, public navParams: NavParams,
     public actionSheetCtrl: ActionSheetController, public storage: Storage,
@@ -101,6 +104,7 @@ export class BookingPage {
   getClubDetails() {
     // Allow one activity fetch per page entry even if the club is unchanged.
     this.activityFetchClubKey = null;
+    this.courtFetchKey = null;
     this.lastSlotFetchKey = null;
     const body: GetParentClubVenuesRequestDto = {
           parentclub_id: this.sharedService.getPostgreParentClubId(),
@@ -177,14 +181,21 @@ export class BookingPage {
     });
   }
   getAllCourts() {
-    this.courts = [];
-    // Default to the "All" option rather than the first court. The booking
-    // APIs already map 'all' -> 'nil', and resetting here also clears a stale
-    // court key when the activity changes (that key belongs to the old activity).
-    this.selectedCourt = 'all';
     if (!this.selectedActivity) {
+      this.courts = [];
+      this.selectedCourt = 'all';
       return;
     }
+    // getAllCourts() has two triggers: the explicit call at the end of getAllActivity()
+    // and the activity select's (ionChange), which Ionic re-fires when getAllActivity()
+    // writes selectedActivity programmatically. Without this guard a venue change hit
+    // the courts endpoint twice. Keyed on club+activity because the request depends on
+    // both (a new venue can expose the same first activity key).
+    const courtFetchKey = `${this.selectedClubKey}-${this.selectedActivity}`;
+    if (this.courtFetchKey === courtFetchKey) {
+      return;
+    }
+    this.courtFetchKey = courtFetchKey;
     // courtbooking/getAllCourts is keyed on Firebase ids, which is what all three
     // of these already hold.
     const params = {
@@ -200,10 +211,13 @@ export class BookingPage {
           .filter((court) => court && court.IsActive && court.firebasekey)
           // Keep $key so the template and the booking API URLs stay unchanged.
           .map((court) => ({ ...court, $key: court.firebasekey }));
-        // Load the slots for the new court list. Previously this happened only as a
-        // side effect of selectedCourt changing to courts[0].$key and re-emitting
-        // (ionChange); with 'all' as the default that write is a no-op, so the fetch
-        // has to be explicit. callbothfunction() dedupes against the ionChange path.
+        // Reset to "All" only now that the new court list is in. Doing it before the
+        // request made the court select re-fire (ionChange) and fetch slots ahead of
+        // the courts, after which this call was deduped away as a repeat.
+        this.selectedCourt = 'all';
+        // Clear the slot guard so this fetch always runs for the new court list, then
+        // let callbothfunction() dedupe the ionChange the write above may trigger.
+        this.lastSlotFetchKey = null;
         this.callbothfunction();
       },
       error: () => {
@@ -226,23 +240,17 @@ export class BookingPage {
     this.lastSlotFetchKey = fetchKey;
 
     this.slotListing = []
+    // Slot data is live booking data, so always hit the API. This used to read
+    // getDataWithExpiry() first and skip the request whenever a cached value existed -
+    // and getTodayBookings()/getActiveBookings() write that cache with a 30-DAY ttl, so
+    // after the very first successful load the endpoint was never called again for that
+    // club/activity/court/tab combination and the list showed month-old bookings. The
+    // cache is still written below (harmless, and cheap to re-enable as an offline
+    // fallback), but it no longer suppresses the fetch.
     if (this.selectedTabInd === 0) {
-      let key = `today-${this.selectedClubKey}-${this.selectedActivity}-${this.selectedCourt}`;
-      let data = await this.commonService.getDataWithExpiry(key)
-      if (data == null) {
-        this.getTodayBookings()
-      } else {
-        this.slotListing = data
-      }
-
+      this.getTodayBookings()
     } else {
-      let key = `allday-${this.selectedClubKey}-${this.selectedActivity}-${this.selectedCourt}`;
-      let data = await this.commonService.getDataWithExpiry(key)
-      if (data == null) {
-        this.getActiveBookings()
-      } else {
-        this.slotListing = data
-      }
+      this.getActiveBookings()
     }
   }
 
@@ -405,9 +413,9 @@ export class BookingPage {
             slot.booking_date = moment.utc(slot.booking_date).local().format('DD MM YYYY')
           });
           const key = `allday-${this.selectedClubKey}-${this.selectedActivity}-${this.selectedCourt}`;
-          const date = new Date();
-          date.setDate(date.getDate() + 30);
-          const ttl = new Date(date).getTime();
+          // 2 minutes, not 30 days: this is live booking data. The long ttl meant a
+          // stale list could outlive the bookings it described.
+          const ttl = new Date().getTime() + (2 * 60 * 1000);
           this.commonService.setDataWithExpiry(key, this.slots, ttl);
         },
         error: (err) => {
@@ -442,9 +450,9 @@ export class BookingPage {
             slot.booking_date = moment.utc(slot.booking_date).local().format('DD MM YYYY')
           });
           const key = `today-${this.selectedClubKey}-${this.selectedActivity}-${this.selectedCourt}`;
-          const date = new Date();
-          date.setDate(date.getDate() + 30);
-          const ttl = new Date(date).getTime();
+          // 2 minutes, not 30 days: this is live booking data. The long ttl meant a
+          // stale list could outlive the bookings it described.
+          const ttl = new Date().getTime() + (2 * 60 * 1000);
           this.commonService.setDataWithExpiry(key, this.Todayslots, ttl);
         },
         error: (err) => {
