@@ -19,6 +19,10 @@ export const environment = {
   // new_graphql_url: "http://localhost:9000/graphql",
   android_onesignal_id: "",
   ios_onesignal_id: "",
+  google: {
+    mapsApiKey: "AIzaSyBb1feu2K9-mNuROhKdAYZccwl5ya3TyJU",
+    useGoogleMaps: false,
+  },
   firebaseConfig: {
     apiKey: "AIzaSyA3frJ0sYhbVEsh6eBzcbGrEv4ILZDq4uc",
     authDomain: "timekare-app.firebaseapp.com",

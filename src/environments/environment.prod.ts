@@ -18,6 +18,10 @@ export const environment = {
   gateway_secured: "https://api-dev-sec.activitypro.co.uk",
   android_onesignal_id: "",
   ios_onesignal_id: "",
+  google: {
+    mapsApiKey: "AIzaSyBb1feu2K9-mNuROhKdAYZccwl5ya3TyJU",
+    useGoogleMaps: false,
+  },
   // nodeURL : "https://activitypro-node-266406.appspot.com";
   firebaseConfig: {
     apiKey: "AIzaSyB-jPaQGGH8clfgP_el_nri37YtsFKked4",
